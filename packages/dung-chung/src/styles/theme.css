@@ -1,0 +1,215 @@
+/* TỆP SINH TỰ ĐỘNG — KHÔNG SỬA TAY.
+ * Nguồn: design/tokens.json · Lệnh: npm run gen:tokens
+ * Ánh xạ token sang theme Tailwind v4 (utility màu, chữ, bo góc, bóng, breakpoint dsv*).
+ */
+
+@theme inline {
+  --color-*: initial;
+  --color-background: var(--dsv-color-background);
+  --color-on-background: var(--dsv-color-on-background);
+  --color-surface: var(--dsv-color-surface);
+  --color-on-surface: var(--dsv-color-on-surface);
+  --color-on-surface-variant: var(--dsv-color-on-surface-variant);
+  --color-on-surface-muted: var(--dsv-color-on-surface-muted);
+  --color-on-surface-disabled: var(--dsv-color-on-surface-disabled);
+  --color-surface-container-lowest: var(--dsv-color-surface-container-lowest);
+  --color-surface-container-low: var(--dsv-color-surface-container-low);
+  --color-surface-container: var(--dsv-color-surface-container);
+  --color-surface-container-high: var(--dsv-color-surface-container-high);
+  --color-surface-container-highest: var(--dsv-color-surface-container-highest);
+  --color-primary: var(--dsv-color-primary);
+  --color-primary-hover: var(--dsv-color-primary-hover);
+  --color-primary-active: var(--dsv-color-primary-active);
+  --color-on-primary: var(--dsv-color-on-primary);
+  --color-primary-container: var(--dsv-color-primary-container);
+  --color-on-primary-container: var(--dsv-color-on-primary-container);
+  --color-primary-soft: var(--dsv-color-primary-soft);
+  --color-secondary: var(--dsv-color-secondary);
+  --color-on-secondary: var(--dsv-color-on-secondary);
+  --color-secondary-container: var(--dsv-color-secondary-container);
+  --color-on-secondary-container: var(--dsv-color-on-secondary-container);
+  --color-tertiary: var(--dsv-color-tertiary);
+  --color-on-tertiary: var(--dsv-color-on-tertiary);
+  --color-tertiary-container: var(--dsv-color-tertiary-container);
+  --color-on-tertiary-container: var(--dsv-color-on-tertiary-container);
+  --color-border: var(--dsv-color-border);
+  --color-border-strong: var(--dsv-color-border-strong);
+  --color-outline: var(--dsv-color-outline);
+  --color-outline-variant: var(--dsv-color-outline-variant);
+  --color-muted: var(--dsv-color-muted);
+  --color-success: var(--dsv-color-success);
+  --color-on-success: var(--dsv-color-on-success);
+  --color-success-container: var(--dsv-color-success-container);
+  --color-on-success-container: var(--dsv-color-on-success-container);
+  --color-warning: var(--dsv-color-warning);
+  --color-warning-text: var(--dsv-color-warning-text);
+  --color-on-warning: var(--dsv-color-on-warning);
+  --color-warning-container: var(--dsv-color-warning-container);
+  --color-on-warning-container: var(--dsv-color-on-warning-container);
+  --color-danger: var(--dsv-color-danger);
+  --color-on-danger: var(--dsv-color-on-danger);
+  --color-danger-container: var(--dsv-color-danger-container);
+  --color-on-danger-container: var(--dsv-color-on-danger-container);
+  --color-focus-ring: var(--dsv-color-focus-ring);
+  --color-focus-ring-offset: var(--dsv-color-focus-ring-offset);
+  --color-focus-ring-on-image: var(--dsv-color-focus-ring-on-image);
+  --color-link: var(--dsv-color-link);
+  --color-link-hover-bg: var(--dsv-color-link-hover-bg);
+  --color-scrim: var(--dsv-color-scrim);
+  --color-shadow: var(--dsv-color-shadow);
+  --color-inverse-surface: var(--dsv-color-inverse-surface);
+  --color-inverse-on-surface: var(--dsv-color-inverse-on-surface);
+  --color-on-image: var(--dsv-color-on-image);
+  --color-on-image-variant: var(--dsv-color-on-image-variant);
+  --color-image-placeholder: var(--dsv-color-image-placeholder);
+  --color-ai-main: var(--dsv-color-ai-main);
+  --color-ai-main-variant: var(--dsv-color-ai-main-variant);
+  --color-ai-analog: var(--dsv-color-ai-analog);
+  --color-ai-analog-variant: var(--dsv-color-ai-analog-variant);
+  --color-ai-complement: var(--dsv-color-ai-complement);
+  --color-ai-complement-variant: var(--dsv-color-ai-complement-variant);
+  --color-ai-pending: var(--dsv-color-ai-pending);
+  --color-ai-approved: var(--dsv-color-ai-approved);
+  --color-ai-on-container: var(--dsv-color-ai-on-container);
+  --color-ai-progress: var(--dsv-color-ai-progress);
+
+  --font-display: var(--dsv-font-display);
+  --font-sans: var(--dsv-font-sans);
+  --font-mono: var(--dsv-font-mono);
+  --font-weight-*: initial;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  --text-*: initial;
+
+  --radius-*: initial;
+  --radius-none: var(--dsv-radius-none);
+  --radius-xs: var(--dsv-radius-xs);
+  --radius-sm: var(--dsv-radius-sm);
+  --radius-md: var(--dsv-radius-md);
+  --radius-lg: var(--dsv-radius-lg);
+  --radius-drawer: var(--dsv-radius-drawer);
+  --radius-full: var(--dsv-radius-full);
+  --shadow-*: initial;
+  --shadow-1: var(--dsv-shadow-1);
+  --shadow-2: var(--dsv-shadow-2);
+  --shadow-topbar: var(--dsv-shadow-topbar);
+  --shadow-drawer: var(--dsv-shadow-drawer);
+  --ease-expo-out: var(--dsv-ease-expo-out);
+  --ease-header: var(--dsv-ease-header);
+  --ease-header-bg: var(--dsv-ease-header-bg);
+  --ease-drawer: var(--dsv-ease-drawer);
+  --ease-fade: var(--dsv-ease-fade);
+
+  --breakpoint-dsvsm: 481px;
+  --breakpoint-dsvmd: 841px;
+  --breakpoint-dsvlg: 1200px;
+  --breakpoint-dsvxl: 1490px;
+}
+
+/* Một utility cho mỗi vai trò chữ: type-h1, type-body-m, type-control, type-label-kicker… */
+
+@utility type-display-xl {
+  font-family: var(--dsv-font-display);
+  font-size: var(--dsv-text-display-xl-size);
+  line-height: var(--dsv-text-display-xl-line-height);
+  font-weight: var(--dsv-text-display-xl-weight);
+  letter-spacing: var(--dsv-text-display-xl-tracking);
+}
+
+@utility type-display-l {
+  font-family: var(--dsv-font-display);
+  font-size: var(--dsv-text-display-l-size);
+  line-height: var(--dsv-text-display-l-line-height);
+  font-weight: var(--dsv-text-display-l-weight);
+  letter-spacing: var(--dsv-text-display-l-tracking);
+}
+
+@utility type-h1 {
+  font-family: var(--dsv-font-sans);
+  font-size: var(--dsv-text-h1-size);
+  line-height: var(--dsv-text-h1-line-height);
+  font-weight: var(--dsv-text-h1-weight);
+  letter-spacing: var(--dsv-text-h1-tracking);
+}
+
+@utility type-h2 {
+  font-family: var(--dsv-font-sans);
+  font-size: var(--dsv-text-h2-size);
+  line-height: var(--dsv-text-h2-line-height);
+  font-weight: var(--dsv-text-h2-weight);
+  letter-spacing: var(--dsv-text-h2-tracking);
+}
+
+@utility type-h3 {
+  font-family: var(--dsv-font-sans);
+  font-size: var(--dsv-text-h3-size);
+  line-height: var(--dsv-text-h3-line-height);
+  font-weight: var(--dsv-text-h3-weight);
+  letter-spacing: var(--dsv-text-h3-tracking);
+}
+
+@utility type-h4 {
+  font-family: var(--dsv-font-sans);
+  font-size: var(--dsv-text-h4-size);
+  line-height: var(--dsv-text-h4-line-height);
+  font-weight: var(--dsv-text-h4-weight);
+  letter-spacing: var(--dsv-text-h4-tracking);
+}
+
+@utility type-body-l {
+  font-family: var(--dsv-font-sans);
+  font-size: var(--dsv-text-body-l-size);
+  line-height: var(--dsv-text-body-l-line-height);
+  font-weight: var(--dsv-text-body-l-weight);
+  letter-spacing: var(--dsv-text-body-l-tracking);
+}
+
+@utility type-body-m {
+  font-family: var(--dsv-font-sans);
+  font-size: var(--dsv-text-body-m-size);
+  line-height: var(--dsv-text-body-m-line-height);
+  font-weight: var(--dsv-text-body-m-weight);
+  letter-spacing: var(--dsv-text-body-m-tracking);
+}
+
+@utility type-body-s {
+  font-family: var(--dsv-font-sans);
+  font-size: var(--dsv-text-body-s-size);
+  line-height: var(--dsv-text-body-s-line-height);
+  font-weight: var(--dsv-text-body-s-weight);
+  letter-spacing: var(--dsv-text-body-s-tracking);
+}
+
+@utility type-control {
+  font-family: var(--dsv-font-sans);
+  font-size: var(--dsv-text-control-size);
+  line-height: var(--dsv-text-control-line-height);
+  font-weight: var(--dsv-text-control-weight);
+  letter-spacing: var(--dsv-text-control-tracking);
+}
+
+@utility type-label {
+  font-family: var(--dsv-font-sans);
+  font-size: var(--dsv-text-label-size);
+  line-height: var(--dsv-text-label-line-height);
+  font-weight: var(--dsv-text-label-weight);
+  letter-spacing: var(--dsv-text-label-tracking);
+}
+
+@utility type-label-kicker {
+  font-family: var(--dsv-font-sans);
+  font-size: var(--dsv-text-label-kicker-size);
+  line-height: var(--dsv-text-label-kicker-line-height);
+  font-weight: var(--dsv-text-label-kicker-weight);
+  letter-spacing: var(--dsv-text-label-kicker-tracking);
+  text-transform: uppercase;
+}
+
+@utility type-mono-label {
+  font-family: var(--dsv-font-mono);
+  font-size: var(--dsv-text-mono-label-size);
+  line-height: var(--dsv-text-mono-label-line-height);
+  font-weight: var(--dsv-text-mono-label-weight);
+  letter-spacing: var(--dsv-text-mono-label-tracking);
+}

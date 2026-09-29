@@ -1,0 +1,8 @@
+/* Điểm vào CSS của web quản trị: Tailwind v4 + token và nền CSS của gói dùng chung. */
+@import 'tailwindcss';
+@import '@dsvhvn/dung-chung/styles/tokens.css';
+@import '@dsvhvn/dung-chung/styles/theme.css';
+@import '@dsvhvn/dung-chung/styles/nen.css';
+
+/* Component của gói dùng chung nằm ngoài thư mục ứng dụng: khai báo để Tailwind quét lớp tiện ích của chúng. */
+@source '../../../../packages/dung-chung/src';
