@@ -1,7 +1,7 @@
 import { ApiError, errorMessage } from './api/client';
 
 /** Đưa focus tới ô lỗi đầu tiên sau khi React vẽ xong thông báo lỗi. */
-export function focusFirstInvalid(form: HTMLFormElement | null): void {
+export function focusFirstInvalid(form: ParentNode | null): void {
   requestAnimationFrame(() => form?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus());
 }
 

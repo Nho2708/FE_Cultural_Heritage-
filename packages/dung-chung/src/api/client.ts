@@ -19,6 +19,7 @@ export const ERROR_CODES = {
   forbidden: 'FORBIDDEN',
   blocked: 'BLOCKED',
   teacherLimitReached: 'TEACHER_LIMIT_REACHED',
+  notReady: 'NOT_READY',
   systemError: 'SYSTEM_ERROR',
 } as const;
 

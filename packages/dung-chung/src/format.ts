@@ -195,3 +195,8 @@ export function vietnamDayBoundary(day: string, edge: 'start' | 'end'): string |
   if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return undefined;
   return edge === 'start' ? `${day}T00:00:00+07:00` : `${day}T23:59:59.999+07:00`;
 }
+
+/** Năm dương lịch hiện tại theo giờ Việt Nam (giới hạn năm công nhận, năm của giai đoạn và sự kiện). */
+export function currentVietnamYear(now: Date = new Date()): number {
+  return Number(new Intl.DateTimeFormat('en-CA', { timeZone: VIETNAM_TZ, year: 'numeric' }).format(now));
+}
