@@ -13,6 +13,7 @@ import { ProfilePage } from '../pages/profile/ProfilePage';
 import {
   AreaRoute,
   AuditLogPage,
+  HeritagesPage,
   OwnAreaRoute,
   SchoolDetailPage,
   SchoolInfoPage,
@@ -36,6 +37,7 @@ const BUILT: Partial<Record<ScreenKey, ReactNode>> = {
   adminOverview: <Navigate to={pathOf('schools')} replace />,
   schools: <SchoolsPage />,
   schoolDetail: <SchoolDetailPage />,
+  heritages: <HeritagesPage />,
   auditLog: <AuditLogPage />,
 };
 
