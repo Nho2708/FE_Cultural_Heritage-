@@ -145,3 +145,48 @@ export function SelectField({ label, hint, error, options, containerClassName, c
     </Field>
   );
 }
+
+type TextAreaProps = Omit<ComponentProps<'textarea'>, 'id'> & {
+  label: string;
+  hint?: ReactNode;
+  error?: string | null;
+  containerClassName?: string;
+};
+
+/** Ô nhập nhiều dòng (mô tả, nội dung): cùng khuôn nhãn, gợi ý và lỗi với ô một dòng. */
+export function TextAreaField({ label, hint, error, containerClassName, className, rows = 4, ...rest }: TextAreaProps) {
+  return (
+    <Field label={label} hint={hint} error={error} className={containerClassName}>
+      {({ inputId, describedBy, invalid }) => (
+        <textarea
+          id={inputId}
+          rows={rows}
+          aria-invalid={invalid || undefined}
+          aria-describedby={describedBy}
+          className={inputClasses(invalid, cn('h-auto min-h-11 resize-y py-2.5 leading-6', className))}
+          {...rest}
+        />
+      )}
+    </Field>
+  );
+}
+
+type CheckboxProps = Omit<ComponentProps<'input'>, 'id' | 'type'> & {
+  label: string;
+  hint?: ReactNode;
+  containerClassName?: string;
+};
+
+/** Ô chọn có nhãn đứng cạnh; vùng bấm là cả dòng nhãn. */
+export function CheckboxField({ label, hint, containerClassName, className, ...rest }: CheckboxProps) {
+  const id = useId();
+  return (
+    <div className={cn('flex flex-col gap-1', containerClassName)}>
+      <label htmlFor={id} className="flex min-h-11 cursor-pointer items-center gap-3 type-body-m text-on-surface">
+        <input id={id} type="checkbox" className={cn('size-5 shrink-0 accent-primary', className)} {...rest} />
+        {label}
+      </label>
+      {hint && <p className="pl-8 type-label text-on-surface-muted">{hint}</p>}
+    </div>
+  );
+}
