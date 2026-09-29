@@ -2,8 +2,7 @@
 
 Ứng dụng React thứ hai (tên hiển thị "Học di sản"), tách khỏi web quản trị: khám phá di sản công khai cho khách và học
 sinh, khu học của học sinh đăng nhập bằng **mã học sinh + mật khẩu**. Giao diện đổi theo **cấp học** của học sinh (suy từ
-khối lớp) bằng bộ token; một bố cục, một bộ component, một bộ câu chữ cho cả ba cấp. Bản này là khung: trang chủ khám
-phá (bản giữ chỗ), học sinh đăng nhập, đổi mật khẩu lần đầu, trang học của em (bản giữ chỗ) và bốn bộ giao diện. Các
+khối lớp) bằng bộ token; một bố cục, một bộ component, một bộ câu chữ cho cả ba cấp. Bản này có: năm màn hình khám phá công khai (xem [kham-pha-di-san.md](kham-pha-di-san.md)), học sinh đăng nhập, đổi mật khẩu lần đầu, trang học của em (bản giữ chỗ) và bốn bộ giao diện. Các
 màn hình khác đã có route và guard, hiện "Đang xây dựng".
 
 ## 1. Màn hình
@@ -12,8 +11,8 @@ Nguồn duy nhất: `apps/web-hoc-tap/src/access/screens.ts` — 14 màn hình (
 
 | Route | Màn hình | Ai mở | Bản này |
 |---|---|---|---|
-| `/` | Trang chủ | Khách, học sinh | Bản khung: lời giới thiệu, hình chào, lối vào tìm kiếm / bản đồ / dòng thời gian, nút "Học sinh đăng nhập" hoặc "Vào trang học của em"; không có ô nhập mã |
-| `/di-san`, `/ban-do`, `/di-san/:diSan`, `/dong-thoi-gian[/:diSan]` | Tìm kiếm, bản đồ, chi tiết di sản, dòng thời gian | Khách, học sinh | Đang xây dựng |
+| `/` | Trang chủ | Khách, học sinh | Đã dựng ([khám phá di sản](kham-pha-di-san.md)): ảnh lớn đầu trang, ô tìm kiếm, di sản nổi bật, khám phá theo vùng và loại, giới thiệu app; nút "Học sinh đăng nhập" hoặc "Vào trang học của em"; không có ô nhập mã |
+| `/di-san`, `/ban-do`, `/di-san/:diSan`, `/dong-thoi-gian[/:diSan]` | Tìm kiếm và lọc, bản đồ, chi tiết di sản, dòng thời gian | Khách, học sinh | Đã dựng ([khám phá di sản](kham-pha-di-san.md)) |
 | `/dang-nhap` | Học sinh đăng nhập | Khách | Đã dựng |
 | `/doi-mat-khau` | Đổi mật khẩu | Học sinh | Đã dựng (chế độ bắt buộc và tự đổi) |
 | `/hoc` | Trang học của em | Học sinh | Bản khung: lời chào, mã học sinh, lớp, khối, cấp học, giáo viên, trường, lời nhắc nhập mã bài học |
@@ -80,14 +79,18 @@ với học sinh xưng "em" do máy chủ trả.
   `--dsv-option-radius`, `--dsv-touch-target`, `--dsv-block-gap`, `--dsv-inline-gap` cho khu học.
 - Vùng bấm: nút, ô nhập, ô chọn của web học tập có `min-height: var(--dsv-touch-target)`.
 - Hình minh họa theo trạng thái (chào, chúc mừng, động viên, trống): `src/theme/Illustration.tsx`, hiện là hình giữ chỗ SVG.
+- **Bộ theo cấp học chỉ dùng ở khu học** (trang học, nhập mã, bài học, làm bài kiểm tra, kết quả, tiến độ, đổi mật khẩu).
+  Năm màn hình khám phá công khai luôn dùng bộ mặc định, kể cả khi học sinh đã đăng nhập: `ThemeProvider` nằm trong router
+  và đọc `handle.area` của route.
 - Test: tương phản WCAG AA mọi cặp chữ / nền của bốn bộ; cỡ chữ và vùng bấm tối thiểu theo cấp; mọi bộ cùng một danh sách
-  biến CSS; khối 5 → cấp 1, 6 → cấp 2, 12 → cấp 3; trang khám phá công khai cũng theo cấp khi học sinh đã đăng nhập;
-  đăng xuất trở lại bộ mặc định.
+  biến CSS; khối 5 → cấp 1, 6 → cấp 2, 12 → cấp 3 ở khu học; trang khám phá công khai luôn bộ mặc định; đăng xuất trở
+  lại bộ mặc định.
 
 ## 4. Kiểm thử
 
 - `npm test -w @dsvhvn/web-hoc-tap`: bảng màn hình và guard, đăng nhập (chuẩn hóa mã, lần đầu sang đổi mật khẩu, sai
-  thông tin, máy chủ chưa có endpoint, mở lại bài học sau đăng nhập), đổi mật khẩu hai chế độ, bộ giao diện theo cấp.
+  thông tin, máy chủ chưa có endpoint, mở lại bài học sau đăng nhập), đổi mật khẩu hai chế độ, bộ giao diện theo cấp, năm
+  màn hình khám phá (xem [kham-pha-di-san.md](kham-pha-di-san.md)).
 - Chạy thử trên Edge thật (390 × 844, 360 × 640, 1280 × 860) với phiên học sinh giả cho ba cấp: đúng bộ giao diện, không
   tràn ngang, không lỗi JavaScript; đăng nhập với backend hiện tại hiện câu lỗi hệ thống (chưa có endpoint).
 - Build: bundle khởi đầu khoảng 125 KB gzip (mục tiêu ≤ 300 KB).
