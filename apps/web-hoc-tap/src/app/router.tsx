@@ -1,0 +1,51 @@
+import type { ReactNode } from 'react';
+import { createBrowserRouter, type RouteObject } from 'react-router';
+import { RequireAccess } from '../access/RequireAccess';
+import { SCREENS, screen, type ScreenKey } from '../access/screens';
+import { FullScreenLayout, MainLayout, RootLayout } from '../components/layout/Layouts';
+import { ChangePasswordPage } from '../pages/ChangePasswordPage';
+import { NotFoundPage, RouteErrorPage } from '../pages/errors/ErrorPages';
+import { HomePage } from '../pages/HomePage';
+import { LearnHomePage } from '../pages/LearnHomePage';
+import { LoginPage } from '../pages/LoginPage';
+import { PendingScreen } from '../pages/PendingScreen';
+
+// Khung route của web học tập: khám phá công khai (`/`, `/di-san`, `/ban-do`, `/dong-thoi-gian`) và khu học của học
+// sinh (`/dang-nhap`, `/doi-mat-khau`, `/hoc`, `/nhap-ma`, `/bai-hoc/...`, `/ket-qua/...`, `/tien-do`). Mỗi route lấy
+// đường dẫn và quyền từ SCREENS; màn hình chưa dựng hiện PendingScreen với đúng guard.
+
+/** Màn hình đã dựng trong bản khung. */
+const BUILT: Partial<Record<ScreenKey, ReactNode>> = {
+  home: <HomePage />,
+  login: <LoginPage />,
+  changePassword: <ChangePasswordPage />,
+  learnHome: <LearnHomePage />,
+};
+
+function screenRoutes(filter: (fullScreen: boolean) => boolean): RouteObject[] {
+  return SCREENS.filter((s) => s.path !== null && filter('fullScreen' in s && s.fullScreen)).flatMap((s) => {
+    const target = screen(s.key);
+    const element = <RequireAccess screen={target}>{BUILT[s.key] ?? <PendingScreen screen={target} />}</RequireAccess>;
+    const paths = [target.path, ...(target.aliases ?? [])].filter((path): path is string => path !== null);
+    return paths.map((path): RouteObject => (path === '/' ? { index: true, element } : { path, element }));
+  });
+}
+
+export const routes: RouteObject[] = [
+  {
+    path: '/',
+    element: <RootLayout />,
+    errorElement: <RouteErrorPage />,
+    children: [
+      {
+        element: <MainLayout />,
+        children: [...screenRoutes((fullScreen) => !fullScreen), { path: '*', element: <NotFoundPage /> }],
+      },
+      { element: <FullScreenLayout />, children: screenRoutes((fullScreen) => fullScreen) },
+    ],
+  },
+];
+
+export function createAppRouter() {
+  return createBrowserRouter(routes);
+}

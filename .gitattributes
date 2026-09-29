@@ -1,0 +1,7 @@
+# Giữ LF trong thư mục làm việc trên mọi máy (core.autocrlf=true của Windows đổi sang CRLF làm lệch
+# kiểm tra token CSS và diff). Ảnh là nhị phân.
+* text=auto eol=lf
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary

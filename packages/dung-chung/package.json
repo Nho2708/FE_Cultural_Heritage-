@@ -1,0 +1,30 @@
+{
+  "name": "@dsvhvn/dung-chung",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Gói dùng chung của web quản trị và web học tập DSVHVN: design token và bộ giao diện theo cấp học, component giao diện web, lớp gọi API, kiểu dữ liệu, phiên đăng nhập, kiểm tra hợp lệ, câu thông báo tiếng Việt.",
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./api": "./src/api/index.ts",
+    "./auth": "./src/auth/index.ts",
+    "./theme": "./src/theme/index.ts",
+    "./ui": "./src/ui/index.ts",
+    "./testing": "./src/testing/api.ts",
+    "./styles/*": "./src/styles/*"
+  },
+  "scripts": {
+    "lint": "oxlint -c ../../.oxlintrc.json --deny-warnings src scripts",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "gen:tokens": "node scripts/gen-tokens.mjs",
+    "check:tokens": "node scripts/gen-tokens.mjs --check"
+  },
+  "peerDependencies": {
+    "react": "^19.3.0",
+    "react-router": "^8.4.0"
+  }
+}

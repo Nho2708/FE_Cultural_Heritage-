@@ -1,0 +1,71 @@
+/* Nền CSS dùng chung của hai web: tiện ích bố cục, kiểu nền của thẻ HTML, vòng focus, giảm chuyển động.
+ * Nạp sau tokens.css và theme.css, trong cùng lần biên dịch Tailwind của từng ứng dụng. */
+
+/* Cột nội dung 1200px (lề 40px mỗi bên từ 841px) và nhịp dọc section 24 → 36px. */
+@utility dsv-content {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 16px;
+  @media (width >= 841px) {
+    max-width: var(--dsv-content-max);
+    width: calc(100% - var(--dsv-content-gutter));
+    padding-inline: 0;
+  }
+}
+
+@utility dsv-section {
+  position: relative;
+  margin: 0;
+  padding-block: var(--dsv-section-pad-y);
+  overflow: hidden;
+  @media (width >= 841px) {
+    overflow: visible;
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--dsv-color-background);
+    color: var(--dsv-color-on-background);
+    font-family: var(--dsv-font-sans);
+    font-size: var(--dsv-text-body-m-size);
+    line-height: var(--dsv-text-body-m-line-height);
+    letter-spacing: var(--dsv-text-body-m-tracking);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Vòng focus đôi trung tính: 2px đệm + 2px vòng, thấy được trên mọi nền kể cả nút đỏ. */
+  :focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px var(--dsv-color-focus-ring-offset),
+      0 0 0 4px var(--dsv-color-focus-ring);
+  }
+
+  .on-image:focus-visible {
+    box-shadow:
+      0 0 0 2px var(--dsv-color-focus-ring-on-image),
+      0 0 0 4px var(--dsv-color-scrim);
+  }
+
+  dialog {
+    color: inherit;
+  }
+}
+
+/* Tắt chuyển động khi người dùng yêu cầu. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

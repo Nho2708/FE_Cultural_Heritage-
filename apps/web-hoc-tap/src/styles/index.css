@@ -1,0 +1,38 @@
+/* Điểm vào CSS của web học tập: Tailwind v4 + token và nền CSS của gói dùng chung + phần riêng của khu học. */
+@import 'tailwindcss';
+@import '@dsvhvn/dung-chung/styles/tokens.css';
+@import '@dsvhvn/dung-chung/styles/theme.css';
+@import '@dsvhvn/dung-chung/styles/nen.css';
+
+/* Component của gói dùng chung nằm ngoài thư mục ứng dụng: khai báo để Tailwind quét lớp tiện ích của chúng. */
+@source '../../../../packages/dung-chung/src';
+
+/*
+ * Biến riêng của khu học, giá trị của bộ giao diện mặc định. ThemeProvider ghi đè cùng các token ngữ nghĩa
+ * (--dsv-color-*, --dsv-text-*, --dsv-radius-*) trên thẻ <html> theo cấp học của học sinh đang đăng nhập.
+ */
+:root {
+  --dsv-question-size: 18px;
+  --dsv-question-line-height: 28px;
+  --dsv-option-radius: 10px;
+  --dsv-touch-target: 44px;
+  --dsv-block-gap: 24px;
+  --dsv-inline-gap: 16px;
+}
+
+/* Cỡ chữ nội dung câu hỏi khi làm bài kiểm tra (cấp 1 từ 22px, cấp 2 và 3 từ 18px). */
+@utility type-question {
+  font-family: var(--dsv-font-sans);
+  font-size: var(--dsv-question-size);
+  line-height: var(--dsv-question-line-height);
+  font-weight: 500;
+}
+
+@layer base {
+  /* Vùng bấm tối thiểu theo bộ giao diện: 44px, cấp 1 là 48px. Component không rẽ nhánh theo cấp, chỉ đọc token. */
+  button,
+  select,
+  input:not([type='checkbox']):not([type='radio']) {
+    min-height: var(--dsv-touch-target);
+  }
+}

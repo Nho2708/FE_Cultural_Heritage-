@@ -1,0 +1,43 @@
+{
+  "name": "dsvhvn-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "description": "DSVHVN — nền tảng cho trường học: giáo viên tạo bài học và bài kiểm tra về di sản văn hóa Việt Nam. Hai ứng dụng web React (web quản trị, web học tập) và gói dùng chung, quản lý bằng npm workspaces.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.22"
+  },
+  "workspaces": [
+    "packages/dung-chung",
+    "apps/web-quan-tri",
+    "apps/web-hoc-tap"
+  ],
+  "scripts": {
+    "dev:quan-tri": "npm run dev -w @dsvhvn/web-quan-tri",
+    "dev:hoc-tap": "npm run dev -w @dsvhvn/web-hoc-tap",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "gen:tokens": "npm run gen:tokens -w @dsvhvn/dung-chung",
+    "check:tokens": "npm run check:tokens -w @dsvhvn/dung-chung"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
+    "@types/node": "^24.13.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "jsdom": "^30.1.1",
+    "oxlint": "^1.85.0",
+    "playwright-core": "^1.63.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~6.0.3",
+    "vite": "^8.3.0",
+    "vitest": "^5.0.1"
+  }
+}
