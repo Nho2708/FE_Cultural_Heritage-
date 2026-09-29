@@ -57,6 +57,7 @@ mật khẩu được ghi ra log của API. Tài khoản học sinh do giáo vi�
 | `npm run gen:tokens` | Sinh `packages/dung-chung/src/styles/tokens.css` và `theme.css` từ `packages/dung-chung/design/tokens.json` |
 | `npm run check:tokens` | Kiểm hai tệp CSS còn khớp `tokens.json` |
 | `npm run smoke -w @dsvhvn/web-quan-tri` | Kiểm thử web quản trị trên Edge/Chrome thật với API thật; cần `API_LOG`, `ADMIN_PASSWORD` |
+| `npm run smoke:di-san -w @dsvhvn/web-quan-tri` | Kiểm thử luồng Kho di sản trên Edge/Chrome thật; cần `ADMIN_PASSWORD`, chạy với database tạm mới |
 
 Chạy riêng một workspace: `npm test -w @dsvhvn/web-hoc-tap`, `npm run build -w @dsvhvn/web-quan-tri`…
 
