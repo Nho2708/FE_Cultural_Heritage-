@@ -13,6 +13,7 @@ import { ProfilePage } from '../pages/profile/ProfilePage';
 import {
   AreaRoute,
   AuditLogPage,
+  HeritageEditorPage,
   HeritagesPage,
   OwnAreaRoute,
   SchoolDetailPage,
@@ -38,6 +39,7 @@ const BUILT: Partial<Record<ScreenKey, ReactNode>> = {
   schools: <SchoolsPage />,
   schoolDetail: <SchoolDetailPage />,
   heritages: <HeritagesPage />,
+  heritageEditor: <HeritageEditorPage />,
   auditLog: <AuditLogPage />,
 };
 
