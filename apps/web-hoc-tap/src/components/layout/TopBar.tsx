@@ -23,7 +23,7 @@ const NAV_LINK = 'rounded-xs px-2 py-2.5 type-control transition-colors duration
 export function Wordmark({ className }: { className?: string }) {
   return (
     <Link to="/" className={cn('flex min-w-0 flex-col justify-center rounded-xs px-2 py-1', className)}>
-      <span className="type-h3 leading-5 text-on-surface">{APP_NAME}</span>
+      <span className="type-h3 leading-5 whitespace-nowrap text-on-surface">{APP_NAME}</span>
       <span className="hidden truncate type-label text-on-surface-muted dsvsm:block">Di sản văn hóa Việt Nam</span>
     </Link>
   );

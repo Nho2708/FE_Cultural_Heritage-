@@ -5,6 +5,8 @@ interface ImportMetaEnv {
   readonly VITE_API_BASE_URL?: string;
   /** Địa chỉ web quản trị, ví dụ http://localhost:5173. */
   readonly VITE_ADMIN_WEB_URL?: string;
+  /** Địa chỉ tải tệp cài đặt Android; bỏ trống khi chưa có tệp. */
+  readonly VITE_ANDROID_APP_URL?: string;
 }
 
 interface ImportMeta {

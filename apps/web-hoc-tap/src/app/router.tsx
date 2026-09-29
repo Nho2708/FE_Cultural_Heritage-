@@ -5,10 +5,15 @@ import { SCREENS, screen, type ScreenKey } from '../access/screens';
 import { FullScreenLayout, MainLayout, RootLayout } from '../components/layout/Layouts';
 import { ChangePasswordPage } from '../pages/ChangePasswordPage';
 import { NotFoundPage, RouteErrorPage } from '../pages/errors/ErrorPages';
+import { HeritageDetailPage } from '../pages/HeritageDetailPage';
 import { HomePage } from '../pages/HomePage';
 import { LearnHomePage } from '../pages/LearnHomePage';
 import { LoginPage } from '../pages/LoginPage';
+import { MapPage } from '../pages/MapPage';
 import { PendingScreen } from '../pages/PendingScreen';
+import { SearchPage } from '../pages/SearchPage';
+import { TimelinePage } from '../pages/TimelinePage';
+import type { RouteHandle } from './routeHandle';
 
 // Khung route của web học tập: khám phá công khai (`/`, `/di-san`, `/ban-do`, `/dong-thoi-gian`) và khu học của học
 // sinh (`/dang-nhap`, `/doi-mat-khau`, `/hoc`, `/nhap-ma`, `/bai-hoc/...`, `/ket-qua/...`, `/tien-do`). Mỗi route lấy
@@ -17,6 +22,10 @@ import { PendingScreen } from '../pages/PendingScreen';
 /** Màn hình đã dựng trong bản khung. */
 const BUILT: Partial<Record<ScreenKey, ReactNode>> = {
   home: <HomePage />,
+  search: <SearchPage />,
+  map: <MapPage />,
+  heritage: <HeritageDetailPage />,
+  timeline: <TimelinePage />,
   login: <LoginPage />,
   changePassword: <ChangePasswordPage />,
   learnHome: <LearnHomePage />,
@@ -27,7 +36,8 @@ function screenRoutes(filter: (fullScreen: boolean) => boolean): RouteObject[] {
     const target = screen(s.key);
     const element = <RequireAccess screen={target}>{BUILT[s.key] ?? <PendingScreen screen={target} />}</RequireAccess>;
     const paths = [target.path, ...(target.aliases ?? [])].filter((path): path is string => path !== null);
-    return paths.map((path): RouteObject => (path === '/' ? { index: true, element } : { path, element }));
+    const handle: RouteHandle = { area: s.area, hideFooter: 'hideFooter' in s && s.hideFooter };
+    return paths.map((path): RouteObject => (path === '/' ? { index: true, element, handle } : { path, element, handle }));
   });
 }
 
