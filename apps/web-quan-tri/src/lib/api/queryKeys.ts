@@ -1,4 +1,4 @@
-import type { AuditLogQuery, OrganizationListQuery, TeacherListQuery } from './endpoints';
+import type { AuditLogQuery, HeritageListQuery, OrganizationListQuery, TeacherListQuery } from './endpoints';
 
 // Khóa bộ nhớ đệm của React Query. Khóa cha (ví dụ ['org']) dùng để làm mới cả nhóm sau khi ghi.
 
@@ -10,6 +10,12 @@ export const queryKeys = {
   organizations: ['admin', 'organizations'] as const,
   organizationList: (query: OrganizationListQuery) => ['admin', 'organizations', 'list', query] as const,
   organization: (id: number) => ['admin', 'organizations', 'detail', id] as const,
+
+  /** Danh mục 34 tỉnh (chỉ đọc, hầu như không đổi). */
+  provinces: ['admin', 'provinces'] as const,
+  heritages: ['admin', 'heritages'] as const,
+  heritageList: (query: HeritageListQuery) => ['admin', 'heritages', 'list', query] as const,
+  heritage: (id: number) => ['admin', 'heritages', 'detail', id] as const,
 
   auditLogs: (query: AuditLogQuery) => ['admin', 'audit-logs', query] as const,
 };

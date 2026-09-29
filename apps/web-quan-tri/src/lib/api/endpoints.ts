@@ -4,7 +4,18 @@ import type {
   ActorRole,
   AuditAction,
   AuditLog,
+  ContentStatus,
+  EventInput,
+  HeritageDetail,
+  HeritageEvent,
+  HeritageInput,
+  HeritageMedia,
+  HeritageReference,
+  HeritageSummary,
+  HeritageTimeline,
+  HeritageType,
   LoginResult,
+  MediaInput,
   MyOrganization,
   NewAccount,
   OrganizationDetail,
@@ -13,9 +24,13 @@ import type {
   OrganizationSummary,
   Paged,
   PasswordTokenInfo,
+  Province,
   QueryValue,
+  RecognitionLevel,
+  ReferenceInput,
   StaffProfile,
   TeacherList,
+  TimelineInput,
   UserStatus,
 } from '@dsvhvn/dung-chung/api';
 import { apiRequest } from './client';
@@ -127,4 +142,103 @@ export interface AuditLogQuery extends PageQuery {
 export const auditLogsApi = {
   list: (query: AuditLogQuery) =>
     apiRequest<Paged<AuditLog>>('/admin/audit-logs', { query: { ...query } as Record<string, QueryValue> }),
+};
+
+export interface HeritageListQuery extends PageQuery {
+  /** Tên di sản, không phân biệt hoa thường và dấu. */
+  keyword?: string;
+  provinceId?: number | '';
+  heritageType?: HeritageType | '';
+  recognitionLevel?: RecognitionLevel | '';
+  status?: ContentStatus | '';
+}
+
+const order = (ids: readonly number[]) => ({ method: 'PUT', body: { ids } }) as const;
+
+/** Kho di sản (quản trị hệ thống): danh mục tỉnh, di sản, chuyển trạng thái. */
+export const adminHeritagesApi = {
+  provinces: () => apiRequest<Province[]>('/admin/provinces'),
+
+  list: (query: HeritageListQuery) =>
+    apiRequest<Paged<HeritageSummary>>('/admin/heritages', { query: { ...query } as Record<string, QueryValue> }),
+
+  /** Đường dẫn gợi ý từ tên, không trùng di sản khác (`heritageId` loại chính di sản đang sửa). */
+  suggestSlug: (name: string, heritageId?: number) =>
+    apiRequest<string>('/admin/heritages/suggest-slug', { query: { name, heritageId } }),
+
+  create: (body: HeritageInput) => apiRequest<HeritageDetail>('/admin/heritages', { method: 'POST', body }),
+
+  get: (id: number) => apiRequest<HeritageDetail>(`/admin/heritages/${id}`),
+
+  update: (id: number, body: HeritageInput) =>
+    apiRequest<HeritageDetail>(`/admin/heritages/${id}`, { method: 'PUT', body }),
+
+  /** Xóa mềm: chỉ di sản nháp hoặc đã ẩn và chưa gắn với bài học hay câu hỏi nào. */
+  remove: (id: number) => apiRequest<null>(`/admin/heritages/${id}`, { method: 'DELETE' }),
+
+  /** `mediaId` null là bỏ ảnh đại diện. */
+  setThumbnail: (id: number, mediaId: number | null) =>
+    apiRequest<HeritageDetail>(`/admin/heritages/${id}/thumbnail`, { method: 'PUT', body: { mediaId } }),
+
+  publish: (id: number) => apiRequest<HeritageDetail>(`/admin/heritages/${id}/publish`, { method: 'POST' }),
+
+  archive: (id: number) => apiRequest<HeritageDetail>(`/admin/heritages/${id}/archive`, { method: 'POST' }),
+
+  restore: (id: number) => apiRequest<HeritageDetail>(`/admin/heritages/${id}/restore`, { method: 'POST' }),
+};
+
+/** Giai đoạn và sự kiện của một di sản (Biểu mẫu giai đoạn và sự kiện, tab Dòng thời gian). */
+export const adminTimelinesApi = {
+  createTimeline: (heritageId: number, body: TimelineInput) =>
+    apiRequest<HeritageTimeline>(`/admin/heritages/${heritageId}/timelines`, { method: 'POST', body }),
+
+  updateTimeline: (id: number, body: TimelineInput) =>
+    apiRequest<HeritageTimeline>(`/admin/timelines/${id}`, { method: 'PUT', body }),
+
+  /** Xóa luôn các sự kiện và ảnh của sự kiện. */
+  deleteTimeline: (id: number) => apiRequest<null>(`/admin/timelines/${id}`, { method: 'DELETE' }),
+
+  orderTimelines: (heritageId: number, ids: readonly number[]) =>
+    apiRequest<HeritageTimeline[]>(`/admin/heritages/${heritageId}/timelines/order`, order(ids)),
+
+  createEvent: (timelineId: number, body: EventInput) =>
+    apiRequest<HeritageEvent>(`/admin/timelines/${timelineId}/events`, { method: 'POST', body }),
+
+  updateEvent: (id: number, body: EventInput) => apiRequest<HeritageEvent>(`/admin/events/${id}`, { method: 'PUT', body }),
+
+  /** Xóa luôn ảnh của sự kiện. */
+  deleteEvent: (id: number) => apiRequest<null>(`/admin/events/${id}`, { method: 'DELETE' }),
+
+  orderEvents: (timelineId: number, ids: readonly number[]) =>
+    apiRequest<HeritageEvent[]>(`/admin/timelines/${timelineId}/events/order`, order(ids)),
+};
+
+/** Ảnh, video, âm thanh minh họa (đường dẫn, kèm ghi công bắt buộc) của di sản hoặc của sự kiện. */
+export const adminMediaApi = {
+  createForHeritage: (heritageId: number, body: MediaInput) =>
+    apiRequest<HeritageMedia>(`/admin/heritages/${heritageId}/media`, { method: 'POST', body }),
+
+  createForEvent: (eventId: number, body: MediaInput) =>
+    apiRequest<HeritageMedia>(`/admin/events/${eventId}/media`, { method: 'POST', body }),
+
+  update: (id: number, body: MediaInput) => apiRequest<HeritageMedia>(`/admin/media/${id}`, { method: 'PUT', body }),
+
+  remove: (id: number) => apiRequest<null>(`/admin/media/${id}`, { method: 'DELETE' }),
+
+  orderForHeritage: (heritageId: number, ids: readonly number[]) =>
+    apiRequest<HeritageMedia[]>(`/admin/heritages/${heritageId}/media/order`, order(ids)),
+
+  orderForEvent: (eventId: number, ids: readonly number[]) =>
+    apiRequest<HeritageMedia[]>(`/admin/events/${eventId}/media/order`, order(ids)),
+};
+
+/** Nguồn tham chiếu của di sản. */
+export const adminReferencesApi = {
+  create: (heritageId: number, body: ReferenceInput) =>
+    apiRequest<HeritageReference>(`/admin/heritages/${heritageId}/references`, { method: 'POST', body }),
+
+  update: (id: number, body: ReferenceInput) =>
+    apiRequest<HeritageReference>(`/admin/heritage-references/${id}`, { method: 'PUT', body }),
+
+  remove: (id: number) => apiRequest<null>(`/admin/heritage-references/${id}`, { method: 'DELETE' }),
 };
