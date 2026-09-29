@@ -16,5 +16,11 @@ function read(name: 'VITE_API_BASE_URL' | 'VITE_ADMIN_WEB_URL', devDefault: stri
 
 export const API_BASE_URL = read('VITE_API_BASE_URL', DEV_DEFAULTS.api);
 
+/**
+ * Địa chỉ tải tệp cài đặt Android của app học tập. Tùy chọn: chưa có tệp thì để trống, trang chủ ghi rõ bản cài đặt
+ * chưa có thay vì hiện nút không dẫn đi đâu.
+ */
+export const ANDROID_APP_URL: string | null = import.meta.env.VITE_ANDROID_APP_URL?.trim() || null;
+
 /** Web quản trị: nơi thầy cô đăng nhập. */
 export const ADMIN_WEB_URL = read('VITE_ADMIN_WEB_URL', DEV_DEFAULTS.adminWeb);

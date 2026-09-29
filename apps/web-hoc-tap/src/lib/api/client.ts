@@ -1,4 +1,4 @@
-import { createApiClient, createStudentApi, sessionEndNotice } from '@dsvhvn/dung-chung/api';
+import { createApiClient, createDiscoveryApi, createStudentApi, sessionEndNotice } from '@dsvhvn/dung-chung/api';
 import { API_BASE_URL } from '../../config/env';
 import { sessionStore } from '../auth/session';
 
@@ -15,3 +15,6 @@ export const apiClient = createApiClient({
 });
 
 export const studentApi = createStudentApi(apiClient);
+
+/** Khám phá di sản công khai: không gắn token nên khách, học sinh và token hỏng đều xem như nhau. */
+export const discoveryApi = createDiscoveryApi(apiClient);

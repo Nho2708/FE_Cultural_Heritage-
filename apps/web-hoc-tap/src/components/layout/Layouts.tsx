@@ -1,9 +1,15 @@
 import { useEffect, type ReactNode } from 'react';
-import { Outlet, ScrollRestoration, useLocation } from 'react-router';
+import { Outlet, ScrollRestoration, useLocation, useMatches } from 'react-router';
+import { isRouteHandle } from '../../app/routeHandle';
 import { useAuth } from '../../lib/auth/context';
+import { ThemeProvider } from '../../theme/ThemeProvider';
+import { SiteFooter } from './SiteFooter';
 import { TopBar } from './TopBar';
 
-/** Gốc của mọi route: khôi phục vị trí cuộn, xóa đích chuyển trang sau đăng nhập / đăng xuất khi đã chuyển xong. */
+/**
+ * Gốc của mọi route: khôi phục vị trí cuộn, xóa đích chuyển trang sau đăng nhập / đăng xuất khi đã chuyển xong, chọn bộ
+ * giao diện theo khu đang mở (ThemeProvider phải nằm trong router).
+ */
 export function RootLayout() {
   const { key } = useLocation();
   const { clearLanding } = useAuth();
@@ -11,10 +17,10 @@ export function RootLayout() {
     if (key) clearLanding();
   }, [key, clearLanding]);
   return (
-    <>
+    <ThemeProvider>
       <ScrollRestoration />
       <Outlet />
-    </>
+    </ThemeProvider>
   );
 }
 
@@ -30,15 +36,16 @@ export function SkipLink() {
   );
 }
 
-/** Khung có thanh điều hướng trên; nội dung đẩy xuống dưới thanh cố định 56px. */
-export function TopBarFrame({ children }: { children: ReactNode }) {
+/** Khung có thanh điều hướng trên; nội dung đẩy xuống dưới thanh cố định 56px. Chân trang trừ trang bản đồ. */
+export function TopBarFrame({ children, footer = true }: { children: ReactNode; footer?: boolean }) {
   return (
-    <div className="min-h-dvh bg-background text-on-background">
+    <div className="flex min-h-dvh flex-col bg-background text-on-background">
       <SkipLink />
       <TopBar />
-      <main id="noi-dung" tabIndex={-1} className="pt-(--dsv-topbar-height) outline-none">
+      <main id="noi-dung" tabIndex={-1} className="flex-1 pt-(--dsv-topbar-height) outline-none">
         {children}
       </main>
+      {footer && <SiteFooter />}
     </div>
   );
 }
@@ -61,11 +68,18 @@ export function BareFrame({ children }: { children: ReactNode }) {
  */
 export function MainLayout() {
   const { user } = useAuth();
-  const Frame = user?.mustChangePassword ? BareFrame : TopBarFrame;
+  const hideFooter = useMatches().some((match) => isRouteHandle(match.handle) && match.handle.hideFooter === true);
+  if (user?.mustChangePassword) {
+    return (
+      <BareFrame>
+        <Outlet />
+      </BareFrame>
+    );
+  }
   return (
-    <Frame>
+    <TopBarFrame footer={!hideFooter}>
       <Outlet />
-    </Frame>
+    </TopBarFrame>
   );
 }
 

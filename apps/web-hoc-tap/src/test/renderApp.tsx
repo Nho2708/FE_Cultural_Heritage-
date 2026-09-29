@@ -8,7 +8,6 @@ import { createQueryClient } from '../app/queryClient';
 import { routes } from '../app/router';
 import { AuthProvider } from '../lib/auth/AuthProvider';
 import { sessionStore } from '../lib/auth/session';
-import { ThemeProvider } from '../theme/ThemeProvider';
 import { sessionOf, studentOf } from './fixtures';
 
 // Dựng toàn bộ ứng dụng trên cây route thật (src/app/router.tsx) tại một đường dẫn, không dựng cây giả.
@@ -20,9 +19,7 @@ export function renderApp(path: string, state?: unknown) {
     <QueryClientProvider client={createQueryClient()}>
       <ToastProvider>
         <AuthProvider>
-          <ThemeProvider>
-            <RouterProvider router={router} />
-          </ThemeProvider>
+          <RouterProvider router={router} />
         </AuthProvider>
       </ToastProvider>
     </QueryClientProvider>,

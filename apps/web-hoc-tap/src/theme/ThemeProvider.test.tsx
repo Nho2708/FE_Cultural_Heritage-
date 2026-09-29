@@ -25,17 +25,33 @@ describe('bộ giao diện theo cấp học', () => {
     [5, 'cap-1', '19px', '48px', 'linh-vat'],
     [6, 'cap-2', '17px', '44px', 'bieu-tuong-net'],
     [12, 'cap-3', '16px', '44px', 'toi-gian'],
-  ] as const)('khối %i → %s: cỡ chữ %s, vùng bấm %s, bộ hình %s — kể cả ở trang khám phá công khai', async (grade, key, body, touch, set) => {
+  ] as const)('khối %i → %s: cỡ chữ %s, vùng bấm %s, bộ hình %s ở khu học', async (grade, key, body, touch, set) => {
     signInAs(studentOf(grade));
     mockApi((call) => (call.path === STUDENT_ENDPOINTS.profile ? envelope(200, { data: studentOf(grade) }) : undefined));
-    renderApp('/');
+    renderApp('/hoc');
 
-    expect(await screen.findByRole('link', { name: 'Vào trang học của em' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: /^Chào / })).toBeInTheDocument();
     expect(root()).toHaveAttribute('data-bo-giao-dien', key);
     expect(cssVar('--dsv-color-primary')).toBe(LEARNING_THEMES[key].color.primary);
     expect(cssVar('--dsv-text-body-m-size')).toBe(body);
     expect(cssVar('--dsv-touch-target')).toBe(touch);
     expect(document.querySelector('figure[data-bo-hinh]')).toHaveAttribute('data-bo-hinh', set);
+  });
+
+  it('trang khám phá công khai luôn dùng bộ mặc định kể cả khi học sinh đã đăng nhập; vào khu học thì đổi theo cấp', async () => {
+    signInAs(studentOf(5));
+    mockApi((call) => (call.path === STUDENT_ENDPOINTS.profile ? envelope(200, { data: studentOf(5) }) : undefined));
+    const user = userEvent.setup();
+    const { router } = renderApp('/');
+
+    await user.click(await screen.findByRole('link', { name: 'Vào trang học của em' }));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/hoc'));
+    expect(root()).toHaveAttribute('data-bo-giao-dien', 'cap-1');
+
+    await router.navigate('/di-san');
+    await waitFor(() => expect(root()).toHaveAttribute('data-bo-giao-dien', 'mac-dinh'));
+    expect(cssVar('--dsv-color-primary')).toBe(LEARNING_THEMES['mac-dinh'].color.primary);
+    expect(cssVar('--dsv-touch-target')).toBe('44px');
   });
 
   it('máy chủ trả cấp học thì ưu tiên cấp đó; giáo viên sửa khối thì lần tải trang sau đổi bộ giao diện', async () => {

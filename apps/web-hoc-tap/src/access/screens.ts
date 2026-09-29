@@ -19,6 +19,8 @@ export interface Screen {
   aliases?: readonly string[];
   /** Ẩn thanh điều hướng (làm bài kiểm tra). */
   fullScreen?: boolean;
+  /** Không hiện chân trang (bản đồ chiếm hết chiều cao màn hình). */
+  hideFooter?: boolean;
 }
 
 const EVERYONE: readonly Actor[] = ['Guest', 'STUDENT'];
@@ -29,7 +31,7 @@ export const SCREENS = [
   // Khám phá công khai
   { key: 'home', name: 'Trang chủ', area: 'explore', actors: EVERYONE, path: '/' },
   { key: 'search', name: 'Tìm kiếm và lọc di sản', area: 'explore', actors: EVERYONE, path: '/di-san' },
-  { key: 'map', name: 'Bản đồ di sản', area: 'explore', actors: EVERYONE, path: '/ban-do' },
+  { key: 'map', name: 'Bản đồ di sản', area: 'explore', actors: EVERYONE, path: '/ban-do', hideFooter: true },
   { key: 'heritage', name: 'Chi tiết di sản', area: 'explore', actors: EVERYONE, path: '/di-san/:diSan' },
   {
     key: 'timeline',
