@@ -1,4 +1,4 @@
-import type { LessonListFilter } from '@dsvhvn/dung-chung/api';
+import type { LessonListFilter, QuestionListFilter } from '@dsvhvn/dung-chung/api';
 import type { ClassListQuery, StudentListQuery } from './classroomEndpoints';
 import type { AuditLogQuery, HeritageListQuery, OrganizationListQuery, TeacherListQuery } from './endpoints';
 
@@ -34,6 +34,16 @@ export const queryKeys = {
   /** Di sản đã xuất bản để chọn cho bài học. */
   publishedHeritages: (filter: unknown) => ['teacher', 'published-heritages', filter] as const,
   discoveryFilters: ['teacher', 'discovery-filters'] as const,
+
+  /** Ngân hàng câu hỏi của giáo viên: danh sách, số đếm các tab, bảng dạng câu theo cấp, chi tiết (làm mới cả nhóm sau khi ghi). */
+  questions: ['teacher', 'questions'] as const,
+  questionList: (filter: QuestionListFilter) => ['teacher', 'questions', 'list', filter] as const,
+  questionCounts: ['teacher', 'questions', 'counts'] as const,
+  questionTypes: ['teacher', 'questions', 'types'] as const,
+  questionDetail: (id: number) => ['teacher', 'questions', 'detail', id] as const,
+  questionQuota: (lessonId: number) => ['teacher', 'questions', 'quota', lessonId] as const,
+  /** Ảnh trong thư viện của một di sản (để chọn hình cho câu hỏi). */
+  heritageImages: (heritageId: number) => ['teacher', 'heritage-images', heritageId] as const,
 
   auditLogs: (query: AuditLogQuery) => ['admin', 'audit-logs', query] as const,
 };
