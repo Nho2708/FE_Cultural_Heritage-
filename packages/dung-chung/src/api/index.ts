@@ -5,3 +5,4 @@ export { studentCodeOf } from './types';
 export type * from './types';
 export type * from './heritage';
 export type * from './classroom';
+export type * from './lessons';

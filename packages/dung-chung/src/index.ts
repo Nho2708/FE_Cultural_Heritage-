@@ -6,6 +6,7 @@ export * from './cn';
 export * from './format';
 export * from './forms';
 export * from './heritage';
+export * from './lessons';
 export * from './messages';
 export * from './validation/classroom';
 export * from './validation/fields';
