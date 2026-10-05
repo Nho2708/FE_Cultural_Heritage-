@@ -106,6 +106,16 @@ describe('Ngân hàng câu hỏi', () => {
     expect(calls.some((c) => c.method === 'POST' && c.path === '/teacher/questions/1/duplicate')).toBe(true);
   });
 
+  it('lọc theo di sản trên URL gửi heritageId', async () => {
+    signInAs('TEACHER');
+    const calls = api([questionRowOf(1)]);
+    renderApp('/giao-vien/cau-hoi?di-san=11&ten-di-san=Hoàng thành Thăng Long');
+    await screen.findByRole('table', { name: 'Câu hỏi trong ngân hàng' });
+    expect(lastList(calls)).toContain('heritageId=11');
+    expect(screen.getByTestId('di-san-da-chon')).toHaveTextContent('Hoàng thành Thăng Long');
+    expect(screen.getByRole('button', { name: 'Bỏ lọc di sản' })).toBeInTheDocument();
+  });
+
   it('chưa có câu nào: trạng thái rỗng hướng dẫn', async () => {
     signInAs('TEACHER');
     api([]);
@@ -219,6 +229,32 @@ describe('Biểu mẫu câu hỏi', () => {
     await user.type(within(dialog).getByLabelText('Giải thích đáp án'), ' thêm');
     await user.click(within(dialog).getByRole('button', { name: 'Lưu' }));
     expect(await within(dialog).findAllByText('Các phương án không được trùng nhau.')).not.toHaveLength(0);
+  });
+
+  it('chấm thử: bấm một phương án trong khung xem trước, kết quả chấm của máy chủ hiện ngay', async () => {
+    signInAs('TEACHER');
+    const calls = api([questionRowOf(1)], (call) => {
+      if (call.path === '/teacher/questions/1' && call.method === 'GET') return envelope(200, { data: questionDetailOf(1) });
+      if (call.path === '/teacher/questions/validate' && (call.body as { submission?: unknown }).submission)
+        return envelope(200, {
+          data: {
+            isValid: true,
+            errors: {},
+            partsTotal: 1,
+            preview: previewOf(),
+            trial: { partsCorrect: 1, partsTotal: 1, parts: [true], isCorrect: true, fraction: 1 },
+          },
+        });
+      return undefined;
+    });
+    const user = userEvent.setup();
+    renderApp('/giao-vien/cau-hoi?tab=cua-toi');
+
+    await user.click(await screen.findByRole('button', { name: /^Sửa câu/ }));
+    const dialog = await screen.findByRole('dialog', { name: 'Sửa câu hỏi' });
+    await user.click(await within(dialog).findByRole('button', { name: 'Chấm thử phương án Phương án A' }));
+    expect(await within(dialog).findByTestId('cham-thu')).toHaveTextContent('Chấm thử: đúng (1/1 phần).');
+    expect(calls.some((c) => (c.body as { submission?: { selectedIndex?: number } } | undefined)?.submission?.selectedIndex === 0)).toBe(true);
   });
 
   it('câu AI chờ duyệt: có Duyệt và Loại; Duyệt gọi máy chủ', async () => {

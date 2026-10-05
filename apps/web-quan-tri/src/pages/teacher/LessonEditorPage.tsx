@@ -2,6 +2,7 @@ import { LESSON_LIMITS, LESSON_SECTION_LABEL, LESSON_STATUS_LABEL, MESSAGES, for
 import { ApiError, errorMessage, type LessonDetail, type LessonImageOption, type LessonLength, type LessonSectionType } from '@dsvhvn/dung-chung/api';
 import {
   Button,
+  ButtonLink,
   ConfirmDialog,
   EmptyState,
   ErrorState,
@@ -16,7 +17,7 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { useBlocker, useNavigate, useParams } from 'react-router';
-import { pathOf } from '../../access/screens';
+import { PATHS, pathOf } from '../../access/screens';
 import { AiPanel, KeyPointsEditor } from '../../components/lesson/ContentParts';
 import { DuplicateLessonDialog } from '../../components/lesson/DuplicateLessonDialog';
 import { ImagePickerDialog } from '../../components/lesson/ImagePickerDialog';
@@ -276,6 +277,10 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
         }
         actions={
           <>
+            <ButtonLink variant="secondary" to={PATHS.lessonAiQuestions(lesson.id)}>
+              <Icon name="sparkles" size={16} />
+              Sinh câu hỏi bằng AI
+            </ButtonLink>
             <Button
               variant="secondary"
               disabled={busy || !planOk}

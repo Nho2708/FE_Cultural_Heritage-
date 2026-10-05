@@ -30,7 +30,17 @@ function Picture({ url }: { url: string | null }) {
 }
 
 /** Câu như học sinh của cấp thấy (không có đáp án đúng); chỉ để xem, không chấm. */
-export function QuestionPreviewCard({ preview }: { preview: QuestionPreview }) {
+export function QuestionPreviewCard({
+  preview,
+  selectedIndex,
+  onSelectOption,
+}: {
+  preview: QuestionPreview;
+  /** Phương án đang chọn khi chấm thử. */
+  selectedIndex?: number | null;
+  /** Có thì các phương án bấm được để chấm thử đáp án. */
+  onSelectOption?: (index: number) => void;
+}) {
   const big = preview.layout === 'LARGE_CARDS';
   const text = big ? 'type-h4' : 'type-body-m';
   return (
@@ -53,9 +63,24 @@ export function QuestionPreviewCard({ preview }: { preview: QuestionPreview }) {
       {preview.options.length > 0 && (
         <ul className={big ? 'mt-3 grid grid-cols-2 gap-3' : 'mt-3 flex flex-col gap-2'}>
           {preview.options.map((o, i) => (
-            <li key={i} className={`flex items-center gap-3 rounded-md border border-border p-3 ${text}`}>
-              <Picture url={o.imageUrl} />
-              <span>{o.content}</span>
+            <li key={i}>
+              {onSelectOption ? (
+                <button
+                  type="button"
+                  aria-pressed={selectedIndex === i}
+                  aria-label={`Chấm thử phương án ${o.content ?? i + 1}`}
+                  onClick={() => onSelectOption(i)}
+                  className={`flex w-full items-center gap-3 rounded-md border p-3 text-left ${text} ${selectedIndex === i ? 'border-2 border-primary' : 'border-border hover:bg-surface-container-low'}`}
+                >
+                  <Picture url={o.imageUrl} />
+                  <span>{o.content}</span>
+                </button>
+              ) : (
+                <div className={`flex items-center gap-3 rounded-md border border-border p-3 ${text}`}>
+                  <Picture url={o.imageUrl} />
+                  <span>{o.content}</span>
+                </div>
+              )}
             </li>
           ))}
         </ul>

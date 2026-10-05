@@ -13,10 +13,11 @@ interface HeritageSelectProps {
   heritageName: string;
   error?: string | null;
   disabled?: boolean;
+  label?: string;
   onChange: (id: number, name: string) => void;
 }
 
-export function HeritageSelect({ heritageId, heritageName, error, disabled, onChange }: HeritageSelectProps) {
+export function HeritageSelect({ heritageId, heritageName, error, disabled, label = 'Di sản', onChange }: HeritageSelectProps) {
   const [open, setOpen] = useState(false);
   const [keyword, setKeyword] = useState('');
   const trimmed = keyword.trim();
@@ -28,7 +29,7 @@ export function HeritageSelect({ heritageId, heritageName, error, disabled, onCh
   });
 
   return (
-    <Field label="Di sản" error={error} hint="Chỉ chọn được di sản đã xuất bản.">
+    <Field label={label} error={error} hint={label === 'Di sản' ? 'Chỉ chọn được di sản đã xuất bản.' : undefined}>
       {({ describedBy }) => (
         <div className="flex flex-wrap items-center gap-3" aria-describedby={describedBy}>
           <span className="type-body-m text-on-surface" data-testid="di-san-da-chon">

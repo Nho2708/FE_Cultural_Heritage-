@@ -34,6 +34,7 @@ import { PATHS } from '../../access/screens';
 import { AreaPage, PageHeader } from '../../components/layout/PageHeader';
 import { DifficultyBadge, LevelRangeBadge, ReviewStatusBadge } from '../../components/question/QuestionBits';
 import { QuestionFormDialog } from '../../components/question/QuestionFormDialog';
+import { HeritageSelect } from '../../components/question/QuestionPickers';
 import { lessonsApi } from '../../lib/api/lessonEndpoints';
 import { questionsApi } from '../../lib/api/questionEndpoints';
 import { queryKeys } from '../../lib/api/queryKeys';
@@ -132,6 +133,8 @@ export default function QuestionBankPage() {
   const source = SOURCE_SLUG.fromSlug(params.get('nguon'));
   const status = tab === 'cua-toi' ? STATUS_SLUG.fromSlug(params.get('trang-thai')) : '';
   const keyword = params.get('tu-khoa') ?? '';
+  const heritageParam = params.get('di-san') ?? '';
+  const heritageName = params.get('ten-di-san') ?? '';
   const filter = {
     scope: SCOPE_OF[tab],
     questionType,
@@ -140,6 +143,7 @@ export default function QuestionBankPage() {
     source,
     status,
     keyword,
+    heritageId: heritageParam ? Number(heritageParam) : ('' as const),
     page,
     pageSize: PAGE_SIZE,
   };
@@ -156,7 +160,7 @@ export default function QuestionBankPage() {
   const [approving, setApproving] = useState(false);
 
   const rows = list.data?.items ?? [];
-  const filtered = Boolean(questionType || level || difficultyLevel || source || status || keyword);
+  const filtered = Boolean(questionType || level || difficultyLevel || source || status || keyword || heritageParam);
   const refresh = () => queryClient.invalidateQueries({ queryKey: queryKeys.questions });
 
   const toggle = (id: number) =>
@@ -245,6 +249,20 @@ export default function QuestionBankPage() {
             <SelectField label="Trạng thái" value={STATUS_SLUG.toSlug(status)} options={STATUS_OPTIONS} onChange={(e) => update({ 'trang-thai': e.target.value })} />
           )}
         </div>
+        <div className="flex flex-wrap items-end gap-3">
+          <HeritageSelect
+            heritageId={heritageParam ? Number(heritageParam) : null}
+            heritageName={heritageName}
+            label="Lọc theo di sản"
+            onChange={(id, name) => update({ 'di-san': String(id), 'ten-di-san': name })}
+          />
+          {heritageParam && (
+            <Button variant="ghost" size="sm" onClick={() => update({ 'di-san': null, 'ten-di-san': null })}>
+              <Icon name="x" size={16} />
+              Bỏ lọc di sản
+            </Button>
+          )}
+        </div>
         <SearchForm key={keyword} label="Tìm trong lời câu" placeholder="Ví dụ: Hoa Lư" value={keyword} onSearch={(v) => update({ 'tu-khoa': v })} />
       </div>
 
@@ -270,7 +288,7 @@ export default function QuestionBankPage() {
             icon="search"
             title={MESSAGES.noResults}
             action={
-              <Button variant="secondary" onClick={() => update({ dang: null, cap: null, 'do-kho': null, nguon: null, 'trang-thai': null, 'tu-khoa': null })}>
+              <Button variant="secondary" onClick={() => update({ dang: null, cap: null, 'do-kho': null, nguon: null, 'trang-thai': null, 'tu-khoa': null, 'di-san': null, 'ten-di-san': null })}>
                 Bỏ bộ lọc
               </Button>
             }
