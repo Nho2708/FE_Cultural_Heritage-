@@ -6,3 +6,5 @@ export type * from './types';
 export type * from './heritage';
 export type * from './classroom';
 export type * from './lessons';
+export type * from './questions';
+export { QUESTION_ENDPOINTS, createQuestionsApi } from './questions';

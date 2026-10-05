@@ -8,6 +8,7 @@ export * from './forms';
 export * from './heritage';
 export * from './lessons';
 export * from './messages';
+export * from './questions';
 export * from './validation/classroom';
 export * from './validation/fields';
 export * from './validation/heritage';
