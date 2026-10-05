@@ -18,6 +18,7 @@ token bộ giao diện của gói dùng chung; component giao diện web không 
 
 Backend: [`BE_Cultural_Heritage-`](../BE_Cultural_Heritage-) (ASP.NET Core 9, tiền tố API `/api/v1`, CSDL v3).
 Chi tiết từng ứng dụng: [`docs/web-quan-tri.md`](docs/web-quan-tri.md), [`docs/web-hoc-tap.md`](docs/web-hoc-tap.md), [`docs/kham-pha-di-san.md`](docs/kham-pha-di-san.md) (khám phá di sản công khai);
+luồng lớp, học sinh và tài khoản học sinh: [`docs/lop-hoc-sinh.md`](docs/lop-hoc-sinh.md);
 kiểm thử trên trình duyệt thật: [`docs/kiem-thu-trinh-duyet.md`](docs/kiem-thu-trinh-duyet.md).
 
 ## Yêu cầu
