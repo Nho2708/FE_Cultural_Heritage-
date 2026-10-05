@@ -95,8 +95,8 @@ describe('khu học chỉ cho học sinh đã đăng nhập', () => {
     await waitFor(() => expect(first.router.state.location.pathname).toBe('/hoc'));
     first.unmount();
 
-    renderApp('/nhap-ma');
-    expect(await screen.findByRole('heading', { level: 1, name: 'Nhập mã bài học' })).toBeInTheDocument();
+    renderApp('/tien-do');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Tiến độ của em' })).toBeInTheDocument();
     expect(screen.getByText('ĐANG XÂY DỰNG')).toBeInTheDocument();
   });
 

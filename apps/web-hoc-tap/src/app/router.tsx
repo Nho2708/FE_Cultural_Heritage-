@@ -6,8 +6,10 @@ import { FullScreenLayout, MainLayout, RootLayout } from '../components/layout/L
 import { ChangePasswordPage } from '../pages/ChangePasswordPage';
 import { NotFoundPage, RouteErrorPage } from '../pages/errors/ErrorPages';
 import { HeritageDetailPage } from '../pages/HeritageDetailPage';
+import { EnterCodePage } from '../pages/EnterCodePage';
 import { HomePage } from '../pages/HomePage';
 import { LearnHomePage } from '../pages/LearnHomePage';
+import { LessonPage } from '../pages/LessonPage';
 import { LoginPage } from '../pages/LoginPage';
 import { MapPage } from '../pages/MapPage';
 import { PendingScreen } from '../pages/PendingScreen';
@@ -29,6 +31,8 @@ const BUILT: Partial<Record<ScreenKey, ReactNode>> = {
   login: <LoginPage />,
   changePassword: <ChangePasswordPage />,
   learnHome: <LearnHomePage />,
+  enterCode: <EnterCodePage />,
+  lesson: <LessonPage />,
 };
 
 function screenRoutes(filter: (fullScreen: boolean) => boolean): RouteObject[] {
