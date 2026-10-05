@@ -3,14 +3,15 @@ import { cn } from '../cn';
 import { Icon } from './Icon';
 
 // Hộp thoại đè lên màn cha, không có URL riêng. Dùng <dialog> gốc của trình duyệt: giam focus, Esc để đóng, trả focus về phần tử đã mở.
-// `dialog` ≤ 480px cho hộp xác nhận; `panel` ≤ 720px cho biểu mẫu (ví dụ biểu mẫu tài khoản). Nút hành động chính luôn ở bên phải.
+// `dialog` ≤ 480px cho hộp xác nhận; `panel` ≤ 720px cho biểu mẫu (ví dụ biểu mẫu tài khoản); `wide` ≤ 1040px cho nội dung rộng
+// (phiếu đăng nhập của học sinh). Nút hành động chính luôn ở bên phải.
 
 interface ModalProps {
   open: boolean;
   title: string;
   /** Mô tả ngắn dưới tiêu đề (được đọc cùng tiêu đề bằng aria-describedby). */
   description?: ReactNode;
-  size?: 'dialog' | 'panel';
+  size?: 'dialog' | 'panel' | 'wide';
   children?: ReactNode;
   /** Hàng nút cuối hộp thoại. Hộp biểu mẫu thường đặt nút trong <form> nên để trống. */
   footer?: ReactNode;
@@ -51,7 +52,11 @@ export function Modal({ open, title, description, size = 'dialog', children, foo
       }}
       className={cn(
         'm-auto max-h-[calc(100dvh-32px)] overflow-y-auto rounded-md bg-(--dsv-modal-bg) p-6 text-on-surface shadow-2 backdrop:bg-(--dsv-modal-scrim) dsvsm:p-8',
-        size === 'panel' ? 'w-[min(720px,calc(100%-32px))]' : 'w-[min(480px,calc(100%-32px))]',
+        size === 'wide'
+          ? 'w-[min(1040px,calc(100%-32px))]'
+          : size === 'panel'
+            ? 'w-[min(720px,calc(100%-32px))]'
+            : 'w-[min(480px,calc(100%-32px))]',
       )}
     >
       <div className="flex items-start gap-4">
@@ -65,7 +70,7 @@ export function Modal({ open, title, description, size = 'dialog', children, foo
             </div>
           )}
         </div>
-        {size === 'panel' && (
+        {size !== 'dialog' && (
           <button
             type="button"
             onClick={onClose}

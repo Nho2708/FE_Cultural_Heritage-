@@ -218,25 +218,40 @@ export interface AuditLog {
 /** Cấp học suy từ khối lớp: khối 1-5 là cấp 1, 6-9 là cấp 2, 10-12 là cấp 3. */
 export type SchoolLevel = 1 | 2 | 3;
 
-/** Lớp của học sinh. */
+/** Lớp trong hồ sơ của học sinh. */
 export interface StudentClass {
   id: number;
   name: string;
   /** Khối 1-12. */
   grade: number;
+  /** Năm học dạng 2026-2027. */
+  schoolYear?: string | null;
 }
 
 /**
  * Hồ sơ học sinh sau khi đăng nhập ở web học tập hoặc app mobile: tên đăng nhập là mã học sinh, không có email.
  * Máy chủ trả cấp học để chọn bộ giao diện; giao diện vẫn tự suy được từ khối lớp nếu thiếu. Thiếu `studentCode` thì
- * dùng `username` (cùng giá trị).
+ * dùng `username` (cùng giá trị). Hồ sơ này do lớp gọi API dựng từ phản hồi của máy chủ (xem studentApi).
  */
 export interface StudentProfile extends UserProfile {
   role: 'STUDENT';
+  studentId?: number;
   studentCode?: string | null;
   schoolLevel: SchoolLevel | null;
   class: StudentClass | null;
   teacherName: string | null;
+}
+
+/** Lớp của em (màn hình Lớp của em): khối, cấp học, năm học, giáo viên phụ trách, trường. */
+export interface StudentClassDetail {
+  id: number;
+  name: string;
+  grade: number;
+  schoolLevel: SchoolLevel;
+  schoolLevelName: string;
+  schoolYear: string | null;
+  teacherName: string | null;
+  organization: OrganizationRef | null;
 }
 
 /** Khuôn phản hồi chung. `errors` chỉ có khi lỗi theo trường (khóa camelCase, lồng nhau nối bằng dấu chấm). */

@@ -13,6 +13,7 @@ export const LIMITS = {
   avatarUrl: 500,
   organizationName: 255,
   organizationAddress: 500,
+  className: 100,
 } as const;
 
 // Có một @, có tên miền với dấu chấm, không khoảng trắng (giống ValidationRules.IsEmail).

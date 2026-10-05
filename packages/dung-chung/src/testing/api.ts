@@ -29,6 +29,19 @@ export interface FetchCall {
   authorization: string | undefined;
 }
 
+/** Nội dung gửi đi: JSON được đọc lại, FormData đổi thành đối tượng (tệp thành { fileName, size }). */
+function readBody(body: BodyInit | null | undefined): unknown {
+  if (!body) return undefined;
+  if (typeof FormData !== 'undefined' && body instanceof FormData) {
+    const fields: Record<string, unknown> = {};
+    body.forEach((value, key) => {
+      fields[key] = typeof value === 'string' ? value : { fileName: value.name, size: value.size };
+    });
+    return fields;
+  }
+  return JSON.parse(String(body));
+}
+
 type Route = (call: FetchCall) => Response | Promise<Response> | undefined;
 
 /**
@@ -45,7 +58,7 @@ export function mockApi(...routes: Route[]) {
       const call: FetchCall = {
         method: init?.method ?? 'GET',
         path: `${url.pathname.replace(/^\/api\/v1/, '')}${url.search}`,
-        body: init?.body ? JSON.parse(String(init.body)) : undefined,
+        body: readBody(init?.body),
         authorization: headers.Authorization,
       };
       calls.push(call);
