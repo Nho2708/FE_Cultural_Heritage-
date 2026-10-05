@@ -93,6 +93,7 @@ function QuestionForm({ detail, initialType, onClose, onChanged, onOpen }: { det
   const [checked, setChecked] = useState<ValidateQuestionResult | null>(null);
   const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
+  const [pick, setPick] = useState<number | null>(null);
   const [previewLevel, setPreviewLevel] = useState<number>(draft.levelMin);
   const [busy, setBusy] = useState<'save' | 'approve' | 'reject' | 'delete' | 'duplicate' | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -105,6 +106,7 @@ function QuestionForm({ detail, initialType, onClose, onChanged, onOpen }: { det
 
   const edit = (next: QuestionDraft) => {
     setDraft(next);
+    setPick(null);
     setDirty(true);
     setServerErrors({});
     setFormError(null);
@@ -118,7 +120,7 @@ function QuestionForm({ detail, initialType, onClose, onChanged, onOpen }: { det
     const controller = new AbortController();
     const timer = setTimeout(() => {
       questionsApi
-        .validate(body, { previewLevel: level }, controller.signal)
+        .validate(body, { previewLevel: level, submission: pick === null ? undefined : { selectedIndex: pick } }, controller.signal)
         .then((r) => {
           if (id === sequence.current) setChecked(r.data);
         })
@@ -128,7 +130,7 @@ function QuestionForm({ detail, initialType, onClose, onChanged, onOpen }: { det
       clearTimeout(timer);
       controller.abort();
     };
-  }, [body, level]);
+  }, [body, level, pick]);
 
   const showErrors = dirty || attempted;
   const errors: Record<string, string> = readOnly ? {} : { ...(showErrors ? (checked?.errors ?? {}) : {}), ...serverErrors };
@@ -311,11 +313,20 @@ function QuestionForm({ detail, initialType, onClose, onChanged, onOpen }: { det
               />
             )}
             {checked?.preview ? (
-              <QuestionPreviewCard preview={checked.preview} />
+              <QuestionPreviewCard
+                preview={checked.preview}
+                selectedIndex={pick}
+                onSelectOption={checked.preview.options.length > 0 && checked.isValid ? setPick : undefined}
+              />
             ) : (
               <p className="rounded-md border border-dashed border-border p-4 type-body-s text-on-surface-variant">
                 Điền lời câu và đáp án để xem câu như học sinh thấy.
               </p>
+            )}
+            {checked?.trial && pick !== null && (
+              <output className="block type-body-s" data-testid="cham-thu">
+                Chấm thử: {checked.trial.isCorrect ? 'đúng' : 'chưa đúng'} ({checked.trial.partsCorrect}/{checked.trial.partsTotal} phần).
+              </output>
             )}
             {checked && (
               <p className="type-body-s text-on-surface-variant" data-testid="trang-thai-hop-le">
