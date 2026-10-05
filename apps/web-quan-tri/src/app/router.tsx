@@ -13,6 +13,8 @@ import { ProfilePage } from '../pages/profile/ProfilePage';
 import {
   AreaRoute,
   AuditLogPage,
+  ClassDetailPage,
+  ClassesPage,
   HeritageEditorPage,
   HeritagesPage,
   OwnAreaRoute,
@@ -41,6 +43,8 @@ const BUILT: Partial<Record<ScreenKey, ReactNode>> = {
   heritages: <HeritagesPage />,
   heritageEditor: <HeritageEditorPage />,
   auditLog: <AuditLogPage />,
+  classes: <ClassesPage />,
+  classDetail: <ClassDetailPage />,
 };
 
 /** Route (kèm guard) cho các màn hình có URL trong `keys`. `base` là đường dẫn của route cha (thành route index). */

@@ -1,5 +1,9 @@
 import type {
   Account,
+  ClassRoom,
+  ClassStudent,
+  ClassStudentList,
+  LoginSheet,
   HeritageDetail,
   HeritageEvent,
   HeritageMedia,
@@ -174,6 +178,72 @@ export function heritageDetailOf(overrides: Partial<HeritageDetail> = {}): Herit
     timelines: [],
     media: [],
     references: [],
+    ...overrides,
+  };
+}
+
+export function classOf(id: number, overrides: Partial<ClassRoom> = {}): ClassRoom {
+  return {
+    id,
+    name: '7A1',
+    grade: 7,
+    schoolLevel: 2,
+    schoolLevelName: 'Cấp 2',
+    schoolYear: '2026-2027',
+    activeStudentCount: 3,
+    maxStudents: 60,
+    lessonCount: 0,
+    neverLoggedInCount: 1,
+    createdAt: '2026-10-06T01:00:00Z',
+    ...overrides,
+  };
+}
+
+export function classStudentOf(id: number, overrides: Partial<ClassStudent> = {}): ClassStudent {
+  return {
+    id,
+    studentCode: `HS8K2QX${id}`,
+    fullName: `Học sinh số ${id}`,
+    isActive: true,
+    lastLoginAt: '2026-10-05T01:00:00Z',
+    passwordChanged: true,
+    createdAt: '2026-10-04T01:00:00Z',
+    ...overrides,
+  };
+}
+
+/** Phiếu đăng nhập như máy chủ trả sau khi tạo tài khoản hoặc đặt lại mật khẩu. */
+export function sheetOf(students: ReadonlyArray<{ id: number; name: string; code: string; password: string }>, className = '7A1'): LoginSheet {
+  return {
+    className,
+    loginUrl: 'http://localhost:5174/dang-nhap',
+    appDownloadUrl: null,
+    instructions: [
+      'Mở trang học tập: http://localhost:5174/dang-nhap',
+      'Hoặc cài ứng dụng DSVHVN trên điện thoại, mở ứng dụng và chọn chế độ "Học sinh" (không chọn "Khách tham quan").',
+      'Đăng nhập bằng mã học sinh và mật khẩu tạm ghi trên phiếu.',
+    ],
+    firstLoginReminder: 'Em sẽ phải đổi mật khẩu ở lần đăng nhập đầu tiên.',
+    notice: 'Mật khẩu tạm chỉ hiện một lần. Hãy in hoặc tải phiếu đăng nhập trước khi rời trang; nếu mất phiếu, dùng "Đặt lại mật khẩu".',
+    entries: students.map((s) => ({
+      studentId: s.id,
+      fullName: s.name,
+      className,
+      studentCode: s.code,
+      temporaryPassword: s.password,
+    })),
+  };
+}
+
+export function studentPage(items: ClassStudent[], overrides: Partial<ClassStudentList> = {}): ClassStudentList {
+  return {
+    items,
+    page: 1,
+    pageSize: 20,
+    totalItems: items.length,
+    totalPages: items.length === 0 ? 0 : 1,
+    activeCount: items.filter((s) => s.isActive).length,
+    maxStudents: 60,
     ...overrides,
   };
 }

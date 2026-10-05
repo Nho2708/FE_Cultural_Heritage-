@@ -1,3 +1,4 @@
+import type { ClassListQuery, StudentListQuery } from './classroomEndpoints';
 import type { AuditLogQuery, HeritageListQuery, OrganizationListQuery, TeacherListQuery } from './endpoints';
 
 // Khóa bộ nhớ đệm của React Query. Khóa cha (ví dụ ['org']) dùng để làm mới cả nhóm sau khi ghi.
@@ -16,6 +17,12 @@ export const queryKeys = {
   heritages: ['admin', 'heritages'] as const,
   heritageList: (query: HeritageListQuery) => ['admin', 'heritages', 'list', query] as const,
   heritage: (id: number) => ['admin', 'heritages', 'detail', id] as const,
+
+  /** Lớp của giáo viên: danh sách, chi tiết và học sinh của lớp (làm mới cả nhóm sau khi thêm, sửa, xóa). */
+  classes: ['teacher', 'classes'] as const,
+  classList: (query: ClassListQuery) => ['teacher', 'classes', 'list', query] as const,
+  classDetail: (id: number) => ['teacher', 'classes', 'detail', id] as const,
+  classStudents: (id: number, query: StudentListQuery) => ['teacher', 'classes', 'students', id, query] as const,
 
   auditLogs: (query: AuditLogQuery) => ['admin', 'audit-logs', query] as const,
 };

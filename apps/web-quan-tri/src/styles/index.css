@@ -6,3 +6,82 @@
 
 /* Component của gói dùng chung nằm ngoài thư mục ứng dụng: khai báo để Tailwind quét lớp tiện ích của chúng. */
 @source '../../../../packages/dung-chung/src';
+
+/*
+ * Bản in phiếu đăng nhập của học sinh: khối #dsv-print-root được gắn vào cuối <body> khi hộp thoại phiếu đang mở. Trên màn hình
+ * khối này ẩn; khi in thì ẩn mọi phần còn lại của trang và xếp phiếu lên khổ A4, 2 cột x 4 hàng mỗi trang, có đường cắt.
+ */
+#dsv-print-root {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 6mm;
+  }
+
+  body > *:not(#dsv-print-root) {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+  }
+
+  #dsv-print-root {
+    display: block;
+    color: #000;
+  }
+
+  #dsv-print-root .dsv-print-title {
+    height: 4mm;
+    margin: 0 0 1mm;
+    font-size: 8pt;
+    line-height: 4mm;
+    color: #444;
+  }
+
+  /* Khổ A4 trừ lề và dòng tiêu đề: 4 hàng phiếu mỗi trang. */
+  #dsv-print-root .dsv-slip-page {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(4, 1fr);
+    height: 279mm;
+    break-after: page;
+    page-break-after: always;
+  }
+
+  #dsv-print-root .dsv-slip-page:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  #dsv-print-root .dsv-slip {
+    break-inside: avoid;
+    border-radius: 0;
+    padding: 3mm;
+    gap: 1.5mm;
+    border: 1px dashed #666;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  #dsv-print-root .dsv-slip * {
+    font-size: 7.5pt;
+    line-height: 1.3;
+  }
+
+  #dsv-print-root .dsv-slip .type-h3 {
+    font-size: 11pt;
+  }
+
+  #dsv-print-root .dsv-slip dd {
+    margin-top: 0;
+    font-size: 12pt;
+  }
+
+  #dsv-print-root .dsv-slip ol {
+    padding-left: 4mm;
+  }
+}
