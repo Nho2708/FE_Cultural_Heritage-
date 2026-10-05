@@ -11,10 +11,15 @@ export const ERROR_CODES = {
   required: 'REQUIRED',
   invalid: 'INVALID',
   passwordPolicy: 'PASSWORD_POLICY',
+  passwordMismatch: 'PASSWORD_MISMATCH',
   samePassword: 'SAME_PASSWORD',
   duplicate: 'DUPLICATE',
   invalidCredentials: 'INVALID_CREDENTIALS',
   accountBlocked: 'ACCOUNT_BLOCKED',
+  studentInvalidCredentials: 'STUDENT_INVALID_CREDENTIALS',
+  studentAccountBlocked: 'STUDENT_ACCOUNT_BLOCKED',
+  passwordChangeRequired: 'PASSWORD_CHANGE_REQUIRED',
+  classLevelChangeNeedsConfirmation: 'CLASS_LEVEL_CHANGE_NEEDS_CONFIRMATION',
   passwordLinkInvalid: 'PASSWORD_LINK_INVALID',
   forbidden: 'FORBIDDEN',
   blocked: 'BLOCKED',
@@ -53,6 +58,7 @@ export type QueryValue = string | number | boolean | null | undefined;
 
 export interface RequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  /** Dữ liệu gửi đi: đối tượng gửi dạng JSON, hoặc FormData (tải tệp lên, trình duyệt tự đặt Content-Type). */
   body?: unknown;
   /** Tham số query; giá trị rỗng, null, undefined bị bỏ qua. */
   query?: Record<string, QueryValue>;
@@ -78,14 +84,36 @@ export interface ApiClientOptions {
   onUnauthorized?: (response: UnauthorizedResponse) => void;
 }
 
+/** Tệp tải về từ máy chủ (tệp mẫu danh sách học sinh). */
+export interface DownloadedFile {
+  blob: Blob;
+  fileName: string;
+}
+
 export interface ApiClient {
   request<T>(path: string, options?: RequestOptions): Promise<ApiResult<T>>;
+  /** Tải một tệp (phản hồi không theo khuôn JSON). Lỗi vẫn theo khuôn phản hồi chung như `request`. */
+  download(path: string, options?: RequestOptions, fallbackFileName?: string): Promise<DownloadedFile>;
 }
 
 function correlationId(): string {
   return typeof crypto !== 'undefined' && 'randomUUID' in crypto
     ? crypto.randomUUID()
     : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
+}
+
+/** Tên tệp trong header Content-Disposition (ưu tiên dạng filename*=UTF-8''…); null nếu không đọc được (trình duyệt chỉ cho đọc header máy chủ đã công bố). */
+export function fileNameOf(header: string | null): string | null {
+  if (!header) return null;
+  const encoded = /filename\*=(?:UTF-8'')?([^;]+)/i.exec(header)?.[1];
+  if (encoded) {
+    try {
+      return decodeURIComponent(encoded.trim().replace(/^"|"$/g, ''));
+    } catch {
+      // rơi xuống tên thường
+    }
+  }
+  return /filename="?([^";]+)"?/i.exec(header)?.[1]?.trim() ?? null;
 }
 
 export function withQuery(path: string, query: Record<string, QueryValue> | undefined): string {
@@ -114,13 +142,14 @@ export function createApiClient({ baseUrl, getAccessToken, onUnauthorized }: Api
       Accept: 'application/json',
       'X-Correlation-Id': correlationId(),
     };
-    if (options.body !== undefined) headers['Content-Type'] = 'application/json';
+    const isForm = typeof FormData !== 'undefined' && options.body instanceof FormData;
+    if (options.body !== undefined && !isForm) headers['Content-Type'] = 'application/json';
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
     try {
       return await fetch(`${baseUrl}${withQuery(path, options.query)}`, {
         method: options.method ?? 'GET',
         headers,
-        body: options.body === undefined ? undefined : JSON.stringify(options.body),
+        body: options.body === undefined ? undefined : isForm ? (options.body as FormData) : JSON.stringify(options.body),
         signal: options.signal,
       });
     } catch (error) {
@@ -129,7 +158,8 @@ export function createApiClient({ baseUrl, getAccessToken, onUnauthorized }: Api
     }
   }
 
-  async function request<T>(path: string, options: RequestOptions = {}): Promise<ApiResult<T>> {
+  /** Gửi yêu cầu kèm token (nếu endpoint cần) và đổi phản hồi lỗi thành ApiError; trả phản hồi khi thành công. */
+  async function exchange(path: string, options: RequestOptions): Promise<{ response: Response; token: string | null }> {
     const needsAuth = options.auth ?? true;
     let token: string | null = null;
     if (needsAuth) {
@@ -137,11 +167,10 @@ export function createApiClient({ baseUrl, getAccessToken, onUnauthorized }: Api
       // Chưa đăng nhập hoặc token đã quá hạn: không gọi mạng, route guard sẽ đưa về màn hình đăng nhập.
       if (!token) throw new ApiError(401, ERROR_CODES.forbidden, MESSAGES.forbidden);
     }
+    return { response: await send(path, options, token), token };
+  }
 
-    const response = await send(path, options, token);
-    const envelope = await readEnvelope<T>(response);
-    if (response.ok && envelope?.success) return { data: envelope.data as T, message: envelope.message };
-
+  function fail(response: Response, token: string | null, envelope: ApiEnvelope<unknown> | null): never {
     if (token && response.status === 401) {
       onUnauthorized?.({ token, errorCode: envelope?.errorCode ?? null, message: envelope?.message ?? null });
     }
@@ -155,7 +184,22 @@ export function createApiClient({ baseUrl, getAccessToken, onUnauthorized }: Api
     );
   }
 
-  return { request };
+  async function request<T>(path: string, options: RequestOptions = {}): Promise<ApiResult<T>> {
+    const { response, token } = await exchange(path, options);
+    const envelope = await readEnvelope<T>(response);
+    if (response.ok && envelope?.success) return { data: envelope.data as T, message: envelope.message };
+    return fail(response, token, envelope);
+  }
+
+  async function download(path: string, options: RequestOptions = {}, fallbackFileName = 'tep-tai-ve'): Promise<DownloadedFile> {
+    const { response, token } = await exchange(path, options);
+    if (response.ok) {
+      return { blob: await response.blob(), fileName: fileNameOf(response.headers.get('Content-Disposition')) ?? fallbackFileName };
+    }
+    return fail(response, token, await readEnvelope<unknown>(response));
+  }
+
+  return { request, download };
 }
 
 /** Câu hiển thị cho một lỗi bất kỳ: câu thông báo của backend, hoặc câu lỗi hệ thống. */
