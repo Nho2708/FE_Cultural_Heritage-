@@ -16,7 +16,8 @@ Nguồn duy nhất: `apps/web-hoc-tap/src/access/screens.ts` — 14 màn hình (
 | `/dang-nhap` | Học sinh đăng nhập | Khách | Đã dựng |
 | `/doi-mat-khau` | Đổi mật khẩu | Học sinh | Đã dựng (chế độ bắt buộc và tự đổi) |
 | `/hoc` | Trang học của em | Học sinh | Ba bản bố cục theo cấp (cấp 1, 2, 3): lời chào, thông tin của em, Lớp của em, lối vào nhập mã bài học; các khối bài học, gợi ý, huy hiệu dựng ở luồng sau ([lop-hoc-sinh.md](lop-hoc-sinh.md)) |
-| `/nhap-ma`, `/bai-hoc/:maBaiHoc`, `/bai-hoc/:maBaiHoc/kiem-tra/:baiKiemTra` (toàn màn hình), `/ket-qua/:luotLam`, `/tien-do` | Nhập mã, bài học, làm bài kiểm tra, kết quả, tiến độ | Học sinh | Đang xây dựng |
+| `/nhap-ma`, `/bai-hoc/:maBaiHoc` | Nhập mã bài học, Bài học (ba bố cục theo cấp) | Học sinh | Đã dựng ([bai-hoc-theo-cap.md](bai-hoc-theo-cap.md)) |
+| `/bai-hoc/:maBaiHoc/kiem-tra/:baiKiemTra` (toàn màn hình), `/ket-qua/:luotLam`, `/tien-do` | Làm bài kiểm tra, kết quả, tiến độ | Học sinh | Đang xây dựng |
 
 Thanh điều hướng trên: chưa đăng nhập — Khám phá · Bản đồ · Dòng thời gian · "Học sinh đăng nhập"; học sinh đã đăng nhập
 — Trang học · Nhập mã · Tiến độ · Khám phá · Bản đồ · Dòng thời gian · menu tài khoản (họ tên, mã học sinh, lớp; Đổi mật

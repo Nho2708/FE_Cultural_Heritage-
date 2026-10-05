@@ -23,7 +23,7 @@ ma trận phân quyền. Khóa màn hình đặt theo nghĩa (`login`, `schoolTe
 | Xác thực | `/dang-nhap`, `/quen-mat-khau`, `/dat-mat-khau` | Chỉ khách | Thanh trên có chữ nhận diện "Trang quản trị" và "Mở trang khám phá di sản" (web học tập, tab mới) |
 | `/` | — | Mọi người | Khách → Đăng nhập; người đã đăng nhập → trang mặc định của vai trò |
 | Hồ sơ cá nhân | `/tai-khoan` | Ba vai trò | Hiện trong khu làm việc của người đang đăng nhập |
-| Giáo viên | `/giao-vien` | TEACHER | Thanh bên: Lớp học · Bài học · Ngân hàng câu hỏi · Bài kiểm tra |
+| Giáo viên | `/giao-vien` | TEACHER | Thanh bên: Lớp học · Bài học · Ngân hàng câu hỏi · Bài kiểm tra. Bài học (danh sách, tạo, soạn, mã bài học, nhân bản) dựng ở [bai-hoc-theo-cap.md](bai-hoc-theo-cap.md) |
 | Quản trị trường | `/truong` | ORG_ADMIN | Thanh bên: Trường và gói · Giáo viên (thêm "Tổng quan" khi màn hình này được dựng) |
 | Quản trị hệ thống | `/quan-tri` | ADMIN | Thanh bên: Trường · Di sản · Câu hỏi · Gói dịch vụ · Nhật ký; dark mode theo hệ điều hành |
 
