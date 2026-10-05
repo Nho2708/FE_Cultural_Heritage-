@@ -1,4 +1,5 @@
 import type { ApiClient, ApiResult } from './client';
+import type { StudentLesson } from './lessons';
 import type { AccessToken, LoginResult, OrganizationRef, SchoolLevel, StudentClassDetail, StudentProfile } from './types';
 
 // Endpoint của học sinh, dùng chung cho web học tập và app mobile (cùng API, cùng kết quả). Máy chủ trả hồ sơ học sinh
@@ -10,6 +11,7 @@ export const STUDENT_ENDPOINTS = {
   profile: '/student/me',
   password: '/student/me/password',
   class: '/student/class',
+  lesson: (code: string) => `/student/lessons/${encodeURIComponent(code)}`,
 } as const;
 
 export interface StudentLoginBody {
@@ -109,6 +111,12 @@ export function createStudentApi(client: ApiClient) {
 
     /** Lớp của em. Máy chủ từ chối (403) khi em còn phải đổi mật khẩu. */
     classroom: () => client.request<StudentClassDetail>(STUDENT_ENDPOINTS.class),
+
+    /**
+     * Mở bài học bằng mã bài học (đã chuẩn hóa). Mã sai, bài chưa xuất bản hoặc không thuộc lớp của em đều trả cùng một câu 404
+     * và tính vào giới hạn nhập sai (429 khi vượt).
+     */
+    lessonByCode: (code: string) => client.request<StudentLesson>(STUDENT_ENDPOINTS.lesson(code)),
   };
 }
 
