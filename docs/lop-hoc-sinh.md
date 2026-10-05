@@ -15,7 +15,7 @@ Phần giao diện của luồng này trên hai ứng dụng web, nối với ba
 | Route | Màn hình | Nội dung |
 |---|---|---|
 | `/giao-vien/lop` | Lớp học | Khối "Tạo lớp" ngay trên trang (tên lớp, khối 1-12, năm học mặc định theo năm học hiện hành), bảng lớp (khối kèm cấp học, năm học, sĩ số, số bài học, số em chưa đăng nhập lần nào), tìm theo tên, lọc theo khối, sửa và xóa mềm từng dòng |
-| `/giao-vien/lop/:lop` | Chi tiết lớp | Đầu trang: tên lớp, khối và cấp học, năm học, sĩ số, "Sửa lớp". Năm tab nằm trên URL (`?tab=`): **Học sinh** dựng ở luồng này; Bài học, Tiến độ, Thành thạo, Gợi ý ôn tập báo "sẽ có ở bản sau" |
+| `/giao-vien/lop/:lop` | Chi tiết lớp | Đầu trang: tên lớp, khối và cấp học, năm học, sĩ số, "Sửa lớp". Năm tab nằm trên URL (`?tab=`): **Học sinh** dựng ở luồng này, **Bài học** dựng ở luồng bài học theo cấp; Tiến độ, Thành thạo, Gợi ý ôn tập báo "sẽ có ở bản sau" |
 | — | Thêm học sinh và tạo tài khoản | Hộp thoại hai chế độ: **Thêm từng em** (một hoặc vài dòng họ tên) và **Nhập danh sách** (tệp `.xlsx` / `.csv` kéo thả hoặc chọn, hoặc dán họ tên; tải tệp mẫu; xem trước từng dòng; "Lưu các dòng hợp lệ") |
 | — | Phiếu đăng nhập của học sinh | Hộp thoại rộng, mỗi em một phiếu (mã học sinh, mật khẩu tạm, hướng dẫn); "In phiếu" khổ A4 8 phiếu mỗi trang có đường cắt; đóng thì hỏi "Thầy cô đã in hoặc lưu phiếu chưa?" |
 
@@ -75,7 +75,7 @@ Máy chủ trả 401 (vô hiệu, xóa học sinh, xóa lớp, ngừng trường
 ## 3. Chưa làm ở luồng này
 
 - Hồ sơ học tập của học sinh (nhóm bài học và kết quả): route `/giao-vien/lop/:lop/hoc-sinh/:hocSinh` còn "Đang xây dựng"; dòng học sinh chưa là liên kết.
-- Tab Bài học, Tiến độ, Thành thạo, Gợi ý ôn tập của Chi tiết lớp.
+- Tab Tiến độ, Thành thạo, Gợi ý ôn tập của Chi tiết lớp (tab Bài học đã dựng ở [bai-hoc-theo-cap.md](bai-hoc-theo-cap.md)).
 - Tổng quan trường (số lớp, số học sinh theo cấp từ `GET /org/school-summary`): màn hình Tổng quan trường chưa dựng nên chưa dùng endpoint này.
 - Tải tệp PDF thật (xem trên): đang dùng hộp thoại in của trình duyệt.
 

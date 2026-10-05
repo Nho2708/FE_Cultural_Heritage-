@@ -73,3 +73,39 @@ nếu không `App__SetPasswordPath=/dat-mat-khau` bị đổi thành đường d
 
 Kịch bản đầu cuối của đăng nhập học sinh, đổi mật khẩu lần đầu và Lớp của em chạy trên Chrome thật với API nhánh `feature/DSVHVN-007-lop-hoc-sinh`
 và database tạm: xem mục Kiểm thử trong [lop-hoc-sinh.md](lop-hoc-sinh.md).
+
+## Bài học theo cấp (web quản trị và web học tập)
+
+> Chạy ngày 06/10/2026 (+07) với backend nhánh `feature/DSVHVN-008-bai-hoc-theo-cap`. Kết quả: **29/29 bước đạt**, không có lỗi JavaScript trên trang, không có phản hồi 5xx.
+> Script: [`apps/web-quan-tri/scripts/smoke-bai-hoc.mjs`](../apps/web-quan-tri/scripts/smoke-bai-hoc.mjs) (`npm run smoke:bai-hoc -w @dsvhvn/web-quan-tri`).
+
+| Mục | Giá trị |
+|---|---|
+| Trình duyệt | Microsoft Edge headless qua `playwright-core`; khung 1440 × 900 và 390 × 844 |
+| API | Bản build của backend, `ASPNETCORE_ENVIRONMENT=Development`, `http://localhost:5095`, LocalDB **database tạm** `dsvhvn_ui_bai_hoc_tmp` (migrate và nạp 20 di sản đợt 1 lúc khởi động, **đã xóa sau khi chạy**), `Email__Mode=Log` (không gửi thư thật), `Ai:Mode` mặc định `Simulated` (không gọi nhà cung cấp AI) |
+| Giao diện | `VITE_API_BASE_URL=http://localhost:5095/api/v1 npx vite --port 5195` (web quản trị, `VITE_LEARNING_WEB_URL=http://localhost:5196`) và `--port 5196` (web học tập); đã tắt mọi tiến trình đã bật |
+| Chuẩn bị | Gọi thẳng API: xuất bản 4 di sản có dòng thời gian, tạo trường, quản trị trường, giáo viên, lớp khối 3 và lớp khối 8, mỗi lớp một học sinh đã đổi mật khẩu lần đầu. Mọi thao tác với bài học đi qua giao diện |
+
+| # | Bước | Kết quả |
+|---:|---|---|
+| 1 | Giáo viên đăng nhập web quản trị; Bài học của tôi chưa có bài | Trạng thái rỗng |
+| 2 | Tạo bài cho lớp khối 3: chọn lớp, hai di sản, tiêu đề | Mở Soạn bài học cấp 1 |
+| 3 | "Soạn nội dung bằng AI", "Lưu nháp", "Xuất bản" | Mã `BH` + 6 ký tự thuộc bảng 32 ký tự; hộp thoại Mã bài học |
+| 4 | Mã bài học: đường dẫn tới web học tập; Chiếu lên bảng | Mã chia nhóm `BH xxx xxx`, Esc để thoát |
+| 5 | Tạo, soạn, xuất bản bài cho lớp khối 8 | Khung cấp 2 (mốc thời gian nối sự kiện); mã khác mã lớp khối 3 |
+| 6 | Bài học của tôi | Hai bài đã xuất bản kèm mã |
+| 7 | Nhân bản bài khối 3 sang lớp khối 8 | Cảnh báo khác cấp; bài Nháp chưa có mã ở lớp khối 8 |
+| 8 | 390px màn hình Soạn bài học | Không tràn ngang |
+| 9 | Học sinh khối 3 đăng nhập, gõ `bh 7f3-k2q` kiểu thường có khoảng trắng và gạch | Mở bài với **bố cục cấp 1**: luồng Nghe chuyện, Xem hình, Chơi, Nhận sao; mỗi lần một đoạn |
+| 10 | Cấp 1: Tiếp nhé, tải lại trang | Mở đúng đoạn đang dừng; đi hết tới bước Nhận sao |
+| 11 | Học sinh khối 3 gõ mã của lớp khối 8 | Cùng một câu "Mã bài học chưa đúng hoặc không dành cho lớp của em" |
+| 12 | Màn hình Nhập mã | Nhớ mã vừa mở trên máy này |
+| 13 | Học sinh khối 8 đăng nhập, gõ mã | **Bố cục cấp 2**: ba tab Đọc bài, Dòng thời gian của bài, Bài kiểm tra; các mốc theo năm |
+| 14 | 390px bài học cấp 2 | Không tràn ngang |
+| 15 | Học sinh khối 8 mở đường dẫn bài của lớp khối 3 | Bị từ chối |
+| 16 | Lưu trữ bài khối 8 | Học sinh không mở được bằng mã |
+| 17 | Xuất bản lại | Giữ nguyên mã |
+| 18 | Lỗi JavaScript và phản hồi 5xx | Không có |
+
+Ghi chú: ảnh của Wikimedia Commons không tải được trong môi trường kiểm thử nên các khung ảnh trống (giao diện vẫn hiện chú thích và ghi công). Bố cục cấp 3 chỉ có test giao diện, chưa chạy trên
+trình duyệt thật (lần này dùng lớp khối 3 và khối 8).
