@@ -2,7 +2,7 @@
 
 Ứng dụng React thứ hai (tên hiển thị "Học di sản"), tách khỏi web quản trị: khám phá di sản công khai cho khách và học
 sinh, khu học của học sinh đăng nhập bằng **mã học sinh + mật khẩu**. Giao diện đổi theo **cấp học** của học sinh (suy từ
-khối lớp) bằng bộ token; một bố cục, một bộ component, một bộ câu chữ cho cả ba cấp. Bản này có: năm màn hình khám phá công khai (xem [kham-pha-di-san.md](kham-pha-di-san.md)), học sinh đăng nhập, đổi mật khẩu lần đầu, trang học của em (bản giữ chỗ) và bốn bộ giao diện. Các
+khối lớp) bằng bộ token; một bố cục, một bộ component, một bộ câu chữ cho cả ba cấp. Bản này có: năm màn hình khám phá công khai (xem [kham-pha-di-san.md](kham-pha-di-san.md)), học sinh đăng nhập, đổi mật khẩu lần đầu, trang học của em (ba bản bố cục theo cấp) và bốn bộ giao diện. Các
 màn hình khác đã có route và guard, hiện "Đang xây dựng".
 
 ## 1. Màn hình
@@ -15,7 +15,7 @@ Nguồn duy nhất: `apps/web-hoc-tap/src/access/screens.ts` — 14 màn hình (
 | `/di-san`, `/ban-do`, `/di-san/:diSan`, `/dong-thoi-gian[/:diSan]` | Tìm kiếm và lọc, bản đồ, chi tiết di sản, dòng thời gian | Khách, học sinh | Đã dựng ([khám phá di sản](kham-pha-di-san.md)) |
 | `/dang-nhap` | Học sinh đăng nhập | Khách | Đã dựng |
 | `/doi-mat-khau` | Đổi mật khẩu | Học sinh | Đã dựng (chế độ bắt buộc và tự đổi) |
-| `/hoc` | Trang học của em | Học sinh | Bản khung: lời chào, mã học sinh, lớp, khối, cấp học, giáo viên, trường, lời nhắc nhập mã bài học |
+| `/hoc` | Trang học của em | Học sinh | Ba bản bố cục theo cấp (cấp 1, 2, 3): lời chào, thông tin của em, Lớp của em, lối vào nhập mã bài học; các khối bài học, gợi ý, huy hiệu dựng ở luồng sau ([lop-hoc-sinh.md](lop-hoc-sinh.md)) |
 | `/nhap-ma`, `/bai-hoc/:maBaiHoc`, `/bai-hoc/:maBaiHoc/kiem-tra/:baiKiemTra` (toàn màn hình), `/ket-qua/:luotLam`, `/tien-do` | Nhập mã, bài học, làm bài kiểm tra, kết quả, tiến độ | Học sinh | Đang xây dựng |
 
 Thanh điều hướng trên: chưa đăng nhập — Khám phá · Bản đồ · Dòng thời gian · "Học sinh đăng nhập"; học sinh đã đăng nhập
@@ -43,22 +43,19 @@ khẩu; Đăng xuất). Dưới 841px gom vào ngăn kéo. Đăng xuất về tr
 | Tự đổi (menu tài khoản) | Thêm ô mật khẩu hiện tại, có nút Hủy |
 | Phiên | Chỉ access token; lưu ở `sessionStorage` khóa `dsvhvn.hoc-tap.phien` (mất khi đóng tab — học sinh hay dùng chung máy của trường). Mở ứng dụng thì đọc lại hồ sơ để cập nhật cấp học khi giáo viên sửa khối lớp |
 
-### Endpoint học sinh (đề xuất, backend chưa có)
+### Endpoint học sinh
 
-Backend hiện chỉ có cửa đăng nhập web quản trị (tài khoản học sinh bị từ chối ở đó). Lớp gọi API của học sinh đã có sẵn ở
-gói dùng chung (`packages/dung-chung/src/api/studentApi.ts`, app mobile dùng lại); đường dẫn và tên trường là đề xuất,
-chốt khi backend làm chức năng đăng nhập học sinh — đổi ở `STUDENT_ENDPOINTS` là đủ.
+Dùng endpoint thật của backend (nhánh `feature/DSVHVN-007-lop-hoc-sinh`); lớp gọi API ở gói dùng chung (`packages/dung-chung/src/api/studentApi.ts`, app mobile dùng lại).
+Chi tiết và cách đổi hồ sơ máy chủ sang `StudentProfile`: [lop-hoc-sinh.md](lop-hoc-sinh.md).
 
-| Method | Đường dẫn (đề xuất) | Thân | Trả về |
+| Method | Đường dẫn | Thân | Trả về |
 |---|---|---|---|
-| POST | `/auth/student-login` (công khai) | `{ studentCode, password }` | `{ tokenType, accessToken, expiresAt, user }` — `user` là hồ sơ học sinh |
-| GET | `/student/me` | — | Hồ sơ học sinh |
-| PUT | `/student/me/password` | `{ currentPassword, newPassword }` (`currentPassword` là `null` ở chế độ bắt buộc) | Access token mới |
+| POST | `/student/auth/login` (công khai) | `{ studentCode, password }` | `{ tokenType, accessToken, expiresAt, student }` |
+| GET | `/student/me` | — | Hồ sơ học sinh (gọi được cả khi đang bị buộc đổi mật khẩu) |
+| PUT | `/student/me/password` | `{ currentPassword, newPassword, confirmNewPassword }` (`currentPassword` là `null` ở chế độ bắt buộc) | Như đăng nhập: token mới, token cũ hết dùng |
+| GET | `/student/class` | — | Lớp của em (403 `PASSWORD_CHANGE_REQUIRED` khi còn phải đổi mật khẩu) |
 
-Hồ sơ học sinh (`StudentProfile`) = hồ sơ chung (`id`, `username` = mã học sinh, `email` = `null`, `fullName`, `role` =
-`STUDENT`, `mustChangePassword`, `organization`…) + `studentCode`, `schoolLevel` (1 / 2 / 3), `class { id, name, grade }`,
-`teacherName`. Thiếu `schoolLevel` thì giao diện tự suy từ `class.grade`; thiếu `studentCode` thì dùng `username`.
-Mã lỗi dùng chung bộ mã theo nghĩa của backend (`INVALID_CREDENTIALS`, `ACCOUNT_BLOCKED`, `SAME_PASSWORD`…); câu chữ
+Mã lỗi theo nghĩa của backend (`STUDENT_INVALID_CREDENTIALS`, `STUDENT_ACCOUNT_BLOCKED`, `PASSWORD_CHANGE_REQUIRED`, `SAME_PASSWORD`, `PASSWORD_MISMATCH`…); câu chữ
 với học sinh xưng "em" do máy chủ trả.
 
 ## 3. Bộ giao diện theo cấp học

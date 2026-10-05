@@ -50,7 +50,7 @@ nếu không `App__SetPasswordPath=/dat-mat-khau` bị đổi thành đường d
 | 25 | Giáo viên đặt mật khẩu, đăng nhập | Hồ sơ cá nhân `/tai-khoan` trong khu giáo viên |
 | 26 | Hồ sơ cá nhân | Hiện tên trường của giáo viên |
 | 27 | Hồ sơ cá nhân: sửa số điện thoại | "Lưu hồ sơ thành công." |
-| 28 | `/giao-vien` | `/giao-vien/lop` ("Đang xây dựng") trong khu có thanh bên |
+| 28 | `/giao-vien` | `/giao-vien/lop` (Lớp học) trong khu có thanh bên |
 | 29 | Giáo viên mở `/truong/giao-vien` | 403 "Bạn không có quyền thực hiện thao tác này." |
 | 30 | Quản trị trường bấm "Khóa" | Hộp xác nhận "Bạn có chắc muốn khóa tài khoản "{họ tên}"?" |
 | 31 | Xác nhận khóa | "Khóa tài khoản thành công.", trạng thái "Bị khóa" |
@@ -71,7 +71,5 @@ nếu không `App__SetPasswordPath=/dat-mat-khau` bị đổi thành đường d
 
 ## Web học tập
 
-Backend chưa có endpoint đăng nhập học sinh nên chưa có kịch bản đầu cuối cho web học tập. Đã chạy thử trên Edge thật
-với phiên học sinh giả và hồ sơ giả (khối 3, 7, 11 và tài khoản đang bị buộc đổi mật khẩu) ở 1280 × 860, 390 × 844,
-360 × 640: đúng bộ giao diện theo cấp, không tràn ngang, không lỗi JavaScript; đăng nhập với backend hiện tại hiện câu lỗi
-hệ thống.
+Kịch bản đầu cuối của đăng nhập học sinh, đổi mật khẩu lần đầu và Lớp của em chạy trên Chrome thật với API nhánh `feature/DSVHVN-007-lop-hoc-sinh`
+và database tạm: xem mục Kiểm thử trong [lop-hoc-sinh.md](lop-hoc-sinh.md).

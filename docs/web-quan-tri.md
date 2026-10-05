@@ -8,7 +8,7 @@ trường, quản lý trường, nhật ký thao tác — trên API của backen
 | Mục | Giá trị |
 |---|---|
 | Chức năng | Đăng nhập web quản trị · Đặt mật khẩu qua email · Hồ sơ cá nhân · Quản lý thông tin trường · Quản lý tài khoản giáo viên · Xem nhật ký thao tác |
-| Màn hình dựng | Đăng nhập · Quên và đặt mật khẩu · Hồ sơ cá nhân · Trường và gói (tab Thông tin trường) · Giáo viên của trường · Biểu mẫu tài khoản · Quản lý trường · Chi tiết trường · Nhật ký thao tác · trang 403, 404, lỗi hệ thống |
+| Màn hình dựng | Lớp học · Chi tiết lớp (tab Học sinh), Thêm học sinh, Phiếu đăng nhập ([lop-hoc-sinh.md](lop-hoc-sinh.md)) · Đăng nhập · Quên và đặt mật khẩu · Hồ sơ cá nhân · Trường và gói (tab Thông tin trường) · Giáo viên của trường · Biểu mẫu tài khoản · Quản lý trường · Chi tiết trường · Nhật ký thao tác · trang 403, 404, lỗi hệ thống |
 | Backend | `BE_Cultural_Heritage-`, tài liệu `docs/nen-tang-to-chuc.md` |
 
 ## 1. Route và màn hình
@@ -61,7 +61,7 @@ Ba khu làm việc và màn hình của chúng tách chunk riêng, chỉ tải s
 | `signed-in` | Đã đăng nhập mà mở Đăng nhập, Quên / đặt mật khẩu | Về trang vừa chọn khi đăng nhập, hoặc trang mặc định của vai trò |
 | `forbidden` | Vai trò không có quyền | Trang 403 |
 
-Trang mặc định: giáo viên → Hồ sơ cá nhân (tới khi dựng Lớp học); quản trị trường → Giáo viên của trường; quản trị hệ
+Trang mặc định: giáo viên → Hồ sơ cá nhân (màn hình Lớp học đã dựng nhưng trang mặc định chưa đổi sang đó; đổi ở `roleHome` khi chốt); quản trị trường → Giáo viên của trường; quản trị hệ
 thống → Quản lý trường. Test kiểm số màn hình theo cột ma trận: **2 / 19 / 7 / 12** (khách / giáo viên / quản trị trường
 / quản trị hệ thống). Guard chỉ để điều hướng; backend kiểm vai trò và trường ở mọi endpoint.
 
