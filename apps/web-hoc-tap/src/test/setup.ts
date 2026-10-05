@@ -10,6 +10,7 @@ afterEach(() => {
   cleanup();
   sessionStore.clear();
   window.sessionStorage.clear();
+  window.localStorage.clear();
   document.documentElement.removeAttribute('style');
   document.documentElement.removeAttribute('data-bo-giao-dien');
   vi.unstubAllGlobals();
