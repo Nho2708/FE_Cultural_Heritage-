@@ -17,6 +17,8 @@ import {
   ClassesPage,
   HeritageEditorPage,
   HeritagesPage,
+  LessonEditorPage,
+  LessonsPage,
   OwnAreaRoute,
   SchoolDetailPage,
   SchoolInfoPage,
@@ -45,6 +47,8 @@ const BUILT: Partial<Record<ScreenKey, ReactNode>> = {
   auditLog: <AuditLogPage />,
   classes: <ClassesPage />,
   classDetail: <ClassDetailPage />,
+  lessons: <LessonsPage />,
+  lessonEditor: <LessonEditorPage />,
 };
 
 /** Route (kèm guard) cho các màn hình có URL trong `keys`. `base` là đường dẫn của route cha (thành route index). */

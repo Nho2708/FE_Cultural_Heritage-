@@ -162,6 +162,8 @@ export const PATHS = {
   school: (id: number) => `/quan-tri/truong/${id}`,
   /** Chi tiết lớp của giáo viên (tab nằm trong tham số `?tab=`). */
   classRoom: (id: number) => `/giao-vien/lop/${id}`,
+  /** Soạn bài học của giáo viên. */
+  lesson: (id: number) => `/giao-vien/bai-hoc/${id}`,
   /** Biên tập di sản ở trạng thái tạo mới. */
   newHeritage: '/quan-tri/di-san/moi',
   /** Biên tập di sản: sửa một di sản (tab nằm trong tham số `?tab=`). */

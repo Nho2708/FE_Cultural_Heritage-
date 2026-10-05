@@ -18,6 +18,8 @@ export const HeritagesPage = lazy(() => import('../pages/admin/HeritagesPage'));
 export const HeritageEditorPage = lazy(() => import('../pages/admin/HeritageEditorPage'));
 export const ClassesPage = lazy(() => import('../pages/teacher/ClassesPage'));
 export const ClassDetailPage = lazy(() => import('../pages/teacher/ClassDetailPage'));
+export const LessonsPage = lazy(() => import('../pages/teacher/LessonsPage'));
+export const LessonEditorPage = lazy(() => import('../pages/teacher/LessonEditorPage'));
 export const AuditLogPage = lazy(() => import('../pages/admin/AuditLogPage'));
 
 function AreaFallback() {
