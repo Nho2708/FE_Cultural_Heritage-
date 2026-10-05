@@ -72,13 +72,17 @@ describe('route guard theo ma trận phân quyền', () => {
     expect(await screen.findByRole('heading', { level: 1, name: MESSAGES.forbidden })).toBeInTheDocument();
   });
 
-  it('/giao-vien chuyển tới Lớp học (chưa dựng: hiện "đang xây dựng"), trong khung có thanh bên', async () => {
+  it('/giao-vien chuyển tới Lớp học, trong khung có thanh bên', async () => {
     signInAs('TEACHER');
+    mockApi((call) =>
+      call.path.startsWith('/teacher/classes?')
+        ? envelope(200, { data: { items: [], page: 1, pageSize: 20, totalItems: 0, totalPages: 0 } })
+        : undefined,
+    );
     const { router } = renderApp('/giao-vien');
     expect(await screen.findByRole('heading', { level: 1, name: 'Lớp học' })).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/giao-vien/lop');
     expect(screen.getByRole('navigation', { name: 'Khu giáo viên' })).toBeInTheDocument();
-    expect(screen.getByText('ĐANG XÂY DỰNG')).toBeInTheDocument();
   });
 
   it('tới khi có màn hình tổng quan: /truong mở Giáo viên của trường, /quan-tri mở Quản lý trường', async () => {

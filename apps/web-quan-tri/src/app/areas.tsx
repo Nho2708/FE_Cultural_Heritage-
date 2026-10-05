@@ -16,6 +16,8 @@ export const SchoolsPage = lazy(() => import('../pages/admin/SchoolsPage'));
 export const SchoolDetailPage = lazy(() => import('../pages/admin/SchoolDetailPage'));
 export const HeritagesPage = lazy(() => import('../pages/admin/HeritagesPage'));
 export const HeritageEditorPage = lazy(() => import('../pages/admin/HeritageEditorPage'));
+export const ClassesPage = lazy(() => import('../pages/teacher/ClassesPage'));
+export const ClassDetailPage = lazy(() => import('../pages/teacher/ClassDetailPage'));
 export const AuditLogPage = lazy(() => import('../pages/admin/AuditLogPage'));
 
 function AreaFallback() {

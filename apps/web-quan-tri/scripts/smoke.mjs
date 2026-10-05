@@ -236,7 +236,7 @@ try {
   check('Hồ sơ cá nhân: sửa số điện thoại → lưu thành công', true);
   await teacherPage.goto(`${BASE}/giao-vien`);
   await teacherPage.getByRole('heading', { level: 1, name: 'Lớp học' }).waitFor();
-  check('/giao-vien → Lớp học (đang xây dựng) trong khu có thanh bên', path(teacherPage) === '/giao-vien/lop');
+  check('/giao-vien → Lớp học trong khu có thanh bên', path(teacherPage) === '/giao-vien/lop');
   await shot('08-khu-giao-vien', teacherPage);
   await teacherPage.goto(`${BASE}/truong/giao-vien`);
   await teacherPage.getByRole('heading', { level: 1, name: 'Bạn không có quyền thực hiện thao tác này.' }).waitFor();
