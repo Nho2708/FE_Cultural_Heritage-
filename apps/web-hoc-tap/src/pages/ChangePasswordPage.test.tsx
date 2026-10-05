@@ -4,12 +4,12 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { sessionStore } from '../lib/auth/session';
-import { envelope, mockApi, studentOf } from '../test/fixtures';
+import { envelope, mockApi, sessionWireOf, studentOf } from '../test/fixtures';
 import { renderApp, signInAs } from '../test/renderApp';
 
 // Đổi mật khẩu của học sinh: chế độ bắt buộc (lần đầu) và tự đổi (từ menu tài khoản).
 
-const newToken = () => ({ tokenType: 'Bearer', accessToken: 'token-moi', expiresAt: new Date(Date.now() + 3600_000).toISOString() });
+const newToken = (student = studentOf(4)) => sessionWireOf(student, 'token-moi');
 
 describe('Đổi mật khẩu — bắt buộc', () => {
   it('mở trang khác khi đang bị buộc đổi mật khẩu thì về Đổi mật khẩu, giữ trang để mở tiếp', async () => {
@@ -45,7 +45,7 @@ describe('Đổi mật khẩu — bắt buộc', () => {
   it('đổi xong: gửi mật khẩu mới, nhận token mới, tắt cờ buộc đổi, vào trang đang chờ mở với bộ giao diện cấp 1', async () => {
     signInAs(studentOf(2, { mustChangePassword: true }));
     const calls = mockApi((call) =>
-      call.path === STUDENT_ENDPOINTS.password ? envelope(200, { data: newToken(), message: 'Đổi mật khẩu thành công.' }) : undefined,
+      call.path === STUDENT_ENDPOINTS.password ? envelope(200, { data: newToken(studentOf(2)), message: 'Đổi mật khẩu thành công.' }) : undefined,
     );
     const user = userEvent.setup();
     const { router } = renderApp('/doi-mat-khau?sau=%2Ftien-do');
@@ -57,7 +57,7 @@ describe('Đổi mật khẩu — bắt buộc', () => {
     await waitFor(() => expect(router.state.location.pathname).toBe('/tien-do'));
     expect(calls.find((c) => c.path === STUDENT_ENDPOINTS.password)).toMatchObject({
       method: 'PUT',
-      body: { currentPassword: null, newPassword: 'MatKhauMoi9' },
+      body: { currentPassword: null, newPassword: 'MatKhauMoi9', confirmNewPassword: 'MatKhauMoi9' },
       authorization: 'Bearer access-hoc-sinh',
     });
     expect(sessionStore.getSession()).toMatchObject({ accessToken: 'token-moi', user: { mustChangePassword: false } });
@@ -85,7 +85,6 @@ describe('Đổi mật khẩu — tự đổi', () => {
   it('có ô mật khẩu hiện tại, nút hủy và thanh điều hướng; gửi cả mật khẩu hiện tại', async () => {
     signInAs(studentOf(11));
     const calls = mockApi((call) => {
-      if (call.path === STUDENT_ENDPOINTS.profile) return envelope(200, { data: studentOf(11) });
       if (call.path === STUDENT_ENDPOINTS.password) return envelope(200, { data: newToken() });
       return undefined;
     });
@@ -105,6 +104,7 @@ describe('Đổi mật khẩu — tự đổi', () => {
     expect(calls.find((c) => c.path === STUDENT_ENDPOINTS.password)?.body).toEqual({
       currentPassword: 'MatKhau2026',
       newPassword: 'MatKhau2027',
+      confirmNewPassword: 'MatKhau2027',
     });
   });
 });
