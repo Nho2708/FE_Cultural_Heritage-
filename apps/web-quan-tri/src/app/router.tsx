@@ -11,6 +11,7 @@ import { PendingScreen } from '../pages/PendingScreen';
 import { HomeRedirect, OutsideNotFound } from './fallbackRoutes';
 import { ProfilePage } from '../pages/profile/ProfilePage';
 import {
+  AiQuestionsPage,
   AreaRoute,
   AuditLogPage,
   ClassDetailPage,
@@ -20,6 +21,7 @@ import {
   LessonEditorPage,
   LessonsPage,
   OwnAreaRoute,
+  QuestionBankPage,
   SchoolDetailPage,
   SchoolInfoPage,
   SchoolsPage,
@@ -49,6 +51,8 @@ const BUILT: Partial<Record<ScreenKey, ReactNode>> = {
   classDetail: <ClassDetailPage />,
   lessons: <LessonsPage />,
   lessonEditor: <LessonEditorPage />,
+  questionBank: <QuestionBankPage />,
+  aiQuestions: <AiQuestionsPage />,
 };
 
 /** Route (kèm guard) cho các màn hình có URL trong `keys`. `base` là đường dẫn của route cha (thành route index). */

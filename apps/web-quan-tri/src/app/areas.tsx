@@ -19,6 +19,8 @@ export const HeritageEditorPage = lazy(() => import('../pages/admin/HeritageEdit
 export const ClassesPage = lazy(() => import('../pages/teacher/ClassesPage'));
 export const ClassDetailPage = lazy(() => import('../pages/teacher/ClassDetailPage'));
 export const LessonsPage = lazy(() => import('../pages/teacher/LessonsPage'));
+export const QuestionBankPage = lazy(() => import('../pages/teacher/QuestionBankPage'));
+export const AiQuestionsPage = lazy(() => import('../pages/teacher/AiQuestionsPage'));
 export const LessonEditorPage = lazy(() => import('../pages/teacher/LessonEditorPage'));
 export const AuditLogPage = lazy(() => import('../pages/admin/AuditLogPage'));
 
