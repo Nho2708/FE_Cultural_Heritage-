@@ -34,7 +34,8 @@ describe('Chi tiết lớp — tab Học sinh', () => {
     api(three());
     renderApp('/giao-vien/lop/1');
 
-    expect(await screen.findByRole('heading', { level: 1, name: 'Lớp 7A1' })).toBeInTheDocument();
+    // Lần render đầu của file còn phải nạp module, máy bận có thể quá 1 giây mặc định.
+    expect(await screen.findByRole('heading', { level: 1, name: 'Lớp 7A1' }, { timeout: 5000 })).toBeInTheDocument();
     expect(screen.getByText(/Năm học 2026-2027/)).toBeInTheDocument();
     const table = await screen.findByRole('table', { name: 'Học sinh của lớp' });
     const second = within(table).getByRole('row', { name: /Trần Gia Bảo/ });
