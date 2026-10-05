@@ -1,22 +1,13 @@
 import { MESSAGES } from '@dsvhvn/dung-chung';
-import { ERROR_CODES, STUDENT_ENDPOINTS, type LoginResult, type StudentProfile } from '@dsvhvn/dung-chung/api';
+import { ERROR_CODES, STUDENT_ENDPOINTS } from '@dsvhvn/dung-chung/api';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { sessionStore } from '../lib/auth/session';
-import { envelope, mockApi, studentOf } from '../test/fixtures';
+import { envelope, mockApi, sessionWireOf, studentOf } from '../test/fixtures';
 import { renderApp } from '../test/renderApp';
 
 // Học sinh đăng nhập bằng mã học sinh + mật khẩu; lần đầu (mật khẩu tạm) chuyển sang Đổi mật khẩu.
-
-function loginResult(student: StudentProfile): LoginResult<StudentProfile> {
-  return {
-    tokenType: 'Bearer',
-    accessToken: 'token-hoc-sinh',
-    expiresAt: new Date(Date.now() + 8 * 3600_000).toISOString(),
-    user: student,
-  };
-}
 
 describe('Học sinh đăng nhập', () => {
   it('có dòng nhắc quên mật khẩu, dòng chỉ thầy cô sang trang quản trị; không có liên kết quên mật khẩu qua email', async () => {
@@ -41,7 +32,7 @@ describe('Học sinh đăng nhập', () => {
 
   it('mã học sinh tự viết hoa, bỏ khoảng trắng và dấu gạch; đăng nhập xong vào trang học với bộ giao diện theo cấp', async () => {
     const calls = mockApi((call) => {
-      if (call.path === STUDENT_ENDPOINTS.login) return envelope(200, { data: loginResult(studentOf(8)) });
+      if (call.path === STUDENT_ENDPOINTS.login) return envelope(200, { data: sessionWireOf(studentOf(8)) });
       return undefined;
     });
     const user = userEvent.setup();
@@ -55,14 +46,14 @@ describe('Học sinh đăng nhập', () => {
     await waitFor(() => expect(router.state.location.pathname).toBe('/hoc'));
     expect(calls.find((c) => c.path === STUDENT_ENDPOINTS.login)?.body).toEqual({ studentCode: 'HS8K2QX7', password: 'MatKhau2026' });
     expect(sessionStore.getSession()?.accessToken).toBe('token-hoc-sinh');
-    expect(await screen.findByRole('heading', { level: 1, name: 'Chào Nguyễn Minh An' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Trang học của em' })).toBeInTheDocument();
     expect(document.documentElement).toHaveAttribute('data-bo-giao-dien', 'cap-2');
   });
 
   it('lần đầu đăng nhập bằng mật khẩu tạm: sang Đổi mật khẩu, không có thanh điều hướng', async () => {
     mockApi((call) =>
       call.path === STUDENT_ENDPOINTS.login
-        ? envelope(200, { data: loginResult(studentOf(3, { mustChangePassword: true })) })
+        ? envelope(200, { data: sessionWireOf(studentOf(3, { mustChangePassword: true })) })
         : undefined,
     );
     const user = userEvent.setup();
@@ -78,7 +69,7 @@ describe('Học sinh đăng nhập', () => {
   });
 
   it('sai mã hoặc mật khẩu: câu chung của máy chủ In line, xóa ô mật khẩu', async () => {
-    mockApi(() => envelope(401, { errorCode: ERROR_CODES.invalidCredentials, message: MESSAGES.studentInvalidCredentials }));
+    mockApi(() => envelope(401, { errorCode: ERROR_CODES.studentInvalidCredentials, message: MESSAGES.studentInvalidCredentials }));
     const user = userEvent.setup();
     renderApp('/dang-nhap');
 
@@ -87,6 +78,23 @@ describe('Học sinh đăng nhập', () => {
     await user.click(screen.getByRole('button', { name: 'Đăng nhập' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Mã học sinh hoặc mật khẩu chưa đúng. Em hãy kiểm tra lại phiếu đăng nhập.');
+    expect(screen.getByLabelText('Mật khẩu')).toHaveValue('');
+  });
+
+  it('tạm khóa hoặc bị vô hiệu: hiện nguyên câu của máy chủ, giữ mã học sinh đã gõ', async () => {
+    const blocked = MESSAGES.studentCannotSignIn('Em đã nhập sai nhiều lần. Em hãy thử lại sau 15 phút hoặc nhờ thầy cô đặt lại mật khẩu.');
+    mockApi((call) =>
+      call.path === STUDENT_ENDPOINTS.login ? envelope(403, { errorCode: ERROR_CODES.studentAccountBlocked, message: blocked }) : undefined,
+    );
+    const user = userEvent.setup();
+    renderApp('/dang-nhap');
+
+    await user.type(await screen.findByLabelText('Mã học sinh'), 'HS8K2QX7');
+    await user.type(screen.getByLabelText('Mật khẩu'), 'SaiMatKhau1');
+    await user.click(screen.getByRole('button', { name: 'Đăng nhập' }));
+
+    expect(await screen.findByText(blocked)).toBeInTheDocument();
+    expect(screen.getByLabelText('Mã học sinh')).toHaveValue('HS8K2QX7');
     expect(screen.getByLabelText('Mật khẩu')).toHaveValue('');
   });
 
@@ -103,7 +111,7 @@ describe('Học sinh đăng nhập', () => {
   });
 
   it('mở đường dẫn bài học khi chưa đăng nhập: báo cần đăng nhập, đăng nhập xong mở lại đúng bài', async () => {
-    mockApi((call) => (call.path === STUDENT_ENDPOINTS.login ? envelope(200, { data: loginResult(studentOf(10)) }) : undefined));
+    mockApi((call) => (call.path === STUDENT_ENDPOINTS.login ? envelope(200, { data: sessionWireOf(studentOf(10)) }) : undefined));
     const user = userEvent.setup();
     const { router } = renderApp('/bai-hoc/BH7F3K2Q');
 

@@ -1,9 +1,8 @@
-import { STUDENT_ENDPOINTS } from '@dsvhvn/dung-chung/api';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { cardOf, detailOf, HUE, publicApi } from '../test/discoveryFixtures';
-import { envelope, mockApi, studentOf } from '../test/fixtures';
+import { envelope, mockApi, studentOf, studentServer } from '../test/fixtures';
 import { renderApp, signInAs } from '../test/renderApp';
 
 // Trang chủ khám phá: công khai, dữ liệu từ /public/home, không có ô nhập mã bài học.
@@ -93,7 +92,7 @@ describe('Trang chủ', () => {
 
   it('học sinh đã đăng nhập thấy nút vào trang học; trang này vẫn dùng bộ giao diện mặc định', async () => {
     signInAs(studentOf(5));
-    mockApi((call) => (call.path === STUDENT_ENDPOINTS.profile ? envelope(200, { data: studentOf(5) }) : undefined), withDetail(), publicApi());
+    mockApi(studentServer(studentOf(5)), withDetail(), publicApi());
     renderApp('/');
 
     const enter = await screen.findByRole('link', { name: 'Vào trang học của em' });

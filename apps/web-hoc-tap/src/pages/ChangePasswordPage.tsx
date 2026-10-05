@@ -27,9 +27,9 @@ import { Illustration } from '../theme/Illustration';
 // Đổi xong máy chủ trả token mới trong cùng phản hồi, cờ buộc đổi tắt, học sinh vào thẳng trang học (hoặc bài đang chờ
 // mở), không phải đăng nhập lại.
 
-type Field = 'currentPassword' | 'newPassword' | 'confirmPassword';
+type Field = 'currentPassword' | 'newPassword' | 'confirmNewPassword';
 
-const EMPTY: Record<Field, string> = { currentPassword: '', newPassword: '', confirmPassword: '' };
+const EMPTY: Record<Field, string> = { currentPassword: '', newPassword: '', confirmNewPassword: '' };
 
 function RuleChecklist({ password }: { password: string }) {
   const check = checkPassword(password);
@@ -72,7 +72,7 @@ export function ChangePasswordPage() {
     const found = collectErrors<Field>({
       currentPassword: forced ? null : validateRequired(values.currentPassword, 'mật khẩu hiện tại'),
       newPassword: validateNewPassword(values.newPassword, 'mật khẩu mới'),
-      confirmPassword: validatePasswordConfirmation(values.newPassword, values.confirmPassword),
+      confirmNewPassword: validatePasswordConfirmation(values.newPassword, values.confirmNewPassword),
     });
     setErrors(found);
     if (Object.keys(found).length > 0) return focusFirstInvalid(formRef.current);
@@ -82,12 +82,13 @@ export function ChangePasswordPage() {
       const { data, message } = await studentApi.changePassword({
         currentPassword: forced ? null : values.currentPassword,
         newPassword: values.newPassword,
+        confirmNewPassword: values.confirmNewPassword,
       });
       passwordChanged(data);
       toast.success(message ?? MESSAGES.success('Đổi mật khẩu'));
       navigate(next, { replace: true });
     } catch (err) {
-      const failure = splitApiError<Field>(err, ['currentPassword', 'newPassword']);
+      const failure = splitApiError<Field>(err, ['currentPassword', 'newPassword', 'confirmNewPassword']);
       setErrors(failure.fields);
       setFormError(failure.form);
       setSaving(false);
@@ -135,11 +136,11 @@ export function ChangePasswordPage() {
           <RuleChecklist password={values.newPassword} />
           <PasswordField
             label="Nhập lại mật khẩu mới"
-            name="confirmPassword"
+            name="confirmNewPassword"
             autoComplete="new-password"
-            value={values.confirmPassword}
-            onChange={set('confirmPassword')}
-            error={errors.confirmPassword}
+            value={values.confirmNewPassword}
+            onChange={set('confirmNewPassword')}
+            error={errors.confirmNewPassword}
           />
           <div className="flex flex-wrap gap-3">
             <Button type="submit" size="lg" loading={saving} fullWidth={forced}>

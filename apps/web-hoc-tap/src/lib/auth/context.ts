@@ -1,4 +1,4 @@
-import type { AccessToken, StudentProfile } from '@dsvhvn/dung-chung/api';
+import type { LoginResult, StudentProfile } from '@dsvhvn/dung-chung/api';
 import { createContext, useContext } from 'react';
 
 export interface AuthContextValue {
@@ -10,8 +10,8 @@ export interface AuthContextValue {
   login: (studentCode: string, password: string, from?: string | null) => Promise<StudentProfile>;
   /** Đăng xuất: chỉ xóa access token trên trình duyệt, rồi về trang chủ. */
   logout: () => void;
-  /** Đổi mật khẩu xong: máy chủ trả token mới, cờ buộc đổi mật khẩu tắt. */
-  passwordChanged: (token: AccessToken) => void;
+  /** Đổi mật khẩu xong: máy chủ trả token mới và hồ sơ với cờ buộc đổi mật khẩu đã tắt; token cũ hết dùng. */
+  passwordChanged: (result: LoginResult<StudentProfile>) => void;
   clearLanding: () => void;
   clearNotice: () => void;
 }

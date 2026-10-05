@@ -1,5 +1,5 @@
 import { normalizeCode } from '@dsvhvn/dung-chung';
-import type { AccessToken } from '@dsvhvn/dung-chung/api';
+import type { LoginResult, StudentProfile } from '@dsvhvn/dung-chung/api';
 import { sessionFromLogin } from '@dsvhvn/dung-chung/auth';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from 'react';
@@ -61,17 +61,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryClient.clear();
   }, [queryClient]);
 
-  const passwordChanged = useCallback((token: AccessToken) => {
-    const current = sessionStore.getSnapshot().session;
-    if (!current) return;
-    sessionStore.setSession(
-      {
-        accessToken: token.accessToken,
-        expiresAt: Date.parse(token.expiresAt),
-        user: { ...current.user, mustChangePassword: false },
-      },
-      null,
-    );
+  const passwordChanged = useCallback((result: LoginResult<StudentProfile>) => {
+    if (!sessionStore.getSnapshot().session) return;
+    sessionStore.setSession({ ...sessionFromLogin(result), user: { ...result.user, mustChangePassword: false } }, null);
   }, []);
 
   const value = useMemo<AuthContextValue>(
