@@ -7,6 +7,7 @@ import { useParams, useSearchParams } from 'react-router';
 import { pathOf } from '../../access/screens';
 import { LevelBadge } from '../../components/classroom/ClassFields';
 import { ClassFormDialog } from '../../components/classroom/ClassFormDialog';
+import { ClassLessonsTab } from '../../components/lesson/ClassLessonsTab';
 import { LoginSlipsDialog } from '../../components/classroom/LoginSlipsDialog';
 import { StudentsTab } from '../../components/classroom/StudentsTab';
 import { AreaPage, PageHeader } from '../../components/layout/PageHeader';
@@ -15,7 +16,7 @@ import { queryKeys } from '../../lib/api/queryKeys';
 import { useAuth } from '../../lib/auth/context';
 
 // Chi tiết lớp (nhiều tab) — giáo viên. Đầu trang: tên lớp, khối và cấp học, năm học, sĩ số; "Sửa lớp". Tab Học sinh dựng
-// ở chức năng này; các tab Bài học, Tiến độ, Thành thạo, Gợi ý ôn tập dựng cùng chức năng bài học và kết quả. Tab đang mở
+// ở chức năng này; tab Bài học dựng ở chức năng bài học theo cấp; các tab Tiến độ, Thành thạo, Gợi ý ôn tập dựng cùng chức năng kết quả. Tab đang mở
 // nằm trên URL (?tab=). Phiếu đăng nhập hiện ngay sau khi thêm học sinh hoặc đặt lại mật khẩu.
 
 const TABS = [
@@ -116,6 +117,8 @@ export default function ClassDetailPage() {
       <TabPanel idPrefix={PREFIX} id={tab}>
         {tab === 'hoc-sinh' ? (
           <StudentsTab classRoom={classRoom} onSlips={setSlips} />
+        ) : tab === 'bai-hoc' ? (
+          <ClassLessonsTab classRoom={classRoom} />
         ) : (
           <EmptyState icon="clock" title={`Tab ${TABS.find((t) => t.id === tab)?.label ?? ''} sẽ có ở bản sau.`}>
             Tab này hiện số liệu về bài học và kết quả làm bài của lớp; chưa có dữ liệu vì phần bài học, bài kiểm tra chưa được dựng.
