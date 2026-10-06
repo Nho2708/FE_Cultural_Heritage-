@@ -1,7 +1,7 @@
 import type { LessonListFilter, QuestionListFilter } from '@dsvhvn/dung-chung/api';
 import type { ClassListQuery, StudentListQuery } from './classroomEndpoints';
 import type { LanguageCode, TranslationQueueQuery } from '@dsvhvn/dung-chung/api';
-import type { AuditLogQuery, HeritageListQuery, OrganizationListQuery, TeacherListQuery } from './endpoints';
+import type { AuditLogQuery, HeritageListQuery, InvoiceListQuery, OrganizationListQuery, TeacherListQuery } from './endpoints';
 
 // Khóa bộ nhớ đệm của React Query. Khóa cha (ví dụ ['org']) dùng để làm mới cả nhóm sau khi ghi.
 
@@ -60,6 +60,19 @@ export const queryKeys = {
   questionQuota: (lessonId: number) => ['teacher', 'questions', 'quota', lessonId] as const,
   /** Ảnh trong thư viện của một di sản (để chọn hình cho câu hỏi). */
   heritageImages: (heritageId: number) => ['teacher', 'heritage-images', heritageId] as const,
+
+  /** Gói dịch vụ (quản trị hệ thống). */
+  plans: ['admin', 'plans'] as const,
+
+  /** Gói và thanh toán của trường: tổng quan, gói đang bán, báo giá, hóa đơn, kết quả một giao dịch (làm mới cả nhóm sau khi mua, hủy, thanh toán). */
+  billing: ['org', 'billing'] as const,
+  billingOverview: ['org', 'billing', 'overview'] as const,
+  planOffers: ['org', 'billing', 'offers'] as const,
+  planQuote: (planId: number) => ['org', 'billing', 'quote', planId] as const,
+  invoices: ['org', 'billing', 'invoices'] as const,
+  invoiceList: (query: InvoiceListQuery) => ['org', 'billing', 'invoices', 'list', query] as const,
+  invoiceDetail: (id: number) => ['org', 'billing', 'invoices', 'detail', id] as const,
+  paymentResult: (id: number) => ['org', 'billing', 'payment', id] as const,
 
   auditLogs: (query: AuditLogQuery) => ['admin', 'audit-logs', query] as const,
 };

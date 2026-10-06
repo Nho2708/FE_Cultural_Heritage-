@@ -18,3 +18,9 @@ export const API_BASE_URL = read('VITE_API_BASE_URL', DEV_DEFAULTS.api);
 
 /** Web học tập: trang khám phá di sản công khai và nơi học sinh đăng nhập. */
 export const LEARNING_WEB_URL = read('VITE_LEARNING_WEB_URL', DEV_DEFAULTS.learningWeb);
+
+/**
+ * Hiện ghi chú "môi trường thử VNPay" ở màn hình Chọn gói và thanh toán. Mặc định hiện (VNPay sandbox); đặt
+ * `VITE_VNPAY_SANDBOX_NOTE=false` khi trường thanh toán bằng cổng thật.
+ */
+export const SHOW_VNPAY_SANDBOX_NOTE = (import.meta.env.VITE_VNPAY_SANDBOX_NOTE ?? '').trim().toLowerCase() !== 'false';

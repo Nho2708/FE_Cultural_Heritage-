@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState, type FormEvent } from 'react';
+import { useSearchParams } from 'react-router';
 import { AreaPage, PageHeader } from '../../components/layout/PageHeader';
 import {
   Button,
@@ -26,10 +27,12 @@ import {
   validateOptionalText,
 } from '@dsvhvn/dung-chung';
 import { SubscriptionSummary } from '../../components/account/SubscriptionSummary';
+import { InvoicesTab } from '../../components/billing/InvoicesTab';
+import { PlanTab } from '../../components/billing/PlanTab';
 
-// Trường và gói (nhiều tab) — quản trị trường. Bản này có tab "Thông tin trường": tên trường chỉ đọc (chỉ quản trị hệ
-// thống sửa), địa chỉ, số điện thoại, email liên hệ sửa được. Tab "Gói và hạn mức", "Hóa đơn và giao dịch" làm cùng
-// chức năng mua, gia hạn, nâng cấp, hủy gói qua VNPay; tới lúc đó gói hiện tại hiện chỉ đọc cạnh biểu mẫu.
+// Trường và gói (ba tab, nằm trên URL bằng ?tab=) — quản trị trường. Tab "Thông tin trường": tên trường chỉ đọc (chỉ quản trị
+// hệ thống sửa), địa chỉ, số điện thoại, email liên hệ sửa được. Tab "Gói và hạn mức": gói đang dùng, hạn mức, mua, gia hạn,
+// nâng cấp, hủy gói qua VNPay. Tab "Hóa đơn và giao dịch": biên nhận nội bộ và các lần thanh toán.
 
 type Field = 'address' | 'phone' | 'email';
 
@@ -126,27 +129,53 @@ function ContactForm({ org }: { org: MyOrganization }) {
   );
 }
 
-const TABS = [{ id: 'thong-tin', label: 'Thông tin trường' }] as const;
+const TABS = [
+  { id: 'thong-tin', label: 'Thông tin trường' },
+  { id: 'goi-va-han-muc', label: 'Gói và hạn mức' },
+  { id: 'hoa-don', label: 'Hóa đơn và giao dịch' },
+] as const;
+
+type TabId = (typeof TABS)[number]['id'];
+
+const readTab = (value: string | null): TabId => TABS.find((t) => t.id === value)?.id ?? 'thong-tin';
+
+function InfoTab() {
+  const org = useQuery({ queryKey: queryKeys.org, queryFn: () => orgApi.get().then((r) => r.data) });
+  if (org.isPending) return <LoadingState rows={4} />;
+  if (org.isError) return <ErrorState error={org.error} onRetry={() => void org.refetch()} />;
+  return (
+    <div className="flex flex-col gap-10 dsvlg:flex-row dsvlg:items-start">
+      <ContactForm key={org.data.id} org={org.data} />
+      <SubscriptionSummary subscription={org.data.subscription} quota={org.data.teacherQuota} />
+    </div>
+  );
+}
 
 export default function SchoolInfoPage() {
-  const org = useQuery({ queryKey: queryKeys.org, queryFn: () => orgApi.get().then((r) => r.data) });
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = readTab(searchParams.get('tab'));
+
+  const setTab = (next: TabId) =>
+    setSearchParams(
+      (current) => {
+        const params = new URLSearchParams(current);
+        if (next === 'thong-tin') params.delete('tab');
+        else params.set('tab', next);
+        return params;
+      },
+      { replace: true },
+    );
 
   return (
     <AreaPage>
-      <PageHeader title="Trường và gói" description="Thông tin liên hệ của trường hiện với quản trị hệ thống và trên hóa đơn." />
+      <PageHeader
+        title="Trường và gói"
+        description="Thông tin của trường, gói dịch vụ đang dùng, hạn mức và hóa đơn thanh toán."
+      />
       <div>
-        <Tabs idPrefix="truong" label="Trường và gói" items={TABS} value="thong-tin" onChange={() => undefined} />
-        <TabPanel idPrefix="truong" id="thong-tin">
-          {org.isPending ? (
-            <LoadingState rows={4} />
-          ) : org.isError ? (
-            <ErrorState error={org.error} onRetry={() => void org.refetch()} />
-          ) : (
-            <div className="flex flex-col gap-10 dsvlg:flex-row dsvlg:items-start">
-              <ContactForm key={org.data.id} org={org.data} />
-              <SubscriptionSummary subscription={org.data.subscription} quota={org.data.teacherQuota} />
-            </div>
-          )}
+        <Tabs idPrefix="truong" label="Trường và gói" items={TABS} value={tab} onChange={setTab} />
+        <TabPanel idPrefix="truong" id={tab}>
+          {tab === 'thong-tin' ? <InfoTab /> : tab === 'goi-va-han-muc' ? <PlanTab /> : <InvoicesTab />}
         </TabPanel>
       </div>
     </AreaPage>

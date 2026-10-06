@@ -22,6 +22,9 @@ export const LessonsPage = lazy(() => import('../pages/teacher/LessonsPage'));
 export const QuestionBankPage = lazy(() => import('../pages/teacher/QuestionBankPage'));
 export const AiQuestionsPage = lazy(() => import('../pages/teacher/AiQuestionsPage'));
 export const LessonEditorPage = lazy(() => import('../pages/teacher/LessonEditorPage'));
+export const PlansPage = lazy(() => import('../pages/admin/PlansPage'));
+export const PlanPurchasePage = lazy(() => import('../pages/school/PlanPurchasePage'));
+export const PaymentResultPage = lazy(() => import('../pages/school/PaymentResultPage'));
 export const AuditLogPage = lazy(() => import('../pages/admin/AuditLogPage'));
 export const TranslationReviewPage = lazy(() => import('../pages/admin/TranslationReviewPage'));
 
