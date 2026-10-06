@@ -7,6 +7,7 @@ import { lessonPath } from '../lessons/lessonData';
 import { resultPath, takeQuizPath } from '../quiz/quizData';
 import { Bar } from '../quiz/Meters';
 import { Illustration } from '../theme/Illustration';
+import { HomeRecommendations } from './Recommendations';
 import { SpeakButton } from './SpeakButton';
 import { useStudentHome } from './useStudentHome';
 
@@ -202,6 +203,8 @@ function Sections({ home, level }: { home: StudentHome; level: Level }) {
         </Section>
       )}
 
+      <HomeRecommendations level={level} id="goi-y" />
+
       {home.recentBadges.length > 0 && (
         <Section id="huy-hieu-gan-day" level={level} title="Huy hiệu gần đây" speak="Đây là các huy hiệu của em.">
           <List level={level}>
@@ -234,16 +237,19 @@ export function LearningSections({ level }: { level: Level }) {
   const empty = data.inProgress.length === 0 && data.openQuizzes.length === 0 && data.myLessons.length === 0 && data.recentBadges.length === 0;
   if (empty) {
     return (
-      <div
-        className={cn(
-          'flex items-center gap-(--dsv-inline-gap) p-(--dsv-inline-gap)',
-          level === 1 ? 'rounded-lg border-2 border-dashed border-border-strong' : 'rounded-md border border-border bg-surface',
-        )}
-      >
-        <Illustration state="trong" className={level === 3 ? 'size-14' : undefined} />
-        <p className={level === 1 ? 'type-h4' : 'type-body-m text-on-surface-variant'}>
-          {level === 1 ? 'Chưa có bài chơi nào. Em hãy nhờ thầy cô đưa mã bài học nhé!' : MESSAGES.studentNoAttemptsYet}
-        </p>
+      <div className="flex flex-col gap-(--dsv-block-gap)">
+        <div
+          className={cn(
+            'flex items-center gap-(--dsv-inline-gap) p-(--dsv-inline-gap)',
+            level === 1 ? 'rounded-lg border-2 border-dashed border-border-strong' : 'rounded-md border border-border bg-surface',
+          )}
+        >
+          <Illustration state="trong" className={level === 3 ? 'size-14' : undefined} />
+          <p className={level === 1 ? 'type-h4' : 'type-body-m text-on-surface-variant'}>
+            {level === 1 ? 'Chưa có bài chơi nào. Em hãy nhờ thầy cô đưa mã bài học nhé!' : MESSAGES.studentNoAttemptsYet}
+          </p>
+        </div>
+        <HomeRecommendations level={level} id="goi-y" />
       </div>
     );
   }
