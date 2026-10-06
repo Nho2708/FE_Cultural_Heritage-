@@ -49,6 +49,8 @@ export function useQuizAttempt(
   const inFlight = useRef<Promise<boolean> | null>(null);
   const retryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const finished = useRef(false);
+  /** Hết giờ: bài nộp ra từ đây là tự nộp dù máy chủ ghi nhận còn trong hạn. */
+  const timeUp = useRef(false);
   const onFinishedRef = useRef(onFinished);
   useEffect(() => {
     onFinishedRef.current = onFinished;
@@ -172,7 +174,7 @@ export function useQuizAttempt(
         return;
       }
       const { data } = await studentApi.submit(attempt.id);
-      finish(data, false);
+      finish(data, timeUp.current);
     } catch (error) {
       if (!finished.current) {
         setSubmitError(error instanceof ApiError ? error.message : 'Chưa nộp được bài. Em thử lại nhé.');
@@ -198,6 +200,7 @@ export function useQuizAttempt(
   useEffect(() => {
     if (remaining !== 0 || finished.current) return;
     setTimedOut(true);
+    timeUp.current = true;
     if (autoSubmit.current) return;
     autoSubmit.current = true;
     let stopped = false;

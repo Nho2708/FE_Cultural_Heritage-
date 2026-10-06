@@ -140,3 +140,30 @@ trình duyệt thật (lần này dùng lớp khối 3 và khối 8).
 | Bài cấp 3 phát hành với giờ đóng sau 1 phút: sau giờ đóng tác vụ nền tự chuyển sang Đã đóng | Đạt |
 
 Ghi chú: ảnh của Wikimedia Commons không tải được trong môi trường kiểm thử nên các khung ảnh trống. Luồng làm bài của học sinh chưa có nên chưa kiểm số đã nộp lớn hơn 0 và Kết quả bài kiểm tra.
+
+## Web học tập: học tập của học sinh theo cấp (làm bài, kết quả, tiến độ)
+
+> Chạy ngày 06/10/2026 (+07) với backend nhánh `feature/DSVHVN-012-hoc-tap-theo-cap`. Kết quả: **43/43 bước đạt**, không có lỗi JavaScript trên trang, không có lỗi console.
+> Script: [`apps/web-hoc-tap/scripts/smoke-lam-bai.mjs`](../apps/web-hoc-tap/scripts/smoke-lam-bai.mjs) (`npm run smoke:lam-bai -w @dsvhvn/web-hoc-tap`).
+
+| Mục | Giá trị |
+|---|---|
+| Máy, trình duyệt | Windows 11, Node 24.19, Microsoft Edge headless qua `playwright-core`; khung 1440 × 900 và 390 × 844 |
+| API | Bản build của backend, `http://localhost:5180`, LocalDB **database tạm** `dsvhvn_tam_wt_…` (migrate và nạp di sản lúc khởi động, **đã xóa sau khi chạy**), `Email__Mode=Log` (không gửi thư thật), CORS cho cổng của web |
+| Web học tập | `VITE_API_BASE_URL=http://localhost:5180/api/v1 npx vite --port 5274 --strictPort` |
+| Lệnh | `API_URL=http://localhost:5180/api/v1 BASE_URL=http://localhost:5274 API_LOG=<log của API> ADMIN_PASSWORD=<mật khẩu seed> npm run smoke:lam-bai -w @dsvhvn/web-hoc-tap` (đặt `SKIP_TIMEOUT=1` để bỏ phần chờ hết giờ khoảng 70 giây) |
+| Chuẩn bị | Gọi thẳng API: xuất bản di sản, tạo trường, quản trị trường, giáo viên, ba lớp (khối 3, 8, 11), mỗi lớp một bài học xuất bản, đủ tám dạng câu, bốn bài kiểm tra đang mở (cấp 1 không thời gian, cấp 2 15 phút, cấp 3 45 phút và một bài nhanh 1 phút), mỗi lớp một học sinh đã đổi mật khẩu |
+
+| Nhóm bước | Kết quả |
+|---|---|
+| Học sinh đăng nhập; trang học báo bài kiểm tra chưa nhập mã bằng nhãn "Cần mã bài học" (cấp 1 và 2); nhập mã bài học, mở hộp thoại Bắt đầu bài kiểm tra (số câu, thời gian, lời nhắc một lần) | Đạt |
+| Cấp 2: bố cục cân bằng, đồng hồ 15 phút, vào bài không còn thanh điều hướng; làm một đáp án, đúng/sai, sắp xếp, điền từ (kho từ); bảng số câu báo 4 / 4 | Đạt |
+| Cấp 2: tải lại giữa chừng vào tiếp đúng lượt, đủ 4 câu đã lưu, đồng hồ không đặt lại; mở thẳng đường dẫn thì hiện Làm tiếp, không tạo lượt mới | Đạt |
+| Cấp 2: ngắt mạng thì báo "Mất kết nối", giữ câu vừa chọn; có mạng lại thì tự lưu | Đạt |
+| Cấp 2: hộp xác nhận nộp, nộp; kết quả có điểm, câu đúng, sai, bỏ trống, đáp án và giải thích, huy hiệu; lịch sử, tiến độ (biểu đồ điểm theo thời gian), thành thạo, huy hiệu; mở lại bài đã nộp thì chuyển thẳng tới kết quả; trang học thấy bài học và huy hiệu gần đây | Đạt |
+| Cấp 1: bố cục từng câu, không đồng hồ, hàng sao; chọn hình, đúng/sai, ghép cặp (kéo tên thả vào hình bằng chuột thật), sắp xếp; câu cuối "Xong rồi!"; kết quả ba sao, lời khen, huy hiệu, không điểm và phần trăm; Sao của em, tab Bài đã chơi; 390px không tràn ngang | Đạt |
+| Cấp 3: bố cục gọn, đồng hồ 45 phút, bảng số câu nằm ngang, đánh dấu xem lại, tư liệu ghim bên trái cho nhóm câu đọc tư liệu; một đáp án, nhiều mệnh đề, đọc tư liệu; kết quả có phân tích theo di sản và dạng câu; lịch sử, thành thạo; 390px không tràn ngang | Đạt |
+| Cấp 3: bài nhanh 1 phút, dưới 1 phút đồng hồ chuyển cảnh báo "sắp hết giờ", hết giờ tự nộp và kết quả báo "đã được nộp tự động" | Đạt |
+| Em khác lớp không xem được lượt của em (404) | Đạt |
+
+Ghi chú: ảnh của Wikimedia Commons có thể không tải được trong môi trường kiểm thử nên một số khung ảnh trống. Đã gặp và sửa trong lúc chạy: bài tự nộp đúng hạn máy chủ ghi là "Đã nộp" nên giao diện giữ cờ "tự nộp khi hết giờ" ở phía máy em để vẫn báo đúng.
