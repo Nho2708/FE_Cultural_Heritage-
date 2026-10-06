@@ -3,6 +3,7 @@ import { Redirect } from 'expo-router';
 import { Tabs } from 'expo-router/js-tabs';
 import { useTranslation } from 'react-i18next';
 import type { ColorValue } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp, useAuth } from '../../src/state/AppProvider';
 import { useTheme } from '../../src/theme/ThemeProvider';
 
@@ -22,6 +23,7 @@ export default function StudentLayout() {
   const { session } = useAuth();
   const { t } = useTranslation();
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   if (mode !== 'student') return <Redirect href="/" />;
   if (!session) return <Redirect href="/dang-nhap" />;
   if (session.user.mustChangePassword) return <Redirect href="/doi-mat-khau" />;
@@ -32,8 +34,8 @@ export default function StudentLayout() {
         headerTitleStyle: { color: theme.color.onBackground, fontWeight: '700', fontSize: theme.text.bodySize + 2 },
         tabBarActiveTintColor: theme.color.primary,
         tabBarInactiveTintColor: theme.color.onSurfaceVariant,
-        tabBarStyle: { backgroundColor: theme.color.surface, borderTopColor: theme.color.border, minHeight: theme.touchTarget + 12 },
-        tabBarLabelStyle: { fontSize: theme.level === 1 ? 14 : 12, fontWeight: '700' },
+        tabBarStyle: { backgroundColor: theme.color.surface, borderTopColor: theme.color.border, height: Math.max(68, theme.touchTarget + 22) + insets.bottom, paddingBottom: insets.bottom + 8, paddingTop: 8 },
+        tabBarLabelStyle: { fontSize: theme.level === 1 ? 14 : 12, lineHeight: theme.level === 1 ? 17 : 15, fontWeight: "700" },
         sceneStyle: { backgroundColor: theme.color.background },
       }}
     >

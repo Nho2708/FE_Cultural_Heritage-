@@ -3,6 +3,7 @@ import { Redirect } from 'expo-router';
 import { Tabs } from 'expo-router/js-tabs';
 import { useTranslation } from 'react-i18next';
 import type { ColorValue } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '../../src/state/AppProvider';
 import { useTheme } from '../../src/theme/ThemeProvider';
 
@@ -20,6 +21,7 @@ export default function GuestLayout() {
   const { mode } = useApp();
   const { t } = useTranslation();
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   if (mode !== 'guest') return <Redirect href="/" />;
   return (
     <Tabs
@@ -28,8 +30,8 @@ export default function GuestLayout() {
         headerTitleStyle: { color: theme.color.onBackground, fontWeight: '700' },
         tabBarActiveTintColor: theme.color.primary,
         tabBarInactiveTintColor: theme.color.onSurfaceVariant,
-        tabBarStyle: { backgroundColor: theme.color.surface, borderTopColor: theme.color.border },
-        tabBarLabelStyle: { fontSize: 12, fontWeight: '600' },
+        tabBarStyle: { backgroundColor: theme.color.surface, borderTopColor: theme.color.border, height: 68 + insets.bottom, paddingBottom: insets.bottom + 8, paddingTop: 8 },
+        tabBarLabelStyle: { fontSize: 12, lineHeight: 15, fontWeight: "600" },
         sceneStyle: { backgroundColor: theme.color.background },
       }}
     >

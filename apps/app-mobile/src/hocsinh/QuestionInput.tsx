@@ -268,7 +268,7 @@ function FillBlankInput({ question, answer, onChange, level, disabled }: Questio
       <View style={styles2.sentence}>
         {segments.map((text, index) => (
           <View key={index} style={styles2.segment}>
-            <Txt variant={level === 1 ? 'heading' : 'question'} style={level === 1 ? { fontSize: theme.text.questionSize } : undefined}>
+            <Txt variant={level === 1 ? 'heading' : 'question'} style={[{ flexShrink: 1 }, level === 1 ? { fontSize: theme.text.questionSize } : null]}>
               {text}
             </Txt>
             {index < count && index < segments.length - 1 ? (
@@ -402,5 +402,5 @@ const local = StyleSheet.create({
 
 const styles2 = StyleSheet.create({
   sentence: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', rowGap: 10, columnGap: 6 },
-  segment: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6 },
+  segment: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6, flexShrink: 1, maxWidth: '100%' },
 });

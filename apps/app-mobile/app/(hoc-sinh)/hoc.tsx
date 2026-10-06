@@ -25,7 +25,7 @@ function LessonCard({ lesson, level, onOpen }: { lesson: StudentLessonRef; level
   const theme = useTheme();
   const compact = level === 3;
   return (
-    <Card onPress={onOpen} accessibilityLabel={lesson.title ?? ''}>
+    <Card>
       <View style={[ui.row, { padding: compact ? 10 : 14, gap: 12 }]}>
         <View style={ui.grow}>
           <Txt variant={level === 1 ? 'heading' : 'title'} numberOfLines={2} style={level === 1 ? { fontSize: theme.text.headingSize - 6 } : undefined}>
@@ -119,7 +119,7 @@ export default function StudentHomeScreen() {
       {data.inProgress.length > 0 ? (
         <Section title={t('hs.home.inProgress')}>
           {data.inProgress.map((item) => (
-            <Card key={item.attemptId} onPress={() => openQuiz(item.quizId)} accessibilityLabel={item.quizName ?? ''}>
+            <Card key={item.attemptId}>
               <View style={[ui.row, { padding: 14, gap: 12 }]}>
                 <View style={ui.grow}>
                   <Txt variant="title">{item.quizName}</Txt>
