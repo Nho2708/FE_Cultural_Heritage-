@@ -3,7 +3,7 @@
 Phần giao diện của khu học trên **web học tập**: học sinh mở bài kiểm tra từ bài học, làm bài với **bố cục riêng theo cấp học của lớp** (cấp 1 nút to và hình lớn, cấp 2 cân bằng,
 cấp 3 gọn có đồng hồ), lưu từng câu, nộp, xem kết quả theo cấp, lịch sử và tiến độ. Học sinh không chọn bố cục: máy chủ trả cấp của lớp và giao diện theo cấp đó.
 Backend ở `BE_Cultural_Heritage-/docs/hoc-tap-theo-cap.md` (nhánh `feature/DSVHVN-012-hoc-tap-theo-cap`); thiết kế ở Figma (file `AfNZ3KxFxJqqUxmGhYLXuS`, các màn hình
-"— cấp N") và ảnh trong `doc/design/mockups/`. Phần **"Gợi ý cho em"** và các màn hình giáo viên xem kết quả của lớp chưa dựng.
+"— cấp N") và ảnh trong `doc/design/mockups/`. Phần **"Gợi ý cho em"** và các màn hình giáo viên xem kết quả của lớp dựng ở luồng Thống kê và gợi ý: [`thong-ke-goi-y.md`](thong-ke-goi-y.md).
 
 ## 1. Màn hình
 
