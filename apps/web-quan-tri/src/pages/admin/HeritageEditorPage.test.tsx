@@ -2,7 +2,7 @@ import { MESSAGES } from '@dsvhvn/dung-chung';
 import type { HeritageDetail } from '@dsvhvn/dung-chung/api';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   envelope,
   heritageDetailOf,
@@ -955,5 +955,117 @@ describe('Biên tập di sản — tab Nguồn tham chiếu', () => {
     renderApp('/quan-tri/di-san/1?tab=nguon');
 
     expect(await screen.findByText(warning)).toBeInTheDocument();
+  });
+});
+
+describe('Biên tập di sản — xem trang công khai và xem trước', () => {
+  /** Tab mới: `window.open` trả về đối tượng giả để kiểm chuyển hướng và đóng tab. */
+  function fakeTab() {
+    const tab = { location: { href: '' }, close: vi.fn<() => void>() };
+    const open = vi.spyOn(window, 'open').mockReturnValue(tab as unknown as Window);
+    return { tab, open };
+  }
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('di sản đã xuất bản: liên kết "Xem trang công khai" mở trang chi tiết của web học tập ở tab mới, không có nút Xem trước', async () => {
+    signInAs('ADMIN');
+    api({ detail: heritageDetailOf({ status: 'PUBLISHED', slug: 'quan-the-co-do-hue' }) });
+    renderApp('/quan-tri/di-san/1');
+
+    const link = await screen.findByRole('link', { name: 'Xem trang công khai' });
+    expect(link).toHaveAttribute('href', 'http://hoc.test/di-san/quan-the-co-do-hue');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', expect.stringContaining('noopener'));
+    expect(screen.queryByRole('button', { name: 'Xem trước' })).not.toBeInTheDocument();
+  });
+
+  it('di sản nháp: nút "Xem trước" xin mã rồi chuyển tab mới sang trang xem trước; không có liên kết công khai', async () => {
+    signInAs('ADMIN');
+    const { tab, open } = fakeTab();
+    const calls = api({ detail: heritageDetailOf() }, (call) =>
+      call.path === '/admin/heritages/1/preview' && call.method === 'POST'
+        ? envelope(200, { data: { code: 'MA-XEM', path: '/xem-truoc/di-san/MA-XEM', expiresAt: '2026-10-06T14:30:00Z', expiresInMinutes: 30 } })
+        : undefined,
+    );
+    const user = userEvent.setup();
+    renderApp('/quan-tri/di-san/1');
+
+    expect(screen.queryByRole('link', { name: 'Xem trang công khai' })).not.toBeInTheDocument();
+    await user.click(await screen.findByRole('button', { name: 'Xem trước' }));
+
+    await waitFor(() => expect(tab.location.href).toBe('http://hoc.test/xem-truoc/di-san/MA-XEM'));
+    expect(open).toHaveBeenCalledWith('', '_blank');
+    expect(calls.filter((c) => c.path === '/admin/heritages/1/preview')).toHaveLength(1);
+    expect(tab.close).not.toHaveBeenCalled();
+    // Mã xem trước chỉ nằm trong địa chỉ của tab mới, không hiện ở trang biên tập.
+    expect(document.body.textContent).not.toContain('MA-XEM');
+  });
+
+  it('có thay đổi chưa lưu: lưu nháp trước rồi mới xin mã xem trước', async () => {
+    signInAs('ADMIN');
+    const { tab } = fakeTab();
+    const order: string[] = [];
+    api({ detail: heritageDetailOf() }, (call) => {
+      if (call.path === '/admin/heritages/1' && call.method === 'PUT') {
+        order.push('lưu');
+        return envelope(200, { data: heritageDetailOf({ name: 'Cố đô Huế' }), message: 'Lưu di sản thành công.' });
+      }
+      if (call.path === '/admin/heritages/1/preview') {
+        order.push('xem trước');
+        return envelope(200, { data: { code: 'MA', path: '/xem-truoc/di-san/MA', expiresAt: '2026-10-06T14:30:00Z', expiresInMinutes: 30 } });
+      }
+      return undefined;
+    });
+    const user = userEvent.setup();
+    renderApp('/quan-tri/di-san/1');
+
+    const name = await screen.findByLabelText('Tên');
+    await user.clear(name);
+    await user.type(name, 'Cố đô Huế');
+    await user.click(screen.getByRole('button', { name: 'Xem trước' }));
+
+    await waitFor(() => expect(tab.location.href).toBe('http://hoc.test/xem-truoc/di-san/MA'));
+    expect(order).toEqual(['lưu', 'xem trước']);
+  });
+
+  it('máy chủ từ chối cấp mã: đóng tab trống, báo lỗi', async () => {
+    signInAs('ADMIN');
+    const { tab } = fakeTab();
+    api({ detail: heritageDetailOf({ status: 'ARCHIVED' }) }, (call) =>
+      call.path === '/admin/heritages/1/preview'
+        ? envelope(422, { errorCode: 'BLOCKED', message: 'Không thể xem trước. Di sản đã xuất bản, hãy mở trang công khai.' })
+        : undefined,
+    );
+    const user = userEvent.setup();
+    renderApp('/quan-tri/di-san/1');
+
+    await user.click(await screen.findByRole('button', { name: 'Xem trước' }));
+    expect(await screen.findByText('Không thể xem trước. Di sản đã xuất bản, hãy mở trang công khai.')).toBeInTheDocument();
+    expect(tab.close).toHaveBeenCalled();
+    expect(tab.location.href).toBe('');
+  });
+
+  it('trình duyệt chặn cửa sổ mới: báo cách xử lý và không xin mã', async () => {
+    signInAs('ADMIN');
+    vi.spyOn(window, 'open').mockReturnValue(null);
+    const calls = api({ detail: heritageDetailOf() });
+    const user = userEvent.setup();
+    renderApp('/quan-tri/di-san/1');
+
+    await user.click(await screen.findByRole('button', { name: 'Xem trước' }));
+    expect(await screen.findByText(/Trình duyệt đang chặn cửa sổ mới/)).toBeInTheDocument();
+    expect(calls.some((c) => c.path.endsWith('/preview'))).toBe(false);
+  });
+
+  it('tạo mới chưa lưu: chưa có nút xem', async () => {
+    signInAs('ADMIN');
+    api({ detail: heritageDetailOf() });
+    renderApp('/quan-tri/di-san/moi');
+    await screen.findByRole('heading', { level: 1, name: 'Tạo di sản' });
+    expect(screen.queryByRole('button', { name: 'Xem trước' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Xem trang công khai' })).not.toBeInTheDocument();
   });
 });

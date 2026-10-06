@@ -1,4 +1,4 @@
-// Bảng màn hình của web học tập (14 màn hình): khám phá di sản công khai (Khách và học sinh) và khu học của học sinh.
+// Bảng màn hình của web học tập (15 màn hình): khám phá di sản công khai (Khách và học sinh) và khu học của học sinh.
 // Nguồn duy nhất cho route guard và thanh điều hướng. Tên màn hình bằng lời, khóa đặt theo nghĩa. Giáo viên và quản trị
 // không đăng nhập ở đây; mở các trang khám phá thì họ là Khách.
 // Chặn ở giao diện chỉ để điều hướng đúng; backend kiểm vai trò, lớp và lượt làm của chính học sinh ở mọi endpoint.
@@ -33,6 +33,8 @@ export const SCREENS = [
   { key: 'search', name: 'Tìm kiếm và lọc di sản', area: 'explore', actors: EVERYONE, path: '/di-san' },
   { key: 'map', name: 'Bản đồ di sản', area: 'explore', actors: EVERYONE, path: '/ban-do', hideFooter: true },
   { key: 'heritage', name: 'Chi tiết di sản', area: 'explore', actors: EVERYONE, path: '/di-san/:diSan' },
+  // Chỉ quản trị hệ thống mở được từ web quản trị (mã xem trước + token); không có trong thanh điều hướng.
+  { key: 'heritagePreview', name: 'Xem trước di sản nháp', area: 'explore', actors: EVERYONE, path: '/xem-truoc/di-san/:ma' },
   {
     key: 'timeline',
     name: 'Dòng thời gian di sản',

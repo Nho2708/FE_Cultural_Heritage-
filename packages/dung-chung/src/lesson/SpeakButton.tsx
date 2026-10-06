@@ -1,4 +1,4 @@
-import { Icon } from '@dsvhvn/dung-chung/ui';
+import { Icon } from '../ui';
 
 // Nút loa đọc to bằng giọng đọc có sẵn của trình duyệt (cấp 1). Trình duyệt không có giọng đọc thì không hiện nút.
 

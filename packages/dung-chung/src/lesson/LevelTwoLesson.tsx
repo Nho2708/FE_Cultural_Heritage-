@@ -1,9 +1,8 @@
-import type { StudentLesson } from '@dsvhvn/dung-chung/api';
-import { ButtonLink, Icon, TabPanel, Tabs, TextLink } from '@dsvhvn/dung-chung/ui';
+import type { StudentLesson } from '../api';
+import { ButtonLink, Icon, TabPanel, Tabs, TextLink } from '../ui';
 import { useState } from 'react';
-import { pathOf } from '../access/screens';
-import { timelinePath } from '../discovery/paths';
 import { milestonesOf, sectionsOf } from './lessonData';
+import { useLessonLinks } from './lessonLinks';
 import { HeritageLinks, LessonFigure, Paragraphs, QuizList } from './LessonParts';
 
 // Bài học — bố cục cấp 2 (khối 6-9): đầu bài có ảnh lớn, ba bước chuyển qua lại tự do bằng tab (Đọc bài · Dòng thời gian của bài ·
@@ -14,6 +13,7 @@ type TabId = 'READ' | 'TIMELINE' | 'QUIZ';
 const PREFIX = 'bai-hoc-cap-2';
 
 export function LevelTwoLesson({ lesson }: { lesson: StudentLesson }) {
+  const links = useLessonLinks();
   const [tab, setTab] = useState<TabId>('READ');
   const milestones = milestonesOf(lesson);
   const body = sectionsOf(lesson, 'READING', 'IMAGE');
@@ -28,16 +28,18 @@ export function LevelTwoLesson({ lesson }: { lesson: StudentLesson }) {
 
   return (
     <section data-bo-cuc="cap-2" aria-labelledby="tieu-de-bai">
-      <title>{`${lesson.title ?? 'Bài học'} · Học di sản`}</title>
+      {!links.preview && <title>{`${lesson.title ?? 'Bài học'} · Học di sản`}</title>}
       <header
         className="relative flex min-h-56 items-end bg-surface-container-low bg-cover bg-center"
         style={hero ? { backgroundImage: `linear-gradient(to top, rgb(0 0 0 / 0.75), rgb(0 0 0 / 0.1)), url("${hero}")` } : undefined}
       >
         <div className={`dsv-content py-6 ${hero ? 'text-white' : 'text-on-surface'}`}>
-          <ButtonLink to={pathOf('learnHome')} variant="link" className={hero ? 'text-white!' : undefined}>
-            <Icon name="arrow-left" size={16} />
-            Trang học của em
-          </ButtonLink>
+          {links.home && (
+            <ButtonLink to={links.home} variant="link" className={hero ? 'text-white!' : undefined}>
+              <Icon name="arrow-left" size={16} />
+              Trang học của em
+            </ButtonLink>
+          )}
           <p className="mt-3 type-label-kicker">
             BÀI HỌC · MÃ <span translate="no">{lesson.accessCode}</span>
           </p>
@@ -132,8 +134,8 @@ export function LevelTwoLesson({ lesson }: { lesson: StudentLesson }) {
                       ))}
                     </ol>
                   )}
-                  {firstTimeline && (
-                    <TextLink to={timelinePath(firstTimeline.slug)} className="w-fit">
+                  {firstTimeline && links.timeline(firstTimeline.slug) && (
+                    <TextLink to={links.timeline(firstTimeline.slug)!} className="w-fit">
                       Xem dòng thời gian đầy đủ của {firstTimeline.name}
                     </TextLink>
                   )}

@@ -60,6 +60,7 @@ mật khẩu được ghi ra log của API. Tài khoản học sinh do giáo vi�
 | `npm run check:tokens` | Kiểm hai tệp CSS còn khớp `tokens.json` |
 | `npm run smoke -w @dsvhvn/web-quan-tri` | Kiểm thử web quản trị trên Edge/Chrome thật với API thật; cần `API_LOG`, `ADMIN_PASSWORD` |
 | `npm run smoke:di-san -w @dsvhvn/web-quan-tri` | Kiểm thử luồng Kho di sản trên Edge/Chrome thật; cần `ADMIN_PASSWORD`, chạy với database tạm mới |
+| `npm run smoke:xem-truoc -w @dsvhvn/web-quan-tri` | Kiểm thử xem trước di sản và "Xem như học sinh" trên Edge/Chrome thật; cần `ADMIN_PASSWORD`, `TEACHER_LOGIN`, `TEACHER_PASSWORD`, chạy với database tạm (xem `docs/xem-truoc.md`) |
 
 Chạy riêng một workspace: `npm test -w @dsvhvn/web-hoc-tap`, `npm run build -w @dsvhvn/web-quan-tri`…
 

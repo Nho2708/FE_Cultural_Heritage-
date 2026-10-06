@@ -1,6 +1,6 @@
-import { cn } from '@dsvhvn/dung-chung';
-import type { IllustrationSet, IllustrationState } from '@dsvhvn/dung-chung/theme';
-import { useLearningTheme } from './context';
+import { cn } from '../cn';
+import type { IllustrationSet, IllustrationState } from '../theme';
+import { useLearningTheme } from './themeContext';
 
 // Chỗ đặt hình minh họa theo trạng thái (chào, chúc mừng, động viên, trống). Một khối cố định trên bố cục; hình lấy từ
 // bộ hình của bộ giao diện đang dùng: ảnh di sản (mặc định), hình vẽ tay có linh vật (cấp 1), biểu tượng nét (cấp 2),

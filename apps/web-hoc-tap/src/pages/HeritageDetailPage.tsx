@@ -143,7 +143,7 @@ function InfoCard({ detail }: { detail: PublicHeritageDetail }) {
   );
 }
 
-function LocationCard({ detail }: { detail: PublicHeritageDetail }) {
+function LocationCard({ detail, preview }: { detail: PublicHeritageDetail; preview: boolean }) {
   if (detail.latitude == null || detail.longitude == null) return null;
   return (
     <section aria-label="Vị trí trên bản đồ" className="overflow-hidden rounded-md border border-border bg-surface">
@@ -154,10 +154,12 @@ function LocationCard({ detail }: { detail: PublicHeritageDetail }) {
       </div>
       <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
         <p className="type-mono-label text-on-surface-variant">{coordinatesText(detail.latitude, detail.longitude)}</p>
-        <Link to={mapPathOf(detail.slug)} className="inline-flex h-11 items-center gap-1 rounded-xs type-control text-link hover:bg-link-hover-bg">
-          <Icon name="map" size={16} />
-          Xem trên bản đồ
-        </Link>
+        {!preview && (
+          <Link to={mapPathOf(detail.slug)} className="inline-flex h-11 items-center gap-1 rounded-xs type-control text-link hover:bg-link-hover-bg">
+            <Icon name="map" size={16} />
+            Xem trên bản đồ
+          </Link>
+        )}
       </div>
     </section>
   );
@@ -207,7 +209,7 @@ function Gallery({ media }: { media: PublicMedia[] }) {
   );
 }
 
-function TimelineSummary({ detail }: { detail: PublicHeritageDetail }) {
+function TimelineSummary({ detail, preview }: { detail: PublicHeritageDetail; preview: boolean }) {
   if (!detail.hasTimeline || detail.timeline.length === 0) return null;
   const events = detail.timeline.reduce((sum, phase) => sum + phase.eventCount, 0);
   return (
@@ -222,9 +224,11 @@ function TimelineSummary({ detail }: { detail: PublicHeritageDetail }) {
               {detail.timeline.length} giai đoạn · {events} sự kiện
             </p>
           </div>
-          <ButtonLink to={timelinePath(detail.slug)} variant="secondary" size="lg" className="border-[1.5px] border-primary text-primary">
-            Mở dòng thời gian
-          </ButtonLink>
+          {!preview && (
+            <ButtonLink to={timelinePath(detail.slug)} variant="secondary" size="lg" className="border-[1.5px] border-primary text-primary">
+              Mở dòng thời gian
+            </ButtonLink>
+          )}
         </div>
         <ol className="flex flex-col dsvmd:flex-row">
           {detail.timeline.map((phase, index) => (
@@ -277,7 +281,29 @@ function Sources({ detail }: { detail: PublicHeritageDetail }) {
   );
 }
 
-function DetailSkeleton() {
+/**
+ * Nội dung trang chi tiết di sản. Dùng cho trang công khai và cho trang xem trước bản nháp của quản trị hệ thống: cùng một
+ * giao diện. Xem trước (`preview`) bỏ các liên kết sang bản đồ và dòng thời gian công khai vì bản nháp chưa có ở đó.
+ */
+export function HeritageDetailView({ detail, preview = false }: { detail: PublicHeritageDetail; preview?: boolean }) {
+  return (
+    <>
+      <Hero detail={detail} />
+      <section className="dsv-content flex flex-col gap-12 pt-14 pb-12 dsvlg:flex-row dsvlg:gap-16">
+        <Content detail={detail} />
+        <aside aria-label="Thông tin và vị trí" className="flex min-w-0 flex-1 flex-col gap-6 dsvlg:max-w-[360px]">
+          <InfoCard detail={detail} />
+          <LocationCard detail={detail} preview={preview} />
+        </aside>
+      </section>
+      <Gallery media={detail.media} />
+      <TimelineSummary detail={detail} preview={preview} />
+      <Sources detail={detail} />
+    </>
+  );
+}
+
+export function DetailSkeleton() {
   return (
     <div aria-busy="true" aria-live="polite">
       <span className="sr-only">Đang tải di sản…</span>
@@ -301,17 +327,7 @@ export function HeritageDetailPage() {
   return (
     <>
       <title>{`${detail.name} · Học di sản`}</title>
-      <Hero detail={detail} />
-      <section className="dsv-content flex flex-col gap-12 pt-14 pb-12 dsvlg:flex-row dsvlg:gap-16">
-        <Content detail={detail} />
-        <aside aria-label="Thông tin và vị trí" className="flex min-w-0 flex-1 flex-col gap-6 dsvlg:max-w-[360px]">
-          <InfoCard detail={detail} />
-          <LocationCard detail={detail} />
-        </aside>
-      </section>
-      <Gallery media={detail.media} />
-      <TimelineSummary detail={detail} />
-      <Sources detail={detail} />
+      <HeritageDetailView detail={detail} />
     </>
   );
 }

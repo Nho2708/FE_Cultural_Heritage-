@@ -161,6 +161,14 @@ export interface UpdateLessonBody {
   heritageIds?: number[] | null;
 }
 
+/** "Xem như học sinh": bài đúng như học sinh của lớp thấy, chỉ đọc (không tạo lượt làm, không ghi tiến độ). */
+export interface LessonPreview {
+  lesson: StudentLesson;
+  status: ContentStatus | null;
+  /** Luôn true: bài kiểm tra chỉ để xem, không nộp bài. */
+  quizzesViewOnly: boolean;
+}
+
 export interface PublishLessonResult {
   lesson: LessonDetail;
   codeCreated: boolean;

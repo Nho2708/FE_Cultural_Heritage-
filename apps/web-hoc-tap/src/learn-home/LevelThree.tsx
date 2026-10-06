@@ -2,7 +2,7 @@ import { MESSAGES } from '@dsvhvn/dung-chung';
 import type { StudentClassDetail, StudentProfile } from '@dsvhvn/dung-chung/api';
 import { ButtonLink, Icon } from '@dsvhvn/dung-chung/ui';
 import { pathOf } from '../access/screens';
-import { Illustration } from '../theme/Illustration';
+import { Illustration } from '@dsvhvn/dung-chung/lesson';
 import { classFacts, whoAmI } from './classroom';
 
 // Trang học của em — bản cấp 3 (khối 10-12): bố cục gọn, nhiều chữ, giống trang tài liệu. Thanh bên mục lục và một cột nội

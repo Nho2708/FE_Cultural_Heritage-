@@ -13,11 +13,14 @@ import {
   type HeritageField,
   type HeritageValues,
 } from '@dsvhvn/dung-chung';
+import { registerPreviewWindow } from '@dsvhvn/dung-chung/auth';
 import {
   Button,
   ConfirmDialog,
   EmptyState,
   ErrorState,
+  ExternalButtonLink,
+  Icon,
   InlineMessage,
   LoadingState,
   TabPanel,
@@ -26,6 +29,7 @@ import {
   useToast,
 } from '@dsvhvn/dung-chung/ui';
 import { PATHS, pathOf } from '../../access/screens';
+import { heritagePreviewLink, heritagePublicLink } from '../../components/heritage/heritageLink';
 import { GENERAL_FORM_ID, GeneralInfoTab } from '../../components/heritage/GeneralInfoTab';
 import { HeritageActionDialog } from '../../components/heritage/HeritageActionDialog';
 import { HERITAGE_FIELDS, EDITOR_TABS, EMPTY_HERITAGE, formFieldOf, heritageBody, heritageValuesOf, readTab, sameHeritage, tabOfMissing, type EditorTab } from '../../components/heritage/heritageForm';
@@ -79,6 +83,7 @@ function Workspace({ heritage }: { heritage: HeritageDetail | null }) {
   const [saving, setSaving] = useState(false);
   const [acting, setActing] = useState(false);
   const [archiving, setArchiving] = useState(false);
+  const [opening, setOpening] = useState(false);
   const leaveAllowed = useRef(false);
 
   const dirty = !sameHeritage(values, heritage ? heritageValuesOf(heritage) : EMPTY_HERITAGE);
@@ -233,6 +238,34 @@ function Workspace({ heritage }: { heritage: HeritageDetail | null }) {
     }
   };
 
+  /**
+   * "Xem trước" bản nháp: mở tab mới ngay trong lúc bấm (nếu đợi máy chủ rồi mới mở, trình duyệt chặn cửa sổ mới), có thay đổi chưa
+   * lưu thì lưu trước, xin mã xem trước rồi chuyển tab sang trang xem trước của web học tập. Tab được đăng ký để chỉ nó nhận token.
+   */
+  const openPreview = async () => {
+    if (!heritage) return;
+    const previewTab = window.open('', '_blank');
+    if (!previewTab) {
+      toast.error('Trình duyệt đang chặn cửa sổ mới. Hãy cho phép cửa sổ bật lên cho trang này rồi bấm lại.');
+      return;
+    }
+    registerPreviewWindow(previewTab);
+    setOpening(true);
+    try {
+      if (dirty && !(await save())) {
+        previewTab.close();
+        return;
+      }
+      const { data } = await adminHeritagesApi.issuePreview(heritage.id);
+      previewTab.location.href = heritagePreviewLink(data.path);
+    } catch (error) {
+      previewTab.close();
+      toast.error(errorMessage(error));
+    } finally {
+      setOpening(false);
+    }
+  };
+
   const status = heritage?.status ?? 'DRAFT';
   const readiness = heritage?.readiness;
   const missingText = readiness?.missing.map((m) => m.label).join(', ');
@@ -267,6 +300,18 @@ function Workspace({ heritage }: { heritage: HeritageDetail | null }) {
             <Button type="submit" form={GENERAL_FORM_ID} variant={heritage && status === 'DRAFT' ? 'secondary' : 'primary'} loading={saving} disabled={acting}>
               {status === 'DRAFT' ? 'Lưu nháp' : 'Lưu'}
             </Button>
+            {heritage && status === 'PUBLISHED' && heritage.slug && (
+              <ExternalButtonLink variant="secondary" href={heritagePublicLink(heritage.slug)}>
+                <Icon name="external-link" size={16} />
+                Xem trang công khai
+              </ExternalButtonLink>
+            )}
+            {heritage && status !== 'PUBLISHED' && (
+              <Button variant="secondary" loading={opening} disabled={saving || acting} onClick={() => void openPreview()}>
+                <Icon name="eye" size={16} />
+                Xem trước
+              </Button>
+            )}
             {heritage && status === 'PUBLISHED' && (
               <Button variant="danger" onClick={() => setArchiving(true)} disabled={busy}>
                 Ẩn

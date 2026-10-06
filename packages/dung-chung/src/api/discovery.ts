@@ -1,5 +1,5 @@
 import type { ApiClient } from './client';
-import type { HeritageType, MediaType, Province, RecognitionLevel } from './heritage';
+import type { ContentStatus, HeritageType, MediaType, Province, RecognitionLevel } from './heritage';
 import type { Paged } from './types';
 
 // Khám phá di sản công khai của web học tập: khách và học sinh xem, không cần đăng nhập (tiền tố /public), chỉ thấy di
@@ -231,3 +231,33 @@ export function createDiscoveryApi(client: ApiClient) {
 }
 
 export type DiscoveryApi = ReturnType<typeof createDiscoveryApi>;
+
+// Xem trước bản nháp di sản (quản trị hệ thống): cùng cấu trúc trang chi tiết công khai nhưng đọc bản nháp đang lưu. Cần cả mã
+// xem trước còn hạn lẫn token quản trị hệ thống; thiếu một trong hai, mã sai, hết hạn hay di sản đã xóa đều trả cùng một 404.
+
+export const PREVIEW_ENDPOINTS = {
+  heritage: (code: string) => `/preview/heritages/${encodeURIComponent(code)}`,
+  timeline: (code: string) => `/preview/heritages/${encodeURIComponent(code)}/timeline`,
+} as const;
+
+/** Bản nháp di sản như trang công khai sẽ hiện, kèm hạn của mã xem trước. */
+export interface HeritagePreview {
+  /** Thời điểm mã hết hạn (ISO). */
+  expiresAt: string;
+  /** Nháp hoặc Đã ẩn (di sản đã xuất bản không cấp mã xem trước). */
+  status: ContentStatus;
+  heritage: PublicHeritageDetail;
+}
+
+export function createPreviewApi(client: ApiClient) {
+  return {
+    /** Bản nháp đang lưu. 404 `PREVIEW_INVALID` cho mọi lý do không đọc được. */
+    heritage: async (code: string, { signal }: RequestSignal = {}) =>
+      (await client.request<HeritagePreview>(PREVIEW_ENDPOINTS.heritage(code), { signal })).data,
+
+    timeline: async (code: string, { signal }: RequestSignal = {}) =>
+      (await client.request<PublicTimeline>(PREVIEW_ENDPOINTS.timeline(code), { signal })).data,
+  };
+}
+
+export type PreviewApi = ReturnType<typeof createPreviewApi>;
