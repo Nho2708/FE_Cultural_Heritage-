@@ -17,7 +17,10 @@
     "smoke:tai-anh": "node scripts/smoke-tai-anh.mjs",
     "smoke:bai-hoc": "node scripts/smoke-bai-hoc.mjs",
     "smoke:xem-truoc": "node scripts/smoke-xem-truoc.mjs",
-    "smoke:goi": "node scripts/smoke-goi.mjs"
+    "smoke:goi": "node scripts/smoke-goi.mjs",
+    "smoke:bai-kiem-tra": "node scripts/smoke-bai-kiem-tra.mjs",
+    "smoke:thong-ke-goi-y": "node scripts/smoke-thong-ke-goi-y.mjs",
+    "smoke:quan-tri-tong-quan": "node scripts/smoke-quan-tri-tong-quan.mjs"
   },
   "dependencies": {
     "@dsvhvn/dung-chung": "0.1.0",

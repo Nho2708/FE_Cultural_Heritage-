@@ -20,11 +20,18 @@ export const ClassesPage = lazy(() => import('../pages/teacher/ClassesPage'));
 export const ClassDetailPage = lazy(() => import('../pages/teacher/ClassDetailPage'));
 export const LessonsPage = lazy(() => import('../pages/teacher/LessonsPage'));
 export const QuestionBankPage = lazy(() => import('../pages/teacher/QuestionBankPage'));
+export const QuizzesPage = lazy(() => import('../pages/teacher/QuizzesPage'));
+export const QuizResultsPage = lazy(() => import('../pages/teacher/QuizResultsPage'));
+export const StudentRecordPage = lazy(() => import('../pages/teacher/StudentRecordPage'));
+export const QuizEditorPage = lazy(() => import('../pages/teacher/QuizEditorPage'));
 export const AiQuestionsPage = lazy(() => import('../pages/teacher/AiQuestionsPage'));
 export const LessonEditorPage = lazy(() => import('../pages/teacher/LessonEditorPage'));
 export const PlansPage = lazy(() => import('../pages/admin/PlansPage'));
 export const PlanPurchasePage = lazy(() => import('../pages/school/PlanPurchasePage'));
 export const PaymentResultPage = lazy(() => import('../pages/school/PaymentResultPage'));
+export const SchoolOverviewPage = lazy(() => import('../pages/school/SchoolOverviewPage'));
+export const OverviewPage = lazy(() => import('../pages/admin/OverviewPage'));
+export const QuestionModerationPage = lazy(() => import('../pages/admin/QuestionModerationPage'));
 export const AuditLogPage = lazy(() => import('../pages/admin/AuditLogPage'));
 export const TranslationReviewPage = lazy(() => import('../pages/admin/TranslationReviewPage'));
 

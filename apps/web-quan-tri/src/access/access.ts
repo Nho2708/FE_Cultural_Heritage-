@@ -40,17 +40,17 @@ export function screenForPath(pathname: string): Screen | undefined {
 
 /**
  * Trang vào mặc định theo vai trò, dùng sau khi đăng nhập và cho nút "Về trang làm việc của tôi".
- * Giáo viên → Hồ sơ cá nhân cho tới khi màn hình Lớp học được dựng; quản trị trường → Giáo viên của trường và quản trị
- * hệ thống → Quản lý trường cho tới khi hai màn hình tổng quan được dựng.
+ * Giáo viên → Hồ sơ cá nhân cho tới khi màn hình Lớp học được dựng; quản trị trường → Tổng quan trường và quản trị
+ * hệ thống → Tổng quan và doanh thu.
  */
 export function roleHome(role: StaffRole): string {
   switch (role) {
     case 'TEACHER':
       return pathOf('profile');
     case 'ORG_ADMIN':
-      return pathOf('schoolTeachers');
+      return pathOf('schoolOverview');
     case 'ADMIN':
-      return pathOf('schools');
+      return pathOf('adminOverview');
   }
 }
 

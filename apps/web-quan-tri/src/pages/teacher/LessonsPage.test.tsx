@@ -47,6 +47,55 @@ describe('Bài học của tôi', () => {
     expect(await screen.findByText(/2 bài học ở 2 lớp · 1 đã xuất bản · 1 nháp · 0 lưu trữ/)).toBeInTheDocument();
   });
 
+  it('cột Độ khó tính từ bài kiểm tra: ba mức và "Chưa có bài kiểm tra"; bộ lọc Độ khó gửi đúng tham số và nằm trên URL', async () => {
+    signInAs('TEACHER');
+    const calls = api([
+      lessonRowOf(1, { title: 'Ngọ Môn', status: 'PUBLISHED', accessCode: 'BH7F3K2Q', quizCount: 1, difficulty: 'MEDIUM', difficultyLabel: 'Trung bình' }),
+      lessonRowOf(2, { title: 'Văn Miếu', quizCount: 2, difficulty: 'HARD', difficultyLabel: 'Khó' }),
+      lessonRowOf(3, { title: 'Vịnh Hạ Long' }),
+    ]);
+    const user = userEvent.setup();
+    const { router } = renderApp('/giao-vien/bai-hoc');
+
+    const table = await screen.findByRole('table', { name: 'Bài học của tôi' });
+    expect(within(table).getByRole('columnheader', { name: 'Độ khó' })).toBeInTheDocument();
+    expect(within(within(table).getByRole('row', { name: /Ngọ Môn/ })).getByText('Trung bình')).toBeInTheDocument();
+    expect(within(within(table).getByRole('row', { name: /Văn Miếu/ })).getByText('Khó')).toBeInTheDocument();
+    expect(within(within(table).getByRole('row', { name: /Vịnh Hạ Long/ })).getByText('Chưa có bài kiểm tra')).toBeInTheDocument();
+
+    await user.selectOptions(screen.getByLabelText('Độ khó'), 'kho');
+    await waitFor(() => {
+      const last = calls.filter((c) => c.path.startsWith('/teacher/lessons?')).at(-1)?.path ?? '';
+      expect(last).toContain('difficulty=HARD');
+    });
+    expect(router.state.location.search).toContain('do-kho=kho');
+  });
+
+  it('nhân bản từ danh sách: bài có bài kiểm tra thì chép kèm theo mặc định, kết quả báo số bài đã chép và số câu bỏ qua', async () => {
+    signInAs('TEACHER');
+    const copy = lessonOf({ id: 8, level: 1, status: 'DRAFT' });
+    const message =
+      'Đã tạo bài học nháp ở lớp 4B1. Đã chép 1 bài kiểm tra thành bản nháp; hãy đặt lại giờ mở và giờ đóng. Bỏ qua 3 câu hỏi đã ẩn hoặc không dùng được ở cấp của lớp.';
+    const calls = api([lessonRowOf(1, { title: 'Ngọ Môn', status: 'PUBLISHED', accessCode: 'BH7F3K2Q', quizCount: 1 })], (call) => {
+      if (call.path === '/teacher/lessons/1/duplicate') return envelope(201, { data: { lesson: copy, skippedHeritages: 0, levelNotice: null, copiedQuizzes: 1, skippedQuestions: 3, message } });
+      if (call.path === '/teacher/lessons/8') return envelope(200, { data: copy });
+      if (call.path === '/teacher/lessons/8/materials') return envelope(200, { data: { images: [], events: [] } });
+      return undefined;
+    });
+    const user = userEvent.setup();
+    renderApp('/giao-vien/bai-hoc');
+
+    await user.click(await screen.findByRole('button', { name: 'Nhân bản "Ngọ Môn" sang lớp khác' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Nhân bản bài học sang lớp khác' });
+    expect(within(dialog).getByText(/1 bài kiểm tra/)).toBeInTheDocument();
+    expect(within(dialog).getByRole('checkbox', { name: 'Chép kèm các bài kiểm tra của bài' })).toBeChecked();
+    await user.selectOptions(await within(dialog).findByLabelText('Lớp đích'), '2');
+    await user.click(within(dialog).getByRole('button', { name: 'Nhân bản' }));
+
+    expect(await screen.findByText(message)).toBeInTheDocument();
+    expect(calls.find((c) => c.path === '/teacher/lessons/1/duplicate')?.body).toEqual({ targetClassId: 2, includeQuizzes: true });
+  });
+
   it('lọc theo lớp, trạng thái, loại di sản và từ khóa gửi đúng tham số', async () => {
     signInAs('TEACHER');
     const calls = api([lessonRowOf(1)]);

@@ -1,4 +1,4 @@
-import type { LessonListFilter, QuestionListFilter } from '@dsvhvn/dung-chung/api';
+import type { ClassMasteryFilter, QuestionQualityFilter, TrendQuery, ClassRecommendationFilter, LessonListFilter, QuestionListFilter, QuizCandidateFilter, QuizListFilter } from '@dsvhvn/dung-chung/api';
 import type { ClassListQuery, StudentListQuery } from './classroomEndpoints';
 import type { LanguageCode, TranslationQueueQuery } from '@dsvhvn/dung-chung/api';
 import type { AuditLogQuery, HeritageListQuery, InvoiceListQuery, OrganizationListQuery, TeacherListQuery } from './endpoints';
@@ -73,6 +73,36 @@ export const queryKeys = {
   invoiceList: (query: InvoiceListQuery) => ['org', 'billing', 'invoices', 'list', query] as const,
   invoiceDetail: (id: number) => ['org', 'billing', 'invoices', 'detail', id] as const,
   paymentResult: (id: number) => ['org', 'billing', 'payment', id] as const,
+
+  /** Bài kiểm tra của giáo viên: danh sách, chi tiết, hộp chọn câu và câu xem trước (làm mới cả nhóm sau khi ghi). */
+  quizzes: ['teacher', 'quizzes'] as const,
+  quizList: (filter: QuizListFilter) => ['teacher', 'quizzes', 'list', filter] as const,
+  quizDetail: (id: number) => ['teacher', 'quizzes', 'detail', id] as const,
+  quizCandidates: (id: number, filter: QuizCandidateFilter) => ['teacher', 'quizzes', 'candidates', id, filter] as const,
+  /** Câu như học sinh của một cấp thấy (xem trước). */
+  questionPreview: (id: number, level: number) => ['teacher', 'questions', 'preview', id, level] as const,
+
+  /** Thống kê của giáo viên: kết quả bài kiểm tra, tiến độ và thành thạo của lớp, hồ sơ học sinh, gợi ý ôn tập (làm mới cả nhóm khi cần). */
+  statistics: ['teacher', 'statistics'] as const,
+  quizOverview: (quizId: number) => ['teacher', 'statistics', 'quiz', quizId, 'overview'] as const,
+  quizQuestionStats: (quizId: number) => ['teacher', 'statistics', 'quiz', quizId, 'questions'] as const,
+  quizStudentRows: (quizId: number) => ['teacher', 'statistics', 'quiz', quizId, 'students'] as const,
+  quizSuggestions: (quizId: number, range: string) => ['teacher', 'statistics', 'quiz', quizId, 'suggestions', range] as const,
+  attemptDetail: (attemptId: number) => ['teacher', 'statistics', 'attempt', attemptId] as const,
+  classProgress: (classId: number) => ['teacher', 'statistics', 'class', classId, 'progress'] as const,
+  classMastery: (classId: number, filter: ClassMasteryFilter) => ['teacher', 'statistics', 'class', classId, 'mastery', filter] as const,
+  classSuggestions: (classId: number, filter: ClassRecommendationFilter) => ['teacher', 'statistics', 'class', classId, 'suggestions', filter] as const,
+  studentProfile: (classId: number, studentId: number) => ['teacher', 'statistics', 'class', classId, 'student', studentId] as const,
+
+  /** Tổng quan: của trường (quản trị trường) và của hệ thống kèm biểu đồ theo thời gian (quản trị hệ thống). */
+  schoolOverview: ['org', 'overview'] as const,
+  systemOverview: ['admin', 'overview'] as const,
+  systemTrend: (query: TrendQuery) => ['admin', 'overview', 'trend', query] as const,
+
+  /** Kiểm duyệt ngân hàng câu hỏi của quản trị hệ thống: danh sách kèm chất lượng và chi tiết chỉ đọc. */
+  moderation: ['admin', 'moderation'] as const,
+  moderationList: (filter: QuestionQualityFilter) => ['admin', 'moderation', 'list', filter] as const,
+  moderationDetail: (id: number) => ['admin', 'moderation', 'detail', id] as const,
 
   auditLogs: (query: AuditLogQuery) => ['admin', 'audit-logs', query] as const,
 };

@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { classOf, classStudentOf, envelope, mockApi, sheetOf, studentPage, userOf, type FetchCall } from '../../test/fixtures';
 import { renderApp, signInAs } from '../../test/renderApp';
+import { progressOf } from '../../test/statisticsFixtures';
 
 // Chi tiết lớp, tab Học sinh: bảng học sinh, thêm từng em, nhập danh sách có xem trước, phiếu đăng nhập, đặt lại mật khẩu,
 // vô hiệu / mở lại / xóa, sửa họ tên tại chỗ.
@@ -48,15 +49,20 @@ describe('Chi tiết lớp — tab Học sinh', () => {
     expect(screen.getByRole('tab', { name: 'Học sinh', selected: true })).toBeInTheDocument();
   });
 
-  it('các tab chưa dựng ở chức năng này báo sẽ có ở bản sau; tab nằm trên URL', async () => {
+  it('tab Tiến độ, Thành thạo, Gợi ý ôn tập mở theo URL và chuyển tab bằng bàn phím', async () => {
     signInAs('TEACHER');
-    api(three());
+    api(three(), (call) => {
+      if (call.path === `${BASE}/progress`) return envelope(200, { data: progressOf() });
+      return undefined;
+    });
     const user = userEvent.setup();
     const { router } = renderApp('/giao-vien/lop/1');
 
     await user.click(await screen.findByRole('tab', { name: 'Tiến độ' }));
-    expect(await screen.findByText('Tab Tiến độ sẽ có ở bản sau.')).toBeInTheDocument();
+    expect(await screen.findByRole('table', { name: 'Học sinh và bài kiểm tra của lớp' })).toBeInTheDocument();
     expect(router.state.location.search).toBe('?tab=tien-do');
+    await user.click(screen.getByRole('tab', { name: 'Học sinh' }));
+    expect(router.state.location.search).toBe('');
   });
 
   it('lớp không có hoặc của giáo viên khác (404): báo không tìm thấy lớp', async () => {

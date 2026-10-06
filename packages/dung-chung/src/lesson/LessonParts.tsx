@@ -1,7 +1,8 @@
 import { formatDateTime } from '../format';
 import type { LessonImageCredit, StudentHeritageCard, StudentQuiz, StudentQuizState } from '../api';
-import { Badge, ButtonLink, Icon, TextLink, type BadgeTone } from '../ui';
-import { canTakeQuiz, paragraphsOf, quizActionLabel } from './lessonData';
+import { Badge, Button, Icon, TextLink, type BadgeTone } from '../ui';
+import { useState } from 'react';
+import { canOpenQuiz, paragraphsOf, quizActionLabel } from './lessonData';
 import { useLessonLinks } from './lessonLinks';
 
 // Phần dùng chung của ba bố cục bài học: đoạn văn, hình kèm chú thích và ghi công, danh sách bài kiểm tra kèm trạng thái với
@@ -83,20 +84,25 @@ interface QuizListProps {
 
 export function QuizList({ code, quizzes, variant }: QuizListProps) {
   const links = useLessonLinks();
+  const QuizDialog = links.quizDialog;
+  const [openId, setOpenId] = useState<number | null>(null);
   if (quizzes.length === 0) {
     return <p className="type-body-m text-on-surface-variant">Bài học này chưa có bài kiểm tra nào.</p>;
   }
   return (
+    <>
+    {QuizDialog && (
+      <QuizDialog quizId={openId} name={quizzes.find((q) => q.id === openId)?.name ?? null} code={code} onClose={() => setOpenId(null)} />
+    )}
     <ul className={variant === 'row' ? 'divide-y divide-border rounded-md border border-border bg-surface' : 'flex flex-col gap-3'}>
       {quizzes.map((quiz) => {
         const action = quizActionLabel(quiz);
         const when = quizWhen(quiz);
-        const quizTo = links.quiz(code, quiz.id);
-        const link = canTakeQuiz(quiz) && action && quizTo && (
-          <ButtonLink to={quizTo} size={variant === 'large' ? 'lg' : 'md'} variant={variant === 'row' ? 'primary' : 'primary'}>
+        const link = QuizDialog && canOpenQuiz(quiz) && action && (
+          <Button onClick={() => setOpenId(quiz.id)} size={variant === 'large' ? 'lg' : 'md'} variant={quiz.state === 'SUBMITTED' ? 'secondary' : 'primary'} aria-label={`${action}: ${quiz.name ?? 'bài kiểm tra'}`}>
             {variant === 'large' && <Icon name="play" size={22} />}
             {action}
-          </ButtonLink>
+          </Button>
         );
         if (variant === 'row') {
           return (
@@ -130,6 +136,7 @@ export function QuizList({ code, quizzes, variant }: QuizListProps) {
         );
       })}
     </ul>
+    </>
   );
 }
 

@@ -202,3 +202,115 @@ thật, đúng như VNPay làm. Phần chưa kiểm: trang thanh toán thật c�
 | Quản trị hệ thống | Số trường đang dùng gói Cơ bản tăng thêm 1 sau khi trường mua | Đạt |
 | Điện thoại | 390px: tab Gói và hạn mức và Chọn gói không tràn ngang | Đạt |
 
+## Bài kiểm tra của bài học (web quản trị)
+
+> Chạy ngày 06/10/2026 (+07) với backend nhánh `feature/DSVHVN-011-bai-kiem-tra`. Kết quả: **48/48 bước đạt**, không có lỗi JavaScript trên trang, không có phản hồi 5xx.
+> Script: [`apps/web-quan-tri/scripts/smoke-bai-kiem-tra.mjs`](../apps/web-quan-tri/scripts/smoke-bai-kiem-tra.mjs) (`npm run smoke:bai-kiem-tra -w @dsvhvn/web-quan-tri`).
+
+| Mục | Giá trị |
+|---|---|
+| Trình duyệt | Microsoft Edge headless qua `playwright-core`; khung 1440 × 900 và 390 × 844, múi giờ Asia/Ho_Chi_Minh |
+| API | Bản build của backend, `ASPNETCORE_ENVIRONMENT=Development`, `http://localhost:5180`, LocalDB **database tạm** (tên bắt đầu bằng `dsvhvn_tam_wt_`, migrate và nạp di sản đợt 1 lúc khởi động, **đã xóa sau khi chạy**), `Email__Mode=Log` (không gửi thư thật), `Ai:Mode` mặc định `Simulated`, `Quizzes__AutoCloseIntervalSeconds=5` để thấy tác vụ tự đóng |
+| Giao diện | `VITE_API_BASE_URL=http://localhost:5180/api/v1 npx vite --port 5273 --strictPort` (web quản trị) và `--port 5274` (web học tập) |
+| Chuẩn bị | Gọi thẳng API: xuất bản một di sản có dòng thời gian và thêm ảnh, tạo trường, quản trị trường, giáo viên, ba lớp (khối 3, 8, 11), mỗi lớp một bài học đã xuất bản, sáu câu hỏi đã duyệt (một đáp án, đúng sai, sắp xếp, điền từ, chọn hình, nhiều mệnh đề), một học sinh lớp khối 8. Mọi thao tác với bài kiểm tra đi qua giao diện |
+
+| Nhóm bước | Kết quả |
+|---|---|
+| Bài kiểm tra của tôi chưa có bài; cột Độ khó của Bài học của tôi ghi "Chưa có bài kiểm tra" cho cả ba bài; lọc độ khó "Khó" không có bài nào | Đạt |
+| Tạo bài kiểm tra cho lớp cấp 2 (chọn bài học, đặt tên); trang soạn mở với bài Nháp, bài học chỉ đọc, thời gian làm tùy chọn | Đạt |
+| Hộp chọn câu cấp 2: có bốn dạng của cấp, **câu chọn hình (cấp 1) bị ẩn**; con mắt mở câu như học sinh và giữ nguyên 4 câu đang chọn; thêm 4 câu | Đạt |
+| Đổi điểm 2,5 (tổng 5,5); điểm 0,1 bị chặn ngay; đổi thứ tự bằng phím mũi tên; bỏ câu; thêm lại (3 câu đã có hiện mờ, không chọn lại được) | Đạt |
+| Xem trước như học sinh (câu 1/4, câu sau); giờ đóng trước giờ mở báo lỗi dưới ô; Lưu rồi tải lại giữ đủ thiết lập | Đạt |
+| Phát hành: hộp xác nhận nhắc khóa danh sách và nêu mã bài học; xong hiện hộp Mã bài học; trường khóa bị vô hiệu, vẫn sửa tên, mô tả, giờ đóng (kéo dài giờ đóng lưu được); thanh trạng thái có Nhân bản, Kết quả, Đóng | Đạt |
+| Học sinh lớp cấp 2 đăng nhập web học tập, mở bài bằng mã, thấy bài ở tab Bài kiểm tra | Đạt |
+| Danh sách: dòng bài đang phát hành "4 câu · 15 phút", 0/1 đã nộp; Nhân bản thành bản Nháp cùng 4 câu không giờ mở, đóng; Phát hành khi thiếu giờ báo ngay, không hỏi xác nhận | Đạt |
+| Độ khó của bài học tính từ hai bài kiểm tra là "Khó"; lọc `?do-kho=kho` còn đúng một bài | Đạt |
+| Nhân bản bài học sang lớp cấp 1, ô chép kèm mặc định chọn và có cảnh báo khác cấp; kết quả "Đã chép 2 bài kiểm tra… Bỏ qua 4 câu hỏi"; bài chép sang cấp 1 có ô thời gian khóa "Không đồng hồ" và chỉ còn 2 câu hợp cấp | Đạt |
+| Lớp cấp 3: hộp chọn câu không có câu điền từ; để trống thời gian làm thì Phát hành báo bắt buộc; có 45 phút thì phát hành được | Đạt |
+| Đóng bài từ danh sách (hộp xác nhận không mở lại được), xóa bài Nháp, lọc trạng thái Đã đóng trên URL | Đạt |
+| 390px: Bài kiểm tra của tôi và Soạn và phát hành bài kiểm tra không tràn ngang | Đạt |
+| Bài cấp 3 phát hành với giờ đóng sau 1 phút: sau giờ đóng tác vụ nền tự chuyển sang Đã đóng | Đạt |
+
+Ghi chú: ảnh của Wikimedia Commons không tải được trong môi trường kiểm thử nên các khung ảnh trống. Luồng làm bài của học sinh chưa có nên chưa kiểm số đã nộp lớn hơn 0 và Kết quả bài kiểm tra.
+
+## Web học tập: học tập của học sinh theo cấp (làm bài, kết quả, tiến độ)
+
+> Chạy ngày 06/10/2026 (+07) với backend nhánh `feature/DSVHVN-012-hoc-tap-theo-cap`. Kết quả: **43/43 bước đạt**, không có lỗi JavaScript trên trang, không có lỗi console.
+> Script: [`apps/web-hoc-tap/scripts/smoke-lam-bai.mjs`](../apps/web-hoc-tap/scripts/smoke-lam-bai.mjs) (`npm run smoke:lam-bai -w @dsvhvn/web-hoc-tap`).
+
+| Mục | Giá trị |
+|---|---|
+| Máy, trình duyệt | Windows 11, Node 24.19, Microsoft Edge headless qua `playwright-core`; khung 1440 × 900 và 390 × 844 |
+| API | Bản build của backend, `http://localhost:5180`, LocalDB **database tạm** `dsvhvn_tam_wt_…` (migrate và nạp di sản lúc khởi động, **đã xóa sau khi chạy**), `Email__Mode=Log` (không gửi thư thật), CORS cho cổng của web |
+| Web học tập | `VITE_API_BASE_URL=http://localhost:5180/api/v1 npx vite --port 5274 --strictPort` |
+| Lệnh | `API_URL=http://localhost:5180/api/v1 BASE_URL=http://localhost:5274 API_LOG=<log của API> ADMIN_PASSWORD=<mật khẩu seed> npm run smoke:lam-bai -w @dsvhvn/web-hoc-tap` (đặt `SKIP_TIMEOUT=1` để bỏ phần chờ hết giờ khoảng 70 giây) |
+| Chuẩn bị | Gọi thẳng API: xuất bản di sản, tạo trường, quản trị trường, giáo viên, ba lớp (khối 3, 8, 11), mỗi lớp một bài học xuất bản, đủ tám dạng câu, bốn bài kiểm tra đang mở (cấp 1 không thời gian, cấp 2 15 phút, cấp 3 45 phút và một bài nhanh 1 phút), mỗi lớp một học sinh đã đổi mật khẩu |
+
+| Nhóm bước | Kết quả |
+|---|---|
+| Học sinh đăng nhập; trang học báo bài kiểm tra chưa nhập mã bằng nhãn "Cần mã bài học" (cấp 1 và 2); nhập mã bài học, mở hộp thoại Bắt đầu bài kiểm tra (số câu, thời gian, lời nhắc một lần) | Đạt |
+| Cấp 2: bố cục cân bằng, đồng hồ 15 phút, vào bài không còn thanh điều hướng; làm một đáp án, đúng/sai, sắp xếp, điền từ (kho từ); bảng số câu báo 4 / 4 | Đạt |
+| Cấp 2: tải lại giữa chừng vào tiếp đúng lượt, đủ 4 câu đã lưu, đồng hồ không đặt lại; mở thẳng đường dẫn thì hiện Làm tiếp, không tạo lượt mới | Đạt |
+| Cấp 2: ngắt mạng thì báo "Mất kết nối", giữ câu vừa chọn; có mạng lại thì tự lưu | Đạt |
+| Cấp 2: hộp xác nhận nộp, nộp; kết quả có điểm, câu đúng, sai, bỏ trống, đáp án và giải thích, huy hiệu; lịch sử, tiến độ (biểu đồ điểm theo thời gian), thành thạo, huy hiệu; mở lại bài đã nộp thì chuyển thẳng tới kết quả; trang học thấy bài học và huy hiệu gần đây | Đạt |
+| Cấp 1: bố cục từng câu, không đồng hồ, hàng sao; chọn hình, đúng/sai, ghép cặp (kéo tên thả vào hình bằng chuột thật), sắp xếp; câu cuối "Xong rồi!"; kết quả ba sao, lời khen, huy hiệu, không điểm và phần trăm; Sao của em, tab Bài đã chơi; 390px không tràn ngang | Đạt |
+| Cấp 3: bố cục gọn, đồng hồ 45 phút, bảng số câu nằm ngang, đánh dấu xem lại, tư liệu ghim bên trái cho nhóm câu đọc tư liệu; một đáp án, nhiều mệnh đề, đọc tư liệu; kết quả có phân tích theo di sản và dạng câu; lịch sử, thành thạo; 390px không tràn ngang | Đạt |
+| Cấp 3: bài nhanh 1 phút, dưới 1 phút đồng hồ chuyển cảnh báo "sắp hết giờ", hết giờ tự nộp và kết quả báo "đã được nộp tự động" | Đạt |
+| Em khác lớp không xem được lượt của em (404) | Đạt |
+
+Ghi chú: ảnh của Wikimedia Commons có thể không tải được trong môi trường kiểm thử nên một số khung ảnh trống. Đã gặp và sửa trong lúc chạy: bài tự nộp đúng hạn máy chủ ghi là "Đã nộp" nên giao diện giữ cờ "tự nộp khi hết giờ" ở phía máy em để vẫn báo đúng.
+
+## Thống kê và gợi ý (web quản trị và web học tập)
+
+> Chạy ngày 07/10/2026 (+07) với backend nhánh `feature/DSVHVN-016-thong-ke-goi-y`. Kết quả: **51/51 bước đạt**, không có lỗi JavaScript trên trang, không có phản hồi 5xx mà trình duyệt nhận.
+> Script: [`apps/web-quan-tri/scripts/smoke-thong-ke-goi-y.mjs`](../apps/web-quan-tri/scripts/smoke-thong-ke-goi-y.mjs) (`npm run smoke:thong-ke-goi-y -w @dsvhvn/web-quan-tri`).
+
+| Mục | Giá trị |
+|---|---|
+| Máy, trình duyệt | Windows 11, Node 24.19, Microsoft Edge headless qua `playwright-core`; khung 1440 × 900 và 390 × 844 |
+| API | Bản build của backend, `http://localhost:5180`, LocalDB **database tạm** `dsvhvn_tam_wt_…` (migrate và nạp di sản lúc khởi động, **đã xóa sau khi chạy**), `Email__Mode=Log` (không gửi thư thật), `Ai__Mode=Simulated`, CORS cho hai cổng web |
+| Web | `VITE_API_BASE_URL=http://localhost:5180/api/v1 npx vite --port 5273 --strictPort` (web quản trị) và `--port 5274` (web học tập) |
+| Lệnh | `API_LOG=<log của API> ADMIN_PASSWORD=<mật khẩu seed> npm run smoke:thong-ke-goi-y -w @dsvhvn/web-quan-tri` |
+| Chuẩn bị | Gọi thẳng API: xuất bản ba di sản, tạo trường, quản trị trường, hai giáo viên, ba lớp của giáo viên thứ nhất (khối 3, 8, 11) và một lớp của giáo viên thứ hai; mỗi lớp ba bài học đã xuất bản, câu hỏi đã duyệt theo cấp, hai bài kiểm tra đang mở; lớp cấp 2 có 6 học sinh làm bài đúng và sai khác nhau (5 em làm bài thứ nhất, 1 em làm cả hai, 1 em chưa làm gì), lớp cấp 1 và 3 mỗi lớp 2 em |
+
+| Nhóm bước | Kết quả |
+|---|---|
+| Chi tiết lớp, tab Tiến độ: 6 em, 2 bài đã phát hành, tiến độ 50% (6 lượt trên 12 ô), điểm 8/8 của em làm đúng hết, em chưa làm ghi "Chưa làm"; tên học sinh mở Hồ sơ học tập | Đạt |
+| Hồ sơ học tập: biểu đồ điểm theo thời gian, lịch sử 2 lượt, thẻ "2 trên 2 bài đã phát hành"; mở Chi tiết bài làm từ lịch sử: 4 câu, bài sai hết, câu em trả lời cạnh đáp án đúng và giải thích | Đạt |
+| Tab Thành thạo: bảng nhiệt hàng Cả lớp và 6 em, ô 100% là Thành thạo, chú giải màu, tỉ lệ theo dạng câu; lọc theo loại gọi lại không lỗi | Đạt |
+| Tab Gợi ý ôn tập: di sản nên ôn "Lớp sai 60% ở 20 câu về di sản này", di sản liên quan; Tạo bài ôn tập mở hộp thoại Tạo bài học với lớp khóa, tiêu đề "Ôn tập: …", tạo xong chuyển sang Soạn bài học | Đạt |
+| Kết quả bài kiểm tra: Tổng quan (5 / 6, chưa làm 1 em, điểm trung bình 3,2, phổ điểm 10 khoảng); Từng câu (bốn câu, câu dưới 50% cảnh báo, lỗi hay gặp của câu điền từ); Từng học sinh (cả em chưa làm, lọc trạng thái), Chi tiết bài làm 0/8, tab Gợi ý chỉ bài này | Đạt |
+| Lớp cấp 1: giáo viên thấy điểm kèm số sao của từng em; tab Tiến độ giải thích học sinh chỉ thấy sao | Đạt |
+| Đóng bài: hộp xác nhận ghi số em đã nộp, sau khi đóng trạng thái Đã đóng và không còn nút Đóng bài kiểm tra | Đạt |
+| Giáo viên khác mở lớp, kết quả bài, hồ sơ học sinh không phải của mình: báo không tìm thấy | Đạt |
+| Học sinh cấp 2: Gợi ý cho em có đủ phần, nhãn Cần mã bài học, bài mới không lộ mã, lý do có số liệu, thẻ di sản mở chi tiết di sản, kết quả của một lượt có gợi ý; học sinh chưa làm gì thấy lời mời nhập mã và bài mới | Đạt |
+| Học sinh cấp 1: thẻ hình nhãn ngắn, không số và phần trăm ở Trang học và Kết quả bài làm; cấp 3: danh sách theo nhóm kèm "Lý do: …", mục lục có Gợi ý | Đạt |
+| 390px: Kết quả bài kiểm tra và tab Thành thạo (bảng nhiệt cuộn trong khung) không tràn ngang | Đạt |
+
+Ghi chú: ảnh của Wikimedia Commons không tải được trong môi trường kiểm thử nên các khung ảnh di sản gợi ý trống. Log của API có vài dòng `SqlException` kèm "A severe error occurred on the current command"
+khi trình duyệt đóng yêu cầu đang chạy (chuyển trang giữa chừng); đó là hủy yêu cầu, không phải lỗi của chức năng, và trình duyệt không nhận 5xx nào.
+
+## Quản trị và tổng quan (web quản trị)
+
+> Chạy ngày 07/10/2026 (+07) với backend nhánh `feature/DSVHVN-017-quan-tri-tong-quan`. Kết quả: **43/43 bước đạt**, không có lỗi JavaScript trên trang, không có phản hồi 5xx, log của API không có dòng lỗi.
+> Script: [`apps/web-quan-tri/scripts/smoke-quan-tri-tong-quan.mjs`](../apps/web-quan-tri/scripts/smoke-quan-tri-tong-quan.mjs) (`npm run smoke:quan-tri-tong-quan -w @dsvhvn/web-quan-tri`).
+
+| Mục | Giá trị |
+|---|---|
+| Máy, trình duyệt | Windows 11, Node 24.19, Microsoft Edge headless qua `playwright-core`; khung 1440 × 900 và 390 × 800 |
+| API | Bản build của backend, `http://localhost:5180`, LocalDB **database tạm** `dsvhvn_tam_wt_…` (nạp di sản lúc khởi động, **đã xóa sau khi chạy**), `Email__Mode=Log`, `Ai__Mode=Simulated`, CORS cho cổng 5273 và 5274 |
+| Lệnh | `API_LOG=<log của API> ADMIN_PASSWORD=<mật khẩu seed> npm run smoke:quan-tri-tong-quan -w @dsvhvn/web-quan-tri` |
+| Chuẩn bị | Gọi thẳng API: xuất bản một di sản, tạo trường, quản trị trường, giáo viên, lớp cấp 2, bài học, hai câu hỏi (một đáp án đúng, đúng sai), bài kiểm tra đã phát hành, mười học sinh làm bài (sai câu một đáp án, đúng câu đúng sai) |
+
+| Nhóm bước | Kết quả |
+|---|---|
+| Quản trị trường vào thẳng Tổng quan trường: giáo viên 1 / hạn mức, 1 lớp, 10 học sinh đã đăng nhập hết, 1 bài học, 1 bài kiểm tra đang mở, 10 lượt nộp, điểm trung bình 5, lượt AI so với hạn mức có thanh dùng hạn mức, tên lớp trong biểu đồ theo lớp, thanh bên có Tổng quan | Đạt |
+| Chỉ có số tổng: trang không chứa tên giáo viên hay tên học sinh; nút Xem gói và hóa đơn mở Trường và gói; 390px không tràn ngang | Đạt |
+| Quản trị trường mở Kiểm duyệt câu hỏi nhận trang 403, máy chủ cũng trả 403 cho tổng quan hệ thống | Đạt |
+| Quản trị hệ thống vào thẳng Tổng quan: các thẻ số liệu, bảng số trường theo từng gói, biểu đồ 30 ngày (30 cột) có đủ lượt nộp vừa làm; khoảng 12 tháng tự gom theo tháng; đổi số liệu sang Học sinh mới | Đạt |
+| Tab Doanh thu: ghi rõ chờ nối thanh toán, không có số doanh thu, hai liên kết mở AdMob và Ad Manager ở tab mới, giữ trên URL; 390px không tràn ngang | Đạt |
+| Kiểm duyệt: câu một đáp án đúng 10 lượt, 0%, "Cần xem lại"; câu đúng sai 10 lượt, 100%; ba số đếm; lọc chỉ câu cần xem lại (trên URL); xem chỉ đọc có đáp án đúng, giải thích, kết quả làm bài, không có ô nhập | Đạt |
+| Ẩn câu có lý do: giáo viên không còn thấy câu ở tab Dùng chung, bài kiểm tra đã phát hành giữ nguyên câu; lọc Đã ẩn; Hiện lại câu có lý do: giáo viên thấy lại; nhật ký có "Ẩn câu hỏi" và "Hiện lại câu hỏi" kèm lý do, lọc được theo hành động | Đạt |
+| 390px: Kiểm duyệt không tràn ngang (bảng cuộn trong khung) | Đạt |
+
+Ghi chú: lần chạy đầu phát hiện trang Tổng quan hệ thống tràn ngang ở 390px vì ô lưới không co theo bảng; đã sửa (cột lưới `minmax(0, 1fr)`) và chạy lại.

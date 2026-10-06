@@ -20,6 +20,10 @@ const PAGE_SIZE = 12;
 interface CreateLessonDialogProps {
   /** Lớp chọn sẵn và khóa (mở từ Chi tiết lớp). */
   fixedClass?: ClassRoom;
+  /** Di sản chọn sẵn (tạo bài ôn tập từ gợi ý cho lớp); giáo viên vẫn bỏ hoặc thêm được. */
+  initialHeritages?: HeritageCard[];
+  /** Tiêu đề điền sẵn (ví dụ "Ôn tập: …"). */
+  initialTitle?: string;
   onCreated: (lesson: LessonDetail, message: string | null) => void;
   onClose: () => void;
 }
@@ -219,13 +223,15 @@ function HeritageGrid({
   );
 }
 
-export function CreateLessonDialog({ fixedClass, onCreated, onClose }: CreateLessonDialogProps) {
+export function CreateLessonDialog({ fixedClass, initialHeritages, initialTitle, onCreated, onClose }: CreateLessonDialogProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [step, setStep] = useState<Step>(fixedClass ? 'heritage' : 'class');
   const [classId, setClassId] = useState<number | null>(fixedClass?.id ?? null);
-  const [selected, setSelected] = useState<Map<number, HeritageCard>>(new Map());
-  const [title, setTitle] = useState('');
-  const [titleTouched, setTitleTouched] = useState(false);
+  const [selected, setSelected] = useState<Map<number, HeritageCard>>(
+    () => new Map((initialHeritages ?? []).slice(0, MAX_HERITAGES).map((card) => [card.id, card])),
+  );
+  const [title, setTitle] = useState(initialTitle ?? '');
+  const [titleTouched, setTitleTouched] = useState(initialTitle !== undefined);
   const [errors, setErrors] = useState<{ title?: string; heritageIds?: string; classId?: string }>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);

@@ -14,7 +14,10 @@ import { LessonPage } from '../pages/LessonPage';
 import { LoginPage } from '../pages/LoginPage';
 import { MapPage } from '../pages/MapPage';
 import { PendingScreen } from '../pages/PendingScreen';
+import { ProgressPage } from '../pages/ProgressPage';
+import { ResultPage } from '../pages/ResultPage';
 import { SearchPage } from '../pages/SearchPage';
+import { TakeQuizPage } from '../pages/TakeQuizPage';
 import { TimelinePage } from '../pages/TimelinePage';
 import type { RouteHandle } from './routeHandle';
 
@@ -35,6 +38,9 @@ const BUILT: Partial<Record<ScreenKey, ReactNode>> = {
   learnHome: <LearnHomePage />,
   enterCode: <EnterCodePage />,
   lesson: <LessonPage />,
+  takeQuiz: <TakeQuizPage />,
+  result: <ResultPage />,
+  progress: <ProgressPage />,
 };
 
 function screenRoutes(filter: (fullScreen: boolean) => boolean): RouteObject[] {

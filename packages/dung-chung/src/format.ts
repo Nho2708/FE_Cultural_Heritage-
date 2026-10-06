@@ -33,7 +33,7 @@ export const ACTOR_ROLE_LABEL: Record<ActorRole, string> = {
   SYSTEM: 'Hệ thống',
 };
 
-/** Nhãn 25 mã thao tác cho bộ lọc của màn hình Nhật ký thao tác (máy chủ trả sẵn nhãn trên từng dòng). */
+/** Nhãn 26 mã thao tác cho bộ lọc của màn hình Nhật ký thao tác (máy chủ trả sẵn nhãn trên từng dòng). */
 export const AUDIT_ACTION_LABEL: Record<AuditAction, string> = {
   LOGIN: 'Đăng nhập web quản trị',
   LOGIN_LOCKED_OUT: 'Tạm khóa đăng nhập do sai 5 lần',
@@ -56,6 +56,7 @@ export const AUDIT_ACTION_LABEL: Record<AuditAction, string> = {
   QUIZ_PUBLISHED: 'Phát hành bài kiểm tra',
   QUIZ_CLOSED: 'Đóng bài kiểm tra',
   QUESTION_HIDDEN: 'Ẩn câu hỏi',
+  QUESTION_RESTORED: 'Hiện lại câu hỏi',
   PLAN_UPDATED: 'Cập nhật gói dịch vụ',
   SUBSCRIPTION_CHANGED: 'Đổi gói của trường',
   BILLING_STATUS_CHANGED: 'Hệ thống đổi trạng thái gói, hóa đơn, giao dịch',

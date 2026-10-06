@@ -16,12 +16,14 @@ import {
   Table,
   Td,
   TextField,
+  TextLink,
   Th,
   Tr,
   useToast,
 } from '@dsvhvn/dung-chung/ui';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { PATHS } from '../../access/screens';
 import { studentsApi, type StudentListQuery } from '../../lib/api/classroomEndpoints';
 import { queryKeys } from '../../lib/api/queryKeys';
 import { PAGE_SIZE, slugMap, useListParams } from '../../lib/listParams';
@@ -346,7 +348,7 @@ export function StudentsTab({ classRoom, onSlips }: StudentsTabProps) {
                     {editingId === student.id ? (
                       <RenameCell student={student} onSave={(name) => rename(student, name)} onCancel={() => setEditingId(null)} />
                     ) : (
-                      student.fullName
+                      <TextLink to={PATHS.studentRecord(classRoom.id, student.id)}>{student.fullName}</TextLink>
                     )}
                   </Td>
                   <Td>

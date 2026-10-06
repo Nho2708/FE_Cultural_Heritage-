@@ -80,6 +80,8 @@ export interface QuestionAccess {
   canReject: boolean;
   canDuplicate: boolean;
   canHide: boolean;
+  /** Quản trị hệ thống hiện lại được câu đã bị ẩn. */
+  canRestore?: boolean;
 }
 
 /** Dòng của danh sách ngân hàng câu hỏi. */

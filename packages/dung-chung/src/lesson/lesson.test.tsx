@@ -1,11 +1,11 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { SchoolLevel, StudentLesson, StudentQuiz } from '../api';
 import { LEARNING_THEMES } from '../theme';
-import { canTakeQuiz, milestonesOf, paragraphsOf, sectionsOf } from './lessonData';
+import { canOpenQuiz, canTakeQuiz, milestonesOf, paragraphsOf, quizActionLabel, sectionsOf } from './lessonData';
 import { LessonLinksProvider } from './LessonLinksProvider';
-import { NO_LESSON_LINKS, type LessonLinks } from './lessonLinks';
+import { NO_LESSON_LINKS, type LessonLinks, type LessonQuizDialogProps } from './lessonLinks';
 import { lessonScopeStyle } from './lessonScopeStyle';
 import { LessonThemeScope } from './LessonThemeScope';
 import { LessonView } from './LessonView';
@@ -43,11 +43,16 @@ function lessonOf(level: SchoolLevel, overrides: Partial<StudentLesson> = {}): S
   };
 }
 
+/** Hộp thoại giả của web học tập: hiện mã bài và mã bài kiểm tra đang mở. */
+function QuizDialogStub({ quizId, code }: LessonQuizDialogProps) {
+  return quizId === null ? null : <dialog open>{`${code}/${quizId}`}</dialog>;
+}
+
 const REAL_LINKS: LessonLinks = {
   heritage: (slug) => `/di-san/${slug}`,
   map: (slug) => `/ban-do?chon=${slug}`,
   timeline: (slug) => `/dong-thoi-gian/${slug}`,
-  quiz: (code, id) => `/bai-hoc/${code}/kiem-tra/${id}`,
+  quizDialog: QuizDialogStub,
   home: '/hoc',
   preview: false,
 };
@@ -78,6 +83,9 @@ describe('hàm thuần của bố cục bài học', () => {
     expect(canTakeQuiz(quiz('OPEN'))).toBe(true);
     expect(canTakeQuiz(quiz('IN_PROGRESS'))).toBe(true);
     expect(canTakeQuiz(quiz('CLOSED'))).toBe(false);
+    expect(canOpenQuiz(quiz('SUBMITTED'))).toBe(true);
+    expect(canOpenQuiz(quiz('NOT_OPEN'))).toBe(false);
+    expect(quizActionLabel(quiz('SUBMITTED'))).toBe('Xem kết quả');
   });
 });
 
@@ -91,17 +99,19 @@ describe('bố cục theo cấp', () => {
     expect(container.querySelector(`[data-bo-cuc="${layout}"]`)).not.toBeNull();
   });
 
-  it.each([2, 3] as const)('cấp %i có đường dẫn thật: liên kết về trang học và nút làm bài', (level) => {
+  it.each([2, 3] as const)('cấp %i có đường dẫn thật: liên kết về trang học và nút làm bài mở hộp thoại', (level) => {
     show(lessonOf(level), REAL_LINKS);
     expect(screen.getAllByRole('link', { name: /Trang học của em/ })[0]?.getAttribute('href')).toBe('/hoc');
-    expect(screen.getAllByRole('link', { name: 'Làm bài' })[0]?.getAttribute('href')).toBe('/bai-hoc/BH7F3K2Q/kiem-tra/3');
+    expect(screen.queryByRole('dialog')).toBeNull();
+    fireEvent.click(screen.getAllByRole('button', { name: /^Làm bài/ })[0]!);
+    expect(screen.getByRole('dialog').textContent).toBe('BH7F3K2Q/3');
   });
 
   it.each([1, 2, 3] as const)('cấp %i xem trước: không liên kết sang di sản, bản đồ, dòng thời gian, trang học hay làm bài', (level) => {
     show(lessonOf(level), NO_LESSON_LINKS);
     for (const link of screen.queryAllByRole('link')) expect(link.getAttribute('href')).toMatch(/^#/);
     expect(screen.queryByRole('link', { name: /Trang học/ })).toBeNull();
-    expect(screen.queryByRole('link', { name: 'Làm bài' })).toBeNull();
+    expect(screen.queryByRole('button', { name: /^Làm bài/ })).toBeNull();
   });
 
   it('xem trước không đặt tiêu đề trang của khu học', () => {

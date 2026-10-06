@@ -70,6 +70,7 @@ const PATHS = {
   square: 'M5 5h14v14H5Z',
   list: 'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',
   box: 'M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16ZM3.3 7 12 12l8.7-5M12 22V12',
+  'bar-chart': 'M12 20V10M18 20V4M6 20v-4',
 } as const;
 
 export type IconName = keyof typeof PATHS;

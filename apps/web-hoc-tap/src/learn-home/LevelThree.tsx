@@ -1,17 +1,17 @@
-import { MESSAGES } from '@dsvhvn/dung-chung';
 import type { StudentClassDetail, StudentProfile } from '@dsvhvn/dung-chung/api';
 import { ButtonLink, Icon } from '@dsvhvn/dung-chung/ui';
 import { pathOf } from '../access/screens';
-import { Illustration } from '@dsvhvn/dung-chung/lesson';
 import { classFacts, whoAmI } from './classroom';
+import { LearningSections } from './LearningSections';
 
 // Trang học của em — bản cấp 3 (khối 10-12): bố cục gọn, nhiều chữ, giống trang tài liệu. Thanh bên mục lục và một cột nội
-// dung rộng; đầu trang một dòng thông tin; danh sách dạng dòng, không thẻ hình, không linh vật. Mục lục chỉ có các mục
-// đã dựng; Bài học của em, Gợi ý, Huy hiệu thêm cùng chức năng học tập.
+// dung rộng; đầu trang một dòng thông tin; danh sách dạng dòng, không thẻ hình, không linh vật. Mục lục có Lớp của em,
+// Việc cần làm và Gợi ý.
 
 const TOC = [
   { id: 'lop-cua-em', label: 'Lớp của em' },
   { id: 'viec-can-lam', label: 'Việc cần làm' },
+  { id: 'goi-y', label: 'Gợi ý' },
 ];
 
 export function LevelThree({ user, classroom }: { user: StudentProfile; classroom: StudentClassDetail }) {
@@ -68,9 +68,8 @@ export function LevelThree({ user, classroom }: { user: StudentProfile; classroo
             <h2 id="viec-can-lam-tieu-de" className="type-h2 text-on-surface">
               Việc cần làm
             </h2>
-            <div className="mt-3 flex items-center gap-4 rounded-md border border-border bg-surface p-4">
-              <Illustration state="trong" className="size-14" />
-              <p className="type-body-m text-on-surface-variant">{MESSAGES.studentNoAttemptsYet}</p>
+            <div className="mt-3">
+              <LearningSections level={3} />
             </div>
           </section>
         </div>
