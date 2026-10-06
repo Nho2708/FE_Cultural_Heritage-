@@ -26,6 +26,7 @@ import {
   SchoolInfoPage,
   SchoolsPage,
   TeachersPage,
+  TranslationReviewPage,
 } from './areas';
 
 // Khung route của web quản trị: xác thực (Đăng nhập, Quên / đặt mật khẩu), Hồ sơ cá nhân, khu giáo viên `/giao-vien`,
@@ -46,6 +47,7 @@ const BUILT: Partial<Record<ScreenKey, ReactNode>> = {
   schoolDetail: <SchoolDetailPage />,
   heritages: <HeritagesPage />,
   heritageEditor: <HeritageEditorPage />,
+  translationReview: <TranslationReviewPage />,
   auditLog: <AuditLogPage />,
   classes: <ClassesPage />,
   classDetail: <ClassDetailPage />,

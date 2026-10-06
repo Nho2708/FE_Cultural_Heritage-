@@ -1,13 +1,14 @@
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link } from 'react-router';
-import type { ContentStatus, HeritageSummary, HeritageType, RecognitionLevel } from '@dsvhvn/dung-chung/api';
+import type { ContentStatus, HeritageSummary, HeritageType, RecognitionLevel, TranslationState } from '@dsvhvn/dung-chung/api';
 import {
   formatDate,
   HERITAGE_STATUS_LABEL,
   HERITAGE_TYPE_LABEL,
   MESSAGES,
   RECOGNITION_LEVEL_LABEL,
+  TRANSLATION_STATE_LABEL,
 } from '@dsvhvn/dung-chung';
 import {
   Blank,
@@ -29,6 +30,7 @@ import {
 import { PATHS } from '../../access/screens';
 import { HeritageActionDialog, type HeritageAction } from '../../components/heritage/HeritageActionDialog';
 import { HeritageStatusBadge } from '../../components/heritage/HeritageStatusBadge';
+import { TranslationStateBadge } from '../../components/translation/TranslationStateBadge';
 import { AreaPage, PageHeader } from '../../components/layout/PageHeader';
 import { adminHeritagesApi, type HeritageListQuery } from '../../lib/api/endpoints';
 import { queryKeys } from '../../lib/api/queryKeys';
@@ -54,6 +56,7 @@ const LEVEL_SLUG = slugMap<RecognitionLevel>({
   NONE: 'chua-xep-hang',
 });
 const STATUS_SLUG = slugMap<ContentStatus>({ DRAFT: 'nhap', PUBLISHED: 'da-xuat-ban', ARCHIVED: 'da-an' });
+const TRANSLATION_SLUG = slugMap<TranslationState>({ NONE: 'chua-dich', PENDING: 'cho-duyet', APPROVED: 'da-duyet', OUTDATED: 'can-dich-lai' });
 
 function options<T extends string>(
   all: string,
@@ -66,6 +69,7 @@ function options<T extends string>(
 const TYPE_OPTIONS = options('Tất cả loại', HERITAGE_TYPE_LABEL, TYPE_SLUG);
 const LEVEL_OPTIONS = options('Tất cả cấp xếp hạng', RECOGNITION_LEVEL_LABEL, LEVEL_SLUG);
 const STATUS_OPTIONS = options('Tất cả trạng thái', HERITAGE_STATUS_LABEL, STATUS_SLUG);
+const TRANSLATION_OPTIONS = options('Tất cả tình trạng bản dịch', TRANSLATION_STATE_LABEL, TRANSLATION_SLUG);
 
 function Thumbnail({ url }: { url: string | null }) {
   return (
@@ -89,8 +93,9 @@ export default function HeritagesPage() {
   const heritageType = TYPE_SLUG.fromSlug(params.get('loai'));
   const recognitionLevel = LEVEL_SLUG.fromSlug(params.get('cap'));
   const status = STATUS_SLUG.fromSlug(params.get('trang-thai'));
-  const query: HeritageListQuery = { keyword, provinceId, heritageType, recognitionLevel, status, page, pageSize: PAGE_SIZE };
-  const filtered = Boolean(keyword || provinceId || heritageType || recognitionLevel || status);
+  const translationState = TRANSLATION_SLUG.fromSlug(params.get('ban-dich'));
+  const query: HeritageListQuery = { keyword, provinceId, heritageType, recognitionLevel, status, translationState, page, pageSize: PAGE_SIZE };
+  const filtered = Boolean(keyword || provinceId || heritageType || recognitionLevel || status || translationState);
 
   const list = useQuery({
     queryKey: queryKeys.heritageList(query),
@@ -138,7 +143,7 @@ export default function HeritagesPage() {
             onSearch={(value) => update({ 'tu-khoa': value })}
           />
         </div>
-        <div className="grid gap-3 dsvsm:grid-cols-2 dsvlg:grid-cols-4">
+        <div className="grid gap-3 dsvsm:grid-cols-2 dsvlg:grid-cols-5">
           <SelectField
             label="Tỉnh, thành phố"
             name="tinh"
@@ -167,6 +172,13 @@ export default function HeritagesPage() {
             options={STATUS_OPTIONS}
             onChange={(e) => update({ 'trang-thai': e.target.value })}
           />
+          <SelectField
+            label="Bản dịch"
+            name="ban-dich"
+            value={TRANSLATION_SLUG.toSlug(translationState)}
+            options={TRANSLATION_OPTIONS}
+            onChange={(e) => update({ 'ban-dich': e.target.value })}
+          />
         </div>
       </div>
 
@@ -182,7 +194,7 @@ export default function HeritagesPage() {
             action={
               <Button
                 variant="secondary"
-                onClick={() => update({ 'tu-khoa': null, tinh: null, loai: null, cap: null, 'trang-thai': null })}
+                onClick={() => update({ 'tu-khoa': null, tinh: null, loai: null, cap: null, 'trang-thai': null, 'ban-dich': null })}
               >
                 Bỏ bộ lọc
               </Button>
@@ -210,6 +222,7 @@ export default function HeritagesPage() {
                 <Th>Loại</Th>
                 <Th>Cấp xếp hạng</Th>
                 <Th>Trạng thái</Th>
+                <Th>Bản dịch</Th>
                 <Th className="text-right">Số giai đoạn</Th>
                 <Th className="text-right">Số nguồn</Th>
                 <Th>Cập nhật</Th>
@@ -233,6 +246,7 @@ export default function HeritagesPage() {
                   <Td>
                     <HeritageStatusBadge status={item.status} />
                   </Td>
+                  <Td>{item.translationState ? <TranslationStateBadge state={item.translationState} /> : <Blank />}</Td>
                   <Td className="text-right type-mono-label">{item.timelineCount}</Td>
                   <Td className="text-right type-mono-label">{item.referenceCount}</Td>
                   <Td className="type-mono-label whitespace-nowrap">{formatDate(item.updatedAt ?? item.createdAt)}</Td>

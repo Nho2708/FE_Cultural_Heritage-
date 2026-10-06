@@ -1,5 +1,6 @@
 import type { LessonListFilter, QuestionListFilter } from '@dsvhvn/dung-chung/api';
 import type { ClassListQuery, StudentListQuery } from './classroomEndpoints';
+import type { LanguageCode, TranslationQueueQuery } from '@dsvhvn/dung-chung/api';
 import type { AuditLogQuery, HeritageListQuery, OrganizationListQuery, TeacherListQuery } from './endpoints';
 
 // Khóa bộ nhớ đệm của React Query. Khóa cha (ví dụ ['org']) dùng để làm mới cả nhóm sau khi ghi.
@@ -18,6 +19,16 @@ export const queryKeys = {
   heritages: ['admin', 'heritages'] as const,
   heritageList: (query: HeritageListQuery) => ['admin', 'heritages', 'list', query] as const,
   heritage: (id: number) => ['admin', 'heritages', 'detail', id] as const,
+
+  /** Bản dịch và tóm tắt: bảng của một di sản, hàng chờ duyệt, số đếm các tab, nội dung hai cột (làm mới cả nhóm sau khi dịch, sửa, duyệt, từ chối). */
+  translations: ['admin', 'translations'] as const,
+  translationOverview: (heritageId: number) => ['admin', 'translations', 'overview', heritageId] as const,
+  translationQueue: (query: TranslationQueueQuery) => ['admin', 'translations', 'queue', query] as const,
+  translationCounts: ['admin', 'translations', 'counts'] as const,
+  translationDetail: (heritageId: number, kind: string, language: LanguageCode) =>
+    ['admin', 'translations', 'detail', heritageId, kind, language] as const,
+  /** Di sản để chọn ở bộ lọc của màn hình Duyệt bản dịch và tóm tắt. */
+  translationHeritages: ['admin', 'translations', 'heritage-options'] as const,
 
   /** Lớp của giáo viên: danh sách, chi tiết và học sinh của lớp (làm mới cả nhóm sau khi thêm, sửa, xóa). */
   classes: ['teacher', 'classes'] as const,

@@ -15,6 +15,7 @@ import type {
   HeritageSummary,
   HeritageTimeline,
   HeritageType,
+  LanguageCode,
   LoginResult,
   MediaInput,
   MyOrganization,
@@ -27,11 +28,23 @@ import type {
   PasswordTokenInfo,
   Province,
   QueryValue,
+  QueueTab,
   RecognitionLevel,
   ReferenceInput,
+  ReviewResult,
+  ReviewScope,
+  SummaryDetail,
   StaffProfile,
   TeacherList,
   TimelineInput,
+  TranslationCounts,
+  TranslationDetail,
+  TranslationOverview,
+  TranslationQueuePage,
+  TranslationQueueQuery,
+  TranslationState,
+  UpdateSummaryInput,
+  UpdateTranslationInput,
   UserStatus,
 } from '@dsvhvn/dung-chung/api';
 import { apiRequest } from './client';
@@ -157,6 +170,8 @@ export interface HeritageListQuery extends PageQuery {
   heritageType?: HeritageType | '';
   recognitionLevel?: RecognitionLevel | '';
   status?: ContentStatus | '';
+  /** Tình trạng bản dịch của di sản (cột và bộ lọc ở Quản lý di sản). */
+  translationState?: TranslationState | '';
 }
 
 const order = (ids: readonly number[]) => ({ method: 'PUT', body: { ids } }) as const;
@@ -272,3 +287,46 @@ export const adminReferencesApi = {
 
   remove: (id: number) => apiRequest<null>(`/admin/heritage-references/${id}`, { method: 'DELETE' }),
 };
+
+/** Dịch và tóm tắt di sản bằng AI, duyệt bản dịch tiếng Anh và tóm tắt tiếng Việt, tiếng Anh (chỉ quản trị hệ thống). Mã ngôn ngữ trong đường dẫn: vi, en, ko, zh-Hans, ja. */
+export const adminTranslationsApi = {
+  /** Bảng bốn bản dịch và năm bản tóm tắt của một di sản (tab Bản dịch và tóm tắt). */
+  overview: (heritageId: number) => apiRequest<TranslationOverview>(`/admin/heritages/${heritageId}/translations`),
+
+  /**
+   * "Dịch và tóm tắt bằng AI": một lần tóm tắt tiếng Việt rồi bốn lần dịch chạy song song; có thể mất tới vài phút. Hỏng một lần thì không lưu gì
+   * (503 `AI_UNAVAILABLE`), bản cũ giữ nguyên. 409 `TRANSLATION_BUSY` khi di sản đang được dịch; 422 khi chưa có nội dung tiếng Việt hoặc đang ẩn.
+   */
+  generate: (heritageId: number) =>
+    apiRequest<TranslationOverview>(`/admin/heritages/${heritageId}/translations/generate`, { method: 'POST' }),
+
+  /** Hai cột để duyệt bản dịch nội dung: bản gốc tiếng Việt và bản dịch của một ngôn ngữ (en, ko, zh-Hans, ja). */
+  translation: (heritageId: number, language: LanguageCode) =>
+    apiRequest<TranslationDetail>(`/admin/heritages/${heritageId}/translations/${language}/translation`),
+
+  /** Sửa chữ bản dịch tiếng Anh tại chỗ; bản đã duyệt hoặc bị từ chối được sửa thì quay về chờ duyệt. Tiếng Hàn, Trung, Nhật là bản dịch máy: 422. */
+  updateTranslation: (heritageId: number, language: LanguageCode, body: UpdateTranslationInput) =>
+    apiRequest<TranslationDetail>(`/admin/heritages/${heritageId}/translations/${language}/translation`, { method: 'PUT', body }),
+
+  summary: (heritageId: number, language: LanguageCode) =>
+    apiRequest<SummaryDetail>(`/admin/heritages/${heritageId}/translations/${language}/summary`),
+
+  updateSummary: (heritageId: number, language: LanguageCode, body: UpdateSummaryInput) =>
+    apiRequest<SummaryDetail>(`/admin/heritages/${heritageId}/translations/${language}/summary`, { method: 'PUT', body }),
+
+  /** Duyệt bản dịch, tóm tắt hoặc cả hai của một ngôn ngữ. Duyệt tiếng Anh thì bản Hàn, Trung, Nhật được dịch lại từ bản đã duyệt. */
+  approve: (heritageId: number, language: LanguageCode, kind: ReviewScope) =>
+    apiRequest<ReviewResult>(`/admin/heritages/${heritageId}/translations/${language}/approve`, { method: 'POST', body: { kind } }),
+
+  /** Từ chối (yêu cầu dịch lại); lý do không bắt buộc, chỉ ghi vào nhật ký thao tác. */
+  reject: (heritageId: number, language: LanguageCode, kind: ReviewScope, reason: string | null) =>
+    apiRequest<ReviewResult>(`/admin/heritages/${heritageId}/translations/${language}/reject`, { method: 'POST', body: { kind, reason } }),
+
+  /** Hàng chờ của màn hình Duyệt bản dịch và tóm tắt theo tab. */
+  queue: (query: TranslationQueueQuery) =>
+    apiRequest<TranslationQueuePage>('/admin/translations', { query: { ...query } as Record<string, QueryValue> }),
+
+  counts: () => apiRequest<TranslationCounts>('/admin/translations/counts'),
+};
+
+export type { QueueTab };
