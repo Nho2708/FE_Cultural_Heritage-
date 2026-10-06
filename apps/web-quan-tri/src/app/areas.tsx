@@ -32,6 +32,7 @@ export const PaymentResultPage = lazy(() => import('../pages/school/PaymentResul
 export const SchoolOverviewPage = lazy(() => import('../pages/school/SchoolOverviewPage'));
 export const OverviewPage = lazy(() => import('../pages/admin/OverviewPage'));
 export const QuestionModerationPage = lazy(() => import('../pages/admin/QuestionModerationPage'));
+export const AdStatsPage = lazy(() => import('../pages/admin/AdStatsPage'));
 export const AuditLogPage = lazy(() => import('../pages/admin/AuditLogPage'));
 export const TranslationReviewPage = lazy(() => import('../pages/admin/TranslationReviewPage'));
 

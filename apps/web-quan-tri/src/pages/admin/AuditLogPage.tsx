@@ -70,6 +70,7 @@ const ACTION_SLUG = slugMap<AuditAction>({
   SUBSCRIPTION_CHANGED: 'doi-goi',
   BILLING_STATUS_CHANGED: 'doi-trang-thai-thanh-toan',
   IPN_REJECTED: 'tu-choi-ipn',
+  AD_REWARD_REJECTED: 'tu-choi-thuong-quang-cao',
 });
 
 const TARGET_SLUG: Record<string, string> = {
@@ -87,6 +88,7 @@ const TARGET_SLUG: Record<string, string> = {
   plans: 'goi-dich-vu',
   invoices: 'hoa-don',
   payments: 'giao-dich',
+  ad_unlocks: 'mo-khoa-quang-cao',
 };
 const TARGET_BY_SLUG = new Map(Object.entries(TARGET_SLUG).map(([target, slug]) => [slug, target]));
 

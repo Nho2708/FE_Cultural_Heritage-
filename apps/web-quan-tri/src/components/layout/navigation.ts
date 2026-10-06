@@ -41,7 +41,7 @@ const SCHOOL: readonly NavSpec[] = [
   { screen: 'schoolTeachers', label: 'Giáo viên', icon: 'users' },
 ];
 
-/** Thanh bên /quan-tri: Tổng quan · Trường · Di sản · Bản dịch · Câu hỏi · Gói dịch vụ · Nhật ký. */
+/** Thanh bên /quan-tri: Tổng quan · Trường · Di sản · Bản dịch · Câu hỏi · Gói dịch vụ · Khách và quảng cáo · Nhật ký. */
 const ADMIN: readonly NavSpec[] = [
   { screen: 'adminOverview', label: 'Tổng quan', icon: 'bar-chart' },
   { screen: 'schools', label: 'Trường', icon: 'building' },
@@ -49,6 +49,7 @@ const ADMIN: readonly NavSpec[] = [
   { screen: 'translationReview', label: 'Bản dịch', icon: 'languages' },
   { screen: 'questionModeration', label: 'Câu hỏi', icon: 'shield-check' },
   { screen: 'plans', label: 'Gói dịch vụ', icon: 'star' },
+  { screen: 'adStats', label: 'Khách và quảng cáo', icon: 'play' },
   { screen: 'auditLog', label: 'Nhật ký', icon: 'file-text' },
 ];
 
