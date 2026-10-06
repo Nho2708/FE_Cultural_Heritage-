@@ -1,19 +1,26 @@
 import { cn } from '@dsvhvn/dung-chung';
 import { ApiError, ERROR_CODES, type PublicSummary } from '@dsvhvn/dung-chung/api';
 import { Button, Icon, InlineMessage, Modal, TabPanel, Tabs } from '@dsvhvn/dung-chung/ui';
-import { useMemo, useRef } from 'react';
-import { useHeritageSummary } from '../discovery/queries';
-import { useRecordListen } from '../guest/guestData';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { serverTime, useAdUnlockStatus, useAtExpiry } from '../ads/adsData';
+import { useRewardedUnlock } from '../ads/useRewardedUnlock';
+import { SUMMARY_KEY, useHeritageSummary } from '../discovery/queries';
+import { useIsGuest, useRecordListen } from '../guest/guestData';
 import { useI18n } from '../i18n/context';
+import { formatDateTime } from '../i18n/format';
 import { languageOption } from '../i18n/languages';
 import { SPEEDS, useNarration } from '../narration/useNarration';
 import { splitParagraphs, splitSentences } from '../narration/sentences';
+import { AdGate } from './AdGate';
 import { LocalizationNotice } from './LocalizationNotice';
 import { PublicErrorState } from './PublicErrorState';
 
 // Hộp thoại "Tóm tắt và thuyết minh" của chi tiết di sản: tab Đọc (bản tóm tắt chi tiết) và tab Nghe (bản tóm tắt ngắn đọc bằng giọng của
 // trình duyệt, có phát, tạm dừng, dừng, tốc độ và tô sáng câu đang đọc). Nội dung lấy từ bản đã lưu theo ngôn ngữ đang chọn, không gọi AI khi xem.
 // Ngôn ngữ chưa có tóm tắt hiện hành thì hiện bản tiếng Việt kèm thông báo và đọc bằng giọng tiếng Việt, không dùng giọng của ngôn ngữ khác.
+// Khách (chưa đăng nhập) xem tóm tắt và nghe thuyết minh của một di sản sau khi xem một quảng cáo có thưởng (mở 24 giờ trên thiết bị): máy chủ trả 403 khi chưa mở khóa
+// thì hộp thoại hiện lời mời xem quảng cáo thay cho nội dung; hết hạn thì tự quay lại lời mời. Học sinh đã đăng nhập không bao giờ thấy quảng cáo.
 
 export type SummaryTab = 'doc' | 'nghe';
 
@@ -120,34 +127,69 @@ function Reader({ summary }: { summary: PublicSummary }) {
 
 export function SummaryDialog({
   slug,
+  name,
   open,
   tab,
   onTabChange,
   onClose,
 }: {
   slug: string;
+  /** Tên di sản theo ngôn ngữ đang chọn, dùng trong lời mời xem quảng cáo. */
+  name: string;
   open: boolean;
   tab: SummaryTab;
   onTabChange: (tab: SummaryTab) => void;
   onClose: () => void;
 }) {
-  const { t } = useI18n();
+  const { language, t } = useI18n();
+  const queryClient = useQueryClient();
+  const guest = useIsGuest();
   const query = useHeritageSummary(slug, open);
-  const summary = query.data;
+  // Máy chủ báo chưa mở khóa thì không hiện nội dung đã giữ trong bộ nhớ đệm (ví dụ tab để mở quá 24 giờ).
+  const locked = guest && query.error instanceof ApiError && query.error.code === ERROR_CODES.adUnlockRequired;
+  const summary = locked ? undefined : query.data;
   const unavailable = query.error instanceof ApiError && query.error.code === ERROR_CODES.summaryUnavailable;
 
+  const refetch = query.refetch;
+  const unlock = useRewardedUnlock(slug, useCallback(() => void refetch(), [refetch]));
+
+  // Còn mở khóa thì hẹn đúng lúc hết hạn (giờ máy chủ): hỏi lại tóm tắt, máy chủ trả 403 và hộp thoại quay về lời mời xem quảng cáo.
+  const status = useAdUnlockStatus(slug, open && guest && Boolean(summary));
+  const expiresAt = status.data?.gateRequired && status.data.unlocked ? status.data.expiresAt : null;
+  const relock = useCallback(() => {
+    void queryClient.invalidateQueries({ queryKey: ['ads', 'unlock', slug] });
+    void queryClient.resetQueries({ queryKey: SUMMARY_KEY, predicate: (q) => q.queryKey[3] === slug });
+  }, [queryClient, slug]);
+  useAtExpiry(expiresAt, relock);
+
+  // Khách đóng hộp thoại thì bỏ tóm tắt đã tải: lần mở sau hỏi lại máy chủ, không hiện nội dung đã hết hạn mở khóa.
+  useEffect(() => {
+    if (!open && guest) void queryClient.resetQueries({ queryKey: SUMMARY_KEY, predicate: (q) => q.queryKey[3] === slug });
+  }, [open, guest, queryClient, slug]);
+
+  // Quảng cáo của Google hiện trên trang chứ không nằm trong hộp thoại; hộp thoại ở lớp trên cùng sẽ che mất nó nên tạm đóng trong lúc quảng cáo chạy.
+  const adPlaying = unlock.phase === 'watching';
+
   return (
-    <Modal open={open} title={t.summary.kicker} size="panel" closeLabel={t.common.close} onClose={onClose}>
+    <Modal open={open && !adPlaying} title={t.summary.kicker} size="panel" closeLabel={t.common.close} onClose={onClose}>
       {open && (
         <div className="flex flex-col gap-5">
           {summary && <p className="type-h2 text-on-surface">{summary.name}</p>}
+          {summary && expiresAt && Number.isFinite(serverTime(expiresAt)) && (
+            <p className="-mt-3 inline-flex items-center gap-2 type-label text-on-surface-variant">
+              <Icon name="check" size={16} />
+              {t.ads.unlockedUntil(formatDateTime(expiresAt, language))}
+            </p>
+          )}
+          {locked && <AdGate name={name} phase={unlock.phase} problem={unlock.problem} onWatch={() => void unlock.start()} onResend={unlock.resend} onLater={onClose} />}
           {summary && <LocalizationNotice localization={summary.localization} />}
-          {query.isPending && (
+          {query.isPending && !locked && (
             <p aria-busy="true" className="type-body-m text-on-surface-variant">
               {t.summary.loading}
             </p>
           )}
           {query.isError &&
+            !locked &&
             (unavailable ? <InlineMessage tone="info">{t.summary.unavailable}</InlineMessage> : <PublicErrorState error={query.error} onRetry={() => void query.refetch()} />)}
           {summary && (
             <>

@@ -94,11 +94,14 @@ export function usePickerHeritages(keyword: string) {
   });
 }
 
+/** Tiền tố khóa của mọi tóm tắt đã tải; khóa đầy đủ là `[...SUMMARY_KEY, ngôn ngữ, slug]`. */
+export const SUMMARY_KEY = ['discovery', 'summary'] as const;
+
 /** Tóm tắt của một di sản theo ngôn ngữ đang chọn; chỉ gọi khi hộp thoại tóm tắt mở (`enabled`). 404 là chưa có tóm tắt tiếng Việt đã duyệt: không thử lại. */
 export function useHeritageSummary(slug: string | undefined, enabled: boolean) {
   const lang = useLanguage();
   return useQuery({
-    queryKey: ['discovery', 'summary', lang, slug],
+    queryKey: [...SUMMARY_KEY, lang, slug],
     queryFn: ({ signal }) => discoveryApi.summary(slug!, { signal, lang }),
     enabled: enabled && Boolean(slug),
     retry: false,
