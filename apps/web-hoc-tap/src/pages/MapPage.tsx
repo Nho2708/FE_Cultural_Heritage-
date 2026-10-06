@@ -12,7 +12,7 @@ import { useFilterCatalog, useMapPins } from '../discovery/queries';
 import { Thumbnail } from '../discovery/Thumbnail';
 import { useI18n } from '../i18n/context';
 import { formatCount, listFlags } from '../i18n/format';
-import { HERITAGE_TYPE_NAME, provinceName } from '../i18n/taxonomy';
+import { HERITAGE_TYPE_NAME, provinceName } from '@dsvhvn/dung-chung/i18n';
 
 // Bản đồ di sản (công khai). Leaflet chỉ được nạp khi mở trang này (React.lazy). Bộ lọc dùng chung với trang tìm kiếm
 // nên "Xem trên bản đồ" giữ nguyên từ khóa và bộ lọc; ghim đang chọn nằm trên địa chỉ trang (`chon=<slug>`).

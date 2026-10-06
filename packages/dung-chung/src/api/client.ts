@@ -88,6 +88,8 @@ export interface ApiClientOptions {
   getAccessToken: () => string | null;
   /** Máy chủ trả 401 cho một yêu cầu có token: ứng dụng kết thúc phiên. */
   onUnauthorized?: (response: UnauthorizedResponse) => void;
+  /** Header thêm vào mọi yêu cầu (app mobile gửi mã thiết bị, phiên bản và kênh phân phối); mặc định không thêm gì. */
+  extraHeaders?: () => Record<string, string>;
 }
 
 /** Tệp tải về từ máy chủ (tệp mẫu danh sách học sinh). */
@@ -175,11 +177,12 @@ function sendWithProgress(
   });
 }
 
-export function createApiClient({ baseUrl, getAccessToken, onUnauthorized }: ApiClientOptions): ApiClient {
+export function createApiClient({ baseUrl, getAccessToken, onUnauthorized, extraHeaders }: ApiClientOptions): ApiClient {
   async function send(path: string, options: RequestOptions, accessToken: string | null): Promise<Response> {
     const headers: Record<string, string> = {
       Accept: 'application/json',
       'X-Correlation-Id': correlationId(),
+      ...extraHeaders?.(),
     };
     const isForm = typeof FormData !== 'undefined' && options.body instanceof FormData;
     if (options.body !== undefined && !isForm) headers['Content-Type'] = 'application/json';
