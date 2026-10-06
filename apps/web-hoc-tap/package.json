@@ -13,7 +13,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "smoke": "node scripts/smoke.mjs",
-    "smoke:da-ngon-ngu": "node scripts/smoke-da-ngon-ngu.mjs"
+    "smoke:da-ngon-ngu": "node scripts/smoke-da-ngon-ngu.mjs",
+    "smoke:mo-hinh-3d": "node scripts/smoke-mo-hinh-3d.mjs"
   },
   "dependencies": {
     "@dsvhvn/dung-chung": "0.1.0",
