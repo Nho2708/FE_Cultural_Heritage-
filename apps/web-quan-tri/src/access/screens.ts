@@ -166,6 +166,10 @@ export const PATHS = {
   lesson: (id: number) => `/giao-vien/bai-hoc/${id}`,
   /** Sinh và duyệt câu hỏi bằng AI từ một bài học. */
   lessonAiQuestions: (id: number) => `/giao-vien/bai-hoc/${id}/sinh-cau-hoi`,
+  /** Soạn và phát hành một bài kiểm tra của giáo viên. */
+  quiz: (id: number) => `/giao-vien/kiem-tra/${id}`,
+  /** Kết quả bài kiểm tra. */
+  quizResults: (id: number) => `/giao-vien/kiem-tra/${id}/ket-qua`,
   /** Biên tập di sản ở trạng thái tạo mới. */
   newHeritage: '/quan-tri/di-san/moi',
   /** Biên tập di sản: sửa một di sản (tab nằm trong tham số `?tab=`). */
