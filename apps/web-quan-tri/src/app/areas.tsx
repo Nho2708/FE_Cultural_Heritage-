@@ -23,6 +23,7 @@ export const QuestionBankPage = lazy(() => import('../pages/teacher/QuestionBank
 export const AiQuestionsPage = lazy(() => import('../pages/teacher/AiQuestionsPage'));
 export const LessonEditorPage = lazy(() => import('../pages/teacher/LessonEditorPage'));
 export const AuditLogPage = lazy(() => import('../pages/admin/AuditLogPage'));
+export const TranslationReviewPage = lazy(() => import('../pages/admin/TranslationReviewPage'));
 
 function AreaFallback() {
   return (

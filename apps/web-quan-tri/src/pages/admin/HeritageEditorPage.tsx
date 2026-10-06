@@ -37,6 +37,7 @@ import { HeritageStatusBadge } from '../../components/heritage/HeritageStatusBad
 import { MediaTab } from '../../components/heritage/MediaTab';
 import { ReferencesTab } from '../../components/heritage/ReferencesTab';
 import { TimelineTab } from '../../components/heritage/TimelineTab';
+import { TranslationsTab } from '../../components/translation/TranslationsTab';
 import { AreaPage, PageHeader } from '../../components/layout/PageHeader';
 import { adminHeritagesApi } from '../../lib/api/endpoints';
 import { queryKeys } from '../../lib/api/queryKeys';
@@ -274,6 +275,13 @@ function Workspace({ heritage }: { heritage: HeritageDetail | null }) {
     (heritage && status !== 'PUBLISHED' && readiness && !readiness.isReady
       ? { message: `Chưa đủ điều kiện xuất bản. Còn thiếu: ${missingText}.`, tab: tabOfMissing(readiness.missing[0]?.field ?? '') }
       : null);
+  // Nhắc dịch: sau khi xuất bản mà chưa có bản dịch, hoặc khi nội dung tiếng Việt đã sửa sau lần dịch (bản cũ vẫn hiện cho khách).
+  const translationNudge: { tone: 'info' | 'warning'; message: string } | null =
+    heritage?.translationState === 'OUTDATED'
+      ? { tone: 'warning', message: 'Nội dung tiếng Việt đã được sửa sau khi dịch. Các bản dịch và tóm tắt cần dịch lại; bản cũ vẫn hiện cho khách tới khi bạn dịch lại.' }
+      : heritage && status === 'PUBLISHED' && heritage.translationState === 'NONE'
+        ? { tone: 'info', message: 'Di sản đã xuất bản nhưng chưa có bản dịch. Hãy bấm "Dịch và tóm tắt bằng AI" để khách xem được di sản bằng năm ngôn ngữ.' }
+        : null;
   const busy = saving || acting;
   const title = heritage?.name?.trim() || (creating ? 'Tạo di sản' : 'Di sản');
 
@@ -344,6 +352,19 @@ function Workspace({ heritage }: { heritage: HeritageDetail | null }) {
         <InlineMessage tone="info">{readiness.warnings.join(' ')}</InlineMessage>
       )}
 
+      {translationNudge && tab !== 'ban-dich' && (
+        <InlineMessage
+          tone={translationNudge.tone}
+          action={
+            <Button variant="secondary" size="sm" onClick={() => setTab('ban-dich')}>
+              Mở tab {TAB_LABEL['ban-dich']}
+            </Button>
+          }
+        >
+          {translationNudge.message}
+        </InlineMessage>
+      )}
+
       <Tabs idPrefix={TAB_PREFIX} label="Nội dung di sản" items={EDITOR_TABS} value={tab} onChange={setTab} />
 
       {/* Tab Thông tin chung luôn nằm trong cây để giữ các ô đang nhập khi chuyển tab. */}
@@ -383,6 +404,8 @@ function Workspace({ heritage }: { heritage: HeritageDetail | null }) {
             <MediaTab heritage={heritage} onChanged={refreshDetail} />
           ) : tab === 'dong-thoi-gian' ? (
             <TimelineTab heritage={heritage} onChanged={refreshDetail} />
+          ) : tab === 'ban-dich' ? (
+            <TranslationsTab heritage={heritage} />
           ) : (
             <ReferencesTab heritage={heritage} onChanged={refreshDetail} />
           )}

@@ -78,13 +78,14 @@ export function sameHeritage(a: HeritageValues, b: HeritageValues): boolean {
 // ---------------------------------------------------------------------------------------------------------------
 // Tab và điều kiện xuất bản
 
-export type EditorTab = 'thong-tin' | 'anh' | 'dong-thoi-gian' | 'nguon';
+export type EditorTab = 'thong-tin' | 'anh' | 'dong-thoi-gian' | 'nguon' | 'ban-dich';
 
 export const EDITOR_TABS: ReadonlyArray<{ id: EditorTab; label: string }> = [
   { id: 'thong-tin', label: 'Thông tin chung' },
   { id: 'anh', label: 'Ảnh và media' },
   { id: 'dong-thoi-gian', label: 'Dòng thời gian' },
   { id: 'nguon', label: 'Nguồn tham chiếu' },
+  { id: 'ban-dich', label: 'Bản dịch và tóm tắt' },
 ];
 
 export function readTab(value: string | null): EditorTab {

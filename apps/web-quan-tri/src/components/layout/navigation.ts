@@ -44,12 +44,13 @@ const SCHOOL: readonly NavSpec[] = [
 ];
 
 /**
- * Thanh bên /quan-tri: Tổng quan · Trường · Di sản · Câu hỏi · Gói dịch vụ · Nhật ký. Tới khi màn hình Tổng quan và
+ * Thanh bên /quan-tri: Tổng quan · Trường · Di sản · Bản dịch · Câu hỏi · Gói dịch vụ · Nhật ký. Tới khi màn hình Tổng quan và
  * doanh thu được dựng, /quan-tri chuyển tới Quản lý trường nên chưa có mục "Tổng quan".
  */
 const ADMIN: readonly NavSpec[] = [
   { screen: 'schools', label: 'Trường', icon: 'building' },
   { screen: 'heritages', label: 'Di sản', icon: 'map-pin' },
+  { screen: 'translationReview', label: 'Bản dịch', icon: 'languages' },
   { screen: 'questionModeration', label: 'Câu hỏi', icon: 'shield-check' },
   { screen: 'plans', label: 'Gói dịch vụ', icon: 'star' },
   { screen: 'auditLog', label: 'Nhật ký', icon: 'file-text' },
