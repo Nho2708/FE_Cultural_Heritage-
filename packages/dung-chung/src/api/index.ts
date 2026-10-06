@@ -7,4 +7,5 @@ export type * from './heritage';
 export type * from './classroom';
 export type * from './lessons';
 export type * from './questions';
+export type * from './translations';
 export { QUESTION_ENDPOINTS, createQuestionsApi } from './questions';

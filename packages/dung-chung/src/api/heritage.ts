@@ -1,6 +1,8 @@
 // Kiểu dữ liệu kho di sản (chỉ quản trị hệ thống dùng ở web quản trị; web học tập dùng lại khi có trang khám phá).
 // Enum là chuỗi viết HOA đúng giá trị trong CSDL; giao diện hiện nhãn tiếng Việt (heritage.ts ở gốc gói).
 
+import type { TranslationState } from './translations';
+
 /** `heritages.heritage_type`. */
 export type HeritageType = 'TANGIBLE' | 'INTANGIBLE' | 'NATURAL' | 'MIXED' | 'DOCUMENTARY';
 
@@ -38,6 +40,8 @@ export interface HeritageSummary {
   timelineCount: number;
   mediaCount: number;
   referenceCount: number;
+  /** Tình trạng bản dịch: chưa dịch, có bản cần dịch lại, có bản chờ duyệt, hoặc đã dịch xong. */
+  translationState?: TranslationState;
   createdAt: string | null;
   updatedAt: string | null;
 }
@@ -142,6 +146,7 @@ export interface HeritageDetail {
   createdAt: string | null;
   updatedAt: string | null;
   readiness: PublishReadiness;
+  translationState?: TranslationState;
   timelines: HeritageTimeline[];
   media: HeritageMedia[];
   references: HeritageReference[];

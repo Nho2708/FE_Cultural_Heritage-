@@ -25,6 +25,9 @@ export const ERROR_CODES = {
   blocked: 'BLOCKED',
   teacherLimitReached: 'TEACHER_LIMIT_REACHED',
   notReady: 'NOT_READY',
+  aiUnavailable: 'AI_UNAVAILABLE',
+  translationBusy: 'TRANSLATION_BUSY',
+  summaryUnavailable: 'SUMMARY_UNAVAILABLE',
   systemError: 'SYSTEM_ERROR',
 } as const;
 

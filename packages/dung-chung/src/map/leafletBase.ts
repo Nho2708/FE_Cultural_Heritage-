@@ -11,10 +11,32 @@ import { EAST_SEA_LABEL, VIETNAM_ARCHIPELAGOS } from './seas';
 export type LeafletLib = typeof Leaflet;
 
 const TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-const ATTRIBUTION =
-  'Bản đồ nền © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">Những người đóng góp OpenStreetMap</a>';
 const LEAFLET_PREFIX = '<a href="https://leafletjs.com" target="_blank" rel="noopener noreferrer">Leaflet</a>';
 const PIN_PATH = 'M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Zm-8 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z';
+
+/**
+ * Chữ trên bản đồ theo ngôn ngữ giao diện (web học tập có năm ngôn ngữ): nút phóng to, thu nhỏ, ghi công nền và nhãn hai quần đảo, Biển Đông.
+ * Nhãn quần đảo luôn kèm "Việt Nam" ở mọi ngôn ngữ.
+ */
+export interface MapLabels {
+  zoomIn: string;
+  zoomOut: string;
+  /** Ghi công nền: `prefix` đứng trước, `owners` là chữ của liên kết tới trang bản quyền OpenStreetMap. */
+  attribution: { prefix: string; owners: string };
+  hoangSa: string;
+  truongSa: string;
+  eastSea: string;
+}
+
+/** Chữ tiếng Việt, dùng khi nơi gọi không truyền nhãn. */
+export const MAP_LABELS_VI: MapLabels = {
+  zoomIn: 'Phóng to',
+  zoomOut: 'Thu nhỏ',
+  attribution: { prefix: 'Bản đồ nền ©', owners: 'Những người đóng góp OpenStreetMap' },
+  hoangSa: 'Quần đảo Hoàng Sa (Việt Nam)',
+  truongSa: 'Quần đảo Trường Sa (Việt Nam)',
+  eastSea: 'BIỂN ĐÔNG',
+};
 
 let loading: Promise<LeafletLib> | null = null;
 
@@ -34,7 +56,7 @@ export function loadLeaflet(): Promise<LeafletLib> {
 }
 
 /** Vẽ hai quần đảo thuộc Việt Nam (chấm đảo, nhãn) và nhãn Biển Đông lên một lớp riêng không nhận chuột. */
-function addVietnamSeas(L: LeafletLib, map: Leaflet.Map) {
+function addVietnamSeas(L: LeafletLib, map: Leaflet.Map, labels: MapLabels) {
   const pane = map.createPane('vung-bien');
   pane.style.zIndex = '450';
   pane.style.pointerEvents = 'none';
@@ -50,21 +72,24 @@ function addVietnamSeas(L: LeafletLib, map: Leaflet.Map) {
     for (const island of archipelago.islands) {
       L.circleMarker([island.latitude, island.longitude], { pane: 'vung-bien', radius: 3, className: 'dsv-island', interactive: false }).addTo(map);
     }
-    label(archipelago.label, archipelago.labelAt, 'dsv-map-label');
+    label(archipelago.key === 'hoang-sa' ? labels.hoangSa : labels.truongSa, archipelago.labelAt, 'dsv-map-label');
   }
-  label(EAST_SEA_LABEL.text, EAST_SEA_LABEL.at, 'dsv-map-label dsv-map-label--sea');
+  label(labels.eastSea, EAST_SEA_LABEL.at, 'dsv-map-label dsv-map-label--sea');
 }
 
 export interface BaseMapOptions {
   scrollWheelZoom?: boolean;
+  /** Chữ trên bản đồ; bỏ trống thì tiếng Việt. */
+  labels?: MapLabels;
 }
 
-export function createBaseMap(L: LeafletLib, element: HTMLElement, { scrollWheelZoom = true }: BaseMapOptions = {}): Leaflet.Map {
+export function createBaseMap(L: LeafletLib, element: HTMLElement, { scrollWheelZoom = true, labels = MAP_LABELS_VI }: BaseMapOptions = {}): Leaflet.Map {
   const map = L.map(element, { zoomControl: false, scrollWheelZoom, minZoom: 4, maxZoom: 18 });
   map.attributionControl.setPrefix(LEAFLET_PREFIX);
-  L.tileLayer(TILE_URL, { maxZoom: 19, attribution: ATTRIBUTION }).addTo(map);
-  L.control.zoom({ position: 'bottomright', zoomInTitle: 'Phóng to', zoomOutTitle: 'Thu nhỏ' }).addTo(map);
-  addVietnamSeas(L, map);
+  const attribution = `${labels.attribution.prefix} <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">${labels.attribution.owners}</a>`;
+  L.tileLayer(TILE_URL, { maxZoom: 19, attribution }).addTo(map);
+  L.control.zoom({ position: 'bottomright', zoomInTitle: labels.zoomIn, zoomOutTitle: labels.zoomOut }).addTo(map);
+  addVietnamSeas(L, map, labels);
   return map;
 }
 

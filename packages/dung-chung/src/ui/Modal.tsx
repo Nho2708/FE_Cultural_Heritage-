@@ -17,10 +17,12 @@ interface ModalProps {
   footer?: ReactNode;
   /** Đang lưu: chặn Esc và nút đóng để không mất thao tác giữa chừng. */
   busy?: boolean;
+  /** Tên nút đóng ở góc (đọc cho trình đọc màn hình); mặc định tiếng Việt, web học tập truyền chữ theo ngôn ngữ đang chọn. */
+  closeLabel?: string;
   onClose: () => void;
 }
 
-export function Modal({ open, title, description, size = 'dialog', children, footer, busy = false, onClose }: ModalProps) {
+export function Modal({ open, title, description, size = 'dialog', children, footer, busy = false, closeLabel = 'Đóng', onClose }: ModalProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const descriptionId = useId();
@@ -77,7 +79,7 @@ export function Modal({ open, title, description, size = 'dialog', children, foo
             type="button"
             onClick={onClose}
             disabled={busy}
-            aria-label="Đóng"
+            aria-label={closeLabel}
             className="-mt-2 -mr-2 flex size-11 shrink-0 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container disabled:opacity-50"
           >
             <Icon name="x" size={20} />

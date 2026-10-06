@@ -1,4 +1,5 @@
 import type { ContentStatus, HeritageType, MediaType, RecognitionLevel, ReferenceSourceType } from './api/heritage';
+import type { TranslationKind, TranslationState, TranslationStatus } from './api/translations';
 
 // Nhãn giao diện chỉ tiếng Việt cho các enum của kho di sản. CSDL và API giữ giá trị enum viết HOA.
 
@@ -23,6 +24,33 @@ export const HERITAGE_STATUS_LABEL: Record<ContentStatus, string> = {
   DRAFT: 'Nháp',
   PUBLISHED: 'Đã xuất bản',
   ARCHIVED: 'Đã ẩn',
+};
+
+/** Tình trạng bản dịch của cả di sản (cột và bộ lọc ở Quản lý di sản, dải nhắc sau khi xuất bản). */
+export const TRANSLATION_STATE_LABEL: Record<TranslationState, string> = {
+  NONE: 'Chưa dịch',
+  PENDING: 'Chờ duyệt',
+  APPROVED: 'Đã duyệt',
+  OUTDATED: 'Cần dịch lại',
+};
+
+/** Trạng thái của một bản dịch hoặc tóm tắt. */
+export const TRANSLATION_STATUS_LABEL: Record<TranslationStatus, string> = {
+  MACHINE: 'Bản dịch máy',
+  PENDING: 'Chờ duyệt',
+  APPROVED: 'Đã duyệt',
+  REJECTED: 'Bị từ chối',
+};
+
+export const TRANSLATION_KIND_LABEL: Record<TranslationKind, string> = {
+  TRANSLATION: 'Bản dịch',
+  SUMMARY: 'Tóm tắt',
+};
+
+/** Phần nội dung của mỗi loại, hiện dưới nhãn loại ở hàng chờ duyệt. */
+export const TRANSLATION_KIND_HINT: Record<TranslationKind, string> = {
+  TRANSLATION: 'Mô tả ngắn, nội dung, giai đoạn, sự kiện, chú thích ảnh',
+  SUMMARY: 'Bản ngắn và bản chi tiết',
 };
 
 export const MEDIA_TYPE_LABEL: Record<MediaType, string> = {

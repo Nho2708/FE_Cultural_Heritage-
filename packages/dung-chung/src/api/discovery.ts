@@ -6,13 +6,52 @@ import type { Paged } from './types';
 // sản đã xuất bản. Giá trị enum viết HOA như CSDL; nhãn tiếng Việt lấy ở heritage.ts hoặc danh mục bộ lọc.
 
 export const DISCOVERY_ENDPOINTS = {
+  languages: '/public/languages',
   home: '/public/home',
   filters: '/public/filters',
   heritages: '/public/heritages',
   map: '/public/heritages/map',
   heritage: (slug: string) => `/public/heritages/${encodeURIComponent(slug)}`,
   timeline: (slug: string) => `/public/heritages/${encodeURIComponent(slug)}/timeline`,
+  summary: (slug: string) => `/public/heritages/${encodeURIComponent(slug)}/summary`,
 } as const;
+
+/**
+ * Năm ngôn ngữ của phần công khai: mã của giao diện và của API (`lang`). Tiếng Việt là bản gốc; tiếng Anh cần được quản trị duyệt;
+ * tiếng Hàn, Trung giản thể, Nhật là bản dịch máy hiện ngay kèm nhãn. Học sinh đã đăng nhập luôn nhận tiếng Việt.
+ */
+export type LanguageCode = 'vi' | 'en' | 'ko' | 'zh-Hans' | 'ja';
+
+/** Một ngôn ngữ của bộ chọn: tên viết bằng chính ngôn ngữ đó, mã giọng đọc của thiết bị và cờ cho biết bản gốc hay chỉ có bản dịch máy. */
+export interface LanguageOption {
+  code: LanguageCode;
+  nativeName: string;
+  /** Mã giọng đọc của trình duyệt hoặc thiết bị (`vi-VN`, `en-US`, `ko-KR`, `zh-CN`, `ja-JP`). */
+  speechTag: string;
+  isSource: boolean;
+  isMachineOnly: boolean;
+}
+
+/**
+ * Cờ ngôn ngữ của một phản hồi: `language` là ngôn ngữ nội dung đang hiện; khác `requestedLanguage` khi `isFallback` (chưa có bản hiện hành
+ * nên đang hiện tiếng Việt: giao diện báo một lần cho cả trang). `isMachineTranslated` bật với tiếng Hàn, Trung, Nhật: luôn gắn nhãn "bản dịch máy".
+ */
+export interface Localization {
+  requestedLanguage: LanguageCode;
+  language: LanguageCode;
+  isFallback: boolean;
+  isMachineTranslated: boolean;
+}
+
+/** Tóm tắt của một di sản: `shortText` để nghe thuyết minh, `detailedText` để đọc. Lấy từ bản đã lưu, không gọi AI khi xem. */
+export interface PublicSummary {
+  heritageId: number;
+  slug: string;
+  name: string;
+  localization: Localization;
+  shortText: string;
+  detailedText: string;
+}
 
 /** Thời kỳ của bộ lọc: năm âm là trước Công nguyên; các khoảng cố định do máy chủ quyết định. */
 export type HeritagePeriod = 'PREHISTORIC' | 'NORTHERN_RULE' | 'INDEPENDENT_FEUDAL' | 'MODERN' | 'CONTEMPORARY';
@@ -43,6 +82,10 @@ export interface HeritageCard {
   heritageType: HeritageType | null;
   recognitionLevel: RecognitionLevel | null;
   recognizedYear: number | null;
+  /** Chưa có bản hiện hành ở ngôn ngữ yêu cầu nên tên và mô tả ngắn đang là tiếng Việt. */
+  isFallback?: boolean;
+  /** Tên và mô tả ngắn là bản dịch máy. */
+  isMachineTranslated?: boolean;
 }
 
 export interface CountItem {
@@ -72,6 +115,8 @@ export interface HeritagePin {
   heritageType: HeritageType | null;
   recognitionLevel: RecognitionLevel | null;
   hasTimeline: boolean;
+  isFallback?: boolean;
+  isMachineTranslated?: boolean;
 }
 
 export interface HeritageMapResult {
@@ -135,6 +180,10 @@ export interface PublicHeritageDetail {
   media: PublicMedia[];
   references: PublicReference[];
   timeline: PublicPhaseSummary[];
+  /** Ngôn ngữ đang hiện và nhãn bản dịch máy; bản cũ của máy chủ không có thì xem như tiếng Việt. */
+  localization?: Localization | null;
+  /** Di sản có tóm tắt tiếng Việt đã duyệt (bật nút "Tóm tắt" và "Nghe"). */
+  hasSummary?: boolean;
 }
 
 export interface PublicEvent {
@@ -170,6 +219,7 @@ export interface PublicTimeline {
   provinceName: string | null;
   /** Rỗng khi di sản chưa có giai đoạn nào (vẫn là phản hồi thành công). */
   phases: PublicPhase[];
+  localization?: Localization | null;
 }
 
 export interface FilterOption {
@@ -206,27 +256,38 @@ interface RequestSignal {
   signal?: AbortSignal;
 }
 
+/** Ngôn ngữ nội dung: bỏ trống thì máy chủ trả tiếng Việt (hoặc theo tiêu đề Accept-Language). Học sinh đã đăng nhập luôn nhận tiếng Việt. */
+interface LanguageOptions extends RequestSignal {
+  lang?: LanguageCode;
+}
+
 export function createDiscoveryApi(client: ApiClient) {
   const get = async <T>(path: string, query?: Record<string, string | number | undefined>, signal?: AbortSignal) =>
     (await client.request<T>(path, { auth: false, query, signal })).data;
 
   return {
-    home: ({ signal }: RequestSignal = {}) => get<DiscoveryHome>(DISCOVERY_ENDPOINTS.home, undefined, signal),
+    /** Năm ngôn ngữ của bộ chọn. Danh mục cố định, máy chủ cho lưu tạm 1 giờ. */
+    languages: ({ signal }: RequestSignal = {}) => get<LanguageOption[]>(DISCOVERY_ENDPOINTS.languages, undefined, signal),
+
+    home: ({ signal, lang }: LanguageOptions = {}) => get<DiscoveryHome>(DISCOVERY_ENDPOINTS.home, { lang }, signal),
 
     /** Danh mục cho mọi ô lọc (tỉnh, vùng, loại, cấp xếp hạng, thời kỳ). Máy chủ cho lưu tạm 1 giờ. */
     filters: ({ signal }: RequestSignal = {}) => get<FilterCatalog>(DISCOVERY_ENDPOINTS.filters, undefined, signal),
 
     /** Tìm và lọc, phân trang (`pageSize` mặc định 20, tối đa 100). */
-    search: (filter: DiscoveryFilter, paging: { page?: number; pageSize?: number } = {}, { signal }: RequestSignal = {}) =>
-      get<Paged<HeritageCard>>(DISCOVERY_ENDPOINTS.heritages, { ...filterQuery(filter), page: paging.page, pageSize: paging.pageSize }, signal),
+    search: (filter: DiscoveryFilter, paging: { page?: number; pageSize?: number } = {}, { signal, lang }: LanguageOptions = {}) =>
+      get<Paged<HeritageCard>>(DISCOVERY_ENDPOINTS.heritages, { ...filterQuery(filter), page: paging.page, pageSize: paging.pageSize, lang }, signal),
 
     /** Ghim bản đồ theo cùng bộ lọc, không phân trang. */
-    map: (filter: DiscoveryFilter, { signal }: RequestSignal = {}) =>
-      get<HeritageMapResult>(DISCOVERY_ENDPOINTS.map, filterQuery(filter), signal),
+    map: (filter: DiscoveryFilter, { signal, lang }: LanguageOptions = {}) =>
+      get<HeritageMapResult>(DISCOVERY_ENDPOINTS.map, { ...filterQuery(filter), lang }, signal),
 
-    detail: (slug: string, { signal }: RequestSignal = {}) => get<PublicHeritageDetail>(DISCOVERY_ENDPOINTS.heritage(slug), undefined, signal),
+    detail: (slug: string, { signal, lang }: LanguageOptions = {}) => get<PublicHeritageDetail>(DISCOVERY_ENDPOINTS.heritage(slug), { lang }, signal),
 
-    timeline: (slug: string, { signal }: RequestSignal = {}) => get<PublicTimeline>(DISCOVERY_ENDPOINTS.timeline(slug), undefined, signal),
+    timeline: (slug: string, { signal, lang }: LanguageOptions = {}) => get<PublicTimeline>(DISCOVERY_ENDPOINTS.timeline(slug), { lang }, signal),
+
+    /** Tóm tắt theo ngôn ngữ. 404 `SUMMARY_UNAVAILABLE` khi chưa có tóm tắt tiếng Việt đã duyệt; ngôn ngữ chưa có bản hiện hành thì trả bản tiếng Việt kèm `isFallback`. */
+    summary: (slug: string, { signal, lang }: LanguageOptions = {}) => get<PublicSummary>(DISCOVERY_ENDPOINTS.summary(slug), { lang }, signal),
   };
 }
 
@@ -252,11 +313,11 @@ export interface HeritagePreview {
 export function createPreviewApi(client: ApiClient) {
   return {
     /** Bản nháp đang lưu. 404 `PREVIEW_INVALID` cho mọi lý do không đọc được. */
-    heritage: async (code: string, { signal }: RequestSignal = {}) =>
-      (await client.request<HeritagePreview>(PREVIEW_ENDPOINTS.heritage(code), { signal })).data,
+    heritage: async (code: string, { signal, lang }: LanguageOptions = {}) =>
+      (await client.request<HeritagePreview>(PREVIEW_ENDPOINTS.heritage(code), { signal, query: { lang } })).data,
 
-    timeline: async (code: string, { signal }: RequestSignal = {}) =>
-      (await client.request<PublicTimeline>(PREVIEW_ENDPOINTS.timeline(code), { signal })).data,
+    timeline: async (code: string, { signal, lang }: LanguageOptions = {}) =>
+      (await client.request<PublicTimeline>(PREVIEW_ENDPOINTS.timeline(code), { signal, query: { lang } })).data,
   };
 }
 
