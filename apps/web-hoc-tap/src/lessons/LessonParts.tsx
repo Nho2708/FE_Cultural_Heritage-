@@ -1,8 +1,10 @@
 import { formatDateTime } from '@dsvhvn/dung-chung';
 import type { LessonImageCredit, StudentHeritageCard, StudentQuiz, StudentQuizState } from '@dsvhvn/dung-chung/api';
-import { Badge, ButtonLink, Icon, TextLink, type BadgeTone } from '@dsvhvn/dung-chung/ui';
+import { Badge, Button, Icon, TextLink, type BadgeTone } from '@dsvhvn/dung-chung/ui';
+import { useState } from 'react';
 import { heritagePath, mapPathOf, timelinePath } from '../discovery/paths';
-import { canTakeQuiz, paragraphsOf, quizActionLabel, quizPath } from './lessonData';
+import { StartQuizDialog } from '../quiz/QuizIntro';
+import { canOpenQuiz, paragraphsOf, quizActionLabel } from './lessonData';
 
 // Phần dùng chung của ba bố cục bài học: đoạn văn, hình kèm chú thích và ghi công, danh sách bài kiểm tra kèm trạng thái với
 // riêng em, thẻ di sản,. Ba cấp khác nhau ở bố cục và kích thước, cùng dùng các phần này.
@@ -82,19 +84,22 @@ interface QuizListProps {
 }
 
 export function QuizList({ code, quizzes, variant }: QuizListProps) {
+  const [openId, setOpenId] = useState<number | null>(null);
   if (quizzes.length === 0) {
     return <p className="type-body-m text-on-surface-variant">Bài học này chưa có bài kiểm tra nào.</p>;
   }
   return (
+    <>
+    <StartQuizDialog quizId={openId} name={quizzes.find((q) => q.id === openId)?.name ?? null} code={code} onClose={() => setOpenId(null)} />
     <ul className={variant === 'row' ? 'divide-y divide-border rounded-md border border-border bg-surface' : 'flex flex-col gap-3'}>
       {quizzes.map((quiz) => {
         const action = quizActionLabel(quiz);
         const when = quizWhen(quiz);
-        const link = canTakeQuiz(quiz) && action && (
-          <ButtonLink to={quizPath(code, quiz.id)} size={variant === 'large' ? 'lg' : 'md'} variant={variant === 'row' ? 'primary' : 'primary'}>
+        const link = canOpenQuiz(quiz) && action && (
+          <Button onClick={() => setOpenId(quiz.id)} size={variant === 'large' ? 'lg' : 'md'} variant={quiz.state === 'SUBMITTED' ? 'secondary' : 'primary'} aria-label={`${action}: ${quiz.name ?? 'bài kiểm tra'}`}>
             {variant === 'large' && <Icon name="play" size={22} />}
             {action}
-          </ButtonLink>
+          </Button>
         );
         if (variant === 'row') {
           return (
@@ -128,6 +133,7 @@ export function QuizList({ code, quizzes, variant }: QuizListProps) {
         );
       })}
     </ul>
+    </>
   );
 }
 

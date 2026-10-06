@@ -1,9 +1,8 @@
-import { MESSAGES } from '@dsvhvn/dung-chung';
 import type { StudentClassDetail, StudentProfile } from '@dsvhvn/dung-chung/api';
 import { ButtonLink, Icon } from '@dsvhvn/dung-chung/ui';
 import { pathOf } from '../access/screens';
-import { Illustration } from '../theme/Illustration';
 import { classFacts, whoAmI } from './classroom';
+import { LearningSections } from './LearningSections';
 
 // Trang học của em — bản cấp 3 (khối 10-12): bố cục gọn, nhiều chữ, giống trang tài liệu. Thanh bên mục lục và một cột nội
 // dung rộng; đầu trang một dòng thông tin; danh sách dạng dòng, không thẻ hình, không linh vật. Mục lục chỉ có các mục
@@ -68,9 +67,8 @@ export function LevelThree({ user, classroom }: { user: StudentProfile; classroo
             <h2 id="viec-can-lam-tieu-de" className="type-h2 text-on-surface">
               Việc cần làm
             </h2>
-            <div className="mt-3 flex items-center gap-4 rounded-md border border-border bg-surface p-4">
-              <Illustration state="trong" className="size-14" />
-              <p className="type-body-m text-on-surface-variant">{MESSAGES.studentNoAttemptsYet}</p>
+            <div className="mt-3">
+              <LearningSections level={3} />
             </div>
           </section>
         </div>

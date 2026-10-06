@@ -53,7 +53,7 @@ describe('Bài học — cấp 1 (kể chuyện từng bước)', () => {
     await user.click(screen.getByRole('button', { name: 'Tiếp nhé' }));
     expect(screen.getByRole('heading', { name: 'Bài chơi của em' })).toBeInTheDocument();
     expect(screen.getByText('Chơi cùng bạn Na')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Làm bài' })).toHaveAttribute('href', '/bai-hoc/BH7F3K2Q/kiem-tra/1');
+    expect(screen.getByRole('button', { name: /^Làm bài/ })).toBeInTheDocument();
     expect(readPosition(student.id, 'BH7F3K2Q').step).toBe(2);
 
     unmount();
@@ -93,10 +93,10 @@ describe('Bài học — cấp 2 (bài đọc và dòng thời gian)', () => {
     expect(screen.getByText(/CC BY-SA/)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Ý chính' })).toBeInTheDocument();
     const aside = screen.getByRole('complementary');
-    expect(within(aside).getByRole('link', { name: 'Làm bài' })).toHaveAttribute('href', '/bai-hoc/BH7F3K2Q/kiem-tra/1');
-    expect(within(aside).getByRole('link', { name: 'Làm tiếp' })).toBeInTheDocument();
+    expect(within(aside).getByRole('button', { name: /^Làm bài/ })).toBeInTheDocument();
+    expect(within(aside).getByRole('button', { name: /^Làm tiếp/ })).toBeInTheDocument();
     expect(within(aside).getByText('Đã đóng')).toBeInTheDocument();
-    expect(within(aside).getAllByRole('link')).toHaveLength(2);
+    expect(within(aside).getAllByRole('button')).toHaveLength(2);
     expect(screen.getByRole('link', { name: 'Xem chi tiết' })).toHaveAttribute('href', '/di-san/quan-the-co-do-hue');
 
     await user.click(screen.getByRole('tab', { name: 'Dòng thời gian của bài' }));
@@ -148,7 +148,7 @@ describe('Bài học — cấp 3 (tài liệu)', () => {
     expect(screen.getByRole('link', { name: /Chi tiết di sản: Quần thể di tích Cố đô Huế/ })).toHaveAttribute('href', '/di-san/quan-the-co-do-hue');
     expect(screen.getByText(/đồng hồ đếm ngược/)).toBeInTheDocument();
     expect(screen.getByText('Kiểm tra 45 phút')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Làm bài' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Làm bài/ })).toBeInTheDocument();
     expect(screen.getByText('Em đã làm')).toBeInTheDocument();
     expect(document.querySelector('figure[data-bo-hinh]')).toBeNull();
   });

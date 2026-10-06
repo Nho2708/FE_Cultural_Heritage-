@@ -3,11 +3,12 @@ import { ButtonLink, Icon } from '@dsvhvn/dung-chung/ui';
 import { pathOf } from '../access/screens';
 import { Illustration } from '../theme/Illustration';
 import { classFacts } from './classroom';
+import { LearningSections } from './LearningSections';
 import { SpeakButton } from './SpeakButton';
 
 // Trang học của em — bản cấp 1 (khối 1-5): một cột, nút to, ít chữ, nhiều hình, nút loa đọc to. Chỉ có khối chào, thẻ lớp
-// của em và nút "Nhập mã bài học"; các khối bài chơi, gợi ý, huy hiệu, số sao dựng cùng chức năng học tập. Không có bảng,
-// biểu đồ hay điểm số.
+// của em, nút "Nhập mã bài học" và các khối bài chơi đang chờ, bài học của em, huy hiệu gần đây (LearningSections). Không có
+// bảng, biểu đồ hay điểm số.
 
 export function LevelOne({ user, classroom }: { user: StudentProfile; classroom: StudentClassDetail }) {
   const name = user.fullName ?? 'em';
@@ -56,10 +57,7 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
           <p className="mt-4 type-body-m text-on-surface-variant">Mã học sinh của em: {studentCodeOf(user)}</p>
         </section>
 
-        <div className="flex items-center gap-(--dsv-inline-gap) rounded-lg border-2 border-dashed border-border-strong p-(--dsv-inline-gap)">
-          <Illustration state="trong" />
-          <p className="type-h4">Chưa có bài chơi nào. Em hãy nhờ thầy cô đưa mã bài học nhé!</p>
-        </div>
+        <LearningSections level={1} />
       </div>
     </section>
   );
