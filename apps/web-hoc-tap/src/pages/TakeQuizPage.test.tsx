@@ -2,9 +2,10 @@ import { ATTEMPT_ENDPOINTS, type AttemptQuestion, type SchoolLevel, type Student
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { envelope, mockApi, studentOf, studentServer, type FetchCall } from '../test/fixtures';
+import { sessionStore } from '../lib/auth/session';
+import { envelope, mockApi, sessionOf, studentOf, studentServer, type FetchCall } from '../test/fixtures';
 import { attemptOf, introOf, questionOf, resultOf, SERVER_NOW } from '../test/quizFixtures';
-import { renderApp, signInAs } from '../test/renderApp';
+import { renderApp } from '../test/renderApp';
 
 // Làm bài kiểm tra: trang giới thiệu, bắt đầu, ba bố cục theo cấp, lưu từng câu, nộp, hết giờ tự nộp, mất kết nối, lượt đã nộp.
 
@@ -28,7 +29,8 @@ interface ServerOptions {
 
 function quizServer(level: SchoolLevel, options: ServerOptions) {
   const student = studentOf(level === 1 ? 4 : level === 3 ? 11 : 7);
-  signInAs(student);
+  // Phiên hết hạn xa để test đổi giờ hệ thống (bài hết giờ) không làm phiên bị coi là hết hạn.
+  sessionStore.setSession(sessionOf(student, { expiresAt: Date.parse('2099-01-01T00:00:00Z') }));
   const result = options.result ?? resultOf(level);
   return mockApi(
     studentServer(student),
@@ -181,7 +183,8 @@ describe('Làm bài kiểm tra — cấp 2 (cân bằng)', () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     vi.setSystemTime(new Date(SERVER_NOW));
     const attempt = attemptOf(2, questions(), { deadline: '2026-10-06T08:00:03.000Z', remainingSeconds: 3 });
-    const calls = quizServer(2, { attempt, result: resultOf(2, { status: 'EXPIRED', statusLabel: 'Hết giờ, tự nộp' }) });
+    // Máy chủ nhận bài đúng hạn nên ghi là đã nộp; giao diện vẫn báo đây là bài tự nộp khi hết giờ.
+    const calls = quizServer(2, { attempt });
     const { router } = renderApp(PATH, OPEN.state);
 
     expect(await screen.findByRole('timer')).toHaveTextContent('00:03');

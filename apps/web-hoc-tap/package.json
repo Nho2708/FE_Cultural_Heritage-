@@ -12,7 +12,8 @@
     "typecheck": "tsc -b",
     "test": "vitest run",
     "test:watch": "vitest",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "smoke:lam-bai": "node scripts/smoke-lam-bai.mjs"
   },
   "dependencies": {
     "@dsvhvn/dung-chung": "0.1.0",
