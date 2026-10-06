@@ -3,7 +3,7 @@ import type { DiscoveryFilter, FilterCatalog, HeritagePeriod, HeritageType, Reco
 import { Icon } from '@dsvhvn/dung-chung/ui';
 import { useI18n, useT } from '../i18n/context';
 import { periodRangeText } from '../i18n/format';
-import { HERITAGE_TYPE_NAME, PERIOD_NAME, provinceName, RECOGNITION_LEVEL_NAME, REGION_NAME, type RegionValue } from '../i18n/taxonomy';
+import { HERITAGE_TYPE_NAME, PERIOD_NAME, provinceName, RECOGNITION_LEVEL_NAME, REGION_NAME, type RegionValue } from '@dsvhvn/dung-chung/i18n';
 import { hasActiveFilter } from './filters';
 
 // Các ô lọc dùng chung cho trang tìm kiếm và bản đồ: tỉnh, vùng, loại, cấp xếp hạng, thời kỳ. Mỗi ô là <select> thật
