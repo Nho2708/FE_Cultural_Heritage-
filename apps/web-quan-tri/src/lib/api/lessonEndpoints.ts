@@ -25,6 +25,7 @@ export const lessonsApi = {
         classId: filter.classId === '' ? undefined : filter.classId,
         status: filter.status || undefined,
         heritageType: filter.heritageType || undefined,
+        difficulty: filter.difficulty || undefined,
         keyword: filter.keyword || undefined,
         page: filter.page,
         pageSize: filter.pageSize,
@@ -47,8 +48,9 @@ export const lessonsApi = {
 
   archive: (lessonId: number) => apiRequest<LessonDetail>(`/teacher/lessons/${lessonId}/archive`, { method: 'POST' }),
 
-  duplicate: (lessonId: number, targetClassId: number) =>
-    apiRequest<DuplicateLessonResult>(`/teacher/lessons/${lessonId}/duplicate`, { method: 'POST', body: { targetClassId } }),
+  /** `includeQuizzes`: chép kèm mọi bài kiểm tra chưa xóa thành bản nháp (bỏ giờ mở, giờ đóng, câu ẩn và câu không hợp cấp lớp đích). */
+  duplicate: (lessonId: number, targetClassId: number, includeQuizzes = false) =>
+    apiRequest<DuplicateLessonResult>(`/teacher/lessons/${lessonId}/duplicate`, { method: 'POST', body: { targetClassId, includeQuizzes } }),
 
   /** Ảnh và sự kiện của các di sản của bài, để chọn hình và mốc thời gian. */
   materials: (lessonId: number) => apiRequest<LessonMaterials>(`/teacher/lessons/${lessonId}/materials`),

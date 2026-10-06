@@ -1,6 +1,7 @@
-import { HERITAGE_TYPE_LABEL, LESSON_STATUS_LABEL, MESSAGES } from '@dsvhvn/dung-chung';
-import { errorMessage, type ContentStatus, type HeritageType, type LessonRow } from '@dsvhvn/dung-chung/api';
+import { DIFFICULTIES, DIFFICULTY_LABEL, HERITAGE_TYPE_LABEL, LESSON_STATUS_LABEL, MESSAGES } from '@dsvhvn/dung-chung';
+import { errorMessage, type ContentStatus, type HeritageType, type LessonRow, type QuestionDifficulty } from '@dsvhvn/dung-chung/api';
 import {
+  Badge,
   Blank,
   Button,
   ConfirmDialog,
@@ -35,8 +36,10 @@ import { PAGE_SIZE, slugMap, useListParams } from '../../lib/listParams';
 
 // Bài học của tôi — giáo viên. Mọi bài học của thầy cô ở các lớp: tiêu đề và di sản, lớp, trạng thái, mã bài học (chỉ bài đã
 // xuất bản), số bài kiểm tra, ngày sửa. Lọc theo lớp, trạng thái, loại di sản và từ khóa; bộ lọc nằm trên URL. Thao tác trên
-// dòng: bàn phím = Mã bài học (chỉ bài đã xuất bản), sao chép = Nhân bản sang lớp khác, bút = Soạn, hộp = Lưu trữ (hỏi xác
-// nhận), thùng rác = Xóa bài nháp chưa có bài kiểm tra. Trường hết gói thì nút "Tạo bài học" và "Nhân bản" bị khóa.
+// dòng: bàn phím = Mã bài học (chỉ bài đã xuất bản), sao chép = Nhân bản sang lớp khác (chép kèm bài kiểm tra được), bút = Soạn, hộp = Lưu
+// trữ (hỏi xác nhận), thùng rác = Xóa bài nháp chưa có bài kiểm tra. Cột và bộ lọc Độ khó: độ khó của bài tính từ các câu trong các bài
+// kiểm tra của bài (không nhập tay); bài chưa có bài kiểm tra ghi "Chưa có bài kiểm tra" và không khớp mức nào. Trường hết gói thì nút
+// "Tạo bài học" và "Nhân bản" bị khóa.
 
 const STATUS_SLUG = slugMap<ContentStatus>({ DRAFT: 'nhap', PUBLISHED: 'da-xuat-ban', ARCHIVED: 'luu-tru' });
 const TYPE_SLUG = slugMap<HeritageType>({
@@ -46,6 +49,12 @@ const TYPE_SLUG = slugMap<HeritageType>({
   MIXED: 'hon-hop',
   DOCUMENTARY: 'tu-lieu',
 });
+
+const DIFFICULTY_SLUG = slugMap<QuestionDifficulty>({ EASY: 'de', MEDIUM: 'trung-binh', HARD: 'kho' });
+const DIFFICULTY_OPTIONS = [
+  { value: '', label: 'Tất cả mức' },
+  ...DIFFICULTIES.map((d) => ({ value: DIFFICULTY_SLUG.toSlug(d), label: DIFFICULTY_LABEL[d] })),
+];
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Tất cả trạng thái' },
@@ -79,8 +88,9 @@ export default function LessonsPage() {
   const classParam = params.get('lop') ?? '';
   const status = STATUS_SLUG.fromSlug(params.get('trang-thai'));
   const heritageType = TYPE_SLUG.fromSlug(params.get('loai'));
+  const difficulty = DIFFICULTY_SLUG.fromSlug(params.get('do-kho'));
   const keyword = params.get('tu-khoa') ?? '';
-  const filter = { classId: classParam ? Number(classParam) : ('' as const), status, heritageType, keyword, page, pageSize: PAGE_SIZE };
+  const filter = { classId: classParam ? Number(classParam) : ('' as const), status, heritageType, difficulty, keyword, page, pageSize: PAGE_SIZE };
 
   const list = useQuery({
     queryKey: queryKeys.lessonList(filter),
@@ -118,7 +128,7 @@ export default function LessonsPage() {
   };
 
   const rows = list.data?.items ?? [];
-  const filtered = Boolean(classParam || status || heritageType || keyword);
+  const filtered = Boolean(classParam || status || heritageType || difficulty || keyword);
   const classOptions = [
     { value: '', label: 'Tất cả lớp' },
     ...(classes.data?.items ?? []).map((c) => ({ value: String(c.id), label: `Lớp ${c.name}` })),
@@ -160,6 +170,13 @@ export default function LessonsPage() {
           onChange={(e) => update({ loai: e.target.value })}
           containerClassName="dsvmd:w-52"
         />
+        <SelectField
+          label="Độ khó"
+          value={DIFFICULTY_SLUG.toSlug(difficulty)}
+          options={DIFFICULTY_OPTIONS}
+          onChange={(e) => update({ 'do-kho': e.target.value })}
+          containerClassName="dsvmd:w-44"
+        />
         <SearchForm key={keyword} label="Tìm theo tiêu đề" placeholder="Tiêu đề bài học" value={keyword} onSearch={(v) => update({ 'tu-khoa': v })} />
       </div>
 
@@ -173,7 +190,7 @@ export default function LessonsPage() {
             icon="search"
             title={MESSAGES.noResults}
             action={
-              <Button variant="secondary" onClick={() => update({ lop: null, 'trang-thai': null, loai: null, 'tu-khoa': null })}>
+              <Button variant="secondary" onClick={() => update({ lop: null, 'trang-thai': null, loai: null, 'do-kho': null, 'tu-khoa': null })}>
                 Bỏ bộ lọc
               </Button>
             }
@@ -193,6 +210,7 @@ export default function LessonsPage() {
                 <Th>Trạng thái</Th>
                 <Th>Mã bài học</Th>
                 <Th>Bài kiểm tra</Th>
+                <Th>Độ khó</Th>
                 <Th>Ngày sửa</Th>
                 <Th className="text-right">Hành động</Th>
               </tr>
@@ -214,6 +232,9 @@ export default function LessonsPage() {
                     </Td>
                     <Td>{row.accessCode ? <CodeDisplay code={row.accessCode} className="type-mono-label" /> : <Blank />}</Td>
                     <Td className="type-mono-label">{row.quizCount}</Td>
+                    <Td className="whitespace-nowrap">
+                      {row.difficulty ? row.difficultyLabel : <Badge>{row.difficultyLabel || 'Chưa có bài kiểm tra'}</Badge>}
+                    </Td>
                     <Td className="type-mono-label whitespace-nowrap">{formatDate(row.updatedAt ?? row.createdAt)}</Td>
                     <Td>
                       <div className="flex justify-end gap-1">
@@ -268,7 +289,7 @@ export default function LessonsPage() {
       )}
       <p className="type-body-s text-on-surface-variant">
         Thao tác trên dòng: bàn phím — Mã bài học (chỉ bài đã xuất bản); sao chép — Nhân bản sang lớp khác; bút — Soạn; hộp — Lưu trữ (hỏi xác
-        nhận); thùng rác — Xóa bài chưa có bài kiểm tra.
+        nhận); thùng rác — Xóa bài chưa có bài kiểm tra. Độ khó suy từ câu hỏi trong các bài kiểm tra của bài, không nhập tay.
       </p>
 
       {creating && (
@@ -292,6 +313,7 @@ export default function LessonsPage() {
             className: copying.className,
             schoolLevel: copying.schoolLevel,
             heritageCount: copying.heritages.length,
+            quizCount: copying.quizCount,
             isPublished: copying.status === 'PUBLISHED',
           }}
           onDone={(result) => {
