@@ -8,7 +8,7 @@ import { renderApp, signInAs } from '../test/renderApp';
 // Trang chủ khám phá: công khai, dữ liệu từ /public/home, không có ô nhập mã bài học.
 
 const withDetail = () => (call: { path: string }) =>
-  call.path === `/public/heritages/${HUE.slug}` ? envelope(200, { data: detailOf() }) : undefined;
+  call.path.split('?')[0] === `/public/heritages/${HUE.slug}` ? envelope(200, { data: detailOf() }) : undefined;
 
 describe('Trang chủ', () => {
   it('khách thấy ảnh lớn đầu trang, di sản nổi bật, khám phá theo vùng và loại; không có ô nhập mã bài học', async () => {
@@ -112,7 +112,7 @@ describe('Trang chủ', () => {
     let fail = true;
     mockApi(
       (call) =>
-        call.path === '/public/home' && fail ? envelope(500, { errorCode: 'SYSTEM_ERROR', message: 'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ quản trị viên.' }) : undefined,
+        call.path.split('?')[0] === '/public/home' && fail ? envelope(500, { errorCode: 'SYSTEM_ERROR', message: 'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ quản trị viên.' }) : undefined,
       publicApi(),
     );
     const user = userEvent.setup();

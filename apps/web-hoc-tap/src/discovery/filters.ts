@@ -1,4 +1,3 @@
-import { MESSAGES } from '@dsvhvn/dung-chung';
 import type { DiscoveryFilter, HeritagePeriod, HeritageType, RecognitionLevel } from '@dsvhvn/dung-chung/api';
 
 // Bộ lọc khám phá nằm trên địa chỉ trang (chia sẻ được, nút Back đúng): tìm kiếm và bản đồ dùng chung một bộ tham số
@@ -72,14 +71,10 @@ export function selectFilterCount(filter: DiscoveryFilter): number {
   return [filter.provinceId, filter.region, filter.heritageType, filter.recognitionLevel, filter.period].filter((v) => v !== undefined).length;
 }
 
-/** Câu lỗi cho từ khóa ngoài 2-100 ký tự (cùng câu với máy chủ), hoặc null nếu dùng được / để trống. */
-export function keywordError(keyword: string | undefined): string | null {
+/** Từ khóa ngoài 2-100 ký tự là không hợp lệ (máy chủ báo 400); để trống thì không lỗi. Câu báo lỗi lấy từ chữ giao diện của ngôn ngữ đang chọn. */
+export function keywordInvalid(keyword: string | undefined): boolean {
   const text = keyword?.trim() ?? '';
-  if (text === '') return null;
-  if (text.length < KEYWORD_MIN || text.length > KEYWORD_MAX) {
-    return MESSAGES.invalid('Từ khóa', `phải dài ${KEYWORD_MIN}-${KEYWORD_MAX} ký tự`);
-  }
-  return null;
+  return text !== '' && (text.length < KEYWORD_MIN || text.length > KEYWORD_MAX);
 }
 
 export function toSearch(params: URLSearchParams): string {

@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from 'react';
 import { Outlet, ScrollRestoration, useLocation, useMatches } from 'react-router';
 import { isRouteHandle } from '../../app/routeHandle';
+import { useT } from '../../i18n/context';
 import { useAuth } from '../../lib/auth/context';
 import { ThemeProvider } from '../../theme/ThemeProvider';
 import { SiteFooter } from './SiteFooter';
@@ -26,12 +27,13 @@ export function RootLayout() {
 
 /** Liên kết "Bỏ qua tới nội dung chính" — phần tử nhận focus đầu tiên. */
 export function SkipLink() {
+  const t = useT();
   return (
     <a
       href="#noi-dung"
       className="fixed top-2 left-2 z-(--dsv-z-toast) -translate-y-24 rounded-sm bg-primary px-4 py-3 type-control text-on-primary focus-visible:translate-y-0"
     >
-      Bỏ qua tới nội dung chính
+      {t.nav.skip}
     </a>
   );
 }

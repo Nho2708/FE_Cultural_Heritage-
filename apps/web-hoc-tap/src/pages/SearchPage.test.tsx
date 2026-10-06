@@ -42,6 +42,7 @@ describe('Tìm kiếm và lọc di sản', () => {
       period: 'INDEPENDENT_FEUDAL',
       page: '2',
       pageSize: '12',
+      lang: 'vi',
     });
     expect(screen.getByRole('searchbox', { name: 'Từ khóa' })).toHaveValue('thang long');
   });

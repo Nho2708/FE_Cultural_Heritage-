@@ -1,15 +1,16 @@
 import { cn } from '@dsvhvn/dung-chung';
 import { Icon } from '@dsvhvn/dung-chung/ui';
 import { useId, useState, type FormEvent } from 'react';
-import { keywordError } from './filters';
+import { useT } from '../i18n/context';
+import { KEYWORD_MAX, KEYWORD_MIN, keywordInvalid } from './filters';
 
 interface KeywordSearchProps {
   /** Từ khóa đang áp dụng; đổi từ bên ngoài thì phần tử cha đổi `key` để ô nhập đồng bộ. */
   value: string;
   placeholder: string;
   onSearch: (keyword: string) => void;
-  /** Lỗi từ bên ngoài (từ khóa trên địa chỉ trang sai độ dài). */
-  externalError?: string | null;
+  /** Từ khóa trên địa chỉ trang sai độ dài (câu lỗi hiện dưới ô theo ngôn ngữ đang chọn). */
+  externalInvalid?: boolean;
   large?: boolean;
   className?: string;
 }
@@ -18,18 +19,19 @@ interface KeywordSearchProps {
  * Ô từ khóa của khám phá. Chỉ gửi khi bấm "Tìm kiếm" hoặc Enter (không gọi API theo từng phím gõ). Từ khóa ngoài 2-100 ký
  * tự báo lỗi ngay dưới ô, cùng câu với máy chủ, và không chuyển trang.
  */
-export function KeywordSearch({ value, placeholder, onSearch, externalError = null, large = false, className }: KeywordSearchProps) {
+export function KeywordSearch({ value, placeholder, onSearch, externalInvalid = false, large = false, className }: KeywordSearchProps) {
   const [text, setText] = useState(value);
-  const [error, setError] = useState<string | null>(null);
+  const [invalid, setInvalid] = useState(false);
+  const t = useT();
   const inputId = useId();
   const errorId = `${inputId}-loi`;
-  const shownError = error ?? externalError;
+  const shownError = invalid || externalInvalid ? t.keyword.invalid(KEYWORD_MIN, KEYWORD_MAX) : null;
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const keyword = text.trim();
-    const problem = keywordError(keyword);
-    setError(problem);
+    const problem = keywordInvalid(keyword);
+    setInvalid(problem);
     if (!problem) onSearch(keyword);
   };
 
@@ -45,7 +47,7 @@ export function KeywordSearch({ value, placeholder, onSearch, externalError = nu
         >
           <Icon name="search" size={large ? 24 : 20} className="shrink-0 text-on-surface-variant" />
           <label htmlFor={inputId} className="sr-only">
-            Từ khóa
+            {t.keyword.label}
           </label>
           <input
             id={inputId}
@@ -54,7 +56,7 @@ export function KeywordSearch({ value, placeholder, onSearch, externalError = nu
             value={text}
             onChange={(event) => {
               setText(event.target.value);
-              setError(null);
+              setInvalid(false);
             }}
             placeholder={placeholder}
             autoComplete="off"
@@ -69,7 +71,7 @@ export function KeywordSearch({ value, placeholder, onSearch, externalError = nu
             type="submit"
             className="h-11 shrink-0 rounded-sm bg-primary px-4 type-control text-on-primary transition-colors hover:bg-primary-hover active:bg-primary-active dsvsm:px-6"
           >
-            Tìm kiếm
+            {t.keyword.submit}
           </button>
         </div>
         {shownError && (

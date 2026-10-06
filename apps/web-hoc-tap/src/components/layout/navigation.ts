@@ -1,5 +1,6 @@
 import type { IconName } from '@dsvhvn/dung-chung/ui';
 import { pathOf, type ScreenKey } from '../../access/screens';
+import type { Strings } from '../../i18n/strings';
 
 // Mục của thanh điều hướng trên (TopBar). Chưa đăng nhập: Khám phá · Bản đồ · Dòng thời gian (và nút "Học sinh đăng
 // nhập"). Học sinh đã đăng nhập: Trang học · Nhập mã · Tiến độ · Khám phá · Bản đồ · Dòng thời gian (và menu tài khoản).
@@ -12,10 +13,11 @@ export interface NavItem {
 
 const item = (screen: ScreenKey, label: string, icon: IconName): NavItem => ({ to: pathOf(screen), label, icon });
 
-const EXPLORE: readonly NavItem[] = [
-  item('search', 'Khám phá', 'search'),
-  item('map', 'Bản đồ', 'map-pin'),
-  item('timeline', 'Dòng thời gian', 'clock'),
+/** Mục khám phá theo ngôn ngữ đang chọn (khách chọn một trong năm ngôn ngữ; học sinh luôn thấy tiếng Việt). */
+const explore = (t: Strings): NavItem[] => [
+  item('search', t.nav.explore, 'search'),
+  item('map', t.nav.map, 'map-pin'),
+  item('timeline', t.nav.timeline, 'clock'),
 ];
 
 const LEARNING: readonly NavItem[] = [
@@ -24,6 +26,6 @@ const LEARNING: readonly NavItem[] = [
   item('progress', 'Tiến độ', 'star'),
 ];
 
-export function primaryNav(signedIn: boolean): NavItem[] {
-  return signedIn ? [...LEARNING, ...EXPLORE] : [...EXPLORE];
+export function primaryNav(signedIn: boolean, t: Strings): NavItem[] {
+  return signedIn ? [...LEARNING, ...explore(t)] : explore(t);
 }

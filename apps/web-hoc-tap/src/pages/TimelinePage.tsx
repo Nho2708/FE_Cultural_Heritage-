@@ -1,10 +1,12 @@
 import { cn } from '@dsvhvn/dung-chung';
 import type { PublicEvent, PublicPhase, PublicTimeline } from '@dsvhvn/dung-chung/api';
-import { ButtonLink, EmptyState, ErrorState, Icon } from '@dsvhvn/dung-chung/ui';
+import { ButtonLink, EmptyState, Icon } from '@dsvhvn/dung-chung/ui';
 import { useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
 import { pathOf } from '../access/screens';
-import { FILTER_PARAM, keywordError } from '../discovery/filters';
+import { LocalizationNotice } from '../components/LocalizationNotice';
+import { PublicErrorState } from '../components/PublicErrorState';
+import { FILTER_PARAM, keywordInvalid } from '../discovery/filters';
 import { creditLine, safeUrl } from '../discovery/format';
 import { HeritageCard } from '../discovery/HeritageCard';
 import { HeritageLoadError } from '../discovery/HeritageNotFound';
@@ -12,12 +14,16 @@ import { KeywordSearch } from '../discovery/KeywordSearch';
 import { heritagePath, timelinePath } from '../discovery/paths';
 import { useHeritageTimeline, usePickerHeritages } from '../discovery/queries';
 import { Thumbnail } from '../discovery/Thumbnail';
+import { useI18n } from '../i18n/context';
+import { localizeDateText } from '../i18n/format';
+import { provinceName } from '../i18n/taxonomy';
 
 // Dòng thời gian di sản (công khai). Không có `:diSan`: chọn một di sản (tìm nhanh theo tên). Có `:diSan`: trục dọc các
 // giai đoạn theo thứ tự; mở một giai đoạn để xem sự kiện (năm, tháng/ngày nếu có, mô tả, ảnh kèm ghi công). Mỗi di sản
-// có dòng thời gian riêng, không có trục thời gian chung.
+// có dòng thời gian riêng, không có trục thời gian chung. Tên, mô tả giai đoạn và sự kiện, chú thích ảnh theo ngôn ngữ đã chọn.
 
 function EventImages({ event }: { event: PublicEvent }) {
+  const { t } = useI18n();
   const images = event.media.filter((m) => m.mediaType === 'IMAGE' && safeUrl(m.url));
   if (images.length === 0) return null;
   return (
@@ -27,7 +33,7 @@ function EventImages({ event }: { event: PublicEvent }) {
           <div className="relative h-[128px] overflow-hidden rounded-sm bg-(--dsv-card-placeholder-bg)">
             <Thumbnail url={image.url} alt={image.caption ?? event.name ?? ''} width={330} />
           </div>
-          {creditLine(image) && <figcaption className="type-label text-on-surface-variant">{creditLine(image)}</figcaption>}
+          {creditLine(image, t.common.photoCredit) && <figcaption className="type-label text-on-surface-variant">{creditLine(image, t.common.photoCredit)}</figcaption>}
         </figure>
       ))}
     </div>
@@ -35,9 +41,10 @@ function EventImages({ event }: { event: PublicEvent }) {
 }
 
 function EventRow({ event, first }: { event: PublicEvent; first: boolean }) {
+  const { language, t } = useI18n();
   return (
     <li className={cn('flex flex-col gap-3 py-5 dsvmd:flex-row dsvmd:gap-6', !first && 'border-t border-border')}>
-      <p className="type-h3 text-primary dsvmd:w-[132px] dsvmd:shrink-0">{event.dateLabel}</p>
+      <p className="type-h3 text-primary dsvmd:w-[132px] dsvmd:shrink-0">{localizeDateText(event.dateLabel, t, language)}</p>
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <p className="type-h4 text-on-background">{event.name}</p>
         {event.description && <p className="type-body-m text-on-surface-variant">{event.description}</p>}
@@ -48,6 +55,7 @@ function EventRow({ event, first }: { event: PublicEvent; first: boolean }) {
 }
 
 function Phase({ phase, index, last, open, onToggle }: { phase: PublicPhase; index: number; last: boolean; open: boolean; onToggle: () => void }) {
+  const { language, t } = useI18n();
   const listId = `su-kien-giai-doan-${phase.id}`;
   const latest = phase.events.at(-1);
   const count = phase.events.length;
@@ -57,8 +65,8 @@ function Phase({ phase, index, last, open, onToggle }: { phase: PublicPhase; ind
       {!last && <span aria-hidden="true" className="absolute top-6 bottom-0 left-[6px] w-0.5 bg-border dsvmd:hidden" />}
 
       <div className="flex flex-col gap-1 pb-2 dsvmd:items-end dsvmd:pr-8 dsvmd:pb-0">
-        <p className="type-label-kicker text-on-surface-variant">GIAI ĐOẠN {index + 1}</p>
-        <p className="font-display text-[24px] leading-8 text-primary dsvmd:text-[36px] dsvmd:leading-[44px]">{phase.rangeLabel}</p>
+        <p className="type-label-kicker text-on-surface-variant">{t.timeline.phaseKicker(index + 1)}</p>
+        <p className="font-display text-[24px] leading-8 text-primary dsvmd:text-[36px] dsvmd:leading-[44px]">{localizeDateText(phase.rangeLabel, t, language)}</p>
       </div>
 
       <div aria-hidden="true" className="hidden flex-col items-center pt-4 dsvmd:flex">
@@ -77,13 +85,13 @@ function Phase({ phase, index, last, open, onToggle }: { phase: PublicPhase; ind
               onClick={onToggle}
               className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-sm border border-border px-3 type-control text-link hover:bg-link-hover-bg"
             >
-              {open ? 'Thu gọn' : `Xem ${count} sự kiện`}
+              {open ? t.timeline.collapse : t.timeline.viewEvents(count)}
               <Icon name={open ? 'chevron-up' : 'chevron-down'} size={18} />
             </button>
           )}
         </div>
         {phase.description && <p className="type-body-l text-on-surface-variant">{phase.description}</p>}
-        {count === 0 && <p className="type-body-s text-on-surface-variant">Giai đoạn này chưa có sự kiện.</p>}
+        {count === 0 && <p className="type-body-s text-on-surface-variant">{t.timeline.noEvents}</p>}
         {open && count > 0 && (
           <ol id={listId} className="rounded-md border border-border bg-surface px-6">
             {phase.events.map((event, i) => (
@@ -94,9 +102,7 @@ function Phase({ phase, index, last, open, onToggle }: { phase: PublicPhase; ind
         {!open && latest && (
           <p className="flex items-center gap-2 type-body-s text-on-surface-variant">
             <Icon name="calendar" size={16} className="shrink-0" />
-            <span>
-              Mốc gần nhất: {latest.dateLabel} — {latest.name}
-            </span>
+            <span>{t.timeline.latest(localizeDateText(latest.dateLabel, t, language), latest.name ?? '')}</span>
           </p>
         )}
       </div>
@@ -106,6 +112,7 @@ function Phase({ phase, index, last, open, onToggle }: { phase: PublicPhase; ind
 
 function TimelineView({ timeline }: { timeline: PublicTimeline }) {
   const navigate = useNavigate();
+  const { language, t } = useI18n();
   const picker = usePickerHeritages('');
   const [openPhases, setOpenPhases] = useState<ReadonlySet<number>>(() => new Set(timeline.phases.slice(0, 1).map((p) => p.id)));
   const events = timeline.phases.reduce((sum, phase) => sum + phase.events.length, 0);
@@ -123,22 +130,23 @@ function TimelineView({ timeline }: { timeline: PublicTimeline }) {
 
   return (
     <>
-      <title>{`Dòng thời gian ${timeline.name} · Học di sản`}</title>
+      <title>{t.documentTitle(t.timeline.titleOf(timeline.name))}</title>
       <section aria-labelledby="ten-dong-thoi-gian" className="bg-surface-container-low py-10">
         <div className="dsv-content flex flex-col gap-6 dsvmd:flex-row dsvmd:items-end dsvmd:justify-between dsvmd:gap-12">
           <div className="flex min-w-0 flex-1 flex-col gap-3">
-            <p className="type-label-kicker text-primary">DÒNG THỜI GIAN CỦA DI SẢN</p>
+            <p className="type-label-kicker text-primary">{t.timeline.heritageKicker}</p>
             <h1 id="ten-dong-thoi-gian" className="type-display-l text-on-background">
               {timeline.name}
             </h1>
             <p className="type-body-m text-on-surface-variant">
-              {[timeline.provinceName, `${timeline.phases.length} giai đoạn, ${events} sự kiện`].filter(Boolean).join(' · ')}
+              {[provinceName(timeline.provinceName, language), t.timeline.summary(timeline.phases.length, events)].filter(Boolean).join(' · ')}
             </p>
+            <LocalizationNotice localization={timeline.localization} />
           </div>
           <div className="flex flex-wrap items-end gap-4">
             <div className="flex w-full flex-col gap-1.5 dsvmd:w-[320px]">
               <label htmlFor="doi-di-san" className="type-label text-on-surface-variant">
-                Đổi di sản
+                {t.timeline.change}
               </label>
               <div className="relative">
                 <select
@@ -158,24 +166,24 @@ function TimelineView({ timeline }: { timeline: PublicTimeline }) {
             </div>
             <ButtonLink to={heritagePath(timeline.slug)} variant="secondary" className="h-11 border-[1.5px] border-primary px-5 text-primary">
               <Icon name="arrow-left" size={18} />
-              Về trang di sản
+              {t.timeline.backToHeritage}
             </ButtonLink>
           </div>
         </div>
       </section>
 
-      <section aria-label="Các giai đoạn" className="dsv-content pt-12 pb-16 dsvmd:pt-14">
+      <section aria-label={t.timeline.phases} className="dsv-content pt-12 pb-16 dsvmd:pt-14">
         {timeline.phases.length === 0 ? (
           <EmptyState
             icon="clock"
-            title="Di sản này chưa có dòng thời gian"
+            title={t.timeline.emptyTitle}
             action={
               <ButtonLink to={pathOf('timeline')} variant="secondary">
-                Chọn di sản khác
+                {t.timeline.pickOther}
               </ButtonLink>
             }
           >
-            Các giai đoạn và sự kiện sẽ hiện ở đây khi được bổ sung.
+            {t.timeline.emptyText}
           </EmptyState>
         ) : (
           <ol>
@@ -191,7 +199,7 @@ function TimelineView({ timeline }: { timeline: PublicTimeline }) {
             ))}
           </ol>
         )}
-        <p className="mt-4 type-body-s text-on-surface-variant">Mỗi di sản có dòng thời gian riêng; không có trục thời gian chung cho mọi di sản.</p>
+        <p className="mt-4 type-body-s text-on-surface-variant">{t.timeline.perHeritage}</p>
       </section>
     </>
   );
@@ -200,44 +208,43 @@ function TimelineView({ timeline }: { timeline: PublicTimeline }) {
 /** Chưa chọn di sản: danh sách di sản để chọn, tìm nhanh theo tên. */
 function HeritagePicker() {
   const [params, setParams] = useSearchParams();
+  const { t } = useI18n();
   const keyword = params.get(FILTER_PARAM.keyword)?.trim() ?? '';
   const result = usePickerHeritages(keyword);
-  const invalid = keywordError(keyword);
+  const invalid = keywordInvalid(keyword);
   const data = result.data;
 
   return (
     <>
-      <title>Dòng thời gian di sản · Học di sản</title>
+      <title>{t.documentTitle(t.timeline.pageTitle)}</title>
       <section aria-labelledby="chon-di-san" className="bg-surface-container-low py-12">
         <div className="dsv-content flex flex-col gap-6">
           <div className="flex flex-col gap-2">
-            <p className="type-label-kicker text-primary">DÒNG THỜI GIAN</p>
+            <p className="type-label-kicker text-primary">{t.timeline.pickerKicker}</p>
             <h1 id="chon-di-san" className="type-display-l text-on-background">
-              Chọn một di sản để xem dòng thời gian
+              {t.timeline.pickerTitle}
             </h1>
-            <p className="max-w-[760px] type-body-m text-on-surface-variant">
-              Mỗi di sản có dòng thời gian riêng, chia thành các giai đoạn và sự kiện theo thứ tự năm. Di sản chưa có giai đoạn nào sẽ báo rõ khi mở.
-            </p>
+            <p className="max-w-[760px] type-body-m text-on-surface-variant">{t.timeline.pickerText}</p>
           </div>
           <KeywordSearch
             key={keyword}
             value={keyword}
-            placeholder="Tìm nhanh theo tên di sản"
-            externalError={invalid}
+            placeholder={t.timeline.pickerPlaceholder}
+            externalInvalid={invalid}
             onSearch={(next) => setParams(next ? { [FILTER_PARAM.keyword]: next } : {})}
           />
         </div>
       </section>
-      <section aria-label="Danh sách di sản" className="dsv-content py-8">
+      <section aria-label={t.timeline.pickerList} className="dsv-content py-8">
         {result.isError && !data ? (
-          <ErrorState error={result.error} onRetry={() => void result.refetch()} />
+          <PublicErrorState error={result.error} onRetry={() => void result.refetch()} />
         ) : invalid ? null : !data ? (
           <p aria-busy="true" className="type-body-m text-on-surface-variant">
-            Đang tải danh sách di sản…
+            {t.timeline.pickerLoading}
           </p>
         ) : data.items.length === 0 ? (
-          <EmptyState icon="search" title="Không tìm thấy di sản nào">
-            Em hãy thử từ khóa khác.
+          <EmptyState icon="search" title={t.timeline.pickerNone}>
+            {t.timeline.pickerTryOther}
           </EmptyState>
         ) : (
           <ul className="grid grid-cols-1 gap-x-6 gap-y-10 dsvsm:grid-cols-2 dsvmd:grid-cols-3 dsvlg:grid-cols-4">
@@ -253,13 +260,14 @@ function HeritagePicker() {
 
 export function TimelinePage() {
   const { diSan } = useParams();
+  const { t } = useI18n();
   const query = useHeritageTimeline(diSan);
   if (!diSan) return <HeritagePicker />;
   if (query.isError && !query.data) return <HeritageLoadError error={query.error} onRetry={() => void query.refetch()} />;
   if (!query.data) {
     return (
       <div aria-busy="true" aria-live="polite" className="dsv-content py-16">
-        <p className="type-body-m text-on-surface-variant">Đang tải dòng thời gian…</p>
+        <p className="type-body-m text-on-surface-variant">{t.timeline.loading}</p>
       </div>
     );
   }

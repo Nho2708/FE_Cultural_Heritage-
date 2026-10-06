@@ -6,6 +6,7 @@ import { createMemoryRouter } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
 import { createQueryClient } from '../app/queryClient';
 import { routes } from '../app/router';
+import { LanguageProvider } from '../i18n/LanguageProvider';
 import { AuthProvider } from '../lib/auth/AuthProvider';
 import { sessionStore } from '../lib/auth/session';
 import { sessionOf, studentOf } from './fixtures';
@@ -19,7 +20,9 @@ export function renderApp(path: string, state?: unknown) {
     <QueryClientProvider client={createQueryClient()}>
       <ToastProvider>
         <AuthProvider>
-          <RouterProvider router={router} />
+          <LanguageProvider>
+            <RouterProvider router={router} />
+          </LanguageProvider>
         </AuthProvider>
       </ToastProvider>
     </QueryClientProvider>,

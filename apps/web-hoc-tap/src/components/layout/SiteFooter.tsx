@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import { pathOf } from '../../access/screens';
 import { ANDROID_APP_URL } from '../../config/env';
 import { useAuth } from '../../lib/auth/context';
-import { APP_NAME } from './TopBar';
+import { useI18n } from '../../i18n/context';
 
 // Chân trang của web học tập: liên kết khám phá, liên kết học sinh, dòng ghi nguồn nội dung di sản và ghi công ảnh.
 // Chỉ đặt liên kết tới trang đã có; "Tải app cho Android" chỉ hiện khi đã cấu hình địa chỉ tệp cài đặt.
@@ -21,41 +21,41 @@ function Column({ title, children }: { title: string; children: ReactNode }) {
 
 export function SiteFooter() {
   const { user } = useAuth();
+  const { t } = useI18n();
+  const f = t.footer;
   return (
     <footer className="bg-inverse-surface text-inverse-on-surface">
       <div className="dsv-content flex flex-col gap-8 py-12">
         <div className="flex flex-col justify-between gap-8 dsvmd:flex-row">
           <div className="flex max-w-[420px] flex-col gap-2">
-            <p className="type-h3">{APP_NAME}</p>
-            <p className="type-body-s">
-              Nền tảng để trường học và giáo viên tạo bài học, bài kiểm tra về di sản Việt Nam; ai cũng có thể khám phá di sản.
-            </p>
+            <p className="type-h3">{t.brandName}</p>
+            <p className="type-body-s">{f.about}</p>
           </div>
           <div className="flex flex-wrap gap-x-16 gap-y-8">
-            <Column title="Khám phá">
+            <Column title={f.explore}>
               <Link to={pathOf('search')} className={LINK}>
-                Tìm kiếm di sản
+                {f.search}
               </Link>
               <Link to={pathOf('map')} className={LINK}>
-                Bản đồ di sản
+                {f.map}
               </Link>
               <Link to={pathOf('timeline')} className={LINK}>
-                Dòng thời gian
+                {f.timeline}
               </Link>
             </Column>
-            <Column title="Học sinh">
+            <Column title={f.students}>
               {user ? (
                 <Link to={pathOf('learnHome')} className={LINK}>
-                  Trang học của em
+                  {f.studentHome}
                 </Link>
               ) : (
                 <Link to={pathOf('login')} className={LINK}>
-                  Đăng nhập
+                  {f.signIn}
                 </Link>
               )}
               {ANDROID_APP_URL && (
                 <a href={ANDROID_APP_URL} className={LINK}>
-                  Tải app cho Android
+                  {f.android}
                 </a>
               )}
             </Column>
@@ -63,8 +63,8 @@ export function SiteFooter() {
         </div>
         <hr className="border-0 border-t border-inverse-on-surface/30" />
         <div className="flex flex-col justify-between gap-2 type-body-s dsvmd:flex-row">
-          <p>Nội dung di sản tham khảo từ Cục Di sản văn hóa (dsvh.gov.vn). Ảnh từ Wikimedia Commons, ghi công theo từng ảnh.</p>
-          <p className="shrink-0">© 2026 {APP_NAME}</p>
+          <p>{f.source}</p>
+          <p className="shrink-0">{f.copyright}</p>
         </div>
       </div>
     </footer>

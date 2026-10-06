@@ -1,8 +1,10 @@
 import { cn } from '@dsvhvn/dung-chung';
 import type { DiscoveryFilter, FilterCatalog, HeritagePeriod, HeritageType, RecognitionLevel } from '@dsvhvn/dung-chung/api';
 import { Icon } from '@dsvhvn/dung-chung/ui';
+import { useI18n, useT } from '../i18n/context';
+import { periodRangeText } from '../i18n/format';
+import { HERITAGE_TYPE_NAME, PERIOD_NAME, provinceName, RECOGNITION_LEVEL_NAME, REGION_NAME, type RegionValue } from '../i18n/taxonomy';
 import { hasActiveFilter } from './filters';
-import { periodRange } from './format';
 
 // Các ô lọc dùng chung cho trang tìm kiếm và bản đồ: tỉnh, vùng, loại, cấp xếp hạng, thời kỳ. Mỗi ô là <select> thật
 // (bàn phím, gõ chữ đầu để nhảy tới mục, trình đọc màn hình đọc đúng) phủ trong suốt lên khung hiển thị theo thiết kế
@@ -32,7 +34,7 @@ function FilterSelect({ label, value, options, onChange }: { label: string; valu
         )}
       >
         <span className="min-w-0 flex-1 truncate">
-          {label}: {selected?.label ?? 'Tất cả'}
+          {label}: {selected?.label ?? ''}
         </span>
         <Icon name="chevron-down" size={20} className="shrink-0" />
       </div>
@@ -52,8 +54,6 @@ function FilterSelect({ label, value, options, onChange }: { label: string; valu
   );
 }
 
-const ALL: Option = { value: '', label: 'Tất cả' };
-
 interface FilterSelectsProps {
   catalog: FilterCatalog | undefined;
   filter: DiscoveryFilter;
@@ -63,14 +63,29 @@ interface FilterSelectsProps {
   itemClassName?: string;
 }
 
+function isRegion(value: string): value is RegionValue {
+  return value === 'Bắc' || value === 'Trung' || value === 'Nam';
+}
+
 export function FilterSelects({ catalog, filter, onChange, className, itemClassName }: FilterSelectsProps) {
-  const provinces: Option[] = [ALL, ...(catalog?.provinces ?? []).map((p) => ({ value: String(p.id), label: p.name ?? '' }))];
-  const regions: Option[] = [ALL, ...(catalog?.regions ?? [])];
-  const types: Option[] = [ALL, ...(catalog?.heritageTypes ?? [])];
-  const levels: Option[] = [ALL, ...(catalog?.recognitionLevels ?? [])];
+  const { language, t } = useI18n();
+  // Danh mục bộ lọc của máy chủ chỉ có tên tiếng Việt: giá trị (enum, mã vùng, mã thời kỳ) giữ nguyên để lọc, nhãn lấy từ tệp chuỗi.
+  const ALL: Option = { value: '', label: t.filters.all };
+  const named = <T extends string>(table: Record<T, string>, options: ReadonlyArray<{ value: string; label: string }> | undefined): Option[] =>
+    (options ?? []).map((option) => ({ value: option.value, label: table[option.value as T] ?? option.label }));
+  const provinces: Option[] = [ALL, ...(catalog?.provinces ?? []).map((p) => ({ value: String(p.id), label: provinceName(p.name, language) ?? '' }))];
+  const regions: Option[] = [
+    ALL,
+    ...(catalog?.regions ?? []).map((option) => ({ value: option.value, label: isRegion(option.value) ? REGION_NAME[language][option.value] : option.label })),
+  ];
+  const types: Option[] = [ALL, ...named(HERITAGE_TYPE_NAME[language], catalog?.heritageTypes)];
+  const levels: Option[] = [ALL, ...named(RECOGNITION_LEVEL_NAME[language], catalog?.recognitionLevels)];
   const periods: Option[] = [
     ALL,
-    ...(catalog?.periods ?? []).map((period) => ({ value: period.value, label: period.label, menuLabel: `${period.label} (${periodRange(period)})` })),
+    ...(catalog?.periods ?? []).map((period) => {
+      const label = PERIOD_NAME[language][period.value as keyof (typeof PERIOD_NAME)['vi']] ?? period.label;
+      return { value: period.value, label, menuLabel: `${label} (${periodRangeText(period, t, language)})` };
+    }),
   ];
   const item = cn('min-w-0', itemClassName);
   const set = (patch: Partial<DiscoveryFilter>) => onChange({ ...filter, ...patch });
@@ -79,18 +94,18 @@ export function FilterSelects({ catalog, filter, onChange, className, itemClassN
     <div className={className}>
       <div className={item}>
         <FilterSelect
-          label="Tỉnh, thành phố"
+          label={t.filters.province}
           value={filter.provinceId ? String(filter.provinceId) : ''}
           options={provinces}
           onChange={(value) => set({ provinceId: value ? Number(value) : undefined })}
         />
       </div>
       <div className={item}>
-        <FilterSelect label="Vùng" value={filter.region ?? ''} options={regions} onChange={(value) => set({ region: value || undefined })} />
+        <FilterSelect label={t.filters.region} value={filter.region ?? ''} options={regions} onChange={(value) => set({ region: value || undefined })} />
       </div>
       <div className={item}>
         <FilterSelect
-          label="Loại"
+          label={t.filters.type}
           value={filter.heritageType ?? ''}
           options={types}
           onChange={(value) => set({ heritageType: (value || undefined) as HeritageType | undefined })}
@@ -98,7 +113,7 @@ export function FilterSelects({ catalog, filter, onChange, className, itemClassN
       </div>
       <div className={item}>
         <FilterSelect
-          label="Cấp xếp hạng"
+          label={t.filters.level}
           value={filter.recognitionLevel ?? ''}
           options={levels}
           onChange={(value) => set({ recognitionLevel: (value || undefined) as RecognitionLevel | undefined })}
@@ -106,7 +121,7 @@ export function FilterSelects({ catalog, filter, onChange, className, itemClassN
       </div>
       <div className={item}>
         <FilterSelect
-          label="Thời kỳ"
+          label={t.filters.period}
           value={filter.period ?? ''}
           options={periods}
           onChange={(value) => set({ period: (value || undefined) as HeritagePeriod | undefined })}
@@ -118,6 +133,7 @@ export function FilterSelects({ catalog, filter, onChange, className, itemClassN
 
 /** Nút "Xóa bộ lọc": chỉ hiện khi có từ khóa hoặc ô lọc nào đang chọn. */
 export function ClearFilters({ filter, onClear, className }: { filter: DiscoveryFilter; onClear: () => void; className?: string }) {
+  const t = useT();
   if (!hasActiveFilter(filter)) return null;
   return (
     <button
@@ -125,7 +141,7 @@ export function ClearFilters({ filter, onClear, className }: { filter: Discovery
       onClick={onClear}
       className={cn('rounded-xs px-2 type-control text-link underline underline-offset-4 hover:bg-link-hover-bg', className)}
     >
-      Xóa bộ lọc
+      {t.common.clearFilters}
     </button>
   );
 }

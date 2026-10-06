@@ -2,12 +2,10 @@ import { describe, expect, it } from 'vitest';
 import {
   cardSubtitle,
   citationsOf,
-  coordinatesText,
   creditLine,
   displayImageUrl,
   parseContent,
   parseInline,
-  periodRange,
   recognitionText,
   safeUrl,
   sourceSummary,
@@ -32,11 +30,6 @@ describe('chữ hiển thị của trang khám phá', () => {
     expect(creditLine({ author: null, license: 'CC0 1.0', source: ' ', credit: null })).toBe('Ảnh: CC0 1.0');
     expect(creditLine({ author: null, license: null, source: null, credit: 'Ảnh nhóm tự chụp' })).toBe('Ảnh: Ảnh nhóm tự chụp');
     expect(creditLine({ author: null, license: null, source: null, credit: null })).toBeNull();
-  });
-
-  it('tọa độ đọc được theo dấu phẩy thập phân', () => {
-    expect(coordinatesText(16.4694, 107.5778)).toBe('16,4694° B · 107,5778° Đ');
-    expect(coordinatesText(-1.5, -70)).toBe('1,5000° N · 70,0000° T');
   });
 
   it('tách nội dung thành tiêu đề, đoạn và danh sách', () => {
@@ -85,13 +78,6 @@ describe('chữ hiển thị của trang khám phá', () => {
     expect(citations[2]).toMatchObject({ index: 3, name: 'Sách không theo mẫu', agency: '' });
     expect(sourceSummary(citations)).toBe('Nguồn: Cục Di sản văn hóa.');
     expect(sourceSummary([citations[2]!])).toBeNull();
-  });
-
-  it('khoảng năm của thời kỳ, năm âm là trước Công nguyên', () => {
-    expect(periodRange({ fromYear: -179, toYear: 938 })).toBe('179 TCN – 938');
-    expect(periodRange({ fromYear: null, toYear: -180 })).toBe('đến 180 TCN');
-    expect(periodRange({ fromYear: 1945, toYear: null })).toBe('từ 1945');
-    expect(periodRange({ fromYear: null, toYear: null })).toBe('');
   });
 
   it('chỉ nhận địa chỉ http/https', () => {
