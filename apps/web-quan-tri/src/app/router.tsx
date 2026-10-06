@@ -22,6 +22,8 @@ import {
   LessonsPage,
   OwnAreaRoute,
   QuestionBankPage,
+  QuizEditorPage,
+  QuizzesPage,
   SchoolDetailPage,
   SchoolInfoPage,
   SchoolsPage,
@@ -53,6 +55,8 @@ const BUILT: Partial<Record<ScreenKey, ReactNode>> = {
   lessonEditor: <LessonEditorPage />,
   questionBank: <QuestionBankPage />,
   aiQuestions: <AiQuestionsPage />,
+  quizzes: <QuizzesPage />,
+  quizEditor: <QuizEditorPage />,
 };
 
 /** Route (kèm guard) cho các màn hình có URL trong `keys`. `base` là đường dẫn của route cha (thành route index). */
