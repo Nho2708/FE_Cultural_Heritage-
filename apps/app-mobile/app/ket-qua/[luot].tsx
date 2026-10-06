@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Badge, Button, Card, ErrorState, Loading, Screen, Section, Txt, styles as ui } from '../../src/components/ui';
 import { answerLines, type ReviewWords } from '../../src/hocsinh/reviewText';
 import { starsText } from '../../src/hocsinh/format';
+import { Recommendations } from '../../src/hocsinh/Recommendations';
 import { useAuth, useServices } from '../../src/state/AppProvider';
 import { useTheme } from '../../src/theme/ThemeProvider';
 
@@ -131,6 +132,13 @@ export default function ResultScreen() {
     queryFn: async () => (await studentApi.result(attemptId)).data,
   });
 
+  // Gợi ý theo lượt vừa làm: nên làm tiếp, nên ôn, di sản liên quan.
+  const recommendations = useQuery({
+    queryKey: ['student', session?.user.id ?? null, 'result-recommendations', attemptId],
+    enabled: Number.isInteger(attemptId) && session !== null,
+    queryFn: async () => (await studentApi.attemptRecommendations(attemptId)).data,
+  });
+
   if (!session) return <Redirect href="/" />;
   if (query.isLoading) return <Loading label={t('hs.common.loading')} />;
   if (query.isError || !query.data) return <ErrorState message={t('hs.common.error')} retryLabel={t('hs.common.retry')} onRetry={() => void query.refetch()} />;
@@ -185,6 +193,7 @@ export default function ResultScreen() {
       <BadgeList badges={result.badges} level={level} />
       {level === 3 && result.analysis ? <Analysis analysis={result.analysis} /> : null}
       <Review result={result} />
+      {recommendations.data ? <Recommendations data={recommendations.data} /> : null}
 
       <Button label={t('hs.lesson.backHome')} onPress={() => router.replace('/(hoc-sinh)/hoc')} full />
       <Button label={t('hs.tabs.progress')} variant="secondary" onPress={() => router.replace('/(hoc-sinh)/tien-do')} full />
