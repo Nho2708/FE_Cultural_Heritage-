@@ -1,3 +1,5 @@
+import { createAttemptsApi } from './attempts';
+import { createStudentRecommendationsApi } from './recommendations';
 import type { ApiClient, ApiResult } from './client';
 import type { StudentLesson } from './lessons';
 import type { AccessToken, LoginResult, OrganizationRef, SchoolLevel, StudentClassDetail, StudentProfile } from './types';
@@ -117,6 +119,12 @@ export function createStudentApi(client: ApiClient) {
      * và tính vào giới hạn nhập sai (429 khi vượt).
      */
     lessonByCode: (code: string) => client.request<StudentLesson>(STUDENT_ENDPOINTS.lesson(code)),
+
+    /** Làm bài kiểm tra, kết quả, lịch sử, tiến độ và trang học của em. */
+    ...createAttemptsApi(client),
+
+    /** Gợi ý cho em: ở trang học và ở kết quả của một lượt. */
+    ...createStudentRecommendationsApi(client),
   };
 }
 

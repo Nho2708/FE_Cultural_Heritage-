@@ -8,8 +8,9 @@ import { useParams } from 'react-router';
 import { pathOf } from '../access/screens';
 import { heritagePath, mapPathOf, timelinePath } from '../discovery/paths';
 import { useAuth } from '../lib/auth/context';
-import { lessonQueryFn, lessonQueryKey, quizPath } from '../lessons/lessonData';
+import { lessonQueryFn, lessonQueryKey } from '../lessons/lessonData';
 import { readPosition, rememberLesson, writePosition } from '../lessons/recent';
+import { StartQuizDialog } from '../quiz/QuizIntro';
 
 // Bài học (mở bằng mã trên đường dẫn /bai-hoc/<mã>): lấy bài từ máy chủ rồi chọn bố cục theo cấp của lớp em (cấp 1 kể chuyện từng
 // bước, cấp 2 bài đọc và dòng thời gian, cấp 3 tài liệu). Học sinh không chọn bố cục. Mã sai, bài chưa xuất bản hoặc không thuộc
@@ -34,12 +35,12 @@ function CodeProblem({ message }: { message: string }) {
   );
 }
 
-/** Đường dẫn thật của khu học: mở di sản, bản đồ, dòng thời gian, làm bài kiểm tra, về trang học. */
+/** Đường dẫn thật của khu học: mở di sản, bản đồ, dòng thời gian, về trang học; hộp thoại bắt đầu làm bài kiểm tra. */
 const STUDENT_LINKS: LessonLinks = {
   heritage: heritagePath,
   map: mapPathOf,
   timeline: timelinePath,
-  quiz: quizPath,
+  quizDialog: StartQuizDialog,
   home: pathOf('learnHome'),
   preview: false,
 };

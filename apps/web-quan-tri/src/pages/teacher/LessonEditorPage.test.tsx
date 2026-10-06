@@ -3,7 +3,8 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { classOf, envelope, mockApi, userOf, type FetchCall } from '../../test/fixtures';
-import { draftOf, lessonOf, materialsOf, quizOf, quotaOf, sectionOf, studentLessonOf, studentSectionOf } from '../../test/lessonFixtures';
+import { draftOf, lessonOf, lessonRowOf, materialsOf, quizOf as studentQuizOf, quotaOf, sectionOf, studentLessonOf, studentSectionOf } from '../../test/lessonFixtures';
+import { quizOf, quizRowOf } from '../../test/quizFixtures';
 import { renderApp, signInAs } from '../../test/renderApp';
 
 // Soạn bài học: khung nội dung đổi theo cấp của lớp, AI soạn bản nháp, lưu, điều kiện xuất bản, mã bài học, bài đã lưu trữ.
@@ -15,6 +16,9 @@ function api(lesson: LessonDetail, extra?: (call: FetchCall) => Response | undef
       if (call.path === '/me') return envelope(200, { data: userOf('TEACHER') });
       if (call.path === `/teacher/lessons/${lesson.id}` && call.method === 'GET') return envelope(200, { data: lesson });
       if (call.path === `/teacher/lessons/${lesson.id}/materials`) return envelope(200, { data: materialsOf() });
+      if (call.path.startsWith('/teacher/quizzes?')) {
+        return envelope(200, { data: { items: lesson.quizCount > 0 ? [quizRowOf(9, { name: 'Kiểm tra 15 phút', status: 'PUBLISHED' })] : [], page: 1, pageSize: 50, totalItems: lesson.quizCount, totalPages: 1 } });
+      }
       if (call.path.startsWith('/teacher/classes?')) {
         return envelope(200, {
           data: { items: [classOf(1), classOf(2, { name: '10A1', grade: 10, schoolLevel: 3 })], page: 1, pageSize: 100, totalItems: 2, totalPages: 1 },
@@ -318,7 +322,80 @@ describe('Soạn bài học — lưu, xuất bản, mã bài học', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Nhân bản' }));
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/giao-vien/bai-hoc/8'));
-    expect(calls.find((c) => c.path === '/teacher/lessons/5/duplicate')?.body).toEqual({ targetClassId: 2 });
+    expect(calls.find((c) => c.path === '/teacher/lessons/5/duplicate')?.body).toEqual({ targetClassId: 2, includeQuizzes: false });
+  });
+
+  it('nhân bản kèm bài kiểm tra: ô chép kèm mặc định chọn, gửi includeQuizzes, lời nhắc bỏ câu không hợp cấp; bỏ chọn thì không chép', async () => {
+    signInAs('TEACHER');
+    const copy = lessonOf({ id: 8, level: 3, status: 'DRAFT' });
+    const message =
+      'Đã tạo bài học nháp ở lớp 10A1. Đã chép 2 bài kiểm tra thành bản nháp; hãy đặt lại giờ mở và giờ đóng. Bỏ qua 3 câu hỏi đã ẩn hoặc không dùng được ở cấp của lớp.';
+    const calls = api(lessonOf({ status: 'PUBLISHED', accessCode: 'BH7F3K2Q', quizCount: 2, sections: [milestone()] }), (call) => {
+      if (call.path === '/teacher/lessons/5/duplicate') {
+        return envelope(201, { data: { lesson: copy, skippedHeritages: 0, levelNotice: null, copiedQuizzes: 2, skippedQuestions: 3, message }, message });
+      }
+      if (call.path === '/teacher/lessons/8') return envelope(200, { data: copy });
+      if (call.path === '/teacher/lessons/8/materials') return envelope(200, { data: materialsOf() });
+      return undefined;
+    });
+    const user = userEvent.setup();
+    renderApp('/giao-vien/bai-hoc/5');
+
+    await user.click(await screen.findByRole('button', { name: 'Nhân bản sang lớp khác' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Nhân bản bài học sang lớp khác' });
+    expect(within(dialog).getByText(/Cấp 2 · Đã xuất bản · 1 di sản · 2 bài kiểm tra/)).toBeInTheDocument();
+    const copyQuizzes = within(dialog).getByRole('checkbox', { name: 'Chép kèm các bài kiểm tra của bài' });
+    expect(copyQuizzes).toBeChecked();
+    await user.selectOptions(await within(dialog).findByLabelText('Lớp đích'), '2');
+    expect(within(dialog).getByText(/Câu hỏi có dạng không dùng được ở cấp 3 sẽ không được chép/)).toBeInTheDocument();
+
+    await user.click(copyQuizzes);
+    expect(within(dialog).queryByText(/Câu hỏi có dạng không dùng được ở cấp 3 sẽ không được chép/)).not.toBeInTheDocument();
+    await user.click(copyQuizzes);
+    await user.click(within(dialog).getByRole('button', { name: 'Nhân bản' }));
+
+    expect(await screen.findByText(/Đã chép 2 bài kiểm tra thành bản nháp; hãy đặt lại giờ mở và giờ đóng\. Bỏ qua 3 câu hỏi/)).toBeInTheDocument();
+    expect(calls.find((c) => c.path === '/teacher/lessons/5/duplicate')?.body).toEqual({ targetClassId: 2, includeQuizzes: true });
+  });
+
+  it('bài không có bài kiểm tra: hộp nhân bản không có ô chép kèm', async () => {
+    signInAs('TEACHER');
+    api(lessonOf({ status: 'PUBLISHED', accessCode: 'BH7F3K2Q', quizCount: 0, sections: [milestone()] }));
+    const user = userEvent.setup();
+    renderApp('/giao-vien/bai-hoc/5');
+
+    await user.click(await screen.findByRole('button', { name: 'Nhân bản sang lớp khác' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Nhân bản bài học sang lớp khác' });
+    await within(dialog).findByLabelText('Lớp đích');
+    expect(within(dialog).queryByRole('checkbox', { name: /Chép kèm/ })).not.toBeInTheDocument();
+  });
+
+  it('mục bài kiểm tra của bài: liệt kê các bài kiểm tra và tạo bài kiểm tra mới với bài học chọn sẵn', async () => {
+    signInAs('TEACHER');
+    const calls = api(lessonOf({ status: 'PUBLISHED', accessCode: 'BH7F3K2Q', quizCount: 1, sections: [milestone()] }), (call) => {
+      if (call.path === '/teacher/quizzes' && call.method === 'POST') return envelope(201, { data: quizOf({ id: 70 }), message: 'Tạo bài kiểm tra thành công.' });
+      if (call.path === '/teacher/quizzes/70') return envelope(200, { data: quizOf({ id: 70 }) });
+      if (call.path.startsWith('/teacher/lessons?')) {
+        const row = lessonRowOf(5, { title: 'Ngọ Môn và Kinh thành Huế', status: 'PUBLISHED', accessCode: 'BH7F3K2Q' });
+        return envelope(200, { data: { items: [row], page: 1, pageSize: 100, totalItems: 1, totalPages: 1 } });
+      }
+      return undefined;
+    });
+    const user = userEvent.setup();
+    const { router } = renderApp('/giao-vien/bai-hoc/5');
+
+    const list = await screen.findByRole('list', { name: 'Các bài kiểm tra của bài' });
+    expect(within(list).getByRole('link', { name: 'Kiểm tra 15 phút' })).toHaveAttribute('href', '/giao-vien/kiem-tra/9');
+    await user.click(screen.getByRole('button', { name: 'Tạo bài kiểm tra' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Tạo bài kiểm tra' });
+    const radio = await within(dialog).findByRole('radio', { name: 'Ngọ Môn và Kinh thành Huế' });
+    expect(radio).toBeChecked();
+    expect(radio).toBeDisabled();
+    await waitFor(() => expect(within(dialog).getByLabelText('Tên bài kiểm tra')).toHaveValue('Kiểm tra: Ngọ Môn và Kinh thành Huế'));
+    await user.click(within(dialog).getByRole('button', { name: 'Tạo bài kiểm tra' }));
+
+    await waitFor(() => expect(router.state.location.pathname).toBe('/giao-vien/kiem-tra/70'));
+    expect(calls.find((c) => c.method === 'POST' && c.path === '/teacher/quizzes')?.body).toEqual({ lessonId: 5, name: 'Kiểm tra: Ngọ Môn và Kinh thành Huế' });
   });
 });
 
@@ -334,7 +411,7 @@ describe('Soạn bài học — xem như học sinh', () => {
             studentLessonOf(1, {
               accessCode: '',
               sections: [studentSectionOf({ type: 'STORY', title: 'Ngọ Môn là cổng chính.', body: 'Hôm nay Na đến Ngọ Môn.' })],
-              quizzes: [{ ...quizOf(3), state: 'OPEN', stateLabel: 'Đang mở' }],
+              quizzes: [{ ...studentQuizOf(3), state: 'OPEN', stateLabel: 'Đang mở' }],
             }),
           )
         : undefined,
@@ -369,7 +446,7 @@ describe('Soạn bài học — xem như học sinh', () => {
                 studentSectionOf({ type: 'READING', title: 'Bối cảnh', body: 'Đoạn phân tích.' }),
                 studentSectionOf({ type: 'SOURCE_EXCERPT', body: 'Đóng đô ở Đại La.', sourceCitation: 'Chiếu dời đô', sortOrder: 2 }),
               ],
-              quizzes: [{ ...quizOf(3), state: 'OPEN', stateLabel: 'Đang mở' }],
+              quizzes: [{ ...studentQuizOf(3), state: 'OPEN', stateLabel: 'Đang mở' }],
             }),
             'PUBLISHED',
           )

@@ -21,7 +21,7 @@ export type OrganizationState = 'ACTIVE' | 'DEACTIVATED';
 /** `audit_logs.actor_role`: bốn vai trò và `SYSTEM` (tác vụ nền, cổng thanh toán). */
 export type ActorRole = Role | 'SYSTEM';
 
-/** 25 mã thao tác của nhật ký. */
+/** 26 mã thao tác của nhật ký. */
 export type AuditAction =
   | 'LOGIN'
   | 'LOGIN_LOCKED_OUT'
@@ -44,6 +44,7 @@ export type AuditAction =
   | 'QUIZ_PUBLISHED'
   | 'QUIZ_CLOSED'
   | 'QUESTION_HIDDEN'
+  | 'QUESTION_RESTORED'
   | 'PLAN_UPDATED'
   | 'SUBSCRIPTION_CHANGED'
   | 'BILLING_STATUS_CHANGED'

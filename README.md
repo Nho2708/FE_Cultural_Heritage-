@@ -23,6 +23,10 @@ luồng bài học cho lớp theo cấp, AI soạn nội dung, mã bài học: [
 luồng đa ngôn ngữ, AI dịch và tóm tắt di sản, duyệt bản dịch, nghe thuyết minh: [`docs/da-ngon-ngu.md`](docs/da-ngon-ngu.md);
 luồng mô hình 3D di sản (tab Mô hình 3D, trình xem dùng chung, nút Xem 3D): [`docs/mo-hinh-3d.md`](docs/mo-hinh-3d.md);
 luồng gói và thanh toán VNPay (Gói dịch vụ, Trường và gói, Chọn gói và thanh toán, Kết quả thanh toán): [`docs/goi-thanh-toan.md`](docs/goi-thanh-toan.md);
+luồng bài kiểm tra của bài học, nhân bản bài học kèm bài kiểm tra, độ khó của bài học: [`docs/bai-kiem-tra.md`](docs/bai-kiem-tra.md);
+luồng học tập của học sinh theo cấp (làm bài, kết quả, tiến độ): [`docs/hoc-tap-theo-cap.md`](docs/hoc-tap-theo-cap.md);
+luồng thống kê và gợi ý (kết quả bài kiểm tra, tiến độ, thành thạo, hồ sơ học tập, gợi ý cho em): [`docs/thong-ke-goi-y.md`](docs/thong-ke-goi-y.md);
+luồng quản trị và tổng quan (Tổng quan trường, Tổng quan và doanh thu, Kiểm duyệt ngân hàng câu hỏi): [`docs/quan-tri-tong-quan.md`](docs/quan-tri-tong-quan.md);
 kiểm thử trên trình duyệt thật: [`docs/kiem-thu-trinh-duyet.md`](docs/kiem-thu-trinh-duyet.md).
 
 ## Yêu cầu

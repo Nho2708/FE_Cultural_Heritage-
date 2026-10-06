@@ -163,6 +163,8 @@ export const PATHS = {
   school: (id: number) => `/quan-tri/truong/${id}`,
   /** Chi tiết lớp của giáo viên (tab nằm trong tham số `?tab=`). */
   classRoom: (id: number) => `/giao-vien/lop/${id}`,
+  /** Hồ sơ học tập của một học sinh trong lớp. */
+  studentRecord: (classId: number, studentId: number) => `/giao-vien/lop/${classId}/hoc-sinh/${studentId}`,
   /** Soạn bài học của giáo viên. */
   lesson: (id: number) => `/giao-vien/bai-hoc/${id}`,
   /** Sinh và duyệt câu hỏi bằng AI từ một bài học. */
@@ -173,6 +175,10 @@ export const PATHS = {
   schoolInvoices: '/truong/thong-tin?tab=hoa-don',
   /** Chọn gói và thanh toán, chọn sẵn một gói (gia hạn gói hiện tại). */
   planPurchaseFor: (planId: number) => `/truong/chon-goi?goi=${planId}`,
+  /** Soạn và phát hành một bài kiểm tra của giáo viên. */
+  quiz: (id: number) => `/giao-vien/kiem-tra/${id}`,
+  /** Kết quả bài kiểm tra. */
+  quizResults: (id: number) => `/giao-vien/kiem-tra/${id}/ket-qua`,
   /** Biên tập di sản ở trạng thái tạo mới. */
   newHeritage: '/quan-tri/di-san/moi',
   /** Biên tập di sản: sửa một di sản (tab nằm trong tham số `?tab=`). */

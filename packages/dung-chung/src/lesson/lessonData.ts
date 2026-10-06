@@ -20,8 +20,12 @@ export const milestonesOf = (lesson: StudentLesson): StudentSection[] =>
 /** Bài kiểm tra em làm được ngay: đang mở hoặc em đang làm dở. */
 export const canTakeQuiz = (quiz: StudentQuiz) => quiz.state === 'OPEN' || quiz.state === 'IN_PROGRESS';
 
+/** Bài kiểm tra có nút mở hộp thoại: làm được ngay, hoặc đã nộp (xem kết quả). */
+export const canOpenQuiz = (quiz: StudentQuiz) => canTakeQuiz(quiz) || quiz.state === 'SUBMITTED';
+
 export function quizActionLabel(quiz: StudentQuiz): string | null {
   if (quiz.state === 'OPEN') return 'Làm bài';
   if (quiz.state === 'IN_PROGRESS') return 'Làm tiếp';
+  if (quiz.state === 'SUBMITTED') return 'Xem kết quả';
   return null;
 }

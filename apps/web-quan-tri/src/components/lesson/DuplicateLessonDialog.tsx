@@ -1,6 +1,6 @@
 import { splitApiError } from '@dsvhvn/dung-chung';
 import type { ClassRoom, DuplicateLessonResult } from '@dsvhvn/dung-chung/api';
-import { Badge, Button, ErrorState, Icon, InlineMessage, LoadingState, Modal, SelectField } from '@dsvhvn/dung-chung/ui';
+import { Badge, Button, CheckboxField, ErrorState, Icon, InlineMessage, LoadingState, Modal, SelectField } from '@dsvhvn/dung-chung/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
 import { classesApi } from '../../lib/api/classroomEndpoints';
@@ -9,7 +9,8 @@ import { queryKeys } from '../../lib/api/queryKeys';
 
 // Nhân bản bài học sang lớp khác: chọn một lớp khác của chính giáo viên (khối lớp hiện kèm để tránh chọn nhầm cấp). Tạo bài Nháp
 // mới chưa có mã, chép nội dung, các phần và các di sản đang xuất bản; di sản đã ẩn bị bỏ. Lớp đích khác cấp thì vẫn chép, kèm lời nhắc
-// xem lại hoặc nhờ AI soạn lại. Cần gói hiệu lực; không tốn lượt AI.
+// xem lại hoặc nhờ AI soạn lại. Chép kèm các bài kiểm tra của bài (mặc định chọn khi bài có bài kiểm tra): mỗi bài kiểm tra thành bản
+// Nháp, bỏ giờ mở và giờ đóng, bỏ câu đã ẩn và câu có dạng không dùng được ở cấp của lớp đích. Cần gói hiệu lực; không tốn lượt AI.
 
 export interface DuplicateSource {
   id: number;
@@ -18,6 +19,8 @@ export interface DuplicateSource {
   className: string | null;
   schoolLevel: number;
   heritageCount: number;
+  /** Số bài kiểm tra của bài nguồn; có thì hiện ô "Chép kèm các bài kiểm tra của bài". */
+  quizCount?: number;
   isPublished: boolean;
 }
 
@@ -29,6 +32,7 @@ interface DuplicateLessonDialogProps {
 
 export function DuplicateLessonDialog({ source, onDone, onClose }: DuplicateLessonDialogProps) {
   const [target, setTarget] = useState('');
+  const [includeQuizzes, setIncludeQuizzes] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [fieldError, setFieldError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -39,6 +43,7 @@ export function DuplicateLessonDialog({ source, onDone, onClose }: DuplicateLess
   });
   const others: ClassRoom[] = (classes.data?.items ?? []).filter((c) => c.id !== source.classId);
   const chosen = others.find((c) => String(c.id) === target);
+  const hasQuizzes = (source.quizCount ?? 0) > 0;
   const differentLevel = chosen !== undefined && chosen.schoolLevel !== source.schoolLevel;
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
@@ -51,7 +56,7 @@ export function DuplicateLessonDialog({ source, onDone, onClose }: DuplicateLess
     setFieldError(null);
     setSaving(true);
     try {
-      onDone((await lessonsApi.duplicate(source.id, chosen.id)).data);
+      onDone((await lessonsApi.duplicate(source.id, chosen.id, hasQuizzes && includeQuizzes)).data);
     } catch (err) {
       const failure = splitApiError<'targetClassId'>(err, ['targetClassId']);
       setFieldError(failure.fields.targetClassId ?? null);
@@ -75,6 +80,7 @@ export function DuplicateLessonDialog({ source, onDone, onClose }: DuplicateLess
               </p>
               <p className="type-body-s text-on-surface-variant">
                 Cấp {source.schoolLevel} · {source.isPublished ? 'Đã xuất bản' : 'Chưa xuất bản'} · {source.heritageCount} di sản
+                {hasQuizzes ? ` · ${source.quizCount} bài kiểm tra` : ''}
               </p>
             </div>
           </div>
@@ -108,6 +114,7 @@ export function DuplicateLessonDialog({ source, onDone, onClose }: DuplicateLess
           <InlineMessage tone="warning">
             Lớp {chosen.name} thuộc cấp {chosen.schoolLevel}, khác cấp {source.schoolLevel} của bài gốc. Nội dung đang theo khung của cấp bài gốc;
             bạn nên xem lại hoặc nhờ AI soạn lại cho đúng cấp.
+            {hasQuizzes && includeQuizzes && ` Câu hỏi có dạng không dùng được ở cấp ${chosen.schoolLevel} sẽ không được chép.`}
           </InlineMessage>
         )}
         {chosen && !differentLevel && (
@@ -116,8 +123,19 @@ export function DuplicateLessonDialog({ source, onDone, onClose }: DuplicateLess
           </p>
         )}
 
+        {hasQuizzes && (
+          <CheckboxField
+            label="Chép kèm các bài kiểm tra của bài"
+            checked={includeQuizzes}
+            onChange={(e) => setIncludeQuizzes(e.target.checked)}
+            hint="Các bài kiểm tra được chép thành bài kiểm tra Nháp; giờ mở và giờ đóng để trống."
+          />
+        )}
+
         <p className="type-body-s text-on-surface-variant">
-          Bài học mới ở trạng thái Nháp, chưa có mã bài học. Di sản đã ẩn không được chép. Không chép bài kiểm tra và lượt làm bài của học sinh.
+          Bài học mới ở trạng thái Nháp, chưa có mã bài học. Di sản đã ẩn không được chép.{' '}
+          {hasQuizzes && includeQuizzes ? 'Câu hỏi đã bị ẩn cũng không được chép. ' : hasQuizzes ? 'Không chép bài kiểm tra. ' : ''}
+          Không chép lượt làm bài của học sinh.
         </p>
 
         <div className="flex flex-wrap justify-end gap-3">

@@ -47,7 +47,7 @@ describe('Trang học của em — ba bản bố cục theo cấp', () => {
     expect(await screen.findByRole('navigation', { name: 'Mục lục' })).toBeInTheDocument();
     expect(document.querySelector('[data-bo-cuc]')).toHaveAttribute('data-bo-cuc', 'cap-3');
     expect(screen.getByRole('link', { name: 'Việc cần làm' })).toHaveAttribute('href', '#viec-can-lam');
-    expect(document.querySelector('figure[data-bo-hinh]')).toHaveAttribute('data-bo-hinh', 'toi-gian');
+    await waitFor(() => expect(document.querySelector('figure[data-bo-hinh]')).toHaveAttribute('data-bo-hinh', 'toi-gian'));
     expect(screen.getByText('Cấp 3 (Trung học phổ thông)')).toBeInTheDocument();
   });
 

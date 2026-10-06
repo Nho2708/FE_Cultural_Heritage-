@@ -34,20 +34,16 @@ const TEACHER: readonly NavSpec[] = [
   { screen: 'quizzes', label: 'Bài kiểm tra', icon: 'check' },
 ];
 
-/**
- * Thanh bên /truong: Tổng quan · Trường và gói · Giáo viên. Tới khi màn hình Tổng quan trường được dựng, /truong chuyển
- * tới Giáo viên của trường nên chưa có mục "Tổng quan".
- */
+/** Thanh bên /truong: Tổng quan · Trường và gói · Giáo viên. */
 const SCHOOL: readonly NavSpec[] = [
+  { screen: 'schoolOverview', label: 'Tổng quan', icon: 'bar-chart' },
   { screen: 'schoolInfo', label: 'Trường và gói', icon: 'building' },
   { screen: 'schoolTeachers', label: 'Giáo viên', icon: 'users' },
 ];
 
-/**
- * Thanh bên /quan-tri: Tổng quan · Trường · Di sản · Bản dịch · Câu hỏi · Gói dịch vụ · Nhật ký. Tới khi màn hình Tổng quan và
- * doanh thu được dựng, /quan-tri chuyển tới Quản lý trường nên chưa có mục "Tổng quan".
- */
+/** Thanh bên /quan-tri: Tổng quan · Trường · Di sản · Bản dịch · Câu hỏi · Gói dịch vụ · Nhật ký. */
 const ADMIN: readonly NavSpec[] = [
+  { screen: 'adminOverview', label: 'Tổng quan', icon: 'bar-chart' },
   { screen: 'schools', label: 'Trường', icon: 'building' },
   { screen: 'heritages', label: 'Di sản', icon: 'map-pin' },
   { screen: 'translationReview', label: 'Bản dịch', icon: 'languages' },

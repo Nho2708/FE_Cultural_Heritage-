@@ -10,5 +10,3 @@ export const lessonQueryKey = (code: string) => ['student', 'lesson', code] as c
 export const lessonQueryFn = (code: string) => () => studentApi.lessonByCode(code).then((r) => r.data);
 
 export const lessonPath = (code: string) => `${pathOf('lesson').replace(':maBaiHoc', '')}${encodeURIComponent(code)}`;
-
-export const quizPath = (code: string, quizId: number) => `${lessonPath(code)}/kiem-tra/${quizId}`;

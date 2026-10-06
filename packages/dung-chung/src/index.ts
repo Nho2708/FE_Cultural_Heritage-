@@ -3,6 +3,7 @@
 // diện web ở `/ui`, bộ giao diện theo cấp học ở `/theme`, CSS token ở `/styles/*`.
 
 export * from './billing';
+export * from './attempts';
 export * from './cn';
 export * from './files';
 export * from './format';
@@ -12,8 +13,11 @@ export * from './lessons';
 export * from './messages';
 export * from './model3d';
 export * from './questions';
+export * from './quizzes';
 export * from './validation/classroom';
 export * from './validation/fields';
 export * from './validation/heritage';
 export * from './validation/password';
 export * from './validation/studentCode';
+export * from './statistics';
+export * from './overview';
