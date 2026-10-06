@@ -62,6 +62,8 @@ export interface RequestOptions {
   body?: unknown;
   /** Tham số query; giá trị rỗng, null, undefined bị bỏ qua. */
   query?: Record<string, QueryValue>;
+  /** Chỉ khi gửi FormData: gọi mỗi khi có thêm byte được gửi đi, `fraction` từ 0 đến 1 (dùng XMLHttpRequest vì fetch không báo tiến độ gửi). */
+  onUploadProgress?: (fraction: number) => void;
   /** Endpoint cần đăng nhập: gắn Bearer. Mặc định true. */
   auth?: boolean;
   signal?: AbortSignal;
@@ -136,6 +138,39 @@ async function readEnvelope<T>(response: Response): Promise<ApiEnvelope<T> | nul
   }
 }
 
+/** Gửi FormData bằng XMLHttpRequest để có tiến độ tải lên; trả về một Response như fetch để phần còn lại của tầng này dùng chung. */
+function sendWithProgress(
+  url: string,
+  method: string,
+  headers: Record<string, string>,
+  body: FormData,
+  onProgress: (fraction: number) => void,
+  signal?: AbortSignal,
+): Promise<Response> {
+  return new Promise<Response>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, url);
+    for (const [name, value] of Object.entries(headers)) xhr.setRequestHeader(name, value);
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable && event.total > 0) onProgress(Math.min(1, event.loaded / event.total));
+    };
+    xhr.onload = () => {
+      onProgress(1);
+      // Mã 204/205 không được có thân trong Response.
+      const empty = xhr.status === 204 || xhr.status === 205;
+      resolve(new Response(empty ? null : xhr.responseText, { status: xhr.status, headers: { 'Content-Type': xhr.getResponseHeader('Content-Type') ?? 'application/json' } }));
+    };
+    xhr.onerror = () => reject(new ApiError(0, ERROR_CODES.systemError, MESSAGES.systemError));
+    xhr.ontimeout = xhr.onerror;
+    xhr.onabort = () => reject(new DOMException('Đã hủy.', 'AbortError'));
+    if (signal) {
+      if (signal.aborted) return reject(new DOMException('Đã hủy.', 'AbortError'));
+      signal.addEventListener('abort', () => xhr.abort(), { once: true });
+    }
+    xhr.send(body);
+  });
+}
+
 export function createApiClient({ baseUrl, getAccessToken, onUnauthorized }: ApiClientOptions): ApiClient {
   async function send(path: string, options: RequestOptions, accessToken: string | null): Promise<Response> {
     const headers: Record<string, string> = {
@@ -145,8 +180,12 @@ export function createApiClient({ baseUrl, getAccessToken, onUnauthorized }: Api
     const isForm = typeof FormData !== 'undefined' && options.body instanceof FormData;
     if (options.body !== undefined && !isForm) headers['Content-Type'] = 'application/json';
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+    const url = `${baseUrl}${withQuery(path, options.query)}`;
+    if (isForm && options.onUploadProgress && typeof XMLHttpRequest !== 'undefined') {
+      return sendWithProgress(url, options.method ?? 'POST', headers, options.body as FormData, options.onUploadProgress, options.signal);
+    }
     try {
-      return await fetch(`${baseUrl}${withQuery(path, options.query)}`, {
+      return await fetch(url, {
         method: options.method ?? 'GET',
         headers,
         body: options.body === undefined ? undefined : isForm ? (options.body as FormData) : JSON.stringify(options.body),
@@ -174,7 +213,11 @@ export function createApiClient({ baseUrl, getAccessToken, onUnauthorized }: Api
     if (token && response.status === 401) {
       onUnauthorized?.({ token, errorCode: envelope?.errorCode ?? null, message: envelope?.message ?? null });
     }
-    if (!envelope) throw new ApiError(response.status, ERROR_CODES.systemError, MESSAGES.systemError);
+    if (!envelope) {
+      // Máy chủ cắt yêu cầu quá cỡ trước khi tới ứng dụng nên không có khuôn phản hồi.
+      const tooLarge = response.status === 413;
+      throw new ApiError(response.status, tooLarge ? ERROR_CODES.invalid : ERROR_CODES.systemError, tooLarge ? MESSAGES.invalid('Tệp tải lên', 'vượt quá dung lượng cho phép') : MESSAGES.systemError);
+    }
     throw new ApiError(
       response.status,
       envelope.errorCode ?? ERROR_CODES.systemError,

@@ -84,6 +84,8 @@ export interface HeritageMedia {
   source: string | null;
   sortOrder: number | null;
   isThumbnail: boolean;
+  /** Ảnh thu nhỏ (WEBP, cạnh dài tối đa 320 điểm ảnh) của ảnh tải lên; null với ảnh thêm bằng đường dẫn. */
+  previewUrl?: string | null;
 }
 
 export interface HeritageEvent {

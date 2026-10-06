@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { createBaseMap, loadLeaflet, pinIcon } from './leafletBase';
+import { createBaseMap, loadLeaflet, pinIcon } from '@dsvhvn/dung-chung/map/base';
 
 // Bản đồ nhỏ ở trang chi tiết di sản: nền OpenStreetMap, một ghim đang chọn và tên địa phương bên cạnh. Không cuộn chuột
 // để phóng (không kẹt cuộn trang); trên màn hình cảm ứng tắt kéo bản đồ một ngón để trang vẫn cuộn được.

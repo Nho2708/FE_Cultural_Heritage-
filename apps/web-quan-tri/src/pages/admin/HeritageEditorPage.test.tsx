@@ -358,6 +358,106 @@ describe('Biên tập di sản — sửa, xuất bản, ẩn', () => {
   });
 });
 
+describe('Biên tập di sản — chọn tọa độ trên bản đồ', () => {
+  const lat = () => screen.getByLabelText('Vĩ độ') as HTMLInputElement;
+  const lng = () => screen.getByLabelText('Kinh độ') as HTMLInputElement;
+  const mapOf = async () => {
+    await waitFor(() => expect(document.querySelector('.leaflet-container')).not.toBeNull());
+    return document.querySelector('.leaflet-container') as HTMLElement;
+  };
+
+  it('có bản đồ OpenStreetMap kèm Hoàng Sa, Trường Sa; đặt ghim đúng tọa độ đã lưu và ghi công bản đồ', async () => {
+    signInAs('ADMIN');
+    api({ detail: heritageDetailOf({ latitude: 16.4637, longitude: 107.5909 }) });
+    renderApp('/quan-tri/di-san/1');
+
+    await screen.findByLabelText('Vĩ độ');
+    await waitFor(() => expect(document.querySelector('.dsv-pin--selected')).not.toBeNull());
+    const map = await mapOf();
+    expect(map.textContent).toContain('Quần đảo Hoàng Sa (Việt Nam)');
+    expect(map.textContent).toContain('Quần đảo Trường Sa (Việt Nam)');
+    expect(map.querySelector('.leaflet-control-attribution')?.textContent).toContain('Những người đóng góp OpenStreetMap');
+    expect(screen.getByRole('region', { name: 'Bản đồ chọn tọa độ' })).toBeInTheDocument();
+  });
+
+  it('bấm lên bản đồ điền hai ô số bằng tọa độ làm tròn 6 chữ số, ô số vẫn nhập tay được và lưu gửi đúng số', async () => {
+    signInAs('ADMIN');
+    const state = { detail: heritageDetailOf({ latitude: 16.4637, longitude: 107.5909 }) };
+    const calls = api(state, (call) =>
+      call.path === '/admin/heritages/1' && call.method === 'PUT' ? envelope(200, { data: state.detail, message: 'Lưu di sản thành công.' }) : undefined,
+    );
+    const user = userEvent.setup();
+    renderApp('/quan-tri/di-san/1');
+
+    await screen.findByLabelText('Vĩ độ');
+    await waitFor(() => expect(document.querySelector('.dsv-pin--selected')).not.toBeNull());
+    const map = await mapOf();
+    // Bản đồ đang đặt tâm ở ghim: bấm lệch khỏi tâm 60 điểm ảnh sang phải và 40 xuống dưới.
+    fireEvent.click(map, { clientX: 180 + 60, clientY: 144 + 40 });
+
+    await waitFor(() => expect(lat().value).not.toBe('16.4637'));
+    const pickedLat = Number(lat().value);
+    const pickedLng = Number(lng().value);
+    expect(pickedLat).toBeLessThan(16.4637);
+    expect(pickedLat).toBeGreaterThan(16.3);
+    expect(pickedLng).toBeGreaterThan(107.5909);
+    expect(pickedLng).toBeLessThan(107.7);
+    expect(lat().value).toMatch(/^\d+(\.\d{1,6})?$/);
+
+    // Ô số vẫn là nơi nhập chính xác.
+    await user.clear(lat());
+    await user.type(lat(), '16,5');
+    await user.click(screen.getByRole('button', { name: 'Lưu nháp' }));
+
+    expect(await screen.findByText('Lưu di sản thành công.')).toBeInTheDocument();
+    const body = calls.find((c) => c.method === 'PUT')?.body as { latitude: number; longitude: number };
+    expect(body.latitude).toBe(16.5);
+    expect(body.longitude).toBe(pickedLng);
+  });
+
+  it('chưa có tọa độ: bản đồ chưa có ghim; bấm lên bản đồ đặt tọa độ đầu tiên, nút Xóa tọa độ bỏ cả hai ô', async () => {
+    signInAs('ADMIN');
+    api({ detail: heritageDetailOf({ latitude: null, longitude: null }) });
+    const user = userEvent.setup();
+    renderApp('/quan-tri/di-san/1');
+
+    await screen.findByLabelText('Vĩ độ');
+    const map = await mapOf();
+    await waitFor(() => expect(map.querySelector('.leaflet-control-attribution')).not.toBeNull());
+    expect(document.querySelector('.dsv-pin--selected')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Xóa tọa độ' })).not.toBeInTheDocument();
+
+    fireEvent.click(map, { clientX: 180, clientY: 144 });
+    await waitFor(() => expect(lat().value).not.toBe(''));
+    expect(Number(lat().value)).toBeGreaterThanOrEqual(8);
+    expect(Number(lat().value)).toBeLessThanOrEqual(23.5);
+    expect(Number(lng().value)).toBeGreaterThanOrEqual(102);
+    expect(Number(lng().value)).toBeLessThanOrEqual(117.5);
+    await waitFor(() => expect(document.querySelector('.dsv-pin--selected')).not.toBeNull());
+
+    await user.click(screen.getByRole('button', { name: 'Xóa tọa độ' }));
+    expect(lat()).toHaveValue('');
+    expect(lng()).toHaveValue('');
+    await waitFor(() => expect(document.querySelector('.dsv-pin--selected')).toBeNull());
+  });
+
+  it('gõ tọa độ vào ô số thì ghim trên bản đồ theo ngay; gõ ngoài lãnh thổ thì bản đồ không đặt ghim', async () => {
+    signInAs('ADMIN');
+    api({ detail: heritageDetailOf({ latitude: null, longitude: null }) });
+    const user = userEvent.setup();
+    renderApp('/quan-tri/di-san/1');
+
+    await screen.findByLabelText('Vĩ độ');
+    await user.type(lat(), '21,0285');
+    await user.type(lng(), '105,8542');
+    await waitFor(() => expect(document.querySelector('.dsv-pin--selected')).not.toBeNull());
+
+    await user.clear(lat());
+    await user.type(lat(), '40');
+    await waitFor(() => expect(document.querySelector('.dsv-pin--selected')).toBeNull());
+  });
+});
+
 describe('Biên tập di sản — tab Ảnh và media', () => {
   it('thêm ảnh: ghi công đủ ba phần, giấy phép hạn chế bị chặn, gửi đúng thân yêu cầu', async () => {
     signInAs('ADMIN');
@@ -371,7 +471,7 @@ describe('Biên tập di sản — tab Ảnh và media', () => {
 
     const first = (await screen.findByText('Ảnh số 1')).closest('li')!;
     expect(within(first).getByText('Ảnh đại diện')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Thêm ảnh' }));
+    await user.click(screen.getByRole('button', { name: 'Thêm bằng đường dẫn' }));
     const dialog = await screen.findByRole('dialog', { name: 'Thêm ảnh và media' });
 
     await user.click(within(dialog).getByRole('button', { name: 'Lưu' }));
@@ -406,6 +506,140 @@ describe('Biên tập di sản — tab Ảnh và media', () => {
       source: 'Wikimedia Commons',
       sortOrder: null,
       setAsThumbnail: true,
+    });
+  });
+
+  describe('tải ảnh lên', () => {
+    const jpg = () => new File([new Uint8Array(2048)], 'ngo-mon.jpg', { type: 'image/jpeg' });
+
+    const openUpload = async (user: ReturnType<typeof userEvent.setup>) => {
+      await user.click(await screen.findByRole('button', { name: 'Tải ảnh lên' }));
+      return screen.findByRole('dialog', { name: 'Tải ảnh lên' });
+    };
+
+    const fillCredit = async (user: ReturnType<typeof userEvent.setup>, dialog: HTMLElement) => {
+      await user.type(within(dialog).getByLabelText('Chú thích'), 'Ngọ Môn');
+      await user.type(within(dialog).getByLabelText('Tác giả'), 'Nhóm sản phẩm');
+      await user.type(within(dialog).getByLabelText('Giấy phép'), 'Ảnh nhóm tự chụp');
+      await user.type(within(dialog).getByLabelText('Nguồn'), 'Chuyến thực địa');
+    };
+
+    it('chưa chọn tệp và chưa ghi công thì báo từng ô, không gọi API', async () => {
+      signInAs('ADMIN');
+      const calls = api({ detail: heritageDetailOf({ media: [heritageMediaOf(1, { isThumbnail: true })] }) });
+      const user = userEvent.setup();
+      renderApp('/quan-tri/di-san/1?tab=anh');
+
+      const dialog = await openUpload(user);
+      expect(within(dialog).queryByLabelText('Đường dẫn')).not.toBeInTheDocument();
+      await user.click(within(dialog).getByRole('button', { name: 'Tải lên' }));
+
+      expect(await within(dialog).findByText('Vui lòng nhập tệp ảnh.')).toBeInTheDocument();
+      expect(within(dialog).getByText('Vui lòng nhập tác giả.')).toBeInTheDocument();
+      expect(within(dialog).getByText('Vui lòng nhập giấy phép.')).toBeInTheDocument();
+      expect(within(dialog).getByText('Vui lòng nhập nguồn ảnh.')).toBeInTheDocument();
+      expect(calls.some((c) => c.path.endsWith('/media/upload'))).toBe(false);
+    });
+
+    it('tệp sai định dạng hoặc quá 5 MB bị từ chối ngay khi chọn, kèm câu giống backend', async () => {
+      signInAs('ADMIN');
+      const calls = api({ detail: heritageDetailOf({ media: [heritageMediaOf(1, { isThumbnail: true })] }) });
+      const user = userEvent.setup({ applyAccept: false });
+      renderApp('/quan-tri/di-san/1?tab=anh');
+
+      const dialog = await openUpload(user);
+      const input = within(dialog).getByLabelText('Chọn tệp ảnh');
+      await user.upload(input, new File(['GIF89a'], 'anh-dong.gif', { type: 'image/gif' }));
+      expect(await within(dialog).findByText('Tệp ảnh không hợp lệ: chỉ nhận định dạng JPG, PNG hoặc WEBP.')).toBeInTheDocument();
+
+      await user.upload(input, new File(['MZ'], 'ung-dung.jpg', { type: 'application/x-msdownload' }));
+      expect(await within(dialog).findByText('Tệp ảnh không hợp lệ: chỉ nhận định dạng JPG, PNG hoặc WEBP.')).toBeInTheDocument();
+
+      const big = new File([new Uint8Array(6 * 1024 * 1024)], 'to.png', { type: 'image/png' });
+      await user.upload(input, big);
+      expect(await within(dialog).findByText('Tệp ảnh không hợp lệ: tối đa 5 MB, tệp này 6,0 MB.')).toBeInTheDocument();
+
+      await fillCredit(user, dialog);
+      await user.click(within(dialog).getByRole('button', { name: 'Tải lên' }));
+      expect(within(dialog).getByText('Tệp ảnh không hợp lệ: tối đa 5 MB, tệp này 6,0 MB.')).toBeInTheDocument();
+      expect(calls.some((c) => c.path.endsWith('/media/upload'))).toBe(false);
+    });
+
+    it('tải một ảnh JPG: gửi multipart đủ tệp và ghi công, chọn luôn làm ảnh đại diện khi chưa có, rồi đóng và làm mới danh sách', async () => {
+      signInAs('ADMIN');
+      const state = { detail: heritageDetailOf({ media: [] }) };
+      const calls = api(state, (call) => {
+        if (call.path === '/admin/heritages/1/media/upload' && call.method === 'POST') {
+          state.detail = heritageDetailOf({
+            media: [heritageMediaOf(5, { url: '/files/images/ab12.jpg', previewUrl: '/files/images/ab12-thumb.webp', caption: 'Ngọ Môn', isThumbnail: true })],
+          });
+          return envelope(201, { data: state.detail.media[0], message: 'Tải ảnh lên thành công.' });
+        }
+        return undefined;
+      });
+      const user = userEvent.setup();
+      renderApp('/quan-tri/di-san/1?tab=anh');
+
+      const dialog = await openUpload(user);
+      await user.upload(within(dialog).getByLabelText('Chọn tệp ảnh'), jpg());
+      expect(await within(dialog).findByText('ngo-mon.jpg')).toBeInTheDocument();
+      expect(within(dialog).getByText('2 KB')).toBeInTheDocument();
+      // Chưa có ảnh đại diện: mặc định đề nghị chọn ảnh vừa tải.
+      expect(within(dialog).getByLabelText('Dùng làm ảnh đại diện của di sản')).toBeChecked();
+      await fillCredit(user, dialog);
+      await user.click(within(dialog).getByRole('button', { name: 'Tải lên' }));
+
+      expect(await screen.findByText('Tải ảnh lên thành công.')).toBeInTheDocument();
+      expect(calls.find((c) => c.path.endsWith('/media/upload'))?.body).toEqual({
+        file: { fileName: 'ngo-mon.jpg', size: 2048 },
+        author: 'Nhóm sản phẩm',
+        license: 'Ảnh nhóm tự chụp',
+        source: 'Chuyến thực địa',
+        caption: 'Ngọ Môn',
+        setAsThumbnail: 'true',
+      });
+      await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Tải ảnh lên' })).not.toBeInTheDocument());
+      // Danh sách dùng ảnh thu nhỏ, ghép với địa chỉ máy chủ API vì đường dẫn trong kho là tương đối.
+      const row = (await screen.findByText('Ngọ Môn')).closest('li')!;
+      expect(row.querySelector('img')).toHaveAttribute('src', 'http://api.test/files/images/ab12-thumb.webp');
+      expect(within(row).getByText('Ảnh đại diện')).toBeInTheDocument();
+    });
+
+    it('đã có ảnh đại diện thì không tự chọn ảnh mới làm ảnh đại diện', async () => {
+      signInAs('ADMIN');
+      const calls = api({ detail: heritageDetailOf({ media: [heritageMediaOf(1, { isThumbnail: true })] }) }, (call) =>
+        call.path.endsWith('/media/upload') ? envelope(201, { data: heritageMediaOf(2), message: 'Tải ảnh lên thành công.' }) : undefined,
+      );
+      const user = userEvent.setup();
+      renderApp('/quan-tri/di-san/1?tab=anh');
+
+      const dialog = await openUpload(user);
+      expect(within(dialog).getByLabelText('Dùng làm ảnh đại diện của di sản')).not.toBeChecked();
+      await user.upload(within(dialog).getByLabelText('Chọn tệp ảnh'), jpg());
+      await fillCredit(user, dialog);
+      await user.click(within(dialog).getByRole('button', { name: 'Tải lên' }));
+
+      await screen.findByText('Tải ảnh lên thành công.');
+      expect(calls.find((c) => c.path.endsWith('/media/upload'))?.body).not.toHaveProperty('setAsThumbnail');
+    });
+
+    it('backend từ chối tệp (nội dung không phải ảnh) thì báo dưới ô tệp và giữ hộp thoại để chọn lại', async () => {
+      signInAs('ADMIN');
+      const message = 'Tệp ảnh không hợp lệ: không đọc được, tệp không phải ảnh hoặc đã bị hỏng.';
+      api({ detail: heritageDetailOf({ media: [heritageMediaOf(1, { isThumbnail: true })] }) }, (call) =>
+        call.path.endsWith('/media/upload') ? envelope(400, { errorCode: 'INVALID', message, errors: { file: message } }) : undefined,
+      );
+      const user = userEvent.setup();
+      renderApp('/quan-tri/di-san/1?tab=anh');
+
+      const dialog = await openUpload(user);
+      await user.upload(within(dialog).getByLabelText('Chọn tệp ảnh'), jpg());
+      await fillCredit(user, dialog);
+      await user.click(within(dialog).getByRole('button', { name: 'Tải lên' }));
+
+      expect(await within(dialog).findByText(message)).toBeInTheDocument();
+      expect(screen.getByRole('dialog', { name: 'Tải ảnh lên' })).toBeInTheDocument();
+      expect(within(dialog).getByText('ngo-mon.jpg')).toBeInTheDocument();
     });
   });
 

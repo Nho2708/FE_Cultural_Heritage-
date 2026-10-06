@@ -1,5 +1,6 @@
-import { RECOGNITION_LEVEL_LABEL, formatYear, parseReferenceTitle } from '@dsvhvn/dung-chung';
+import { RECOGNITION_LEVEL_LABEL, formatYear, parseReferenceTitle, resolveFileUrl } from '@dsvhvn/dung-chung';
 import type { HeritageCard, PeriodOption, PublicMedia, PublicReference, RecognitionLevel } from '@dsvhvn/dung-chung/api';
+import { API_BASE_URL } from '../config/env';
 
 // Chữ hiển thị của trang khám phá, tách khỏi component để kiểm bằng test đơn vị.
 
@@ -123,11 +124,15 @@ export function sourceSummary(citations: Citation[]): string | null {
   return agencies.length ? `Nguồn: ${agencies.join('; ')}.` : null;
 }
 
-/** Địa chỉ chỉ nhận http/https để không chèn địa chỉ lạ vào thuộc tính src hoặc href. */
+/**
+ * Địa chỉ chỉ nhận http/https để không chèn địa chỉ lạ vào thuộc tính src hoặc href. Ảnh tải lên kho tệp của nền tảng có thể
+ * là đường dẫn tương đối `/files/...` (khi máy chủ không cấu hình địa chỉ công khai): ghép với máy chủ API.
+ */
 export function safeUrl(url: string | null | undefined): string | null {
-  if (!url) return null;
+  const full = resolveFileUrl(url, API_BASE_URL);
+  if (!full) return null;
   try {
-    const parsed = new URL(url);
+    const parsed = new URL(full);
     return parsed.protocol === 'https:' || parsed.protocol === 'http:' ? parsed.href : null;
   } catch {
     return null;

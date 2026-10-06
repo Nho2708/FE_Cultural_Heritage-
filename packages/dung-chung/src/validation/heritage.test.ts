@@ -5,6 +5,7 @@ import {
   endsBeforeStart,
   isAllowedLicense,
   isValidDay,
+  isStoredImagePath,
   isValidSlug,
   parseDecimal,
   parseInteger,
@@ -12,6 +13,7 @@ import {
   validateEvent,
   validateHeritage,
   validateMedia,
+  validateMediaUpload,
   validateReference,
   validateTimeline,
   type EventValues,
@@ -275,6 +277,54 @@ describe('ảnh và ghi công', () => {
       'Đường dẫn không hợp lệ: phải là đường dẫn http hoặc https, tối đa 500 ký tự.',
     );
     expect(validateMedia(media({ url: 'không phải đường dẫn' })).url).toContain('Đường dẫn không hợp lệ');
+  });
+
+  it('đường dẫn ảnh trong kho tệp của nền tảng cũng được nhận', () => {
+    const stored = '/files/images/0123456789abcdef0123456789abcdef.png';
+    expect(isStoredImagePath(stored)).toBe(true);
+    expect(isStoredImagePath('http://api.test/files/images/0123456789abcdef0123456789abcdef.webp')).toBe(true);
+    expect(isStoredImagePath('/files/images/ngan.png')).toBe(false);
+    expect(isStoredImagePath('/files/images/0123456789abcdef0123456789abcdef.gif')).toBe(false);
+    expect(validateMedia(media({ url: stored })).url).toBeUndefined();
+  });
+});
+
+describe('biểu mẫu tải ảnh lên', () => {
+  const jpg = { name: 'hue.jpg', size: 2 * 1024 * 1024, type: 'image/jpeg' };
+  const credit: MediaValues = {
+    mediaType: 'IMAGE',
+    url: '',
+    caption: '',
+    author: 'Nhóm sản phẩm',
+    license: 'Ảnh nhóm tự chụp',
+    source: 'Chụp tại Huế',
+    sortOrder: '',
+  };
+
+  it('hợp lệ khi có tệp ảnh và ghi công đủ ba phần; không đòi loại hay đường dẫn', () => {
+    expect(validateMediaUpload({ ...credit, mediaType: '', url: '' }, jpg)).toEqual({});
+  });
+
+  it('thiếu tệp hoặc thiếu ghi công thì báo theo từng ô, khóa trùng tên trường của backend', () => {
+    expect(validateMediaUpload({ ...credit, author: '', license: '', source: '' }, null)).toEqual({
+      file: 'Vui lòng nhập tệp ảnh.',
+      author: 'Vui lòng nhập tác giả.',
+      license: 'Vui lòng nhập giấy phép.',
+      source: 'Vui lòng nhập nguồn ảnh.',
+    });
+  });
+
+  it('giấy phép hạn chế vẫn bị từ chối trước khi gửi tệp', () => {
+    expect(validateMediaUpload({ ...credit, license: 'CC BY-NC 4.0' }, jpg).license).toContain('Giấy phép không hợp lệ');
+  });
+
+  it('tệp sai định dạng hoặc quá 5 MB bị từ chối', () => {
+    expect(validateMediaUpload(credit, { name: 'a.gif', size: 100, type: 'image/gif' }).file).toBe(
+      'Tệp ảnh không hợp lệ: chỉ nhận định dạng JPG, PNG hoặc WEBP.',
+    );
+    expect(validateMediaUpload(credit, { name: 'a.jpg', size: 6 * 1024 * 1024, type: 'image/jpeg' }).file).toBe(
+      'Tệp ảnh không hợp lệ: tối đa 5 MB, tệp này 6,0 MB.',
+    );
   });
 });
 

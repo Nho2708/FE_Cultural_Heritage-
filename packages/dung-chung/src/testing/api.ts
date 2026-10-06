@@ -69,7 +69,59 @@ export function mockApi(...routes: Route[]) {
       return envelope(404, { errorCode: 'BLOCKED', message: 'Không thể thực hiện. Không tìm thấy dữ liệu.' });
     }),
   );
+  vi.stubGlobal('XMLHttpRequest', FetchBackedXhr);
   return calls;
+}
+
+/**
+ * XMLHttpRequest giả cho tải tệp có tiến độ: gửi thân qua `fetch` đã được giả, báo tiến độ 50% rồi hoàn tất, nên cùng
+ * một route giả phục vụ cả đường fetch lẫn đường XHR của tầng gọi API.
+ */
+class FetchBackedXhr {
+  upload: { onprogress: ((event: { lengthComputable: boolean; loaded: number; total: number }) => void) | null } = { onprogress: null };
+  onload: (() => void) | null = null;
+  onerror: (() => void) | null = null;
+  ontimeout: (() => void) | null = null;
+  onabort: (() => void) | null = null;
+  status = 0;
+  responseText = '';
+  private method = 'GET';
+  private url = '';
+  private headers: Record<string, string> = {};
+  private contentType: string | null = null;
+  private aborted = false;
+
+  open(method: string, url: string) {
+    this.method = method;
+    this.url = url;
+  }
+
+  setRequestHeader(name: string, value: string) {
+    this.headers[name] = value;
+  }
+
+  getResponseHeader(name: string) {
+    return name.toLowerCase() === 'content-type' ? this.contentType : null;
+  }
+
+  abort() {
+    this.aborted = true;
+    this.onabort?.();
+  }
+
+  send(body: FormData) {
+    this.upload.onprogress?.({ lengthComputable: true, loaded: 1, total: 2 });
+    fetch(this.url, { method: this.method, headers: this.headers, body }).then(
+      async (response) => {
+        if (this.aborted) return;
+        this.status = response.status;
+        this.contentType = response.headers.get('Content-Type');
+        this.responseText = await response.text();
+        this.onload?.();
+      },
+      () => this.onerror?.(),
+    );
+  }
 }
 
 /** Storage trong bộ nhớ cho test phiên đăng nhập. */

@@ -1,3 +1,4 @@
+import { validateImageFile, type PickedFile } from '../files';
 import { MESSAGES } from '../messages';
 import type { MediaType, ReferenceSourceType } from '../api/heritage';
 
@@ -72,6 +73,11 @@ function isHttpUrl(value: string): boolean {
   } catch {
     return false;
   }
+}
+
+/** Đường dẫn ảnh trong kho tệp của nền tảng (dạng `/files/images/{32 ký tự}.jpg`), do hệ thống sinh khi tải ảnh lên. */
+export function isStoredImagePath(value: string): boolean {
+  return /^(.*\/files\/images\/[0-9a-f]{32})\.(jpg|png|webp)$/.test(value.trim());
 }
 
 const isBlank = (value: string) => value.trim() === '';
@@ -351,7 +357,7 @@ export function validateMedia(values: MediaValues): Errors<MediaField> {
     url:
       url === ''
         ? MESSAGES.required('đường dẫn')
-        : isHttpUrl(url) && url.length <= HERITAGE_LIMITS.url
+        : (isHttpUrl(url) || isStoredImagePath(url)) && url.length <= HERITAGE_LIMITS.url
           ? null
           : MESSAGES.invalid('Đường dẫn', `phải là đường dẫn http hoặc https, tối đa ${HERITAGE_LIMITS.url} ký tự`),
     caption: tooLong(values.caption, 'Chú thích', HERITAGE_LIMITS.caption),
@@ -370,6 +376,24 @@ export function validateMedia(values: MediaValues): Errors<MediaField> {
           : noSeparator(license, 'Giấy phép'),
     source: source === '' ? MESSAGES.required('nguồn ảnh') : noSeparator(source, 'Nguồn ảnh'),
     sortOrder: validateSortOrder(values.sortOrder),
+  });
+}
+
+export type MediaUploadField = Exclude<MediaField, 'mediaType' | 'url'> | 'file';
+
+/**
+ * Kiểm biểu mẫu tải ảnh lên: ghi công và chú thích như thêm ảnh bằng đường dẫn, thêm lỗi của tệp (khóa `file`, trùng
+ * tên trường của backend). Loại luôn là ảnh và đường dẫn do hệ thống sinh nên không kiểm hai ô đó.
+ */
+export function validateMediaUpload(values: MediaValues, file: PickedFile | null): Errors<MediaUploadField> {
+  const found = validateMedia({ ...values, mediaType: 'IMAGE', url: 'https://tai-len.local/anh.jpg' });
+  return compact<MediaUploadField>({
+    caption: found.caption ?? null,
+    author: found.author ?? null,
+    license: found.license ?? null,
+    source: found.source ?? null,
+    sortOrder: found.sortOrder ?? null,
+    file: validateImageFile(file),
   });
 }
 

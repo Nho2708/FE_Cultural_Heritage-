@@ -37,6 +37,11 @@ import { apiRequest } from './client';
 
 // Endpoint backend mà web quản trị dùng, đường dẫn tương đối so với VITE_API_BASE_URL (…/api/v1).
 
+export interface UploadOptions {
+  onProgress?: (fraction: number) => void;
+  signal?: AbortSignal;
+}
+
 export interface PageQuery {
   page?: number;
   pageSize?: number;
@@ -220,6 +225,27 @@ export const adminMediaApi = {
 
   createForEvent: (eventId: number, body: MediaInput) =>
     apiRequest<HeritageMedia>(`/admin/events/${eventId}/media`, { method: 'POST', body }),
+
+  /**
+   * Tải ảnh lên (multipart): `file` cùng `author`, `license`, `source` bắt buộc, `caption`, `sortOrder`, `setAsThumbnail`.
+   * `onProgress` nhận tỷ lệ đã gửi từ 0 đến 1; `signal` để hủy giữa chừng.
+   */
+  uploadForHeritage: (heritageId: number, body: FormData, options: UploadOptions = {}) =>
+    apiRequest<HeritageMedia>(`/admin/heritages/${heritageId}/media/upload`, {
+      method: 'POST',
+      body,
+      onUploadProgress: options.onProgress,
+      signal: options.signal,
+    }),
+
+  /** Ảnh minh họa của sự kiện: cùng quy tắc, không chọn làm ảnh đại diện được. */
+  uploadForEvent: (eventId: number, body: FormData, options: UploadOptions = {}) =>
+    apiRequest<HeritageMedia>(`/admin/events/${eventId}/media/upload`, {
+      method: 'POST',
+      body,
+      onUploadProgress: options.onProgress,
+      signal: options.signal,
+    }),
 
   update: (id: number, body: MediaInput) => apiRequest<HeritageMedia>(`/admin/media/${id}`, { method: 'PUT', body }),
 

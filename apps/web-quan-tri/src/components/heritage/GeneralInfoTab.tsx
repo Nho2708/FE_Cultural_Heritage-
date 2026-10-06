@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { lazy, Suspense, useState, type FormEvent } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import type { HeritageDetail } from '@dsvhvn/dung-chung/api';
 import {
@@ -10,6 +10,7 @@ import {
 } from '@dsvhvn/dung-chung';
 import { Button, Icon, InlineMessage, SelectField, TextAreaField, TextField } from '@dsvhvn/dung-chung/ui';
 import { adminHeritagesApi } from '../../lib/api/endpoints';
+import { fileUrl } from '../../lib/fileUrl';
 import { queryKeys } from '../../lib/api/queryKeys';
 import { HERITAGE_TYPE_OPTIONS, RECOGNITION_LEVEL_OPTIONS } from './heritageForm';
 import { ThumbnailPickerDialog } from './ThumbnailPickerDialog';
@@ -19,6 +20,23 @@ import { ThumbnailPickerDialog } from './ThumbnailPickerDialog';
 // và ảnh đại diện (chọn trong thư viện ảnh của di sản). Ô nhập do trang cha giữ để nút Lưu ở đầu trang dùng chung.
 
 export const GENERAL_FORM_ID = 'bieu-mau-thong-tin-chung';
+
+// Bản đồ chỉ nạp khi mở tab này (Leaflet khá nặng và chỉ biên tập di sản mới cần).
+const CoordinatePicker = lazy(() => import('@dsvhvn/dung-chung/map/CoordinatePicker'));
+
+/** Khoảng tọa độ lãnh thổ Việt Nam mà backend chấp nhận (cùng giá trị với kiểm tra của biểu mẫu). */
+const COORDINATE_LIMITS = {
+  minLatitude: HERITAGE_LIMITS.latitude.min,
+  maxLatitude: HERITAGE_LIMITS.latitude.max,
+  minLongitude: HERITAGE_LIMITS.longitude.min,
+  maxLongitude: HERITAGE_LIMITS.longitude.max,
+};
+
+/** Tọa độ trong ô nhập: số hợp lệ hoặc null (rỗng hay sai dạng thì bản đồ không đặt ghim). */
+function coordinateOf(text: string): number | null {
+  const value = parseDecimal(text);
+  return value === null || Number.isNaN(value) ? null : value;
+}
 
 interface GeneralInfoTabProps {
   /** Chi tiết đã lưu; null khi đang tạo mới. */
@@ -60,8 +78,10 @@ export function GeneralInfoTab({
     staleTime: Infinity,
   });
   const [picking, setPicking] = useState(false);
+  const [mapNotice, setMapNotice] = useState<string | null>(null);
   const words = countWords(values.content);
   const link = mapUrl(values.latitude, values.longitude);
+  const pinned = coordinateOf(values.latitude) !== null && coordinateOf(values.longitude) !== null;
   const thumbnail = heritage?.media.find((m) => m.isThumbnail) ?? null;
 
   const provinceOptions = [
@@ -214,6 +234,52 @@ export function GeneralInfoTab({
               error={errors.longitude}
             />
           </div>
+          <div className="flex flex-col gap-2">
+            <div className="h-72 overflow-hidden rounded-sm border border-border">
+              <Suspense fallback={<div className="flex size-full items-center justify-center bg-surface-container-low type-body-s text-on-surface-muted">Đang tải bản đồ…</div>}>
+                <CoordinatePicker
+                  latitude={coordinateOf(values.latitude)}
+                  longitude={coordinateOf(values.longitude)}
+                  limits={COORDINATE_LIMITS}
+                  disabled={disabled}
+                  onChange={(lat, lng) => {
+                    setMapNotice(null);
+                    onChange('latitude', String(lat));
+                    onChange('longitude', String(lng));
+                  }}
+                  onOutOfRange={() =>
+                    setMapNotice('Vị trí nằm ngoài lãnh thổ Việt Nam (vĩ độ 8,0 đến 23,5, kinh độ 102,0 đến 117,5). Hãy chọn lại trong khu vực này.')
+                  }
+                />
+              </Suspense>
+            </div>
+            <p className="type-label text-on-surface-muted">
+              Bấm lên bản đồ để đặt vị trí, kéo ghim để chỉnh; hoặc nhập số vào hai ô trên (cách dùng bằng bàn phím). Phóng to
+              bằng nút + và − ở góc bản đồ.
+            </p>
+            {mapNotice && (
+              <p role="alert" className="flex items-start gap-1.5 type-body-s text-danger">
+                <Icon name="alert-triangle" size={16} className="mt-[3px] shrink-0" />
+                <span>{mapNotice}</span>
+              </p>
+            )}
+            {pinned && !disabled && (
+              <div>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setMapNotice(null);
+                    onChange('latitude', '');
+                    onChange('longitude', '');
+                  }}
+                >
+                  <Icon name="x" size={16} />
+                  Xóa tọa độ
+                </Button>
+              </div>
+            )}
+          </div>
           <p className="type-label text-on-surface-muted">
             Vĩ độ từ 8,0 đến 23,5 và kinh độ từ 102,0 đến 117,5 (lãnh thổ Việt Nam). Nhập đủ cả hai hoặc bỏ trống cả hai;
             di sản vật thể, thiên nhiên và hỗn hợp cần có tọa độ để xuất bản.
@@ -226,7 +292,7 @@ export function GeneralInfoTab({
               className="inline-flex items-center gap-2 type-control text-link underline-offset-4 hover:underline"
             >
               <Icon name="external-link" size={16} />
-              Xem vị trí trên bản đồ
+              Xem vị trí trên OpenStreetMap
             </a>
           )}
         </section>
@@ -241,7 +307,7 @@ export function GeneralInfoTab({
             </p>
           ) : heritage.thumbnailUrl ? (
             <>
-              <img src={heritage.thumbnailUrl} alt="" className="h-48 w-full rounded-sm bg-surface-container-high object-cover" />
+              <img src={fileUrl(heritage.thumbnailUrl) ?? ''} alt="" className="h-48 w-full rounded-sm bg-surface-container-high object-cover" />
               <div>
                 {thumbnail?.caption && <p className="type-body-s text-on-surface">{thumbnail.caption}</p>}
                 {thumbnail?.credit && <p className="type-label text-on-surface-muted">{thumbnail.credit}</p>}
