@@ -12,3 +12,7 @@ export type * from './quizzes';
 export { QUIZ_ENDPOINTS, createQuizzesApi } from './quizzes';
 export type * from './attempts';
 export { ATTEMPT_ENDPOINTS, createAttemptsApi } from './attempts';
+export type * from './recommendations';
+export { RECOMMENDATION_ENDPOINTS, createClassRecommendationsApi, createStudentRecommendationsApi } from './recommendations';
+export type * from './statistics';
+export { STATISTICS_ENDPOINTS, createStatisticsApi } from './statistics';

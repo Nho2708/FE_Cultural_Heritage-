@@ -1,4 +1,5 @@
 import { createAttemptsApi } from './attempts';
+import { createStudentRecommendationsApi } from './recommendations';
 import type { ApiClient, ApiResult } from './client';
 import type { StudentLesson } from './lessons';
 import type { AccessToken, LoginResult, OrganizationRef, SchoolLevel, StudentClassDetail, StudentProfile } from './types';
@@ -121,6 +122,9 @@ export function createStudentApi(client: ApiClient) {
 
     /** Làm bài kiểm tra, kết quả, lịch sử, tiến độ và trang học của em. */
     ...createAttemptsApi(client),
+
+    /** Gợi ý cho em: ở trang học và ở kết quả của một lượt. */
+    ...createStudentRecommendationsApi(client),
   };
 }
 
