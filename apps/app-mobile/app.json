@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "Học di sản",
+    "slug": "hoc-di-san",
+    "scheme": "hocdisan",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-localization",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Học di sản dùng vị trí của bạn để gợi ý di sản gần bạn. Vị trí chỉ để tính khoảng cách trên máy này và không được lưu."
+        }
+      ]
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "vn.dsvhvn.hocdisan"
+    },
+    "android": {
+      "package": "vn.dsvhvn.hocdisan"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
