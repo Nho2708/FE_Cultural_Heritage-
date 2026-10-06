@@ -167,6 +167,12 @@ export const PATHS = {
   lesson: (id: number) => `/giao-vien/bai-hoc/${id}`,
   /** Sinh và duyệt câu hỏi bằng AI từ một bài học. */
   lessonAiQuestions: (id: number) => `/giao-vien/bai-hoc/${id}/sinh-cau-hoi`,
+  /** Trường và gói: tab Gói và hạn mức. */
+  schoolPlan: '/truong/thong-tin?tab=goi-va-han-muc',
+  /** Trường và gói: tab Hóa đơn và giao dịch. */
+  schoolInvoices: '/truong/thong-tin?tab=hoa-don',
+  /** Chọn gói và thanh toán, chọn sẵn một gói (gia hạn gói hiện tại). */
+  planPurchaseFor: (planId: number) => `/truong/chon-goi?goi=${planId}`,
   /** Biên tập di sản ở trạng thái tạo mới. */
   newHeritage: '/quan-tri/di-san/moi',
   /** Biên tập di sản: sửa một di sản (tab nằm trong tham số `?tab=`). */

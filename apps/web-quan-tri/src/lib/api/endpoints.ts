@@ -4,6 +4,7 @@ import type {
   ActorRole,
   AuditAction,
   AuditLog,
+  BillingOverview,
   ContentStatus,
   EventInput,
   HeritageDetail,
@@ -17,6 +18,9 @@ import type {
   HeritageSummary,
   HeritageTimeline,
   HeritageType,
+  Invoice,
+  InvoiceDetail,
+  InvoiceStatus,
   LanguageCode,
   LoginResult,
   MediaInput,
@@ -28,7 +32,13 @@ import type {
   OrganizationSummary,
   Paged,
   PasswordTokenInfo,
+  PaymentResult,
+  PaymentStart,
+  Plan,
+  PlanInput,
+  PlanOffer,
   Province,
+  PurchaseQuote,
   QueryValue,
   QueueTab,
   RecognitionLevel,
@@ -375,3 +385,54 @@ export const adminTranslationsApi = {
 };
 
 export type { QueueTab };
+
+/** Màn hình Gói dịch vụ (quản trị hệ thống): gói có kèm số trường đang dùng. Không có thao tác xóa gói. */
+export const adminPlansApi = {
+  list: () => apiRequest<Plan[]>('/admin/plans'),
+
+  /** Gói trả phí (giá lớn hơn 0), tạo xong đang bán. Tên trùng thì 409. */
+  create: (body: PlanInput) => apiRequest<Plan>('/admin/plans', { method: 'POST', body }),
+
+  /** Giá mới chỉ áp cho hóa đơn tạo sau đó. Gói Miễn phí giữ nguyên tên và giá. */
+  update: (id: number, body: PlanInput) => apiRequest<Plan>(`/admin/plans/${id}`, { method: 'PUT', body }),
+
+  enable: (id: number) => apiRequest<Plan>(`/admin/plans/${id}/enable`, { method: 'POST' }),
+
+  /** Tắt bán: trường đang dùng giữ gói tới hết hạn. Gói Miễn phí thì 422. */
+  disable: (id: number) => apiRequest<Plan>(`/admin/plans/${id}/disable`, { method: 'POST' }),
+};
+
+export interface InvoiceListQuery extends PageQuery {
+  status?: InvoiceStatus | '';
+}
+
+/** Gói và thanh toán của quản trị trường: tab Gói và hạn mức, tab Hóa đơn và giao dịch, Chọn gói và thanh toán, Kết quả thanh toán. */
+export const orgBillingApi = {
+  overview: () => apiRequest<BillingOverview>('/org/billing'),
+
+  /** Các gói đang bán (không gồm gói Miễn phí), kèm loại thao tác và có mua được không. */
+  offers: () => apiRequest<PlanOffer[]>('/org/plans'),
+
+  /** Khối xác nhận sau khi chọn gói; gói không mua được thì 422 kèm lý do. */
+  quote: (planId: number) => apiRequest<PurchaseQuote>(`/org/plans/${planId}/quote`),
+
+  /** Tạo yêu cầu mua, hóa đơn và giao dịch chờ; trả địa chỉ VNPay để chuyển trình duyệt tới. Đã có yêu cầu mua chưa trả: 422. */
+  checkout: (planId: number) => apiRequest<PaymentStart>('/org/billing/checkout', { method: 'POST', body: { planId } }),
+
+  /** Kích hoạt ngay, không qua VNPay; chỉ khi trường không có gói hiệu lực. */
+  activateFreePlan: () => apiRequest<BillingOverview>('/org/billing/free-plan', { method: 'POST' }),
+
+  /** Hủy gói trả phí đang hiệu lực (không hoàn tiền) hoặc yêu cầu mua chưa thanh toán. */
+  cancel: (subscriptionId: number) => apiRequest<BillingOverview>(`/org/subscriptions/${subscriptionId}/cancel`, { method: 'POST' }),
+
+  invoices: (query: InvoiceListQuery) =>
+    apiRequest<Paged<Invoice>>('/org/invoices', { query: { ...query } as Record<string, QueryValue> }),
+
+  invoice: (id: number) => apiRequest<InvoiceDetail>(`/org/invoices/${id}`),
+
+  /** "Thanh toán" hoặc "Thanh toán lại" hóa đơn chưa trả: giao dịch mới và địa chỉ VNPay. */
+  pay: (invoiceId: number) => apiRequest<PaymentStart>(`/org/invoices/${invoiceId}/pay`, { method: 'POST' }),
+
+  /** Trang Kết quả thanh toán: chỉ đọc trạng thái do IPN ghi nhận. */
+  payment: (id: number) => apiRequest<PaymentResult>(`/org/payments/${id}`),
+};

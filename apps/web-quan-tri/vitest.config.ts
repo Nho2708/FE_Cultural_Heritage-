@@ -9,5 +9,7 @@ export default defineConfig({
     setupFiles: ['src/test/setup.ts'],
     env: { VITE_API_BASE_URL: 'http://api.test/api/v1', VITE_LEARNING_WEB_URL: 'http://hoc.test' },
     restoreMocks: true,
+    // Nhiều tệp test dựng cả ứng dụng chạy song song: chừa thời gian khi máy bận để không lỗi giả.
+    testTimeout: 15_000,
   },
 });

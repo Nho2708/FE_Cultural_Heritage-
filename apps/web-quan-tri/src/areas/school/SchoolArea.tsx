@@ -1,8 +1,8 @@
 import { MESSAGES, formatPlanDate } from '@dsvhvn/dung-chung';
-import { InlineMessage } from '@dsvhvn/dung-chung/ui';
+import { InlineMessage, TextLink } from '@dsvhvn/dung-chung/ui';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
-import { AREA_ROOT } from '../../access/screens';
+import { AREA_ROOT, pathOf } from '../../access/screens';
 import { AreaLayout } from '../../components/layout/AreaLayout';
 import { schoolNav } from '../../components/layout/navigation';
 import { orgApi } from '../../lib/api/endpoints';
@@ -16,9 +16,20 @@ function PlanBanner() {
   const org = useQuery({ queryKey: queryKeys.org, queryFn: () => orgApi.get().then((r) => r.data) });
   const subscription = org.data?.subscription;
   if (!org.data || subscription?.isEffective) return null;
+  // Gói bị hủy kết thúc ngay nhưng ngày hết hạn ghi trên đăng ký là ngày dự kiến ban đầu: không dùng làm "hết hiệu lực từ ngày".
+  const endedOn = subscription?.status === 'EXPIRED' || subscription?.status === 'ACTIVE' ? subscription.endDate : null;
   return (
     <div className="px-4 pt-4 dsvmd:px-8">
-      <InlineMessage tone="warning">{MESSAGES.noEffectivePlan(formatPlanDate(subscription?.endDate) || null)}</InlineMessage>
+      <InlineMessage
+        tone="warning"
+        action={
+          <TextLink to={pathOf('planPurchase')} className="type-body-s">
+            Mua gói
+          </TextLink>
+        }
+      >
+        {MESSAGES.noEffectivePlan(formatPlanDate(endedOn) || null)}
+      </InlineMessage>
     </div>
   );
 }
