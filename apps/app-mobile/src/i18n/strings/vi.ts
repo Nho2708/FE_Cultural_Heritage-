@@ -65,6 +65,12 @@ export interface Strings {
     results: string;
     loadMore: string;
     keywordShort: string;
+    moreFilters: string;
+    province: string;
+    level: string;
+    period: string;
+    chooseProvince: string;
+    anyProvince: string;
   };
   detail: {
     summary: string;
@@ -206,6 +212,12 @@ export const vi: Strings = {
     results: '{{count}} kết quả',
     loadMore: 'Xem thêm',
     keywordShort: 'Từ khóa cần ít nhất 2 ký tự.',
+    moreFilters: 'Thêm bộ lọc',
+    province: 'Tỉnh, thành phố',
+    level: 'Cấp xếp hạng',
+    period: 'Thời kỳ',
+    chooseProvince: 'Chọn tỉnh, thành phố',
+    anyProvince: 'Mọi tỉnh, thành phố',
   },
   detail: {
     summary: 'Tóm tắt',

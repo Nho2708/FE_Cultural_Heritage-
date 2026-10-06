@@ -64,6 +64,12 @@ export const ko: Strings = {
     results: '결과 {{count}}건',
     loadMore: '더 보기',
     keywordShort: '검색어는 2자 이상이어야 합니다.',
+    moreFilters: '필터 더보기',
+    province: '성·시',
+    level: '등급',
+    period: '시대',
+    chooseProvince: '성·시 선택',
+    anyProvince: '전체 성·시',
   },
   detail: {
     summary: '요약',

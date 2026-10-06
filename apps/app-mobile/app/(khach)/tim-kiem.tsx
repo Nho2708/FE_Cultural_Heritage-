@@ -1,10 +1,11 @@
-import type { DiscoveryFilter, HeritageType } from '@dsvhvn/dung-chung/api';
+import type { DiscoveryFilter, HeritagePeriod, HeritageType, RecognitionLevel } from '@dsvhvn/dung-chung/api';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, StyleSheet, TextInput, View } from 'react-native';
 import { HeritageTile, ListNotes } from '../../src/components/Heritage';
 import { Button, Chip, EmptyState, ErrorState, Loading, Notice, Txt, styles as ui } from '../../src/components/ui';
+import { ExtraFilters, LEVELS, PERIODS } from '../../src/guest/ExtraFilters';
 import { regionName, typeName } from '../../src/guest/format';
 import { useHistory } from '../../src/guest/HistoryProvider';
 import { recentSearches } from '../../src/guest/historyCore';
@@ -19,6 +20,19 @@ const REGIONS = ['Bắc', 'Trung', 'Nam'] as const;
 
 function asType(value: string | undefined): HeritageType | undefined {
   return TYPES.find((item) => item === value);
+}
+
+function asLevel(value: string | undefined): RecognitionLevel | undefined {
+  return LEVELS.find((item) => item === value);
+}
+
+function asPeriod(value: string | undefined): HeritagePeriod | undefined {
+  return PERIODS.find((item) => item === value);
+}
+
+function asProvince(value: string | undefined): number | undefined {
+  const id = Number(value);
+  return Number.isInteger(id) && id > 0 ? id : undefined;
 }
 
 function asRegion(value: string | undefined): string | undefined {
@@ -36,7 +50,7 @@ export default function SearchScreen() {
 }
 
 function SearchBody() {
-  const params = useLocalSearchParams<{ q?: string; loai?: string; vung?: string }>();
+  const params = useLocalSearchParams<{ q?: string; loai?: string; vung?: string; tinh?: string; cap?: string; thoiky?: string }>();
   const { t } = useTranslation();
   const { language } = useApp();
   const theme = useTheme();
@@ -47,15 +61,22 @@ function SearchBody() {
   const keyword = params.q ?? '';
   const heritageType = asType(params.loai);
   const region = asRegion(params.vung);
+  const provinceId = asProvince(params.tinh);
+  const recognitionLevel = asLevel(params.cap);
+  const period = asPeriod(params.thoiky);
+  const [moreOpen, setMoreOpen] = useState(Boolean(provinceId || recognitionLevel || period));
   const setHeritageType = (value: HeritageType | undefined) => router.setParams({ loai: value });
   const setRegion = (value: string | undefined) => router.setParams({ vung: value });
 
-  const filter: DiscoveryFilter = useMemo(() => ({ keyword: keyword.trim() || undefined, heritageType, region }), [keyword, heritageType, region]);
+  const filter: DiscoveryFilter = useMemo(
+    () => ({ keyword: keyword.trim() || undefined, heritageType, region, provinceId, recognitionLevel, period }),
+    [keyword, heritageType, region, provinceId, recognitionLevel, period],
+  );
   const query = useSearch(filter);
   const cards = useMemo(() => query.data?.pages.flatMap((page) => page.items) ?? [], [query.data]);
   const total = query.data?.pages[0]?.totalItems ?? 0;
   const recent = recentSearches(history.entries);
-  const hasFilter = Boolean(keyword.trim() || heritageType || region);
+  const hasFilter = Boolean(keyword.trim() || heritageType || region || provinceId || recognitionLevel || period);
 
   const submit = () => {
     const value = draft.trim();
@@ -105,6 +126,18 @@ function SearchBody() {
           <Chip key={item} label={regionName(item, language)} selected={region === item} onPress={() => setRegion(region === item ? undefined : item)} />
         ))}
       </View>
+      <Button label={moreOpen ? `− ${t('search.moreFilters')}` : `+ ${t('search.moreFilters')}`} variant="ghost" onPress={() => setMoreOpen((open) => !open)} />
+      {moreOpen ? (
+        <ExtraFilters
+          language={language}
+          provinceId={provinceId}
+          level={recognitionLevel}
+          period={period}
+          onProvince={(id) => router.setParams({ tinh: id === undefined ? undefined : String(id) })}
+          onLevel={(value) => router.setParams({ cap: value })}
+          onPeriod={(value) => router.setParams({ thoiky: value })}
+        />
+      ) : null}
       {hasFilter ? (
         <View style={ui.row}>
           <Txt variant="caption" style={ui.grow}>
@@ -113,7 +146,7 @@ function SearchBody() {
           <Button
             label={t('search.clearFilters')}
             variant="ghost"
-            onPress={() => router.setParams({ q: undefined, loai: undefined, vung: undefined })}
+            onPress={() => router.setParams({ q: undefined, loai: undefined, vung: undefined, tinh: undefined, cap: undefined, thoiky: undefined })}
           />
         </View>
       ) : null}

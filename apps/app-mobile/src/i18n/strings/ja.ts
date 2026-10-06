@@ -64,6 +64,12 @@ export const ja: Strings = {
     results: '{{count}} 件',
     loadMore: 'もっと見る',
     keywordShort: 'キーワードは2文字以上必要です。',
+    moreFilters: 'さらに絞り込む',
+    province: '省・市',
+    level: 'ランク',
+    period: '時代',
+    chooseProvince: '省・市を選択',
+    anyProvince: 'すべての省・市',
   },
   detail: {
     summary: '要約',
