@@ -38,6 +38,8 @@ Backend cần chạy với `--urls http://0.0.0.0:5080` (hoặc cổng khác) đ
 - **iPhone**: cài Expo Go từ App Store, mở **Camera** của iPhone và quét mã QR rồi chọn mở bằng Expo Go. iPhone chạy được cả giọng đọc, vị trí, bản đồ và 3D (WebView),
   **không có quảng cáo** (Expo Go không có mô-đun quảng cáo).
 
+Dùng bản Expo Go hỗ trợ **SDK 57** (cập nhật Expo Go trong cửa hàng ứng dụng nếu app báo không tương thích). Hồ sơ dựng APK qua EAS (`development`, `preview`) có sẵn ở [`eas.json`](eas.json), chưa gắn tài khoản Expo của nhóm.
+
 Quảng cáo Google có thưởng (AdMob) **chưa làm**: cần bản dựng phát triển qua EAS, không chạy trong Expo Go. Nơi gắn cổng quảng cáo: [`src/ads/gate.ts`](src/ads/gate.ts).
 Bản APK dùng API `http://` (không `https://`) cần cho phép cleartext (plugin `expo-build-properties`, `android.usesCleartextTraffic`); Expo Go không cần.
 

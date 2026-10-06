@@ -52,7 +52,7 @@ Chưa kiểm trên **thiết bị thật** (Android, iPhone): các phần chỉ 
 
 ## Giới hạn và việc tiếp theo
 
-- AdMob và hộp đồng ý UMP (cần EAS development build); chưa có biểu tượng và màn hình chờ riêng (`icon`, `splash` trong `app.json`) và hồ sơ EAS (`eas.json`).
+- AdMob và hộp đồng ý UMP (cần EAS development build); chưa có biểu tượng và màn hình chờ riêng (`icon`, `splash` trong `app.json`); hồ sơ dựng EAS (`eas.json`) đã có nhưng chưa gắn tài khoản Expo của nhóm.
 - Lịch sử và "Gợi ý cho bạn" của khách chưa đồng bộ với máy chủ; "Gần bạn" tính từ tối đa 500 ghim bản đồ.
 - Kéo thả chưa có: ghép cặp, sắp xếp và điền từ làm bằng chạm (có nút lên xuống ở cấp 2 và 3).
 - Bản APK gọi API `http://` cần bật cleartext (xem README); khuyến nghị API `https://` khi phát hành.
