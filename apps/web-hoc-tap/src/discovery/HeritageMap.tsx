@@ -28,11 +28,27 @@ interface HeritageMapProps {
   labels?: MapLabels;
   /** Tên hộp đóng popup (đọc cho trình đọc màn hình). */
   closeLabel?: string;
+  /** Vị trí của khách ("Gần bạn"): vẽ một chấm tại đó và đưa bản đồ tới đó. Chỉ nằm trong bộ nhớ của trang, không lưu. */
+  userPosition?: { latitude: number; longitude: number } | null;
+  /** Tên của chấm vị trí (đọc cho trình đọc màn hình). */
+  userLabel?: string;
   /** Tên vùng bản đồ (đọc cho trình đọc màn hình). */
   mapLabel?: string;
 }
 
-export default function HeritageMap({ pins, selectedSlug, onSelect, fitKey, fitToPins, renderPopup, labels = MAP_LABELS_VI, closeLabel = 'Đóng thẻ di sản', mapLabel = 'Bản đồ di sản' }: HeritageMapProps) {
+export default function HeritageMap({
+  pins,
+  selectedSlug,
+  onSelect,
+  fitKey,
+  fitToPins,
+  renderPopup,
+  labels = MAP_LABELS_VI,
+  closeLabel = 'Đóng thẻ di sản',
+  mapLabel = 'Bản đồ di sản',
+  userPosition = null,
+  userLabel = 'Vị trí của bạn',
+}: HeritageMapProps) {
   const labelsRef = useRef(labels);
   const closeLabelRef = useRef(closeLabel);
   const containerRef = useRef<HTMLElement>(null);
@@ -96,6 +112,20 @@ export default function HeritageMap({ pins, selectedSlug, onSelect, fitKey, fitT
     cluster.addLayers([...markers.current.values()]);
     shownSlug.current = null; // ghim mới: lần chọn kế tiếp dựng lại popup
   }, [engine, pins]);
+
+  // Vị trí của khách: một chấm xanh có viền trắng, rồi đưa bản đồ tới đó (phóng vừa đủ thấy vùng quanh bạn).
+  useEffect(() => {
+    if (!engine || !userPosition) return;
+    const { L, map } = engine;
+    const at: [number, number] = [userPosition.latitude, userPosition.longitude];
+    const dot = L.circleMarker(at, { radius: 9, color: '#ffffff', weight: 3, fillColor: '#1a56db', fillOpacity: 1 }).addTo(map);
+    dot.bindTooltip(userLabel, { direction: 'top', offset: [0, -8] });
+    dot.getElement()?.setAttribute('aria-label', userLabel);
+    map.setView(at, 11);
+    return () => {
+      dot.remove();
+    };
+  }, [engine, userPosition, userLabel]);
 
   // Căn khung nhìn khi dữ liệu mới về (không đè lên ghim đang được chọn từ địa chỉ trang).
   useEffect(() => {

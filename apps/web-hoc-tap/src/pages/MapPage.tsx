@@ -8,6 +8,9 @@ import { PublicErrorState } from '../components/PublicErrorState';
 import { ClearFilters, FilterSelects } from '../discovery/FilterSelects';
 import { FILTER_PARAM, KEYWORD_MAX, KEYWORD_MIN, filterFromParams, hasActiveFilter, keywordInvalid, paramsFromFilter, selectFilterCount, toSearch } from '../discovery/filters';
 import { heritagePath, timelinePath } from '../discovery/paths';
+import { useIsGuest } from '../guest/guestData';
+import { MapNearby } from '../guest/MapNearby';
+import { mapPositionOf, useNearby } from '../guest/useNearby';
 import { useFilterCatalog, useMapPins } from '../discovery/queries';
 import { Thumbnail } from '../discovery/Thumbnail';
 import { useI18n } from '../i18n/context';
@@ -112,6 +115,9 @@ export function MapPage() {
   const catalog = useFilterCatalog();
   const result = useMapPins(filter);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  // "Gần bạn" chỉ cho khách; khách bấm nút mới hỏi vị trí (không tự hỏi khi mở trang để không đè lên ghim đang chọn từ địa chỉ trang).
+  const guest = useIsGuest();
+  const nearby = useNearby({ auto: false });
 
   const setFilter = (next: DiscoveryFilter) => setParams(paramsFromFilter(next));
   const select = (slug: string | null) =>
@@ -148,6 +154,8 @@ export function MapPage() {
               fitKey={String(result.dataUpdatedAt)}
               fitToPins={hasActiveFilter(filter)}
               renderPopup={(pin) => <PinCard pin={pin} />}
+              userPosition={mapPositionOf(nearby)}
+              userLabel={t.guest.nearby.title}
             />
           </Suspense>
         </div>
@@ -191,6 +199,8 @@ export function MapPage() {
           </div>
           <ListNotes flags={flags} compact />
         </div>
+
+        {guest && <MapNearby nearby={nearby} pins={data?.pins ?? []} onSelect={select} />}
 
         {(invalidKeyword || result.isError || (data && data.totalMatched === 0)) && (
           <div className="absolute inset-x-3 top-1/2 z-10 mx-auto flex max-w-[480px] -translate-y-1/2 flex-col items-start gap-3 rounded-md bg-surface p-5 shadow-2">

@@ -1,6 +1,6 @@
 import type { DiscoveryFilter } from '@dsvhvn/dung-chung/api';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { discoveryApi } from '../lib/api/client';
+import { discoveryApi, quietDiscoveryApi } from '../lib/api/client';
 import { useLanguage } from '../i18n/context';
 import { keywordInvalid } from './filters';
 
@@ -55,6 +55,19 @@ export function useHeritageDetail(slug: string | undefined) {
   return useQuery({
     queryKey: ['discovery', 'detail', lang, slug],
     queryFn: ({ signal }) => discoveryApi.detail(slug!, { signal, lang }),
+    enabled: Boolean(slug),
+  });
+}
+
+/**
+ * Chi tiết di sản tải ngầm, không ghi vào lịch sử "đã xem" của khách (ảnh bìa trang chủ lấy chi tiết của di sản đầu danh sách mà khách chưa hề mở).
+ * Khóa bộ nhớ đệm riêng để kết quả này không bị dùng lại ở trang chi tiết thật: trang đó phải gọi máy chủ để lượt xem được ghi.
+ */
+export function useQuietHeritageDetail(slug: string | undefined) {
+  const lang = useLanguage();
+  return useQuery({
+    queryKey: ['discovery', 'detail-quiet', lang, slug],
+    queryFn: ({ signal }) => quietDiscoveryApi.detail(slug!, { signal, lang }),
     enabled: Boolean(slug),
   });
 }

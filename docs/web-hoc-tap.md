@@ -19,7 +19,7 @@ Nguồn duy nhất: `apps/web-hoc-tap/src/access/screens.ts` — 14 màn hình (
 | `/nhap-ma`, `/bai-hoc/:maBaiHoc` | Nhập mã bài học, Bài học (ba bố cục theo cấp) | Học sinh | Đã dựng ([bai-hoc-theo-cap.md](bai-hoc-theo-cap.md)) |
 | `/bai-hoc/:maBaiHoc/kiem-tra/:baiKiemTra` (toàn màn hình), `/ket-qua/:luotLam`, `/tien-do` | Làm bài kiểm tra, kết quả, tiến độ | Học sinh | Đang xây dựng |
 
-Thanh điều hướng trên: chưa đăng nhập — Khám phá · Bản đồ · Dòng thời gian · **Ngôn ngữ** · "Học sinh đăng nhập" (phần công khai có năm ngôn ngữ, xem [da-ngon-ngu.md](da-ngon-ngu.md)); học sinh đã đăng nhập
+Thanh điều hướng trên: chưa đăng nhập — Khám phá · Bản đồ · Dòng thời gian · **Lịch sử của tôi** · **Ngôn ngữ** · "Học sinh đăng nhập" (phần công khai có năm ngôn ngữ, xem [da-ngon-ngu.md](da-ngon-ngu.md); lịch sử, gợi ý và Gần bạn của khách: [khach-tham-quan.md](khach-tham-quan.md)); học sinh đã đăng nhập
 — Trang học · Nhập mã · Tiến độ · Khám phá · Bản đồ · Dòng thời gian · menu tài khoản (họ tên, mã học sinh, lớp; Đổi mật
 khẩu; Đăng xuất). Dưới 841px gom vào ngăn kéo. Đăng xuất về trang chủ.
 

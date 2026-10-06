@@ -8,6 +8,7 @@ import { EmbedMapPage } from '../embed/EmbedMapPage';
 import { EmbedModelPage } from '../embed/EmbedModelPage';
 import { ChangePasswordPage } from '../pages/ChangePasswordPage';
 import { NotFoundPage, RouteErrorPage } from '../pages/errors/ErrorPages';
+import { GuestHistoryPage } from '../pages/GuestHistoryPage';
 import { HeritageDetailPage } from '../pages/HeritageDetailPage';
 import { HeritagePreviewPage } from '../pages/HeritagePreviewPage';
 import { EnterCodePage } from '../pages/EnterCodePage';
@@ -35,6 +36,7 @@ const BUILT: Partial<Record<ScreenKey, ReactNode>> = {
   map: <MapPage />,
   heritage: <HeritageDetailPage />,
   heritagePreview: <HeritagePreviewPage />,
+  guestHistory: <GuestHistoryPage />,
   timeline: <TimelinePage />,
   login: <LoginPage />,
   changePassword: <ChangePasswordPage />,

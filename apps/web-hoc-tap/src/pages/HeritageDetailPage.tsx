@@ -8,6 +8,7 @@ import { ModelDialog, type ModelSource } from '../components/ModelDialog';
 import { SummaryDialog, type SummaryTab } from '../components/SummaryDialog';
 import { citationsOf, creditLine, parseContent, parseInline, safeUrl, sourceSummary } from '../discovery/format';
 import { HeritageLoadError } from '../discovery/HeritageNotFound';
+import { RecommendationsSection } from '../guest/RecommendationsSection';
 import { mapPathOf, timelinePath } from '../discovery/paths';
 import { useHeritageDetail } from '../discovery/queries';
 import { Thumbnail } from '../discovery/Thumbnail';
@@ -421,6 +422,8 @@ export function HeritageDetailPage() {
     <>
       <title>{t.documentTitle(detail.name)}</title>
       <HeritageDetailView detail={detail} />
+      {/* Khách xem thêm gợi ý theo di sản đang xem và lịch sử của thiết bị. Lượt xem này đã được máy chủ ghi khi tải chi tiết, nên hỏi gợi ý sau đó. */}
+      <RecommendationsSection scope={detail.slug} exceptSlug={detail.slug} className="bg-surface-container-low" />
     </>
   );
 }

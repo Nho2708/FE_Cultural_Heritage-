@@ -60,6 +60,19 @@ describe('Bản đồ Leaflet', () => {
     expect(document.querySelector('.dsv-pin--selected')).not.toBeNull();
   });
 
+  it('vị trí của khách ("Gần bạn") vẽ một chấm có tên và bị gỡ khi không còn vị trí', async () => {
+    const props = { pins: [HUE], selectedSlug: null, onSelect: vi.fn<(slug: string | null) => void>(), fitKey: '1', fitToPins: false, renderPopup: () => null };
+    const { rerender, container } = render(<HeritageMap {...props} userPosition={null} userLabel="Gần bạn" />);
+    await screen.findByRole('button', { name: 'Quần thể di tích Cố đô Huế' });
+    expect(container.querySelector('.leaflet-overlay-pane path[fill="#1a56db"]')).toBeNull();
+
+    rerender(<HeritageMap {...props} userPosition={{ latitude: 16.464, longitude: 107.591 }} userLabel="Gần bạn" />);
+    await waitFor(() => expect(container.querySelector('.leaflet-overlay-pane path[fill="#1a56db"]')).not.toBeNull());
+
+    rerender(<HeritageMap {...props} userPosition={null} userLabel="Gần bạn" />);
+    await waitFor(() => expect(container.querySelector('.leaflet-overlay-pane path[fill="#1a56db"]')).toBeNull());
+  });
+
   it('dữ liệu ghim đổi thì ghim cũ bị thay bằng ghim mới', async () => {
     const props = { selectedSlug: null, onSelect: vi.fn<(slug: string | null) => void>(), fitKey: '1', fitToPins: false, renderPopup: () => null };
     const { rerender } = render(<HeritageMap pins={[HUE]} {...props} />);

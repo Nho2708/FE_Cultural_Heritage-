@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { detectLanguage, LANGUAGES, parseLanguage } from './languages';
-import { coordinatesText, formatCount, formatYearText, localizeDateText, periodRangeText } from './format';
+import { coordinatesText, formatCount, formatDateTime, formatYearText, localizeDateText, periodRangeText } from './format';
 import { STRINGS } from './strings';
 import { HERITAGE_TYPE_NAME, PERIOD_NAME, PROVINCE_COUNT, provinceName, RECOGNITION_LEVEL_NAME, REGION_NAME } from '@dsvhvn/dung-chung/i18n';
 
@@ -71,6 +71,22 @@ describe('tệp chuỗi giao diện', () => {
     };
     for (const [code, strings] of Object.entries(STRINGS)) walk(strings, code);
     expect(empty).toEqual([]);
+  });
+
+  it('mục của khách có đủ chữ ở cả năm ngôn ngữ: điểm chung gợi ý, nhóm lịch sử, "Gần bạn" ghép khoảng cách', () => {
+    const factors = ['SAME_TYPE', 'SAME_PROVINCE', 'SAME_REGION', 'SAME_LEVEL', 'OVERLAPPING_ERA', 'SIMILAR_TEXT'];
+    const groups = ['SEARCH', 'VIEW', 'READ_SUMMARY', 'LISTEN', 'VIEW_3D'];
+    for (const code of ['vi', 'en', 'ko', 'zh-Hans', 'ja'] as const) {
+      const g = STRINGS[code].guest;
+      expect(Object.keys(g.recommend.reasons).sort()).toEqual([...factors].sort());
+      expect(Object.keys(g.history.groups).sort()).toEqual([...groups].sort());
+      expect(g.nearby.away('350 m')).toContain('350 m');
+      expect(g.recommend.because('Huế')).toContain('Huế');
+      expect(g.history.remove('Huế')).toContain('Huế');
+      expect(STRINGS[code].nav.history).not.toBe('');
+    }
+    expect(STRINGS.vi.guest.nearby.away('350 m')).toBe('Cách 350 m');
+    expect(STRINGS.en.guest.nearby.away('350 m')).toBe('350 m away');
   });
 
   it('nhãn hai quần đảo luôn kèm Việt Nam ở mọi ngôn ngữ', () => {
@@ -145,6 +161,16 @@ describe('định dạng theo ngôn ngữ', () => {
     expect(periodRangeText({ fromYear: null, toYear: -180 }, vi, 'vi')).toBe('đến 180 TCN');
     expect(periodRangeText({ fromYear: 1945, toYear: null }, en, 'en')).toBe('from 1945');
     expect(periodRangeText({ fromYear: null, toYear: null }, en, 'en')).toBe('');
+  });
+
+  it('thời điểm của máy chủ: không kèm múi giờ thì hiểu là UTC, kèm múi giờ thì giữ nguyên; giá trị hỏng cho chuỗi rỗng', () => {
+    const utc = new Date('2026-10-06T07:05:00Z');
+    const expected = utc.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+    expect(formatDateTime('2026-10-06T07:05:00', 'en')).toBe(expected);
+    expect(formatDateTime('2026-10-06T07:05:00.1234567', 'en')).toBe(expected);
+    expect(formatDateTime('2026-10-06T07:05:00Z', 'en')).toBe(expected);
+    expect(formatDateTime('2026-10-06T14:05:00+07:00', 'en')).toBe(expected);
+    expect(formatDateTime('không phải ngày', 'en')).toBe('');
   });
 
   it('tọa độ: dấu phẩy thập phân và B/N/Đ/T ở tiếng Việt, dấu chấm và N/S/E/W ở ngôn ngữ khác', () => {

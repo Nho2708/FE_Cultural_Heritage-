@@ -1,8 +1,9 @@
 import { cn } from '@dsvhvn/dung-chung';
 import { ApiError, ERROR_CODES, type PublicSummary } from '@dsvhvn/dung-chung/api';
 import { Button, Icon, InlineMessage, Modal, TabPanel, Tabs } from '@dsvhvn/dung-chung/ui';
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { useHeritageSummary } from '../discovery/queries';
+import { useRecordListen } from '../guest/guestData';
 import { useI18n } from '../i18n/context';
 import { languageOption } from '../i18n/languages';
 import { SPEEDS, useNarration } from '../narration/useNarration';
@@ -25,6 +26,16 @@ function Narrator({ summary }: { summary: PublicSummary }) {
   const sentences = useMemo(() => splitSentences(summary.shortText, spoken.speechTag), [summary.shortText, spoken.speechTag]);
   const narration = useNarration(sentences, spoken.speechTag);
   const { voiceState, status, index } = narration;
+  // Nghe chạy trên trình duyệt nên máy chủ không tự biết: ghi một lượt "nghe" vào lịch sử của khách ở lần bấm Phát đầu tiên (học sinh không ghi).
+  const recordListen = useRecordListen();
+  const listened = useRef(false);
+  const play = () => {
+    if (!listened.current) {
+      listened.current = true;
+      recordListen(summary.slug);
+    }
+    narration.play();
+  };
   const blocked = voiceState === 'unsupported' || voiceState === 'missing';
 
   return (
@@ -59,7 +70,7 @@ function Narrator({ summary }: { summary: PublicSummary }) {
               {t.summary.resume}
             </Button>
           ) : (
-            <Button onClick={narration.play} disabled={blocked || sentences.length === 0} aria-label={t.summary.play}>
+            <Button onClick={play} disabled={blocked || sentences.length === 0} aria-label={t.summary.play}>
               <Icon name="play" size={20} />
               {t.summary.play}
             </Button>

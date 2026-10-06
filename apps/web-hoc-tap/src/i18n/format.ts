@@ -8,6 +8,16 @@ const LOCALE: Record<LanguageCode, string> = { vi: 'vi-VN', en: 'en-US', ko: 'ko
 
 export const localeOf = (language: LanguageCode) => LOCALE[language];
 
+/**
+ * Thời điểm máy chủ trả (UTC, có thể không kèm "Z" vì máy chủ đọc từ cơ sở dữ liệu ra mà không đánh dấu múi giờ) đổi sang giờ của máy khách, viết theo
+ * ngôn ngữ đang chọn ("6 thg 10, 2026, 14:05"). Giá trị không đọc được thì trả chuỗi rỗng.
+ */
+export function formatDateTime(value: string, language: LanguageCode): string {
+  const date = new Date(/(?:Z|[+-]\d{2}:?\d{2})$/i.test(value) ? value : `${value}Z`);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleString(LOCALE[language], { dateStyle: 'medium', timeStyle: 'short' });
+}
+
 export function formatCount(value: number, language: LanguageCode): string {
   return value.toLocaleString(LOCALE[language]);
 }
