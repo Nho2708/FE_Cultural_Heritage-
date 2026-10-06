@@ -1,4 +1,4 @@
-import { createAdminQuestionsApi, createOverviewApi } from '@dsvhvn/dung-chung/api';
+import { createAdminAdsApi, createAdminQuestionsApi, createOverviewApi } from '@dsvhvn/dung-chung/api';
 import { apiClient } from './client';
 
 // Endpoint của luồng Quản trị và tổng quan: Tổng quan trường (quản trị trường), Tổng quan hệ thống và biểu đồ theo thời gian,
@@ -6,3 +6,6 @@ import { apiClient } from './client';
 
 export const overviewApi = createOverviewApi(apiClient);
 export const adminQuestionsApi = createAdminQuestionsApi(apiClient);
+
+/** Thống kê khách và lượt mở khóa bằng quảng cáo Google có thưởng (quản trị hệ thống). */
+export const adStatsApi = createAdminAdsApi(apiClient);

@@ -9,9 +9,9 @@ const roleOf = (actor: Actor): StaffRole | null => (actor === 'Guest' ? null : a
 const ALL: readonly Screen[] = SCREENS;
 
 describe('bảng màn hình và ma trận phân quyền của web quản trị', () => {
-  it('có đủ 37 màn hình, khóa không trùng, 10 hộp thoại không có URL', () => {
-    expect(SCREENS).toHaveLength(37);
-    expect(new Set(SCREENS.map((s) => s.key)).size).toBe(37);
+  it('có đủ 38 màn hình, khóa không trùng, 10 hộp thoại không có URL', () => {
+    expect(SCREENS).toHaveLength(38);
+    expect(new Set(SCREENS.map((s) => s.key)).size).toBe(38);
     expect(SCREENS.filter((s) => s.path === null).map((s) => s.name)).toEqual([
       'Thêm học sinh và tạo tài khoản',
       'Phiếu đăng nhập của học sinh',
@@ -26,14 +26,14 @@ describe('bảng màn hình và ma trận phân quyền của web quản trị',
     ]);
   });
 
-  it('số màn hình theo khu: xác thực và tài khoản 3, giáo viên 18, quản trị trường 6, quản trị hệ thống 10', () => {
+  it('số màn hình theo khu: xác thực và tài khoản 3, giáo viên 18, quản trị trường 6, quản trị hệ thống 11', () => {
     const count = (area: Screen['area']) => ALL.filter((s) => s.area === area).length;
-    expect([count('account'), count('teacher'), count('school'), count('admin')]).toEqual([3, 18, 6, 10]);
+    expect([count('account'), count('teacher'), count('school'), count('admin')]).toEqual([3, 18, 6, 11]);
   });
 
-  it('số màn hình mở được theo vai trò khớp dòng tổng của ma trận: khách 2, giáo viên 19, quản trị trường 7, quản trị hệ thống 13', () => {
+  it('số màn hình mở được theo vai trò khớp dòng tổng của ma trận: khách 2, giáo viên 19, quản trị trường 7, quản trị hệ thống 14', () => {
     const counts = Object.fromEntries(ACTORS.map((actor) => [actor, ALL.filter((s) => s.actors.includes(actor)).length]));
-    expect(counts).toEqual({ Guest: 2, TEACHER: 19, ORG_ADMIN: 7, ADMIN: 13 });
+    expect(counts).toEqual({ Guest: 2, TEACHER: 19, ORG_ADMIN: 7, ADMIN: 14 });
   });
 
   it('mỗi khu dùng đúng tiền tố route; route chỉ có chữ thường không dấu', () => {

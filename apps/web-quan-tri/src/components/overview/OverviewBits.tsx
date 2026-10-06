@@ -1,5 +1,5 @@
 import { cn, formatCount, trendPeriodFull, trendPeriodLabel } from '@dsvhvn/dung-chung';
-import type { SystemTrendPoint, TrendGranularity } from '@dsvhvn/dung-chung/api';
+import type { TrendGranularity } from '@dsvhvn/dung-chung/api';
 import type { ReactNode } from 'react';
 
 // Mảnh dùng chung của hai màn hình Tổng quan: thanh dùng hạn mức, thẻ số liệu, thanh ngang theo lớp, biểu đồ cột theo thời gian.
@@ -76,16 +76,17 @@ export function BarList({ rows, caption }: { rows: BarRow[]; caption: string }) 
  * Biểu đồ cột theo thời gian của một số liệu. Mỗi kỳ một cột (kể cả kỳ trống), cột cao theo giá trị lớn nhất; nhãn trục
  * thưa ra khi nhiều cột. Bảng số ẩn dành cho trình đọc màn hình.
  */
-export function TrendBars({
+export function TrendBars<Metric extends string>({
   points,
   granularity,
   metric,
   metricLabel,
   format = formatCount,
 }: {
-  points: SystemTrendPoint[];
+  /** Mỗi kỳ có `period` (ngày `yyyy-MM-dd` hoặc tháng `yyyy-MM`) và số liệu `metric`; dùng cho cả biểu đồ tổng quan và thống kê quảng cáo. */
+  points: ReadonlyArray<{ period: string } & Record<Metric, number>>;
   granularity: TrendGranularity;
-  metric: keyof Omit<SystemTrendPoint, 'period'>;
+  metric: Metric;
   metricLabel: string;
   /** Cách viết một giá trị (mặc định số đếm; doanh thu viết bằng tiền). */
   format?: (value: number) => string;

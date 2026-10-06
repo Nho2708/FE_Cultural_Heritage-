@@ -1,4 +1,4 @@
-// Bảng màn hình và ma trận phân quyền của web quản trị (37 màn hình: xác thực và tài khoản, khu giáo viên, khu quản
+// Bảng màn hình và ma trận phân quyền của web quản trị (38 màn hình: xác thực và tài khoản, khu giáo viên, khu quản
 // trị trường, khu quản trị hệ thống; 10 hộp thoại không có URL). Đây là nguồn duy nhất cho route guard, thanh bên và
 // menu tài khoản. Tên màn hình bằng lời, khóa đặt theo nghĩa. Học sinh không dùng web quản trị (web học tập riêng).
 // Ẩn menu ở giao diện chỉ để tiện dùng; backend tự kiểm vai trò ở mọi endpoint.
@@ -126,6 +126,13 @@ export const SCREENS = [
   { key: 'translationReview', name: 'Duyệt bản dịch và tóm tắt', area: 'admin', actors: ADMIN, path: '/quan-tri/ban-dich' },
   { key: 'questionModeration', name: 'Kiểm duyệt ngân hàng câu hỏi', area: 'admin', actors: ADMIN, path: '/quan-tri/cau-hoi' },
   { key: 'plans', name: 'Gói dịch vụ', area: 'admin', actors: ADMIN, path: '/quan-tri/goi' },
+  {
+    key: 'adStats',
+    name: 'Thống kê khách và lượt mở khóa bằng quảng cáo',
+    area: 'admin',
+    actors: ADMIN,
+    path: '/quan-tri/khach-va-quang-cao',
+  },
   { key: 'auditLog', name: 'Nhật ký thao tác', area: 'admin', actors: ADMIN, path: '/quan-tri/nhat-ky' },
 ] as const satisfies readonly Screen[];
 

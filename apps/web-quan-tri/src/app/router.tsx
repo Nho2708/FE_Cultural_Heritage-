@@ -11,6 +11,7 @@ import { PendingScreen } from '../pages/PendingScreen';
 import { HomeRedirect, OutsideNotFound } from './fallbackRoutes';
 import { ProfilePage } from '../pages/profile/ProfilePage';
 import {
+  AdStatsPage,
   AiQuestionsPage,
   AreaRoute,
   AuditLogPage,
@@ -61,6 +62,7 @@ const BUILT: Partial<Record<ScreenKey, ReactNode>> = {
   heritageEditor: <HeritageEditorPage />,
   translationReview: <TranslationReviewPage />,
   plans: <PlansPage />,
+  adStats: <AdStatsPage />,
   auditLog: <AuditLogPage />,
   classes: <ClassesPage />,
   classDetail: <ClassDetailPage />,

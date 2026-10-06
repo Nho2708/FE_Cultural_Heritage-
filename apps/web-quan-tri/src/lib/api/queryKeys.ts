@@ -1,6 +1,6 @@
 import type { ClassMasteryFilter, QuestionQualityFilter, SystemPaymentQuery, TrendQuery, ClassRecommendationFilter, LessonListFilter, QuestionListFilter, QuizCandidateFilter, QuizListFilter } from '@dsvhvn/dung-chung/api';
 import type { ClassListQuery, StudentListQuery } from './classroomEndpoints';
-import type { LanguageCode, TranslationQueueQuery } from '@dsvhvn/dung-chung/api';
+import type { AdStatsQuery, LanguageCode, TranslationQueueQuery } from '@dsvhvn/dung-chung/api';
 import type { AuditLogQuery, HeritageListQuery, InvoiceListQuery, OrganizationListQuery, TeacherListQuery } from './endpoints';
 
 // Khóa bộ nhớ đệm của React Query. Khóa cha (ví dụ ['org']) dùng để làm mới cả nhóm sau khi ghi.
@@ -104,6 +104,9 @@ export const queryKeys = {
   moderation: ['admin', 'moderation'] as const,
   moderationList: (filter: QuestionQualityFilter) => ['admin', 'moderation', 'list', filter] as const,
   moderationDetail: (id: number) => ['admin', 'moderation', 'detail', id] as const,
+
+  /** Thống kê khách và lượt mở khóa bằng quảng cáo theo khoảng ngày. */
+  adStats: (query: AdStatsQuery) => ['admin', 'ads', 'stats', query] as const,
 
   auditLogs: (query: AuditLogQuery) => ['admin', 'audit-logs', query] as const,
 };
