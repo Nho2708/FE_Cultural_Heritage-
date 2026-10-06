@@ -3,7 +3,7 @@
 Giao diện của **DSVHVN** (nhóm FA26SE171): nền tảng giúp **trường học** — giáo viên tạo lớp, bài học và bài kiểm tra về
 di sản văn hóa Việt Nam cho học sinh; nội dung di sản tham khảo từ Cục Di sản văn hóa; có khám phá di sản, bản đồ và
 dòng thời gian. Học sinh có tài khoản (mã học sinh + mật khẩu, giáo viên tạo) và học trên web học tập hoặc app mobile.
-Giao diện và nội dung **chỉ tiếng Việt**; route viết chữ Việt không dấu.
+Web quản trị và khu học của học sinh **chỉ tiếng Việt**; phần công khai của web học tập (khám phá di sản) có **năm ngôn ngữ** (Việt, Anh, Hàn, Trung giản thể, Nhật); route viết chữ Việt không dấu.
 
 Repo gồm **hai ứng dụng web** và **một gói dùng chung**, quản lý bằng npm workspaces:
 
@@ -20,6 +20,7 @@ Backend: [`BE_Cultural_Heritage-`](../BE_Cultural_Heritage-) (ASP.NET Core 9, ti
 Chi tiết từng ứng dụng: [`docs/web-quan-tri.md`](docs/web-quan-tri.md), [`docs/web-hoc-tap.md`](docs/web-hoc-tap.md), [`docs/kham-pha-di-san.md`](docs/kham-pha-di-san.md) (khám phá di sản công khai);
 luồng lớp, học sinh và tài khoản học sinh: [`docs/lop-hoc-sinh.md`](docs/lop-hoc-sinh.md);
 luồng bài học cho lớp theo cấp, AI soạn nội dung, mã bài học: [`docs/bai-hoc-theo-cap.md`](docs/bai-hoc-theo-cap.md);
+luồng đa ngôn ngữ, AI dịch và tóm tắt di sản, duyệt bản dịch, nghe thuyết minh: [`docs/da-ngon-ngu.md`](docs/da-ngon-ngu.md);
 kiểm thử trên trình duyệt thật: [`docs/kiem-thu-trinh-duyet.md`](docs/kiem-thu-trinh-duyet.md).
 
 ## Yêu cầu
