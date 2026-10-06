@@ -70,4 +70,6 @@ export const KEYS = {
   history: 'dsvhvn.app.lich-su',
   deviceId: 'dsvhvn.app.ma-thiet-bi',
   session: 'dsvhvn.app.phien',
+  lessonPosition: 'dsvhvn.app.vi-tri-bai',
+  quizFlags: 'dsvhvn.app.danh-dau-cau',
 } as const;

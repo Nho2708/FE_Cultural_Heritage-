@@ -10,6 +10,7 @@ module.exports = {
     '^@dsvhvn/dung-chung/i18n$': `${shared}/i18n/index.ts`,
     '^@dsvhvn/dung-chung/heritage-text$': `${shared}/heritageText.ts`,
     '^@dsvhvn/dung-chung/embed$': `${shared}/embed/index.ts`,
+    '^@dsvhvn/dung-chung/lesson-data$': `${shared}/lesson/lessonData.ts`,
     '^@dsvhvn/dung-chung/speech$': `${shared}/speech/index.ts`,
     '^@dsvhvn/dung-chung/theme$': `${shared}/theme/index.ts`,
     '^@/(.*)$': '<rootDir>/src/$1',

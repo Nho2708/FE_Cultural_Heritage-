@@ -1,6 +1,7 @@
 import type { LanguageCode, StudentProfile } from '@dsvhvn/dung-chung/api';
 import type { AuthSnapshot } from '@dsvhvn/dung-chung/auth';
 import { detectLanguage, parseLanguage } from '@dsvhvn/dung-chung/i18n';
+import { useQueryClient } from '@tanstack/react-query';
 import { getLocales } from 'expo-localization';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { I18nextProvider } from 'react-i18next';
@@ -93,6 +94,17 @@ function Ready({ initial, modeRef, children }: { initial: Loaded; modeRef: { cur
   const [mode, setMode] = useState(initial.mode);
   const [locationEnabled, setLocation] = useState(initial.locationEnabled);
   const { services } = initial;
+  const queryClient = useQueryClient();
+  const snapshot = useSyncExternalStore(services.sessionStore.subscribe, services.sessionStore.getSnapshot, services.sessionStore.getSnapshot);
+  const userId = snapshot.session?.user.id ?? null;
+  const previousUserId = useRef(userId);
+
+  // Đăng xuất hoặc đổi học sinh thì bỏ dữ liệu học tập đã tải của người trước.
+  useEffect(() => {
+    if (previousUserId.current === userId) return;
+    previousUserId.current = userId;
+    queryClient.removeQueries({ queryKey: ['student'] });
+  }, [userId, queryClient]);
 
   const language: LanguageCode = mode === 'student' ? 'vi' : (chosenLanguage ?? deviceLanguage());
 

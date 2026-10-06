@@ -13,5 +13,6 @@
     "react/iframe-missing-sandbox": "off",
     "react/react-in-jsx-scope": "off"
   },
+  "overrides": [{ "files": ["**/*.test.ts", "**/*.test.tsx"], "rules": { "react/immutability": "off" } }],
   "ignorePatterns": ["**/dist", "**/node_modules", "**/.expo", "**/coverage"]
 }
