@@ -122,7 +122,7 @@ function Viewer({ src, poster, labels, fallback, onFailure, onLoaded, onProgress
       setLoaded(true);
       callbacks.current.onLoaded?.();
     };
-    const onLoadProgress = (event: Event) => {
+    const trackProgress = (event: Event) => {
       const total = (event as CustomEvent<{ totalProgress?: number }>).detail?.totalProgress;
       if (typeof total === 'number') {
         const fraction = Math.max(0, Math.min(1, total));
@@ -130,12 +130,12 @@ function Viewer({ src, poster, labels, fallback, onFailure, onLoaded, onProgress
         callbacks.current.onProgress?.(fraction);
       }
     };
-    element.addEventListener('progress', onLoadProgress);
+    element.addEventListener('progress', trackProgress);
     element.addEventListener('load', done);
     element.addEventListener('error', fail);
     if ((element as { loaded?: boolean }).loaded === true) done();
     return () => {
-      element.removeEventListener('progress', onLoadProgress);
+      element.removeEventListener('progress', trackProgress);
       element.removeEventListener('load', done);
       element.removeEventListener('error', fail);
     };
