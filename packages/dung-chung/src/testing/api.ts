@@ -27,6 +27,8 @@ export interface FetchCall {
   path: string;
   body: unknown;
   authorization: string | undefined;
+  /** Mã thiết bị của khách (tiêu đề X-Device-Key) nếu yêu cầu có gửi. */
+  deviceKey: string | undefined;
 }
 
 /** Nội dung gửi đi: JSON được đọc lại, FormData đổi thành đối tượng (tệp thành { fileName, size }). */
@@ -60,6 +62,7 @@ export function mockApi(...routes: Route[]) {
         path: `${url.pathname.replace(/^\/api\/v1/, '')}${url.search}`,
         body: readBody(init?.body),
         authorization: headers.Authorization,
+        deviceKey: headers['X-Device-Key'],
       };
       calls.push(call);
       for (const route of routes) {

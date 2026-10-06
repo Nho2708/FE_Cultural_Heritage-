@@ -8,6 +8,7 @@ export * from './cn';
 export * from './files';
 export * from './format';
 export * from './forms';
+export * from './guest';
 export * from './heritage';
 export * from './lessons';
 export * from './messages';
