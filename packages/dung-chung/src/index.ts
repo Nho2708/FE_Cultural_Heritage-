@@ -2,6 +2,7 @@
 // hợp lệ, xử lý lỗi của biểu mẫu. Lớp gọi API ở `@dsvhvn/dung-chung/api`, phiên đăng nhập ở `/auth`, component giao
 // diện web ở `/ui`, bộ giao diện theo cấp học ở `/theme`, CSS token ở `/styles/*`.
 
+export * from './attempts';
 export * from './cn';
 export * from './format';
 export * from './forms';
