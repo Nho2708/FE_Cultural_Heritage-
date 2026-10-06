@@ -1,4 +1,4 @@
-import type { LessonListFilter, QuestionListFilter, QuizCandidateFilter, QuizListFilter } from '@dsvhvn/dung-chung/api';
+import type { ClassMasteryFilter, ClassRecommendationFilter, LessonListFilter, QuestionListFilter, QuizCandidateFilter, QuizListFilter } from '@dsvhvn/dung-chung/api';
 import type { ClassListQuery, StudentListQuery } from './classroomEndpoints';
 import type { AuditLogQuery, HeritageListQuery, OrganizationListQuery, TeacherListQuery } from './endpoints';
 
@@ -52,6 +52,18 @@ export const queryKeys = {
   quizCandidates: (id: number, filter: QuizCandidateFilter) => ['teacher', 'quizzes', 'candidates', id, filter] as const,
   /** Câu như học sinh của một cấp thấy (xem trước). */
   questionPreview: (id: number, level: number) => ['teacher', 'questions', 'preview', id, level] as const,
+
+  /** Thống kê của giáo viên: kết quả bài kiểm tra, tiến độ và thành thạo của lớp, hồ sơ học sinh, gợi ý ôn tập (làm mới cả nhóm khi cần). */
+  statistics: ['teacher', 'statistics'] as const,
+  quizOverview: (quizId: number) => ['teacher', 'statistics', 'quiz', quizId, 'overview'] as const,
+  quizQuestionStats: (quizId: number) => ['teacher', 'statistics', 'quiz', quizId, 'questions'] as const,
+  quizStudentRows: (quizId: number) => ['teacher', 'statistics', 'quiz', quizId, 'students'] as const,
+  quizSuggestions: (quizId: number, range: string) => ['teacher', 'statistics', 'quiz', quizId, 'suggestions', range] as const,
+  attemptDetail: (attemptId: number) => ['teacher', 'statistics', 'attempt', attemptId] as const,
+  classProgress: (classId: number) => ['teacher', 'statistics', 'class', classId, 'progress'] as const,
+  classMastery: (classId: number, filter: ClassMasteryFilter) => ['teacher', 'statistics', 'class', classId, 'mastery', filter] as const,
+  classSuggestions: (classId: number, filter: ClassRecommendationFilter) => ['teacher', 'statistics', 'class', classId, 'suggestions', filter] as const,
+  studentProfile: (classId: number, studentId: number) => ['teacher', 'statistics', 'class', classId, 'student', studentId] as const,
 
   auditLogs: (query: AuditLogQuery) => ['admin', 'audit-logs', query] as const,
 };

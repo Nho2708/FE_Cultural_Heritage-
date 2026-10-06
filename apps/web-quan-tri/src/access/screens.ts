@@ -162,6 +162,8 @@ export const PATHS = {
   school: (id: number) => `/quan-tri/truong/${id}`,
   /** Chi tiết lớp của giáo viên (tab nằm trong tham số `?tab=`). */
   classRoom: (id: number) => `/giao-vien/lop/${id}`,
+  /** Hồ sơ học tập của một học sinh trong lớp. */
+  studentRecord: (classId: number, studentId: number) => `/giao-vien/lop/${classId}/hoc-sinh/${studentId}`,
   /** Soạn bài học của giáo viên. */
   lesson: (id: number) => `/giao-vien/bai-hoc/${id}`,
   /** Sinh và duyệt câu hỏi bằng AI từ một bài học. */
