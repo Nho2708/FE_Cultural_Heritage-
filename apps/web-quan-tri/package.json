@@ -14,7 +14,8 @@
     "test:watch": "vitest",
     "smoke": "node scripts/smoke.mjs",
     "smoke:di-san": "node scripts/smoke-di-san.mjs",
-    "smoke:bai-hoc": "node scripts/smoke-bai-hoc.mjs"
+    "smoke:bai-hoc": "node scripts/smoke-bai-hoc.mjs",
+    "smoke:bai-kiem-tra": "node scripts/smoke-bai-kiem-tra.mjs"
   },
   "dependencies": {
     "@dsvhvn/dung-chung": "0.1.0",

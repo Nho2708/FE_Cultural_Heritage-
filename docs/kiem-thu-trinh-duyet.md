@@ -109,3 +109,34 @@ và database tạm: xem mục Kiểm thử trong [lop-hoc-sinh.md](lop-hoc-sinh.
 
 Ghi chú: ảnh của Wikimedia Commons không tải được trong môi trường kiểm thử nên các khung ảnh trống (giao diện vẫn hiện chú thích và ghi công). Bố cục cấp 3 chỉ có test giao diện, chưa chạy trên
 trình duyệt thật (lần này dùng lớp khối 3 và khối 8).
+
+## Bài kiểm tra của bài học (web quản trị)
+
+> Chạy ngày 06/10/2026 (+07) với backend nhánh `feature/DSVHVN-011-bai-kiem-tra`. Kết quả: **48/48 bước đạt**, không có lỗi JavaScript trên trang, không có phản hồi 5xx.
+> Script: [`apps/web-quan-tri/scripts/smoke-bai-kiem-tra.mjs`](../apps/web-quan-tri/scripts/smoke-bai-kiem-tra.mjs) (`npm run smoke:bai-kiem-tra -w @dsvhvn/web-quan-tri`).
+
+| Mục | Giá trị |
+|---|---|
+| Trình duyệt | Microsoft Edge headless qua `playwright-core`; khung 1440 × 900 và 390 × 844, múi giờ Asia/Ho_Chi_Minh |
+| API | Bản build của backend, `ASPNETCORE_ENVIRONMENT=Development`, `http://localhost:5180`, LocalDB **database tạm** (tên bắt đầu bằng `dsvhvn_tam_wt_`, migrate và nạp di sản đợt 1 lúc khởi động, **đã xóa sau khi chạy**), `Email__Mode=Log` (không gửi thư thật), `Ai:Mode` mặc định `Simulated`, `Quizzes__AutoCloseIntervalSeconds=5` để thấy tác vụ tự đóng |
+| Giao diện | `VITE_API_BASE_URL=http://localhost:5180/api/v1 npx vite --port 5273 --strictPort` (web quản trị) và `--port 5274` (web học tập) |
+| Chuẩn bị | Gọi thẳng API: xuất bản một di sản có dòng thời gian và thêm ảnh, tạo trường, quản trị trường, giáo viên, ba lớp (khối 3, 8, 11), mỗi lớp một bài học đã xuất bản, sáu câu hỏi đã duyệt (một đáp án, đúng sai, sắp xếp, điền từ, chọn hình, nhiều mệnh đề), một học sinh lớp khối 8. Mọi thao tác với bài kiểm tra đi qua giao diện |
+
+| Nhóm bước | Kết quả |
+|---|---|
+| Bài kiểm tra của tôi chưa có bài; cột Độ khó của Bài học của tôi ghi "Chưa có bài kiểm tra" cho cả ba bài; lọc độ khó "Khó" không có bài nào | Đạt |
+| Tạo bài kiểm tra cho lớp cấp 2 (chọn bài học, đặt tên); trang soạn mở với bài Nháp, bài học chỉ đọc, thời gian làm tùy chọn | Đạt |
+| Hộp chọn câu cấp 2: có bốn dạng của cấp, **câu chọn hình (cấp 1) bị ẩn**; con mắt mở câu như học sinh và giữ nguyên 4 câu đang chọn; thêm 4 câu | Đạt |
+| Đổi điểm 2,5 (tổng 5,5); điểm 0,1 bị chặn ngay; đổi thứ tự bằng phím mũi tên; bỏ câu; thêm lại (3 câu đã có hiện mờ, không chọn lại được) | Đạt |
+| Xem trước như học sinh (câu 1/4, câu sau); giờ đóng trước giờ mở báo lỗi dưới ô; Lưu rồi tải lại giữ đủ thiết lập | Đạt |
+| Phát hành: hộp xác nhận nhắc khóa danh sách và nêu mã bài học; xong hiện hộp Mã bài học; trường khóa bị vô hiệu, vẫn sửa tên, mô tả, giờ đóng (kéo dài giờ đóng lưu được); thanh trạng thái có Nhân bản, Kết quả, Đóng | Đạt |
+| Học sinh lớp cấp 2 đăng nhập web học tập, mở bài bằng mã, thấy bài ở tab Bài kiểm tra | Đạt |
+| Danh sách: dòng bài đang phát hành "4 câu · 15 phút", 0/1 đã nộp; Nhân bản thành bản Nháp cùng 4 câu không giờ mở, đóng; Phát hành khi thiếu giờ báo ngay, không hỏi xác nhận | Đạt |
+| Độ khó của bài học tính từ hai bài kiểm tra là "Khó"; lọc `?do-kho=kho` còn đúng một bài | Đạt |
+| Nhân bản bài học sang lớp cấp 1, ô chép kèm mặc định chọn và có cảnh báo khác cấp; kết quả "Đã chép 2 bài kiểm tra… Bỏ qua 4 câu hỏi"; bài chép sang cấp 1 có ô thời gian khóa "Không đồng hồ" và chỉ còn 2 câu hợp cấp | Đạt |
+| Lớp cấp 3: hộp chọn câu không có câu điền từ; để trống thời gian làm thì Phát hành báo bắt buộc; có 45 phút thì phát hành được | Đạt |
+| Đóng bài từ danh sách (hộp xác nhận không mở lại được), xóa bài Nháp, lọc trạng thái Đã đóng trên URL | Đạt |
+| 390px: Bài kiểm tra của tôi và Soạn và phát hành bài kiểm tra không tràn ngang | Đạt |
+| Bài cấp 3 phát hành với giờ đóng sau 1 phút: sau giờ đóng tác vụ nền tự chuyển sang Đã đóng | Đạt |
+
+Ghi chú: ảnh của Wikimedia Commons không tải được trong môi trường kiểm thử nên các khung ảnh trống. Luồng làm bài của học sinh chưa có nên chưa kiểm số đã nộp lớn hơn 0 và Kết quả bài kiểm tra.
