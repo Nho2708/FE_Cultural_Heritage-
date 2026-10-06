@@ -8,3 +8,5 @@ export type * from './classroom';
 export type * from './lessons';
 export type * from './questions';
 export { QUESTION_ENDPOINTS, createQuestionsApi } from './questions';
+export type * from './quizzes';
+export { QUIZ_ENDPOINTS, createQuizzesApi } from './quizzes';
