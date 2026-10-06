@@ -21,6 +21,7 @@ Chi tiết từng ứng dụng: [`docs/web-quan-tri.md`](docs/web-quan-tri.md), 
 luồng lớp, học sinh và tài khoản học sinh: [`docs/lop-hoc-sinh.md`](docs/lop-hoc-sinh.md);
 luồng bài học cho lớp theo cấp, AI soạn nội dung, mã bài học: [`docs/bai-hoc-theo-cap.md`](docs/bai-hoc-theo-cap.md);
 luồng đa ngôn ngữ, AI dịch và tóm tắt di sản, duyệt bản dịch, nghe thuyết minh: [`docs/da-ngon-ngu.md`](docs/da-ngon-ngu.md);
+luồng mô hình 3D di sản (tab Mô hình 3D, trình xem dùng chung, nút Xem 3D): [`docs/mo-hinh-3d.md`](docs/mo-hinh-3d.md);
 kiểm thử trên trình duyệt thật: [`docs/kiem-thu-trinh-duyet.md`](docs/kiem-thu-trinh-duyet.md).
 
 ## Yêu cầu

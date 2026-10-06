@@ -138,3 +138,35 @@ trình duyệt thật (lần này dùng lớp khối 3 và khối 8).
 Ghi chú: Edge headless trên máy kiểm thử chỉ có giọng đọc `en-US` (ba giọng). Vì vậy tiếng Anh kiểm được trạng thái đang đọc nhưng không nghe được âm thanh trong môi trường không giao diện, còn tiếng Nhật (và Hàn, Trung, Việt) rơi đúng vào trường hợp thiết bị
 chưa có giọng: giao diện báo kèm hướng dẫn cài giọng, khóa nút Phát, vẫn hiện đủ chữ (đã kiểm với tiếng Nhật). Luồng tiến câu, tô sáng, đổi tốc độ, tạm dừng và dừng kiểm bằng Web Speech API giả đặt trước khi trang tải.
 Nội dung bản dịch lấy từ bản AI giả lập (gắn tiền tố mã ngôn ngữ), không phải chất lượng dịch thật. Ảnh của Wikimedia Commons không tải được trong môi trường kiểm thử nên các khung ảnh trống.
+
+## Mô hình 3D di sản (web quản trị và web học tập)
+
+> Chạy ngày 07/10/2026 (+07) với backend nhánh `feature/DSVHVN-014-mo-hinh-3d`. Kết quả: **60/60 bước đạt**, không có lỗi JavaScript trên trang, không có phản hồi 5xx.
+> Script: [`apps/web-hoc-tap/scripts/smoke-mo-hinh-3d.mjs`](../apps/web-hoc-tap/scripts/smoke-mo-hinh-3d.mjs) (`npm run smoke:mo-hinh-3d -w @dsvhvn/web-hoc-tap`). Chi tiết luồng: [mo-hinh-3d.md](mo-hinh-3d.md).
+
+| Mục | Giá trị |
+|---|---|
+| Trình duyệt | Microsoft Edge headless qua `playwright-core` với `--use-angle=swiftshader --enable-unsafe-swiftshader` (WebGL chạy bằng phần mềm); khung 1440 × 900 và 390 × 844 |
+| API | Bản build của backend, `ASPNETCORE_ENVIRONMENT=Development`, `http://localhost:5080`, LocalDB **database tạm** `dsvhvn_tam_a2_ui_mo_hinh_3d` (migrate và nạp 20 di sản đợt 1 lúc khởi động, **đã xóa sau khi chạy**), `Email__Mode=Log`, `Ai__Mode=Simulated`, `Storage__Provider=Local` với thư mục kho tệp tạm |
+| Giao diện | `npx vite --port 5173` (web quản trị) và `--port 5174` (web học tập), `VITE_API_BASE_URL=http://localhost:5080/api/v1`; đã tắt mọi tiến trình đã bật |
+| Chuẩn bị | Gọi thẳng API: xuất bản ba di sản, một di sản nháp có mô hình, một mô hình nặng hơn 6 MB, trường, giáo viên, lớp khối 7 và một học sinh. Tệp `.glb` thử do script tự dựng (khối lập phương glTF 2.0). Việc khai báo mô hình của di sản A đi qua giao diện |
+
+| Nhóm | Bước | Kết quả |
+|---|---|---|
+| Quản trị hệ thống | Tab Mô hình 3D (tab thứ sáu), trạng thái rỗng; chọn `.gltf` và tệp đổi đuôi `.glb` bị từ chối ngay; CC BY-NC bị chặn; giấy phép mở thiếu nguồn bị chặn; ghi công ghép hiện trước khi lưu | Đạt |
+| | Tải `.glb` lên và hiện ngay: "Đang hiển thị", "Khách đang thấy", dung lượng do máy chủ đo | Đạt |
+| | Xem thử: trình xem WebGL thật tải xong và vẽ hình khối nhiều màu; kéo chuột xoay, cuộn chuột phóng to, "Đặt lại góc nhìn" đưa camera về góc ban đầu; người tắt chuyển động thì không tự xoay | Đạt |
+| | Dán đường dẫn ngoài kho bị từ chối; dùng tệp đã lưu, mô hình nhóm tự dựng không cần nguồn; một mô hình hiển thị (ô "hiện ngay" và nút Hiện bị khóa); ẩn rồi hiện mô hình khác | Đạt |
+| | Thay tệp (dung lượng đo lại, ghi công giữ nguyên), sửa tác giả, gỡ (xóa mềm, tệp vẫn tải được) | Đạt |
+| | Quản lý di sản: cột và bộ lọc "Có mô hình 3D", "Chưa có mô hình 3D"; nhật ký ghi thao tác mô hình, không ghi đường dẫn tệp | Đạt |
+| Khách | Di sản không có mô hình: không có nút Xem 3D, chỉ có thư viện ảnh; di sản có mô hình: nút cùng hàng với Tóm tắt và Nghe, chưa bấm thì chưa tải | Đạt |
+| | Xem 3D: trình xem WebGL vẽ hình khối, tự xoay khi không tắt chuyển động, kéo xoay được, ghi công kèm liên kết giấy phép và nguồn, lời gọi mô hình không mang token, không quảng cáo, Esc đóng | Đạt |
+| | Năm ngôn ngữ: nút, tiêu đề hộp thoại, nút Đặt lại góc nhìn bằng en, ko, zh-Hans, ja; ghi công không dịch | Đạt |
+| | 390px: hộp thoại không tràn ngang, trình xem vừa màn hình | Đạt |
+| | Tệp mô hình bị chặn tải, và thiết bị không có WebGL: quay về bộ ảnh kèm câu thông báo | Đạt |
+| | Mô hình nặng trên mạng di động giả lập: hỏi trước, "Vẫn tải mô hình" thì tải; trên mạng thường tải luôn | Đạt |
+| | Ẩn di sản: API mô hình trả 404, nút biến mất, tab của quản trị giải thích khách chưa thấy; hiện lại thì nút trở lại | Đạt |
+| Học sinh | Đã nhớ tiếng Hàn trên máy nhưng đăng nhập thì xem tiếng Việt; Xem 3D bình thường, không cần token | Đạt |
+| Xem trước | Bản nháp có mô hình: tab xem trước có nút Xem 3D (không có Tóm tắt và Nghe), trình xem tải mô hình bằng token quản trị; mô hình của di sản nháp không lộ ra API công khai | Đạt |
+
+Ghi chú: trình duyệt không giao diện vẽ 3D bằng phần mềm nên chỉ kiểm được kết quả đúng (khung vẽ có màu, góc nhìn đổi), không đo hiệu năng. Ảnh của Wikimedia Commons không tải được trong môi trường kiểm thử nên các khung ảnh trống (giao diện vẫn hiện chú thích và ghi công).
