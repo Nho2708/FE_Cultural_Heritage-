@@ -1,4 +1,4 @@
-import { createApiClient, createDiscoveryApi, createGuestApi, createStudentApi, sessionEndNotice } from '@dsvhvn/dung-chung/api';
+import { createAdsApi, createApiClient, createDiscoveryApi, createGuestApi, createStudentApi, sessionEndNotice } from '@dsvhvn/dung-chung/api';
 import { API_BASE_URL } from '../../config/env';
 import { sessionStore } from '../auth/session';
 import { guestHeaders } from '../guest/tracking';
@@ -18,10 +18,19 @@ export const apiClient = createApiClient({
 export const studentApi = createStudentApi(apiClient);
 
 /**
- * Máy khách của các API công khai: không gắn token nên khách, học sinh và token hỏng đều xem như nhau. Khi người xem là khách tham quan thì mỗi
+ * Máy khách của các API công khai: không gắn token nên khách, học sinh và token hỏng đều xem như nhau (riêng tóm tắt di sản gắn token của học sinh để máy chủ
+ * mở thẳng cổng quảng cáo cho học sinh). Khi người xem là khách tham quan thì mỗi
  * yêu cầu mang mã thiết bị ẩn danh (tiêu đề X-Device-Key) để máy chủ ghi lịch sử tìm, xem, đọc tóm tắt, xem 3D; học sinh và trang nhúng không mang mã.
  */
-const publicClient = createApiClient({ baseUrl: API_BASE_URL, getAccessToken: () => null, extraHeaders: guestHeaders });
+const publicClient = createApiClient({
+  baseUrl: API_BASE_URL,
+  // Chỉ các yêu cầu khai `auth: 'optional'` (tóm tắt di sản) mang token của học sinh; mọi yêu cầu công khai khác khai `auth: false` nên không bao giờ mang token.
+  getAccessToken: () => sessionStore.getSession()?.accessToken ?? null,
+  onUnauthorized: (response) => {
+    if (sessionStore.getSession()?.accessToken === response.token) sessionStore.clear(sessionEndNotice(response));
+  },
+  extraHeaders: guestHeaders,
+});
 
 /** Khám phá di sản công khai (có ghi lịch sử của khách). */
 export const discoveryApi = createDiscoveryApi(publicClient);
@@ -40,3 +49,9 @@ export const guestApi = createGuestApi(plainClient);
  * danh sách), để lịch sử "đã xem" chỉ có những di sản khách thật sự mở.
  */
 export const quietDiscoveryApi = createDiscoveryApi(plainClient);
+
+/**
+ * Quảng cáo Google có thưởng của khách: cấu hình, trạng thái mở khóa, bắt đầu và báo đã nhận thưởng ở web. Mã thiết bị đi tường minh ở từng hàm; học sinh không bao giờ gọi
+ * (cổng chỉ hiện cho khách và máy chủ mở thẳng cho phiên học sinh).
+ */
+export const adsApi = createAdsApi(plainClient);

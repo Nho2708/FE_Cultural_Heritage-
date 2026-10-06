@@ -103,7 +103,7 @@ function HeroActions({ detail, previewCode }: { detail: PublicHeritageDetail; pr
           <span>{t.detail.noSummary}</span>
         </output>
       )}
-      {!preview && <SummaryDialog slug={detail.slug} open={dialog !== null} tab={dialog ?? lastTab} onTabChange={setDialog} onClose={() => setDialog(null)} />}
+      {!preview && <SummaryDialog slug={detail.slug} name={detail.name} open={dialog !== null} tab={dialog ?? lastTab} onTabChange={setDialog} onClose={() => setDialog(null)} />}
       {has3d && <ModelDialog detail={detail} source={modelSource} open={modelOpen} onClose={() => setModelOpen(false)} />}
     </div>
   );

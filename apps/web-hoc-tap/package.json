@@ -16,7 +16,8 @@
     "smoke:da-ngon-ngu": "node scripts/smoke-da-ngon-ngu.mjs",
     "smoke:mo-hinh-3d": "node scripts/smoke-mo-hinh-3d.mjs",
     "smoke:lam-bai": "node scripts/smoke-lam-bai.mjs",
-    "smoke:khach": "node scripts/smoke-khach.mjs"
+    "smoke:khach": "node scripts/smoke-khach.mjs",
+    "smoke:quang-cao": "node scripts/smoke-quang-cao.mjs"
   },
   "dependencies": {
     "@dsvhvn/dung-chung": "0.1.0",
