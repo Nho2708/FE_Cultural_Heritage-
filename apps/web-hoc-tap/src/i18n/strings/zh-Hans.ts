@@ -181,6 +181,7 @@ export const zhHans: Strings = {
     agency: '发布机构',
     accessed: '访问日期',
     loading: '正在加载遗产…',
+    view3d: '查看 3D',
     summary: '摘要',
     listen: '收听',
     noSummary: '这处遗产暂无摘要。你仍然可以阅读下方的完整内容。',
@@ -214,6 +215,24 @@ export const zhHans: Strings = {
     unsupportedHint: '你仍然可以阅读下方的全部文字。',
     shortLabel: '供收听的简短版本',
     sourceNote: '摘要来自遗产已保存的内容，查看时不会重新生成。',
+  },
+
+  model: {
+    kicker: '3D 模型',
+    viewerAria: (name) => `${name}的 3D 模型`,
+    hint: '拖动可旋转，滚动或双指捏合可放大、缩小。也可以用方向键旋转。',
+    loading: '正在加载 3D 模型…',
+    progress: (percent) => `正在加载 3D 模型：${percent}%`,
+    resetView: '重置视角',
+    credit: '署名',
+    license: '查看许可协议',
+    source: '查看来源',
+    unavailable: '无法加载 3D 模型。您可以改为查看该遗产的图片集。',
+    photos: '遗产图片集',
+    noPhotos: '该遗产暂时没有图片。',
+    heavyTitle: '此模型较大',
+    heavyText: (size) => `此模型约 ${size}。您正在使用移动网络或省流量模式，加载可能消耗较多流量。`,
+    loadAnyway: '仍然加载',
   },
 
   timeline: {

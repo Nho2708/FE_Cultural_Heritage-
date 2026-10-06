@@ -182,6 +182,7 @@ export const en: Strings = {
     agency: 'Publisher',
     accessed: 'Accessed',
     loading: 'Loading heritage…',
+    view3d: 'View in 3D',
     summary: 'Summary',
     listen: 'Listen',
     noSummary: 'This heritage site has no summary yet. You can still read the full content below.',
@@ -216,6 +217,24 @@ export const en: Strings = {
     unsupportedHint: 'You can still read all of the text below.',
     shortLabel: 'Short version for listening',
     sourceNote: 'Summarized from the saved content of the heritage site; nothing is generated while you view it.',
+  },
+
+  model: {
+    kicker: '3D MODEL',
+    viewerAria: (name) => `3D model of ${name}`,
+    hint: 'Drag to rotate, scroll or pinch to zoom in and out. You can also use the arrow keys to rotate.',
+    loading: 'Loading the 3D model…',
+    progress: (percent) => `Loading the 3D model: ${percent}%`,
+    resetView: 'Reset view',
+    credit: 'Credit',
+    license: 'View license',
+    source: 'View source',
+    unavailable: 'The 3D model could not be loaded. You can view the photo gallery of this heritage site instead.',
+    photos: 'Photo gallery of the heritage site',
+    noPhotos: 'This heritage site has no photos yet.',
+    heavyTitle: 'This model is large',
+    heavyText: (size) => `This model is about ${size}. You are on a mobile network or in data-saving mode, so loading it may use a lot of data.`,
+    loadAnyway: 'Load the model anyway',
   },
 
   timeline: {

@@ -4,6 +4,7 @@ import { lazy, Suspense, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { pathOf } from '../access/screens';
 import { LocalizationNotice } from '../components/LocalizationNotice';
+import { ModelDialog, type ModelSource } from '../components/ModelDialog';
 import { SummaryDialog, type SummaryTab } from '../components/SummaryDialog';
 import { citationsOf, creditLine, parseContent, parseInline, safeUrl, sourceSummary } from '../discovery/format';
 import { HeritageLoadError } from '../discovery/HeritageNotFound';
@@ -46,12 +47,21 @@ function Chips({ detail }: { detail: PublicHeritageDetail }) {
 const ACTION =
   'inline-flex h-12 items-center gap-2 rounded-sm border-[1.5px] border-on-image px-5 type-control text-on-image transition-colors hover:bg-white/15';
 
-/** Nút "Tóm tắt" và "Nghe": mở hộp thoại tóm tắt; di sản chưa có tóm tắt tiếng Việt đã duyệt thì báo một câu, không mở gì. */
-function SummaryActions({ detail }: { detail: PublicHeritageDetail }) {
+/**
+ * Nút "Tóm tắt", "Nghe" và "Xem 3D" dưới tên di sản. "Tóm tắt" và "Nghe" mở hộp thoại tóm tắt (di sản chưa có tóm tắt tiếng Việt đã duyệt thì báo một câu,
+ * không mở gì) và không có ở trang xem trước. "Xem 3D" chỉ hiện khi di sản có mô hình đang hiển thị, luôn miễn phí, có cả ở trang xem trước (đọc mô hình của
+ * bản nháp theo mã xem trước).
+ */
+function HeroActions({ detail, previewCode }: { detail: PublicHeritageDetail; previewCode?: string }) {
   const { t } = useI18n();
+  const preview = previewCode !== undefined;
   const [dialog, setDialog] = useState<SummaryTab | null>(null);
   const [lastTab, setLastTab] = useState<SummaryTab>('doc');
   const [missing, setMissing] = useState(false);
+  const [modelOpen, setModelOpen] = useState(false);
+  const modelSource: ModelSource = preview ? { kind: 'preview', code: previewCode } : { kind: 'public' };
+  const has3d = detail.hasModel === true;
+  if (preview && !has3d) return null;
 
   const open = (tab: SummaryTab) => {
     if (detail.hasSummary === false) {
@@ -67,14 +77,24 @@ function SummaryActions({ detail }: { detail: PublicHeritageDetail }) {
     <div className="flex flex-col gap-3">
       <fieldset className="m-0 flex min-w-0 flex-wrap gap-3 border-0 p-0">
         <legend className="sr-only">{t.detail.actionsAria}</legend>
-        <button type="button" onClick={() => open('doc')} className={ACTION}>
-          <Icon name="file-text" size={20} />
-          {t.detail.summary}
-        </button>
-        <button type="button" onClick={() => open('nghe')} className={ACTION}>
-          <Icon name="headphones" size={20} />
-          {t.detail.listen}
-        </button>
+        {!preview && (
+          <>
+            <button type="button" onClick={() => open('doc')} className={ACTION}>
+              <Icon name="file-text" size={20} />
+              {t.detail.summary}
+            </button>
+            <button type="button" onClick={() => open('nghe')} className={ACTION}>
+              <Icon name="headphones" size={20} />
+              {t.detail.listen}
+            </button>
+          </>
+        )}
+        {has3d && (
+          <button type="button" onClick={() => setModelOpen(true)} className={ACTION}>
+            <Icon name="box" size={20} />
+            {t.detail.view3d}
+          </button>
+        )}
       </fieldset>
       {missing && (
         <output className="flex max-w-[640px] items-start gap-2 rounded-sm bg-surface px-4 py-3 type-body-s text-on-surface">
@@ -82,12 +102,13 @@ function SummaryActions({ detail }: { detail: PublicHeritageDetail }) {
           <span>{t.detail.noSummary}</span>
         </output>
       )}
-      <SummaryDialog slug={detail.slug} open={dialog !== null} tab={dialog ?? lastTab} onTabChange={setDialog} onClose={() => setDialog(null)} />
+      {!preview && <SummaryDialog slug={detail.slug} open={dialog !== null} tab={dialog ?? lastTab} onTabChange={setDialog} onClose={() => setDialog(null)} />}
+      {has3d && <ModelDialog detail={detail} source={modelSource} open={modelOpen} onClose={() => setModelOpen(false)} />}
     </div>
   );
 }
 
-function Hero({ detail, preview }: { detail: PublicHeritageDetail; preview: boolean }) {
+function Hero({ detail, previewCode }: { detail: PublicHeritageDetail; previewCode?: string }) {
   const { t } = useI18n();
   const cover = detail.media.find((m) => m.isThumbnail) ?? detail.media.find((m) => m.url && m.url === detail.thumbnailUrl);
   const credit = cover ? creditLine(cover, t.common.photoCredit) : null;
@@ -107,7 +128,7 @@ function Hero({ detail, preview }: { detail: PublicHeritageDetail; preview: bool
           {detail.name}
         </h1>
         <Chips detail={detail} />
-        {!preview && <SummaryActions detail={detail} />}
+        <HeroActions detail={detail} previewCode={previewCode} />
         {credit && <p className="type-label text-on-image-variant">{credit}</p>}
       </div>
     </section>
@@ -350,13 +371,15 @@ function Sources({ detail }: { detail: PublicHeritageDetail }) {
 
 /**
  * Nội dung trang chi tiết di sản. Dùng cho trang công khai và cho trang xem trước bản nháp của quản trị hệ thống: cùng một
- * giao diện. Xem trước (`preview`) bỏ các liên kết sang bản đồ và dòng thời gian công khai và các nút tóm tắt vì bản nháp chưa có ở đó.
+ * giao diện. Xem trước (có `previewCode`, mã xem trước của bản nháp) bỏ các liên kết sang bản đồ và dòng thời gian công khai và các nút tóm tắt vì bản
+ * nháp chưa có ở đó; nút "Xem 3D" vẫn có và đọc mô hình của bản nháp theo mã.
  */
-export function HeritageDetailView({ detail, preview = false }: { detail: PublicHeritageDetail; preview?: boolean }) {
+export function HeritageDetailView({ detail, previewCode }: { detail: PublicHeritageDetail; previewCode?: string }) {
   const { t } = useI18n();
+  const preview = previewCode !== undefined;
   return (
     <>
-      <Hero detail={detail} preview={preview} />
+      <Hero detail={detail} previewCode={previewCode} />
       <section className="dsv-content flex flex-col gap-12 pt-14 pb-12 dsvlg:flex-row dsvlg:gap-16">
         <Content detail={detail} />
         <aside aria-label={t.detail.infoAria} className="flex min-w-0 flex-1 flex-col gap-6 dsvlg:max-w-[360px]">

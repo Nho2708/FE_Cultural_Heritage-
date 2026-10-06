@@ -108,7 +108,7 @@ export function HeritagePreviewPage() {
           </span>
         </p>
       </output>
-      <HeritageDetailView detail={preview.heritage} preview />
+      <HeritageDetailView detail={preview.heritage} previewCode={code} />
     </>
   );
 }
