@@ -133,7 +133,7 @@ try {
   // ---- Ảnh và media
   await page.getByRole('tab', { name: 'Ảnh và media' }).click();
   await page.getByText('Di sản chưa có ảnh nào.').waitFor();
-  await click('Thêm ảnh');
+  await click('Thêm bằng đường dẫn');
   const mediaDialog = page.getByRole('dialog', { name: 'Thêm ảnh và media' });
   await mediaDialog.getByRole('button', { name: 'Lưu', exact: true }).click();
   check('Thêm ảnh để trống → báo thiếu đường dẫn và ghi công', (await mediaDialog.locator('p.text-danger').count()) === 4);

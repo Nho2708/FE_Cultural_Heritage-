@@ -2,6 +2,7 @@ import { LESSON_LIMITS, LESSON_SECTION_LABEL, cn, countLessonWords } from '@dsvh
 import type { LessonEventOption, LessonFrame, LessonImageOption } from '@dsvhvn/dung-chung/api';
 import { Button, Icon, SelectField, TextAreaField, TextField } from '@dsvhvn/dung-chung/ui';
 import { creditLine, type SectionState } from './lessonForm';
+import { fileUrl } from '../../lib/fileUrl';
 
 // Một phần nội dung của bài trên màn hình Soạn bài học. Mỗi loại phần có ô nhập riêng theo khung của cấp: bước câu chuyện (cấp 1:
 // đoạn truyện, câu ngắn kèm hình, hình bắt buộc), hình và chú thích, đoạn văn, mốc thời gian (năm, nối với sự kiện của di sản),
@@ -51,7 +52,7 @@ function ImageBlock({
   return (
     <div className="flex flex-col gap-2 dsvsm:w-48 dsvsm:shrink-0">
       {section.imageUrl ? (
-        <img src={section.imageUrl} alt="" className="h-32 w-full rounded-sm object-cover" />
+        <img src={fileUrl(section.imageUrl) ?? section.imageUrl} alt="" className="h-32 w-full rounded-sm object-cover" />
       ) : (
         <div
           className={cn(

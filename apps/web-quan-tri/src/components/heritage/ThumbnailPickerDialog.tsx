@@ -3,6 +3,7 @@ import { errorMessage, type HeritageDetail } from '@dsvhvn/dung-chung/api';
 import { cn } from '@dsvhvn/dung-chung';
 import { Button, InlineMessage, Modal } from '@dsvhvn/dung-chung/ui';
 import { adminHeritagesApi } from '../../lib/api/endpoints';
+import { fileUrl } from '../../lib/fileUrl';
 
 // Chọn ảnh đại diện trong thư viện ảnh của chính di sản (để luôn có ghi công). Thư viện chưa có ảnh thì chỉ đường sang
 // tab Ảnh và media.
@@ -72,7 +73,7 @@ export function ThumbnailPickerDialog({ heritage, onPicked, onOpenMediaTab, onCl
                       />
                       <span className="min-w-0 truncate type-body-s text-on-surface">{image.caption || image.url}</span>
                     </span>
-                    <img src={image.url ?? ''} alt="" loading="lazy" className="h-32 w-full rounded-sm object-cover" />
+                    <img src={fileUrl(image.previewUrl ?? image.url) ?? ''} alt="" loading="lazy" className="h-32 w-full rounded-sm object-cover" />
                     <span className="truncate type-label text-on-surface-muted">{image.credit}</span>
                   </label>
                 </li>

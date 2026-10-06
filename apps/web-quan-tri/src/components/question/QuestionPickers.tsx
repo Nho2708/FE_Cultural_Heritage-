@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { publishedHeritagesApi } from '../../lib/api/lessonEndpoints';
 import { queryKeys } from '../../lib/api/queryKeys';
+import { fileUrl } from '../../lib/fileUrl';
 
 // Hai ô chọn của biểu mẫu câu hỏi: di sản đã xuất bản (bắt buộc) và hình trong thư viện ảnh của di sản đó (ảnh của di sản và ảnh
 // của các sự kiện trên dòng thời gian, đúng nguồn mà máy chủ chấp nhận).
@@ -136,7 +137,7 @@ export function ImageField({ label, value, heritageId, heritageName, error, hint
     <Field label={label} error={error} hint={hint}>
       {({ describedBy }) => (
         <div className="flex flex-wrap items-center gap-3" aria-describedby={describedBy}>
-          {value ? <img src={value} alt="" className="h-16 w-24 rounded-sm object-cover" /> : <span className="type-body-s text-on-surface-variant">Chưa chọn hình</span>}
+          {value ? <img src={fileUrl(value) ?? value} alt="" className="h-16 w-24 rounded-sm object-cover" /> : <span className="type-body-s text-on-surface-variant">Chưa chọn hình</span>}
           {!disabled && (
             <>
               <Button variant="secondary" size="sm" disabled={heritageId === null} aria-label={`${label}: chọn từ thư viện ảnh`} onClick={() => setOpen(true)}>
@@ -173,7 +174,7 @@ export function ImageField({ label, value, heritageId, heritageName, error, hint
                           setOpen(false);
                         }}
                       >
-                        <img src={image.url} alt="" loading="lazy" className="h-24 w-full object-cover" />
+                        <img src={fileUrl(image.url) ?? image.url} alt="" loading="lazy" className="h-24 w-full object-cover" />
                         <span className="block p-2 type-body-s text-on-surface-variant">{image.caption || 'Không có chú thích'}</span>
                         {image.credit && <span className="block px-2 pb-2 type-body-s text-on-surface-variant">Nguồn: {image.credit}</span>}
                       </button>

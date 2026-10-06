@@ -94,6 +94,8 @@ export interface PublicMedia {
   license: string | null;
   source: string | null;
   isThumbnail: boolean;
+  /** Ảnh thu nhỏ của ảnh tải lên; null hoặc không có với ảnh thêm bằng đường dẫn. */
+  previewUrl?: string | null;
 }
 
 export interface PublicReference {

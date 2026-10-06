@@ -102,6 +102,15 @@ describe('chữ hiển thị của trang khám phá', () => {
     expect(safeUrl(null)).toBeNull();
   });
 
+  it('ảnh tải lên kho tệp có đường dẫn tương đối /files/... thì ghép với máy chủ API; đường dẫn tương đối khác vẫn bị chặn', () => {
+    expect(safeUrl('/files/images/0123456789abcdef0123456789abcdef.jpg')).toBe('http://api.test/files/images/0123456789abcdef0123456789abcdef.jpg');
+    expect(displayImageUrl('/files/images/0123456789abcdef0123456789abcdef-thumb.webp', 500)).toBe(
+      'http://api.test/files/images/0123456789abcdef0123456789abcdef-thumb.webp',
+    );
+    expect(safeUrl('/admin/secret')).toBeNull();
+    expect(safeUrl('//evil.test/x.jpg')).toBeNull();
+  });
+
   it('ảnh Wikimedia Commons dùng bản thu nhỏ có sẵn; địa chỉ khác giữ nguyên', () => {
     const original = 'https://upload.wikimedia.org/wikipedia/commons/7/7d/20190923_Independence_Palace-10.jpg';
     expect(displayImageUrl(original, 400)).toBe(

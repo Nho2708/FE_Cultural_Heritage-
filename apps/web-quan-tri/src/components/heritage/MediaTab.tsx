@@ -3,11 +3,14 @@ import { errorMessage, type HeritageDetail, type HeritageMedia } from '@dsvhvn/d
 import { cn, MEDIA_TYPE_LABEL, MESSAGES } from '@dsvhvn/dung-chung';
 import { Badge, Button, ConfirmDialog, EmptyState, Icon, useToast } from '@dsvhvn/dung-chung/ui';
 import { adminHeritagesApi, adminMediaApi } from '../../lib/api/endpoints';
+import { fileUrl } from '../../lib/fileUrl';
 import { MediaFormDialog } from './MediaFormDialog';
+import { MediaUploadDialog } from './MediaUploadDialog';
 import { useReorder } from './reorder';
 import { ReorderHandle } from './ReorderHandle';
 
-// Tab Ảnh và media: thư viện ảnh, video, âm thanh của di sản (đường dẫn, chú thích, ghi công bắt buộc, thứ tự kéo thả).
+// Tab Ảnh và media: thư viện ảnh, video, âm thanh của di sản (tải ảnh từ máy lên hoặc thêm bằng đường dẫn, chú thích, ghi công
+// bắt buộc, thứ tự kéo thả). Xóa ảnh khỏi thư viện là xóa mềm: tệp đã tải lên vẫn nằm trong kho tệp.
 // Ảnh đại diện phải là một ảnh trong thư viện này. Ảnh của sự kiện quản lý trong Biểu mẫu giai đoạn và sự kiện.
 
 interface MediaTabProps {
@@ -16,12 +19,20 @@ interface MediaTabProps {
   onChanged: () => void;
 }
 
-export function MediaThumb({ media, className }: { media: Pick<HeritageMedia, 'mediaType' | 'url'>; className?: string }) {
+/** Ảnh nhỏ của một ảnh trong thư viện: ảnh thu nhỏ do máy chủ tạo khi tải lên (nhẹ), không có thì dùng ảnh gốc. */
+export function MediaThumb({
+  media,
+  className,
+}: {
+  media: Pick<HeritageMedia, 'mediaType' | 'url' | 'previewUrl'>;
+  className?: string;
+}) {
   const box = cn('flex shrink-0 items-center justify-center overflow-hidden rounded-sm bg-surface-container-high', className);
-  if (media.mediaType === 'IMAGE' && media.url) {
+  const src = fileUrl(media.previewUrl ?? media.url);
+  if (media.mediaType === 'IMAGE' && src) {
     return (
       <span className={box}>
-        <img src={media.url} alt="" loading="lazy" className="size-full object-cover" />
+        <img src={src} alt="" loading="lazy" className="size-full object-cover" />
       </span>
     );
   }
@@ -35,6 +46,7 @@ export function MediaThumb({ media, className }: { media: Pick<HeritageMedia, 'm
 export function MediaTab({ heritage, onChanged }: MediaTabProps) {
   const toast = useToast();
   const [editing, setEditing] = useState<HeritageMedia | 'new' | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState<HeritageMedia | null>(null);
   const [busy, setBusy] = useState(false);
   const ids = heritage.media.map((m) => m.id);
@@ -72,15 +84,21 @@ export function MediaTab({ heritage, onChanged }: MediaTabProps) {
         <h2 id="tab-anh-tieu-de" className="type-body-m text-on-surface-variant">
           {heritage.media.length} ảnh và media. Kéo biểu tượng bên trái hoặc dùng phím mũi tên lên, xuống để đổi thứ tự.
         </h2>
-        <Button onClick={() => setEditing('new')}>
-          <Icon name="plus" size={16} />
-          Thêm ảnh
-        </Button>
+        <div className="flex flex-wrap gap-3">
+          <Button onClick={() => setUploading(true)}>
+            <Icon name="upload" size={16} />
+            Tải ảnh lên
+          </Button>
+          <Button variant="secondary" onClick={() => setEditing('new')}>
+            <Icon name="plus" size={16} />
+            Thêm bằng đường dẫn
+          </Button>
+        </div>
       </div>
 
       {heritage.media.length === 0 ? (
         <EmptyState icon="image" title="Di sản chưa có ảnh nào.">
-          Thêm ảnh kèm ghi công đầy đủ, rồi chọn một ảnh làm ảnh đại diện để xuất bản di sản.
+          Tải ảnh lên (hoặc thêm bằng đường dẫn) kèm ghi công đầy đủ, rồi chọn một ảnh làm ảnh đại diện để xuất bản di sản.
         </EmptyState>
       ) : (
         <ul className="flex flex-col gap-3">
@@ -140,6 +158,20 @@ export function MediaTab({ heritage, onChanged }: MediaTabProps) {
             );
           })}
         </ul>
+      )}
+
+      {uploading && (
+        <MediaUploadDialog
+          heritageId={heritage.id}
+          heritageName={heritage.name ?? ''}
+          hasThumbnail={heritage.media.some((m) => m.isThumbnail)}
+          onSaved={(message) => {
+            setUploading(false);
+            toast.success(message ?? MESSAGES.success('Tải ảnh lên'));
+            onChanged();
+          }}
+          onClose={() => setUploading(false)}
+        />
       )}
 
       {editing && (

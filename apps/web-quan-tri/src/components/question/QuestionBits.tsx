@@ -1,6 +1,7 @@
 import { DIFFICULTY_LABEL, REVIEW_STATUS_LABEL, levelRangeLabel } from '@dsvhvn/dung-chung';
 import type { QuestionDifficulty, QuestionPreview, QuestionReviewStatus } from '@dsvhvn/dung-chung/api';
 import { Badge, type BadgeTone } from '@dsvhvn/dung-chung/ui';
+import { fileUrl } from '../../lib/fileUrl';
 
 // Các mảnh nhỏ dùng chung của khu Ngân hàng câu hỏi: nhãn trạng thái, độ khó, cấp và khung xem trước như học sinh.
 
@@ -26,7 +27,7 @@ const LAYOUT_NOTE: Record<QuestionPreview['layout'], string> = {
 };
 
 function Picture({ url }: { url: string | null }) {
-  return url ? <img src={url} alt="" loading="lazy" className="max-h-40 rounded-md object-cover" /> : null;
+  return url ? <img src={fileUrl(url) ?? url} alt="" loading="lazy" className="max-h-40 rounded-md object-cover" /> : null;
 }
 
 /** Câu như học sinh của cấp thấy (không có đáp án đúng); chỉ để xem, không chấm. */

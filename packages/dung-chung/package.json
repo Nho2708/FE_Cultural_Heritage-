@@ -11,6 +11,9 @@
     ".": "./src/index.ts",
     "./api": "./src/api/index.ts",
     "./auth": "./src/auth/index.ts",
+    "./map/base": "./src/map/leafletBase.ts",
+    "./map/seas": "./src/map/seas.ts",
+    "./map/CoordinatePicker": "./src/map/CoordinatePicker.tsx",
     "./theme": "./src/theme/index.ts",
     "./ui": "./src/ui/index.ts",
     "./testing": "./src/testing/api.ts",
@@ -22,6 +25,14 @@
     "test": "vitest run",
     "gen:tokens": "node scripts/gen-tokens.mjs",
     "check:tokens": "node scripts/gen-tokens.mjs --check"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4",
+    "leaflet.markercluster": "^1.5.3"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.22",
+    "@types/leaflet.markercluster": "^1.5.6"
   },
   "peerDependencies": {
     "react": "^19.3.0",

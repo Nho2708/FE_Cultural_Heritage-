@@ -3,6 +3,7 @@
 @import '@dsvhvn/dung-chung/styles/tokens.css';
 @import '@dsvhvn/dung-chung/styles/theme.css';
 @import '@dsvhvn/dung-chung/styles/nen.css';
+@import '@dsvhvn/dung-chung/styles/ban-do.css';
 
 /* Component của gói dùng chung nằm ngoài thư mục ứng dụng: khai báo để Tailwind quét lớp tiện ích của chúng. */
 @source '../../../../packages/dung-chung/src';

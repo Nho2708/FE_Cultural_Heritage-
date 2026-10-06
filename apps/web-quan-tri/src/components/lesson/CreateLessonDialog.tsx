@@ -8,6 +8,7 @@ import { classesApi } from '../../lib/api/classroomEndpoints';
 import { lessonsApi, publishedHeritagesApi } from '../../lib/api/lessonEndpoints';
 import { queryKeys } from '../../lib/api/queryKeys';
 import { LevelBadge } from '../classroom/ClassFields';
+import { fileUrl } from '../../lib/fileUrl';
 
 // Tạo bài học (hộp thoại hai bước): chọn lớp, rồi chọn 1-10 di sản đã xuất bản và đặt tiêu đề. Bài học dành riêng cho một
 // lớp; cấp của bài là cấp của lớp nên không có ô chọn cấp. Mở từ Chi tiết lớp thì lớp được chọn sẵn và khóa (bỏ bước 1).
@@ -183,7 +184,7 @@ function HeritageGrid({
                       )}
                     >
                       {card.thumbnailUrl ? (
-                        <img src={card.thumbnailUrl} alt="" loading="lazy" className="h-28 w-full object-cover" />
+                        <img src={fileUrl(card.thumbnailUrl) ?? ''} alt="" loading="lazy" className="h-28 w-full object-cover" />
                       ) : (
                         <span className="flex h-28 w-full items-center justify-center bg-image-placeholder text-on-surface-variant">
                           <Icon name="book-open" size={28} />

@@ -4,6 +4,7 @@ import { Button, EmptyState, ErrorState, LoadingState, Modal } from '@dsvhvn/dun
 import type { UseQueryResult } from '@tanstack/react-query';
 import { useState } from 'react';
 import { creditLine } from './lessonForm';
+import { fileUrl } from '../../lib/fileUrl';
 
 // Chọn hình trong thư viện ảnh của các di sản của bài (để hình luôn có chú thích và ghi công đi kèm). Không dán đường dẫn ngoài:
 // máy chủ chỉ nhận hình thuộc thư viện của di sản trong bài.
@@ -59,7 +60,7 @@ export function ImagePickerDialog({ materials: images, currentUrl, onPick, onClo
                     selected === image.url ? 'border-2 border-primary' : 'border-border hover:bg-surface-container-low',
                   )}
                 >
-                  <img src={image.url} alt={image.caption ?? image.heritageName ?? ''} loading="lazy" className="h-36 w-full object-cover" />
+                  <img src={fileUrl(image.url) ?? image.url} alt={image.caption ?? image.heritageName ?? ''} loading="lazy" className="h-36 w-full object-cover" />
                   <span className="flex flex-1 flex-col gap-1 p-3">
                     <span className="flex items-start gap-2">
                       <input

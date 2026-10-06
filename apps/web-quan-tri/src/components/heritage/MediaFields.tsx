@@ -4,7 +4,7 @@ import type { MediaType } from '@dsvhvn/dung-chung/api';
 import { SelectField, TextField } from '@dsvhvn/dung-chung/ui';
 import { useId } from 'react';
 
-// Các ô của một ảnh / video / âm thanh minh họa: đường dẫn (không tải tệp lên), chú thích và ghi công bắt buộc đủ ba
+// Các ô của một ảnh / video / âm thanh minh họa: đường dẫn (ảnh có sẵn trên mạng; tải tệp lên thì ẩn ô này), chú thích và ghi công bắt buộc đủ ba
 // phần "tác giả · giấy phép · nguồn". Dùng ở tab Ảnh và media và trong Biểu mẫu giai đoạn và sự kiện.
 
 const TYPE_OPTIONS = (Object.keys(MEDIA_TYPE_LABEL) as MediaType[]).map((value) => ({ value, label: MEDIA_TYPE_LABEL[value] }));
@@ -15,9 +15,11 @@ interface MediaFieldsProps {
   onChange: (field: MediaField, value: string) => void;
   /** Ẩn ô chọn loại khi loại đã cố định. */
   showType?: boolean;
+  /** Ẩn ô đường dẫn khi ảnh được tải lên (đường dẫn do hệ thống sinh). */
+  showUrl?: boolean;
 }
 
-export function MediaFields({ values, errors, onChange, showType = true }: MediaFieldsProps) {
+export function MediaFields({ values, errors, onChange, showType = true, showUrl = true }: MediaFieldsProps) {
   const licenseListId = useId();
   return (
     <>
@@ -31,18 +33,20 @@ export function MediaFields({ values, errors, onChange, showType = true }: Media
           error={errors.mediaType}
         />
       )}
-      <TextField
-        label="Đường dẫn"
-        name="url"
-        type="url"
-        inputMode="url"
-        autoCapitalize="none"
-        spellCheck={false}
-        value={values.url}
-        onChange={(e) => onChange('url', e.target.value)}
-        error={errors.url}
-        hint="Đường dẫn http hoặc https của tệp; hệ thống không tải tệp lên."
-      />
+      {showUrl && (
+        <TextField
+          label="Đường dẫn"
+          name="url"
+          type="url"
+          inputMode="url"
+          autoCapitalize="none"
+          spellCheck={false}
+          value={values.url}
+          onChange={(e) => onChange('url', e.target.value)}
+          error={errors.url}
+          hint="Đường dẫn http hoặc https của tệp đã có sẵn trên mạng. Muốn lưu tệp ở hệ thống thì dùng Tải ảnh lên."
+        />
+      )}
       <TextField
         label="Chú thích"
         name="caption"

@@ -110,3 +110,81 @@ describe('tầng gọi API dùng chung', () => {
     expect(sessionEndNotice({ errorCode: null, message: null })).toBe('Phiên đăng nhập đã hết. Vui lòng đăng nhập lại.');
   });
 });
+
+describe('tải tệp có tiến độ', () => {
+  const form = () => {
+    const body = new FormData();
+    body.set('file', new File(['x'], 'a.jpg', { type: 'image/jpeg' }));
+    return body;
+  };
+
+  it('có onUploadProgress thì gửi bằng XMLHttpRequest, gắn Bearer, báo tiến độ rồi đọc khuôn phản hồi chung', async () => {
+    const sent: { method: string; url: string; headers: Record<string, string>; body: unknown }[] = [];
+    class FakeXhr {
+      upload: { onprogress: ((e: { lengthComputable: boolean; loaded: number; total: number }) => void) | null } = { onprogress: null };
+      onload: (() => void) | null = null;
+      status = 201;
+      responseText = JSON.stringify({ success: true, data: { id: 7 }, message: 'Tải ảnh lên thành công.' });
+      private record = { method: '', url: '', headers: {} as Record<string, string>, body: undefined as unknown };
+      open(method: string, url: string) {
+        Object.assign(this.record, { method, url });
+      }
+      setRequestHeader(name: string, value: string) {
+        this.record.headers[name] = value;
+      }
+      getResponseHeader() {
+        return 'application/json';
+      }
+      send(body: unknown) {
+        this.record.body = body;
+        sent.push(this.record);
+        this.upload.onprogress?.({ lengthComputable: true, loaded: 25, total: 100 });
+        this.upload.onprogress?.({ lengthComputable: true, loaded: 100, total: 100 });
+        this.onload?.();
+      }
+    }
+    vi.stubGlobal('XMLHttpRequest', FakeXhr);
+    const fetch = vi.fn<() => Promise<Response>>();
+    vi.stubGlobal('fetch', fetch);
+    const progress: number[] = [];
+    const { client } = clientWith('access-1');
+    const body = form();
+
+    const result = await client.request('/admin/heritages/3/media/upload', {
+      method: 'POST',
+      body,
+      onUploadProgress: (fraction) => progress.push(fraction),
+    });
+
+    expect(result).toEqual({ data: { id: 7 }, message: 'Tải ảnh lên thành công.' });
+    expect(fetch).not.toHaveBeenCalled();
+    expect(progress).toEqual([0.25, 1, 1]);
+    expect(sent[0]).toMatchObject({ method: 'POST', url: `${BASE}/admin/heritages/3/media/upload`, body });
+    expect(sent[0]!.headers.Authorization).toBe('Bearer access-1');
+    // Trình duyệt tự đặt Content-Type có ranh giới của multipart.
+    expect(sent[0]!.headers['Content-Type']).toBeUndefined();
+  });
+
+  it('lỗi của backend khi tải lên vẫn thành ApiError có lỗi theo trường', async () => {
+    const message = 'Tệp ảnh không hợp lệ: chỉ nhận định dạng JPG, PNG hoặc WEBP.';
+    mockApi(() => envelope(400, { errorCode: ERROR_CODES.invalid, message, errors: { file: message } }));
+    const { client } = clientWith('access-1');
+
+    const error = await client
+      .request('/admin/heritages/3/media/upload', { method: 'POST', body: form(), onUploadProgress: () => {} })
+      .catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect(error).toMatchObject({ status: 400, code: 'INVALID', fieldErrors: { file: message } });
+  });
+
+  it('máy chủ cắt yêu cầu quá cỡ (413, không có khuôn phản hồi) vẫn báo câu về dung lượng', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('', { status: 413 })));
+    const { client } = clientWith('access-1');
+
+    await expect(client.request('/admin/files/models', { method: 'POST', body: form() })).rejects.toMatchObject({
+      status: 413,
+      message: 'Tệp tải lên không hợp lệ: vượt quá dung lượng cho phép.',
+    });
+  });
+});

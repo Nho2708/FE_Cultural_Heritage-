@@ -3,6 +3,7 @@
 // diện web ở `/ui`, bộ giao diện theo cấp học ở `/theme`, CSS token ở `/styles/*`.
 
 export * from './cn';
+export * from './files';
 export * from './format';
 export * from './forms';
 export * from './heritage';

@@ -2,8 +2,8 @@ import type { HeritagePin } from '@dsvhvn/dung-chung/api';
 import type * as Leaflet from 'leaflet';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { clusterIcon, createBaseMap, loadLeaflet, pinIcon, type LeafletLib } from './leafletBase';
-import { VIETNAM_BOUNDS } from './seas';
+import { clusterIcon, createBaseMap, loadLeaflet, pinIcon, type LeafletLib } from '@dsvhvn/dung-chung/map/base';
+import { VIETNAM_BOUNDS } from '@dsvhvn/dung-chung/map/seas';
 
 // Bản đồ di sản: nền OpenStreetMap, ghim theo tọa độ (gom nhóm khi gần nhau), popup của ghim đang chọn dựng bằng React
 // (portal vào khung popup của Leaflet). Vị trí chọn nằm trên địa chỉ trang (`chon=<slug>`) nên phần tử cha là nguồn
