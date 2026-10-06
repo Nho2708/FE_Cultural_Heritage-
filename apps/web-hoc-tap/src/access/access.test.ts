@@ -7,9 +7,9 @@ const student = { mustChangePassword: false };
 const mustChange = { mustChangePassword: true };
 
 describe('bảng màn hình của web học tập', () => {
-  it('15 màn hình: 6 khám phá công khai, 9 khu học; 1 hộp thoại; route chữ thường không dấu', () => {
-    expect(SCREENS).toHaveLength(15);
-    expect(ALL.filter((s) => s.area === 'explore')).toHaveLength(6);
+  it('16 màn hình: 7 khám phá công khai, 9 khu học; 1 hộp thoại; route chữ thường không dấu', () => {
+    expect(SCREENS).toHaveLength(16);
+    expect(ALL.filter((s) => s.area === 'explore')).toHaveLength(7);
     expect(ALL.filter((s) => s.area === 'learning')).toHaveLength(9);
     expect(ALL.filter((s) => s.path === null).map((s) => s.name)).toEqual(['Bắt đầu bài kiểm tra']);
     const paths = ALL.flatMap((s) => [s.path, ...(s.aliases ?? [])]).filter((p) => p !== null);
@@ -27,6 +27,12 @@ describe('bảng màn hình của web học tập', () => {
     }
     expect(resolveAccess(screen('login'), null)).toBe('allow');
     expect(resolveAccess(screen('login'), student)).toBe('signed-in');
+  });
+
+  it('lịch sử của khách chỉ cho khách; học sinh đã đăng nhập được đưa về trang học', () => {
+    expect(resolveAccess(screen('guestHistory'), null)).toBe('allow');
+    expect(resolveAccess(screen('guestHistory'), student)).toBe('signed-in');
+    expect(screenForPath('/lich-su')?.key).toBe('guestHistory');
   });
 
   it('đang bị buộc đổi mật khẩu: mọi màn hình khác (kể cả trang khám phá) chuyển về Đổi mật khẩu', () => {

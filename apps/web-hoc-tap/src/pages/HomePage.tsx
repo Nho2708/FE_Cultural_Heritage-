@@ -11,7 +11,9 @@ import { creditLine } from '../discovery/format';
 import { FeaturedTile } from '../discovery/HeritageCard';
 import { heritagePath } from '../discovery/paths';
 import { KeywordSearch } from '../discovery/KeywordSearch';
-import { useHeritageDetail, useHome } from '../discovery/queries';
+import { NearbySection } from '../guest/NearbySection';
+import { RecommendationsSection } from '../guest/RecommendationsSection';
+import { useHome, useQuietHeritageDetail } from '../discovery/queries';
 import { Thumbnail } from '../discovery/Thumbnail';
 import { useI18n } from '../i18n/context';
 import { formatCount, listFlags } from '../i18n/format';
@@ -53,7 +55,7 @@ function Hero({ home }: { home: DiscoveryHome | undefined }) {
   const { user } = useAuth();
   const { language, t } = useI18n();
   const lead = home?.featured[0];
-  const detail = useHeritageDetail(lead?.slug);
+  const detail = useQuietHeritageDetail(lead?.slug);
   const thumbnail = detail.data?.media.find((m) => m.isThumbnail) ?? detail.data?.media.find((m) => m.mediaType === 'IMAGE');
   const credit = thumbnail ? creditLine(thumbnail, t.common.photoCredit) : null;
   const total = home?.totalHeritages;
@@ -327,6 +329,9 @@ export function HomePage() {
       <title>{t.home.title}</title>
       <Hero home={home.data} />
       <ExploreEntries featured={home.data?.featured ?? []} />
+      {/* Chỉ khách tham quan: gợi ý theo lịch sử và di sản gần vị trí (học sinh đã đăng nhập không có hai khối này). */}
+      <RecommendationsSection inviteOnly className="bg-background" />
+      <NearbySection />
       {home.isError && !home.data ? (
         <div className="dsv-content py-12">
           <PublicErrorState error={home.error} onRetry={() => void home.refetch()} />

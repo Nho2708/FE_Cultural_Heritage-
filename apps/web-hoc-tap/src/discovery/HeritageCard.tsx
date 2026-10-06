@@ -1,5 +1,6 @@
 import { cn } from '@dsvhvn/dung-chung';
 import type { HeritageCard as HeritageCardData } from '@dsvhvn/dung-chung/api';
+import type { ReactNode } from 'react';
 import { Link } from 'react-router';
 import { useI18n } from '../i18n/context';
 import { HERITAGE_TYPE_NAME, provinceName } from '@dsvhvn/dung-chung/i18n';
@@ -10,8 +11,11 @@ import { Thumbnail } from './Thumbnail';
 const SCRIM = 'bg-gradient-to-b from-(--dsv-card-scrim-top)';
 const ZOOM = 'transition-transform duration-(--dsv-duration-control) ease-out group-hover:scale-(--dsv-card-hover-scale) group-focus-visible:scale-(--dsv-card-hover-scale)';
 
-/** Thẻ di sản của lưới tìm kiếm: ảnh có tên phủ lên, dưới ảnh là tỉnh và nhãn loại. `to` mặc định là trang chi tiết. */
-export function HeritageCard({ card, to }: { card: HeritageCardData; to?: string }) {
+/**
+ * Thẻ di sản của lưới tìm kiếm: ảnh có tên phủ lên, dưới ảnh là tỉnh và nhãn loại. `to` mặc định là trang chi tiết.
+ * `trailing` thay nhãn loại ở bên phải dòng phụ (ví dụ khoảng cách của "Gần bạn"); `footer` nằm dưới thẻ, ngoài liên kết (ví dụ lý do gợi ý).
+ */
+export function HeritageCard({ card, to, trailing, footer }: { card: HeritageCardData; to?: string; trailing?: ReactNode; footer?: ReactNode }) {
   const { language, t } = useI18n();
   return (
     <li>
@@ -24,13 +28,15 @@ export function HeritageCard({ card, to }: { card: HeritageCardData; to?: string
         </div>
         <div className="flex items-center justify-between gap-2">
           <span className="min-w-0 type-body-s text-on-surface-variant">{provinceName(card.provinceName, language) ?? t.search.multiple}</span>
-          {card.heritageType && (
-            <span className="shrink-0 rounded-xs bg-primary-container px-2 py-0.5 type-label whitespace-nowrap text-on-primary-container">
-              {HERITAGE_TYPE_NAME[language][card.heritageType]}
-            </span>
-          )}
+          {trailing ??
+            (card.heritageType && (
+              <span className="shrink-0 rounded-xs bg-primary-container px-2 py-0.5 type-label whitespace-nowrap text-on-primary-container">
+                {HERITAGE_TYPE_NAME[language][card.heritageType]}
+              </span>
+            ))}
         </div>
       </Link>
+      {footer}
     </li>
   );
 }

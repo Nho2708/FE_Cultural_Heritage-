@@ -2,7 +2,7 @@ import type { IconName } from '@dsvhvn/dung-chung/ui';
 import { pathOf, type ScreenKey } from '../../access/screens';
 import type { Strings } from '../../i18n/strings';
 
-// Mục của thanh điều hướng trên (TopBar). Chưa đăng nhập: Khám phá · Bản đồ · Dòng thời gian (và nút "Học sinh đăng
+// Mục của thanh điều hướng trên (TopBar). Chưa đăng nhập: Khám phá · Bản đồ · Dòng thời gian · Lịch sử của tôi (và nút "Học sinh đăng
 // nhập"). Học sinh đã đăng nhập: Trang học · Nhập mã · Tiến độ · Khám phá · Bản đồ · Dòng thời gian (và menu tài khoản).
 
 export interface NavItem {
@@ -27,5 +27,6 @@ const LEARNING: readonly NavItem[] = [
 ];
 
 export function primaryNav(signedIn: boolean, t: Strings): NavItem[] {
-  return signedIn ? [...LEARNING, ...explore(t)] : explore(t);
+  // Lịch sử xem chỉ có với khách; học sinh đã đăng nhập không bị ghi lịch sử nên không có mục này.
+  return signedIn ? [...LEARNING, ...explore(t)] : [...explore(t), item('guestHistory', t.nav.history, 'clock')];
 }

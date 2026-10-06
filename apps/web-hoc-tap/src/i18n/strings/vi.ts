@@ -1,4 +1,4 @@
-import type { LanguageCode } from '@dsvhvn/dung-chung/api';
+import type { GuestActivityType, LanguageCode, SimilarityFactor } from '@dsvhvn/dung-chung/api';
 
 // Chữ giao diện của phần công khai (khám phá di sản) bằng tiếng Việt: bản gốc để dịch sang bốn ngôn ngữ còn lại (en.ts, ko.ts,
 // zh-Hans.ts, ja.ts phải có đúng các khóa của tệp này, kiểm bằng kiểu `Strings`). Khu học của học sinh và web quản trị chỉ có
@@ -33,6 +33,7 @@ export const vi = {
     menuItems: 'Mục điều hướng',
     mainMenu: 'Điều hướng chính',
     language: 'Ngôn ngữ',
+    history: 'Lịch sử của tôi',
   },
 
   language: {
@@ -267,6 +268,81 @@ export const vi = {
     pickerLoading: 'Đang tải danh sách di sản…',
     pickerNone: 'Không tìm thấy di sản nào',
     pickerTryOther: 'Hãy thử từ khóa khác.',
+  },
+
+  guest: {
+    recommend: {
+      title: 'Gợi ý cho bạn',
+      text: 'Di sản giống những gì bạn đã tìm, đã xem hoặc đã nghe gần đây.',
+      textFeatured: 'Bạn chưa xem di sản nào. Hãy xem thử vài di sản, mục này sẽ gợi ý theo sở thích của bạn. Trong lúc đó, đây là những di sản nổi bật.',
+      because: (name: string) => `Vì bạn quan tâm đến ${name}`,
+      reasonsLabel: 'Điểm chung',
+      reasons: {
+        SAME_TYPE: 'Cùng loại hình',
+        SAME_PROVINCE: 'Cùng tỉnh, thành',
+        SAME_REGION: 'Cùng vùng',
+        SAME_LEVEL: 'Cùng cấp xếp hạng',
+        OVERLAPPING_ERA: 'Cùng thời kỳ',
+        SIMILAR_TEXT: 'Nội dung gần giống',
+      } satisfies Record<SimilarityFactor, string>,
+      fallbackNote: 'Gợi ý được chọn theo loại hình và vùng của di sản bạn xem gần nhất.',
+      loading: 'Đang tìm gợi ý cho bạn…',
+    },
+    nearby: {
+      title: 'Gần bạn',
+      text: 'Di sản gần vị trí hiện tại của bạn. Vị trí chỉ dùng để tính khoảng cách và không được lưu.',
+      allowText: 'Cho phép trình duyệt dùng vị trí để xem các di sản quanh bạn.',
+      allow: 'Cho phép dùng vị trí',
+      locating: 'Đang xác định vị trí của bạn…',
+      loading: 'Đang tìm di sản gần bạn…',
+      away: (distance: string) => `Cách ${distance}`,
+      outsideVietnam: 'Chưa dùng được "Gần bạn": bạn đang ở ngoài Việt Nam.',
+      empty: 'Chưa có di sản nào có vị trí gần bạn.',
+      unavailable: 'Không xác định được vị trí của bạn. Hãy thử lại.',
+      denied: 'Trình duyệt đang chặn quyền vị trí nên "Gần bạn" chưa dùng được.',
+      turnOff: 'Tắt Gần bạn',
+      button: 'Gần bạn',
+      panelClose: 'Đóng danh sách',
+    },
+    history: {
+      title: 'Lịch sử của tôi',
+      lead: 'Những gì bạn đã tìm, xem, đọc, nghe và xem 3D trên trình duyệt này. Không cần tài khoản.',
+      tabs: 'Lịch sử và cài đặt',
+      tabHistory: 'Lịch sử',
+      tabSettings: 'Cài đặt',
+      retention: 'Lịch sử tự xóa sau 90 ngày.',
+      groups: {
+        SEARCH: 'Từ khóa đã tìm',
+        VIEW: 'Di sản đã xem',
+        READ_SUMMARY: 'Tóm tắt đã đọc',
+        LISTEN: 'Di sản đã nghe',
+        VIEW_3D: 'Mô hình 3D đã xem',
+      } satisfies Record<GuestActivityType, string>,
+      empty: 'Chưa có lịch sử. Hãy tìm hoặc mở một di sản, lịch sử sẽ hiện ở đây.',
+      exploreCta: 'Khám phá di sản',
+      remove: (name: string) => `Xóa "${name}" khỏi lịch sử`,
+      searchAgain: (keyword: string) => `Tìm lại "${keyword}"`,
+      clearAll: 'Xóa tất cả',
+      clearTitle: 'Xóa toàn bộ lịch sử?',
+      clearText: 'Lịch sử sẽ bị xóa khỏi máy chủ và không khôi phục được. Mục "Gợi ý cho bạn" quay về các di sản nổi bật.',
+      clearConfirm: 'Xóa tất cả',
+      cancel: 'Hủy',
+      removed: 'Đã xóa mục khỏi lịch sử.',
+      cleared: 'Đã xóa toàn bộ lịch sử.',
+      loadMore: 'Xem thêm',
+      loading: 'Đang tải lịch sử…',
+    },
+    settings: {
+      title: 'Cài đặt',
+      language: 'Ngôn ngữ',
+      changeLanguage: 'Đổi ngôn ngữ',
+      location: 'Dùng vị trí cho "Gần bạn"',
+      locationText: 'Khi bật, trình duyệt sẽ hỏi quyền vị trí. Vị trí chỉ dùng để tính khoảng cách và không được lưu.',
+      on: 'Bật',
+      off: 'Tắt',
+      privacyTitle: 'Mã thiết bị ẩn danh',
+      privacyText: 'Lịch sử gắn với một mã ngẫu nhiên lưu trên trình duyệt này, không gắn với tên hay tài khoản nào. Xóa dữ liệu trang của trình duyệt là bắt đầu lại từ đầu.',
+    },
   },
 
   errors: {
