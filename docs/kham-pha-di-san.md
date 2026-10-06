@@ -81,7 +81,7 @@ bản đồ nền; thẻ tóm tắt là popup tự cuộn bản đồ cho khỏi
 
 - Test đơn vị: `filters.test.ts` (tham số địa chỉ, từ khóa 2-100 ký tự), `format.test.ts` (ghi công, tọa độ, nội dung, chữ đậm, nguồn, ảnh thu nhỏ,
   khoảng năm thời kỳ), `pagination.test.ts`, `seas.test.ts` (hai quần đảo nằm đúng khu vực và trong khung nhìn); `packages/dung-chung/src/api/discovery.test.ts`
-  (đường dẫn, tham số, không gắn token).
+  (đường dẫn, tham số, không gắn token, trừ tóm tắt gắn token của học sinh nếu có phiên).
 - Test màn hình với API giả: `HomePage`, `SearchPage`, `MapPage` (Leaflet thay bằng khung giả), `HeritageDetailPage`, `TimelinePage`.
 - Test Leaflet thật trong jsdom: `HeritageMap.test.tsx`, `LocationMap.test.tsx` (ghi công OpenStreetMap, nhãn Hoàng Sa và Trường Sa, ghim, chọn ghim mở popup, tên
   địa phương không chèn HTML).

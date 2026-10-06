@@ -42,7 +42,7 @@ Khu học của học sinh và toàn bộ web quản trị **chỉ tiếng Việ
 
 ### Tóm tắt và nghe thuyết minh
 
-Nút "Tóm tắt" và "Nghe" ở trang chi tiết (không có ở trang xem trước bản nháp) mở hộp thoại **Tóm tắt và thuyết minh** với hai tab:
+Nút "Tóm tắt" và "Nghe" ở trang chi tiết (không có ở trang xem trước bản nháp) mở hộp thoại **Tóm tắt và thuyết minh** với hai tab (khách phải xem một quảng cáo có thưởng của Google để mở, xem [quang-cao-google.md](quang-cao-google.md); học sinh mở thẳng):
 
 - **Đọc**: bản tóm tắt chi tiết theo ngôn ngữ đang chọn, lấy từ bản đã lưu (`GET /public/heritages/{slug}/summary`), không gọi AI khi xem; tiếng Hàn, Trung, Nhật có nhãn bản dịch máy.
 - **Nghe**: chữ của bản tóm tắt ngắn, **Phát · Tạm dừng · Tiếp tục · Dừng**, tốc độ 0,75× · 1× · 1,25× · 1,5×, câu đang đọc được tô sáng, dòng trạng thái "Đang đọc câu 2 / 3 · Giọng đọc của thiết bị".

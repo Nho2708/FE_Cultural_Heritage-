@@ -23,6 +23,7 @@ luồng bài học cho lớp theo cấp, AI soạn nội dung, mã bài học: [
 luồng đa ngôn ngữ, AI dịch và tóm tắt di sản, duyệt bản dịch, nghe thuyết minh: [`docs/da-ngon-ngu.md`](docs/da-ngon-ngu.md);
 luồng mô hình 3D di sản (tab Mô hình 3D, trình xem dùng chung, nút Xem 3D): [`docs/mo-hinh-3d.md`](docs/mo-hinh-3d.md);
 luồng khách tham quan trên web (mã thiết bị ẩn danh, lịch sử, Gợi ý cho bạn, Gần bạn, trang nhúng cho app): [`docs/khach-tham-quan.md`](docs/khach-tham-quan.md);
+luồng quảng cáo Google có thưởng (cổng xem quảng cáo để mở tóm tắt và nghe thuyết minh của khách, thống kê Khách và quảng cáo): [`docs/quang-cao-google.md`](docs/quang-cao-google.md);
 luồng gói và thanh toán VNPay (Gói dịch vụ, Trường và gói, Chọn gói và thanh toán, Kết quả thanh toán): [`docs/goi-thanh-toan.md`](docs/goi-thanh-toan.md);
 luồng bài kiểm tra của bài học, nhân bản bài học kèm bài kiểm tra, độ khó của bài học: [`docs/bai-kiem-tra.md`](docs/bai-kiem-tra.md);
 luồng học tập của học sinh theo cấp (làm bài, kết quả, tiến độ): [`docs/hoc-tap-theo-cap.md`](docs/hoc-tap-theo-cap.md);
