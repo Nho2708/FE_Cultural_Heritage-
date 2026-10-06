@@ -164,8 +164,8 @@ try {
   // Người đã đăng nhập mở liên kết đặt mật khẩu bị chuyển về trang của vai trò.
   const adminLink = await mailLink(school.admin.email);
   await page.goto(adminLink);
-  await page.waitForURL(`${BASE}/quan-tri/truong`);
-  check('Đang đăng nhập mở /dat-mat-khau → về trang của vai trò', true);
+  await page.waitForURL(`${BASE}/quan-tri`);
+  check('Đang đăng nhập mở /dat-mat-khau → về trang của vai trò (Tổng quan /quan-tri)', true);
   await signOut();
   check('Đăng xuất (hộp xác nhận chung) → Đăng nhập, xóa phiên', (await page.evaluate(() => localStorage.getItem('dsvhvn.quan-tri.phien'))) === null);
 
@@ -187,9 +187,12 @@ try {
 
   // ---- Quản trị trường: Giáo viên của trường, Biểu mẫu tài khoản, Trường và gói
   await signIn(school.admin.email, PASSWORD);
+  await page.waitForURL(`${BASE}/truong`);
+  await page.getByRole('heading', { level: 1, name: 'Tổng quan trường' }).waitFor();
+  await page.getByRole('link', { name: 'Giáo viên', exact: true }).first().click();
   await page.waitForURL(`${BASE}/truong/giao-vien`);
   await page.getByRole('heading', { level: 1, name: 'Giáo viên của trường' }).waitFor();
-  check('Quản trị trường đăng nhập bằng email → Giáo viên của trường /truong/giao-vien', true);
+  check('Quản trị trường đăng nhập bằng email → Tổng quan trường /truong, mở Giáo viên của trường /truong/giao-vien', true);
   await bodyHas('0 / 10 giáo viên');
   check('Bộ đếm hạn mức "0 / 10 giáo viên" (gói Miễn phí môi trường dev)', true);
   await click('Thêm giáo viên');
@@ -292,8 +295,8 @@ try {
 
   // ---- Quản trị hệ thống: Nhật ký thao tác, ngừng trường
   await signIn(ADMIN_LOGIN, ADMIN_PASSWORD);
-  await page.waitForURL(`${BASE}/quan-tri/truong`);
-  check('Quản trị hệ thống đăng nhập → trang mặc định Quản lý trường /quan-tri/truong', true);
+  await page.waitForURL(`${BASE}/quan-tri`);
+  check('Quản trị hệ thống đăng nhập → trang mặc định Tổng quan và doanh thu /quan-tri', true);
   await page.goto(`${BASE}/quan-tri/nhat-ky`);
   await page.getByLabel('Hành động').selectOption({ label: 'Tạo trường' });
   await click('Lọc');
@@ -331,7 +334,7 @@ try {
   await mobile.getByRole('heading', { level: 1, name: 'Đăng nhập' }).waitFor();
   check('390px: màn hình Đăng nhập không có thanh cuộn ngang', !(await mobile.evaluate(() => document.documentElement.scrollWidth > innerWidth)));
   await signIn(ADMIN_LOGIN, ADMIN_PASSWORD, mobile);
-  await mobile.waitForURL(`${BASE}/quan-tri/truong`);
+  await mobile.waitForURL(`${BASE}/quan-tri`);
   await mobile.getByRole('navigation', { name: 'Quản trị hệ thống (thu gọn)' }).waitFor();
   check('390px: khu quản trị dùng hàng điều hướng thu gọn, không tràn ngang', !(await mobile.evaluate(() => document.documentElement.scrollWidth > innerWidth)));
   await shot('11-dien-thoai', mobile);

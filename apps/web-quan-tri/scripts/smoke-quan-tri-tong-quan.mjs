@@ -294,7 +294,9 @@ try {
   await adminPage.getByRole('region', { name: 'Doanh thu từ gói dịch vụ' }).waitFor();
   check('Tab Doanh thu: thẻ doanh thu tháng này, từ trước tới nay, số giao dịch thành công tính từ VNPay', (await adminPage.getByRole('region', { name: 'Doanh thu từ gói dịch vụ' }).innerText()).includes('VNPay'));
   await adminPage.getByRole('figure', { name: 'Doanh thu theo ngày' }).waitFor();
-  check('Tab Doanh thu: biểu đồ doanh thu theo kỳ và danh sách giao dịch (hoặc báo chưa có)', (await adminPage.getByRole('table', { name: 'Giao dịch thanh toán' }).count()) + (await adminPage.getByText('Chưa có giao dịch thanh toán nào.').count()) === 1);
+  const paymentTable = adminPage.getByRole('table', { name: 'Giao dịch thanh toán' });
+  await paymentTable.or(adminPage.getByText('Chưa có giao dịch thanh toán nào.')).waitFor();
+  check('Tab Doanh thu: biểu đồ doanh thu theo kỳ và danh sách giao dịch (hoặc báo chưa có)', true, (await paymentTable.count()) ? `${await paymentTable.locator('tbody tr').count()} giao dịch` : 'chưa có giao dịch');
   check('Tab Doanh thu: liên kết sang bảng điều khiển AdMob và Ad Manager (tab mới)', (await adminPage.locator('a[target="_blank"][href*="admob"], a[target="_blank"][href*="admanager"]').count()) === 2);
   check('Tab Doanh thu giữ trên URL (?tab=doanh-thu)', adminPage.url().includes('tab=doanh-thu'));
   await shot(adminPage, '5-doanh-thu');
