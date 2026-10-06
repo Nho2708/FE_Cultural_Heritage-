@@ -16,3 +16,5 @@ export type * from './recommendations';
 export { RECOMMENDATION_ENDPOINTS, createClassRecommendationsApi, createStudentRecommendationsApi } from './recommendations';
 export type * from './statistics';
 export { STATISTICS_ENDPOINTS, createStatisticsApi } from './statistics';
+export type * from './overview';
+export { OVERVIEW_ENDPOINTS, createAdminQuestionsApi, createOverviewApi } from './overview';

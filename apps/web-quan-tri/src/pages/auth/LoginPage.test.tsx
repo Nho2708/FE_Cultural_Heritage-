@@ -42,7 +42,7 @@ describe('màn hình Đăng nhập', () => {
     await user.type(screen.getByLabelText('Mật khẩu'), 'MatKhau2026');
     await user.click(screen.getByRole('button', { name: 'Đăng nhập' }));
 
-    await waitFor(() => expect(router.state.location.pathname).toBe('/truong/giao-vien'));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/truong'));
     expect(calls.find((c) => c.path === '/auth/login')?.body).toEqual({ emailOrUsername: 'qt.thcs.a', password: 'MatKhau2026' });
     expect(sessionStore.getSession()?.accessToken).toBe('token-ORG_ADMIN');
     expect(await screen.findByText(MESSAGES.success('Đăng nhập'))).toBeInTheDocument();

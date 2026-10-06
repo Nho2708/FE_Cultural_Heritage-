@@ -85,11 +85,11 @@ describe('bảng màn hình và ma trận phân quyền của web quản trị',
 });
 
 describe('trang vào theo vai trò và điều hướng sau đăng nhập', () => {
-  it('trang mặc định: giáo viên → Hồ sơ cá nhân, quản trị trường → Giáo viên của trường, quản trị hệ thống → Quản lý trường', () => {
+  it('trang mặc định: giáo viên → Hồ sơ cá nhân, quản trị trường → Tổng quan trường, quản trị hệ thống → Tổng quan và doanh thu', () => {
     expect(roleHome('TEACHER')).toBe('/tai-khoan');
-    expect(roleHome('ORG_ADMIN')).toBe('/truong/giao-vien');
-    expect(roleHome('ADMIN')).toBe('/quan-tri/truong');
-    expect(postLoginTarget('ADMIN', null)).toBe('/quan-tri/truong');
+    expect(roleHome('ORG_ADMIN')).toBe('/truong');
+    expect(roleHome('ADMIN')).toBe('/quan-tri');
+    expect(postLoginTarget('ADMIN', null)).toBe('/quan-tri');
   });
 
   it('lối vào khu làm việc của vai trò', () => {
@@ -107,11 +107,11 @@ describe('trang vào theo vai trò và điều hướng sau đăng nhập', () =
 
   it('bỏ qua trang bị chặn khi vai trò không mở được, trang chỉ cho khách, hoặc đường dẫn không an toàn', () => {
     expect(postLoginTarget('TEACHER', '/quan-tri/truong')).toBe('/tai-khoan');
-    expect(postLoginTarget('ORG_ADMIN', '/giao-vien/lop')).toBe('/truong/giao-vien');
-    expect(postLoginTarget('ADMIN', '/dang-nhap')).toBe('/quan-tri/truong');
-    expect(postLoginTarget('ADMIN', '//evil.example/steal')).toBe('/quan-tri/truong');
-    expect(postLoginTarget('ADMIN', 'https://evil.example')).toBe('/quan-tri/truong');
-    expect(postLoginTarget('ADMIN', '/khong-ton-tai')).toBe('/quan-tri/truong');
+    expect(postLoginTarget('ORG_ADMIN', '/giao-vien/lop')).toBe('/truong');
+    expect(postLoginTarget('ADMIN', '/dang-nhap')).toBe('/quan-tri');
+    expect(postLoginTarget('ADMIN', '//evil.example/steal')).toBe('/quan-tri');
+    expect(postLoginTarget('ADMIN', 'https://evil.example')).toBe('/quan-tri');
+    expect(postLoginTarget('ADMIN', '/khong-ton-tai')).toBe('/quan-tri');
   });
 
   it('tìm màn hình theo đường dẫn: đường dẫn tĩnh thắng đường dẫn có tham số', () => {

@@ -197,3 +197,28 @@ Ghi chú: ảnh của Wikimedia Commons có thể không tải được trong m�
 
 Ghi chú: ảnh của Wikimedia Commons không tải được trong môi trường kiểm thử nên các khung ảnh di sản gợi ý trống. Log của API có vài dòng `SqlException` kèm "A severe error occurred on the current command"
 khi trình duyệt đóng yêu cầu đang chạy (chuyển trang giữa chừng); đó là hủy yêu cầu, không phải lỗi của chức năng, và trình duyệt không nhận 5xx nào.
+
+## Quản trị và tổng quan (web quản trị)
+
+> Chạy ngày 07/10/2026 (+07) với backend nhánh `feature/DSVHVN-017-quan-tri-tong-quan`. Kết quả: **43/43 bước đạt**, không có lỗi JavaScript trên trang, không có phản hồi 5xx, log của API không có dòng lỗi.
+> Script: [`apps/web-quan-tri/scripts/smoke-quan-tri-tong-quan.mjs`](../apps/web-quan-tri/scripts/smoke-quan-tri-tong-quan.mjs) (`npm run smoke:quan-tri-tong-quan -w @dsvhvn/web-quan-tri`).
+
+| Mục | Giá trị |
+|---|---|
+| Máy, trình duyệt | Windows 11, Node 24.19, Microsoft Edge headless qua `playwright-core`; khung 1440 × 900 và 390 × 800 |
+| API | Bản build của backend, `http://localhost:5180`, LocalDB **database tạm** `dsvhvn_tam_wt_…` (nạp di sản lúc khởi động, **đã xóa sau khi chạy**), `Email__Mode=Log`, `Ai__Mode=Simulated`, CORS cho cổng 5273 và 5274 |
+| Lệnh | `API_LOG=<log của API> ADMIN_PASSWORD=<mật khẩu seed> npm run smoke:quan-tri-tong-quan -w @dsvhvn/web-quan-tri` |
+| Chuẩn bị | Gọi thẳng API: xuất bản một di sản, tạo trường, quản trị trường, giáo viên, lớp cấp 2, bài học, hai câu hỏi (một đáp án đúng, đúng sai), bài kiểm tra đã phát hành, mười học sinh làm bài (sai câu một đáp án, đúng câu đúng sai) |
+
+| Nhóm bước | Kết quả |
+|---|---|
+| Quản trị trường vào thẳng Tổng quan trường: giáo viên 1 / hạn mức, 1 lớp, 10 học sinh đã đăng nhập hết, 1 bài học, 1 bài kiểm tra đang mở, 10 lượt nộp, điểm trung bình 5, lượt AI so với hạn mức có thanh dùng hạn mức, tên lớp trong biểu đồ theo lớp, thanh bên có Tổng quan | Đạt |
+| Chỉ có số tổng: trang không chứa tên giáo viên hay tên học sinh; nút Xem gói và hóa đơn mở Trường và gói; 390px không tràn ngang | Đạt |
+| Quản trị trường mở Kiểm duyệt câu hỏi nhận trang 403, máy chủ cũng trả 403 cho tổng quan hệ thống | Đạt |
+| Quản trị hệ thống vào thẳng Tổng quan: các thẻ số liệu, bảng số trường theo từng gói, biểu đồ 30 ngày (30 cột) có đủ lượt nộp vừa làm; khoảng 12 tháng tự gom theo tháng; đổi số liệu sang Học sinh mới | Đạt |
+| Tab Doanh thu: ghi rõ chờ nối thanh toán, không có số doanh thu, hai liên kết mở AdMob và Ad Manager ở tab mới, giữ trên URL; 390px không tràn ngang | Đạt |
+| Kiểm duyệt: câu một đáp án đúng 10 lượt, 0%, "Cần xem lại"; câu đúng sai 10 lượt, 100%; ba số đếm; lọc chỉ câu cần xem lại (trên URL); xem chỉ đọc có đáp án đúng, giải thích, kết quả làm bài, không có ô nhập | Đạt |
+| Ẩn câu có lý do: giáo viên không còn thấy câu ở tab Dùng chung, bài kiểm tra đã phát hành giữ nguyên câu; lọc Đã ẩn; Hiện lại câu có lý do: giáo viên thấy lại; nhật ký có "Ẩn câu hỏi" và "Hiện lại câu hỏi" kèm lý do, lọc được theo hành động | Đạt |
+| 390px: Kiểm duyệt không tràn ngang (bảng cuộn trong khung) | Đạt |
+
+Ghi chú: lần chạy đầu phát hiện trang Tổng quan hệ thống tràn ngang ở 390px vì ô lưới không co theo bảng; đã sửa (cột lưới `minmax(0, 1fr)`) và chạy lại.
