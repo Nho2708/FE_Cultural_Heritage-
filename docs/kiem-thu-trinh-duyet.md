@@ -167,3 +167,33 @@ Ghi chú: ảnh của Wikimedia Commons không tải được trong môi trườ
 | Em khác lớp không xem được lượt của em (404) | Đạt |
 
 Ghi chú: ảnh của Wikimedia Commons có thể không tải được trong môi trường kiểm thử nên một số khung ảnh trống. Đã gặp và sửa trong lúc chạy: bài tự nộp đúng hạn máy chủ ghi là "Đã nộp" nên giao diện giữ cờ "tự nộp khi hết giờ" ở phía máy em để vẫn báo đúng.
+
+## Thống kê và gợi ý (web quản trị và web học tập)
+
+> Chạy ngày 07/10/2026 (+07) với backend nhánh `feature/DSVHVN-016-thong-ke-goi-y`. Kết quả: **51/51 bước đạt**, không có lỗi JavaScript trên trang, không có phản hồi 5xx mà trình duyệt nhận.
+> Script: [`apps/web-quan-tri/scripts/smoke-thong-ke-goi-y.mjs`](../apps/web-quan-tri/scripts/smoke-thong-ke-goi-y.mjs) (`npm run smoke:thong-ke-goi-y -w @dsvhvn/web-quan-tri`).
+
+| Mục | Giá trị |
+|---|---|
+| Máy, trình duyệt | Windows 11, Node 24.19, Microsoft Edge headless qua `playwright-core`; khung 1440 × 900 và 390 × 844 |
+| API | Bản build của backend, `http://localhost:5180`, LocalDB **database tạm** `dsvhvn_tam_wt_…` (migrate và nạp di sản lúc khởi động, **đã xóa sau khi chạy**), `Email__Mode=Log` (không gửi thư thật), `Ai__Mode=Simulated`, CORS cho hai cổng web |
+| Web | `VITE_API_BASE_URL=http://localhost:5180/api/v1 npx vite --port 5273 --strictPort` (web quản trị) và `--port 5274` (web học tập) |
+| Lệnh | `API_LOG=<log của API> ADMIN_PASSWORD=<mật khẩu seed> npm run smoke:thong-ke-goi-y -w @dsvhvn/web-quan-tri` |
+| Chuẩn bị | Gọi thẳng API: xuất bản ba di sản, tạo trường, quản trị trường, hai giáo viên, ba lớp của giáo viên thứ nhất (khối 3, 8, 11) và một lớp của giáo viên thứ hai; mỗi lớp ba bài học đã xuất bản, câu hỏi đã duyệt theo cấp, hai bài kiểm tra đang mở; lớp cấp 2 có 6 học sinh làm bài đúng và sai khác nhau (5 em làm bài thứ nhất, 1 em làm cả hai, 1 em chưa làm gì), lớp cấp 1 và 3 mỗi lớp 2 em |
+
+| Nhóm bước | Kết quả |
+|---|---|
+| Chi tiết lớp, tab Tiến độ: 6 em, 2 bài đã phát hành, tiến độ 50% (6 lượt trên 12 ô), điểm 8/8 của em làm đúng hết, em chưa làm ghi "Chưa làm"; tên học sinh mở Hồ sơ học tập | Đạt |
+| Hồ sơ học tập: biểu đồ điểm theo thời gian, lịch sử 2 lượt, thẻ "2 trên 2 bài đã phát hành"; mở Chi tiết bài làm từ lịch sử: 4 câu, bài sai hết, câu em trả lời cạnh đáp án đúng và giải thích | Đạt |
+| Tab Thành thạo: bảng nhiệt hàng Cả lớp và 6 em, ô 100% là Thành thạo, chú giải màu, tỉ lệ theo dạng câu; lọc theo loại gọi lại không lỗi | Đạt |
+| Tab Gợi ý ôn tập: di sản nên ôn "Lớp sai 60% ở 20 câu về di sản này", di sản liên quan; Tạo bài ôn tập mở hộp thoại Tạo bài học với lớp khóa, tiêu đề "Ôn tập: …", tạo xong chuyển sang Soạn bài học | Đạt |
+| Kết quả bài kiểm tra: Tổng quan (5 / 6, chưa làm 1 em, điểm trung bình 3,2, phổ điểm 10 khoảng); Từng câu (bốn câu, câu dưới 50% cảnh báo, lỗi hay gặp của câu điền từ); Từng học sinh (cả em chưa làm, lọc trạng thái), Chi tiết bài làm 0/8, tab Gợi ý chỉ bài này | Đạt |
+| Lớp cấp 1: giáo viên thấy điểm kèm số sao của từng em; tab Tiến độ giải thích học sinh chỉ thấy sao | Đạt |
+| Đóng bài: hộp xác nhận ghi số em đã nộp, sau khi đóng trạng thái Đã đóng và không còn nút Đóng bài kiểm tra | Đạt |
+| Giáo viên khác mở lớp, kết quả bài, hồ sơ học sinh không phải của mình: báo không tìm thấy | Đạt |
+| Học sinh cấp 2: Gợi ý cho em có đủ phần, nhãn Cần mã bài học, bài mới không lộ mã, lý do có số liệu, thẻ di sản mở chi tiết di sản, kết quả của một lượt có gợi ý; học sinh chưa làm gì thấy lời mời nhập mã và bài mới | Đạt |
+| Học sinh cấp 1: thẻ hình nhãn ngắn, không số và phần trăm ở Trang học và Kết quả bài làm; cấp 3: danh sách theo nhóm kèm "Lý do: …", mục lục có Gợi ý | Đạt |
+| 390px: Kết quả bài kiểm tra và tab Thành thạo (bảng nhiệt cuộn trong khung) không tràn ngang | Đạt |
+
+Ghi chú: ảnh của Wikimedia Commons không tải được trong môi trường kiểm thử nên các khung ảnh di sản gợi ý trống. Log của API có vài dòng `SqlException` kèm "A severe error occurred on the current command"
+khi trình duyệt đóng yêu cầu đang chạy (chuyển trang giữa chừng); đó là hủy yêu cầu, không phải lỗi của chức năng, và trình duyệt không nhận 5xx nào.
