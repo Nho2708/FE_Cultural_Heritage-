@@ -109,3 +109,32 @@ và database tạm: xem mục Kiểm thử trong [lop-hoc-sinh.md](lop-hoc-sinh.
 
 Ghi chú: ảnh của Wikimedia Commons không tải được trong môi trường kiểm thử nên các khung ảnh trống (giao diện vẫn hiện chú thích và ghi công). Bố cục cấp 3 chỉ có test giao diện, chưa chạy trên
 trình duyệt thật (lần này dùng lớp khối 3 và khối 8).
+
+## Đa ngôn ngữ, AI dịch và tóm tắt di sản, nghe thuyết minh (web quản trị và web học tập)
+
+> Chạy ngày 06/10/2026 (+07) với backend nhánh `feature/DSVHVN-013-da-ngon-ngu`. Kết quả: **42/42 bước đạt**, không có lỗi JavaScript trên trang, không có phản hồi 5xx.
+> Script: [`apps/web-hoc-tap/scripts/smoke-da-ngon-ngu.mjs`](../apps/web-hoc-tap/scripts/smoke-da-ngon-ngu.mjs) (`npm run smoke:da-ngon-ngu -w @dsvhvn/web-hoc-tap`). Chi tiết luồng: [da-ngon-ngu.md](da-ngon-ngu.md).
+
+| Mục | Giá trị |
+|---|---|
+| Trình duyệt | Microsoft Edge headless qua `playwright-core`; khung 1440 × 900 và 390 × 844; các ngữ cảnh trình duyệt riêng cho ngôn ngữ `ko-KR`, `en-US` |
+| API | Bản build của backend, `ASPNETCORE_ENVIRONMENT=Development`, `http://localhost:5080`, LocalDB **database tạm** `dsvhvn_tam_a2_ui_da_ngon_ngu` (migrate và nạp 20 di sản đợt 1 lúc khởi động, **đã xóa sau khi chạy**), `Email__Mode=Log`, `Ai__Mode=Simulated` (không gọi nhà cung cấp AI), `Storage__Provider=Local` |
+| Giao diện | `npx vite --port 5173` (web quản trị) và `--port 5174` (web học tập), `VITE_API_BASE_URL=http://localhost:5080/api/v1`; đã tắt mọi tiến trình đã bật |
+| Chuẩn bị | Gọi thẳng API: xuất bản ba di sản có dòng thời gian, một trường, giáo viên, lớp khối 7 và một học sinh đã đổi mật khẩu lần đầu; dịch di sản B bằng API. Mọi thao tác với bản dịch của di sản A đi qua giao diện |
+
+| Nhóm | Bước | Kết quả |
+|---|---|---|
+| Quản trị hệ thống | Mục Bản dịch ở thanh bên; cột và bộ lọc Bản dịch ở Quản lý di sản; dải nhắc dịch sau khi xuất bản; tab Bản dịch và tóm tắt (năm ngôn ngữ, tiếng Việt là bản gốc) | Đạt |
+| | "Dịch và tóm tắt bằng AI": trạng thái đang xử lý; tiếng Anh và tóm tắt tiếng Việt chờ duyệt; Hàn, Trung, Nhật là bản dịch máy hiện ngay | Đạt |
+| | Duyệt bản dịch: hai cột, sửa tại chỗ, lưu, duyệt (khung đóng); duyệt tóm tắt tiếng Việt và tiếng Anh; từ chối bản dịch tiếng Anh của di sản B kèm lý do | Đạt |
+| | Tab Đã duyệt, Bản dịch máy, Bị từ chối; nhật ký ghi duyệt và từ chối | Đạt |
+| Khách | Mặc định theo trình duyệt (`ko-KR`, `en-US`); hộp thoại Chọn ngôn ngữ có năm lựa chọn; chọn tiếng Nhật, tải lại vẫn nhớ | Đạt |
+| | Tiếng Hàn: bản dịch máy dịch lại từ bản tiếng Anh đã duyệt kèm nhãn; tìm kiếm khớp bản dịch; bản đồ có nhãn hai quần đảo kèm "Việt Nam" bằng tiếng Hàn | Đạt |
+| | Tiếng Anh: di sản đã duyệt hiện bản tiếng Anh; di sản bị từ chối hiện tiếng Việt kèm thông báo; di sản chưa dịch báo chưa có tóm tắt, không mở hộp thoại | Đạt |
+| | Tóm tắt tab Đọc theo ngôn ngữ; tab Nghe; Web Speech API giả: đọc câu 1, câu 2, tô sáng, đổi tốc độ, tạm dừng, tiếp tục, dừng; tiếng Nhật trên máy không có giọng Nhật: báo, khóa nút Phát | Đạt |
+| | 390px bằng tiếng Trung (chọn ngôn ngữ trong ngăn kéo): trang chủ, chi tiết, tìm kiếm, bản đồ, dòng thời gian không tràn ngang; nhãn năm không còn "TCN", "nay" | Đạt |
+| Học sinh | Đã nhớ tiếng Hàn trên máy nhưng đăng nhập thì không có mục Ngôn ngữ, mọi lời gọi gửi `lang=vi`, chi tiết di sản bằng tiếng Việt | Đạt |
+
+Ghi chú: Edge headless trên máy kiểm thử chỉ có giọng đọc `en-US` (ba giọng). Vì vậy tiếng Anh kiểm được trạng thái đang đọc nhưng không nghe được âm thanh trong môi trường không giao diện, còn tiếng Nhật (và Hàn, Trung, Việt) rơi đúng vào trường hợp thiết bị
+chưa có giọng: giao diện báo kèm hướng dẫn cài giọng, khóa nút Phát, vẫn hiện đủ chữ (đã kiểm với tiếng Nhật). Luồng tiến câu, tô sáng, đổi tốc độ, tạm dừng và dừng kiểm bằng Web Speech API giả đặt trước khi trang tải.
+Nội dung bản dịch lấy từ bản AI giả lập (gắn tiền tố mã ngôn ngữ), không phải chất lượng dịch thật. Ảnh của Wikimedia Commons không tải được trong môi trường kiểm thử nên các khung ảnh trống.
