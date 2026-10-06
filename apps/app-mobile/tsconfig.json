@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "es2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "react-native",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "types": ["jest"],
+    "paths": {
+      "@dsvhvn/dung-chung": ["../../packages/dung-chung/src/index.ts"],
+      "@dsvhvn/dung-chung/api": ["../../packages/dung-chung/src/api/index.ts"],
+      "@dsvhvn/dung-chung/auth": ["../../packages/dung-chung/src/auth/index.ts"],
+      "@dsvhvn/dung-chung/i18n": ["../../packages/dung-chung/src/i18n/index.ts"],
+      "@dsvhvn/dung-chung/heritage-text": ["../../packages/dung-chung/src/heritageText.ts"],
+      "@dsvhvn/dung-chung/embed": ["../../packages/dung-chung/src/embed/index.ts"],
+      "@dsvhvn/dung-chung/speech": ["../../packages/dung-chung/src/speech/index.ts"],
+      "@dsvhvn/dung-chung/theme": ["../../packages/dung-chung/src/theme/index.ts"],
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["app", "src", "*.ts", "*.tsx", "expo-env.d.ts"]
+}
