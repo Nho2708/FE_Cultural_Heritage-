@@ -11,7 +11,7 @@ import type { HistoryEntry, HistoryKind } from '../../src/guest/historyCore';
 import { useApp } from '../../src/state/AppProvider';
 import { useTheme } from '../../src/theme/ThemeProvider';
 
-// Lịch sử và cài đặt của khách. Lịch sử (từ khóa đã tìm, di sản đã xem, nghe, xem 3D) chỉ lưu trên máy này, xóa được từng mục hoặc xóa hết, tự xóa sau 90 ngày.
+// Lịch sử và cài đặt của khách. Lịch sử (từ khóa đã tìm, di sản đã xem, nghe, xem 3D) lưu ở máy chủ theo mã thiết bị ẩn danh, xóa được từng mục hoặc xóa hết, tự xóa sau 90 ngày.
 // Cài đặt: ngôn ngữ, vị trí, thông tin quảng cáo, đổi chế độ.
 
 const GROUPS: Array<{ kind: HistoryKind; title: 'searches' | 'viewed' | 'listened' | 'viewed3d' }> = [
