@@ -1,5 +1,6 @@
 import type { ApiClient } from './client';
 import type { ContentStatus, HeritageType, MediaType, Province, RecognitionLevel } from './heritage';
+import type { PublicModel } from './models';
 import type { Paged } from './types';
 
 // Khám phá di sản công khai của web học tập: khách và học sinh xem, không cần đăng nhập (tiền tố /public), chỉ thấy di
@@ -14,6 +15,7 @@ export const DISCOVERY_ENDPOINTS = {
   heritage: (slug: string) => `/public/heritages/${encodeURIComponent(slug)}`,
   timeline: (slug: string) => `/public/heritages/${encodeURIComponent(slug)}/timeline`,
   summary: (slug: string) => `/public/heritages/${encodeURIComponent(slug)}/summary`,
+  model: (slug: string) => `/public/heritages/${encodeURIComponent(slug)}/model`,
 } as const;
 
 /**
@@ -184,6 +186,8 @@ export interface PublicHeritageDetail {
   localization?: Localization | null;
   /** Di sản có tóm tắt tiếng Việt đã duyệt (bật nút "Tóm tắt" và "Nghe"). */
   hasSummary?: boolean;
+  /** Di sản có mô hình 3D đang hiển thị: bật nút "Xem 3D" (miễn phí, không cần đăng nhập). Dữ liệu trình xem lấy ở `model`. */
+  hasModel?: boolean;
 }
 
 export interface PublicEvent {
@@ -288,6 +292,9 @@ export function createDiscoveryApi(client: ApiClient) {
 
     /** Tóm tắt theo ngôn ngữ. 404 `SUMMARY_UNAVAILABLE` khi chưa có tóm tắt tiếng Việt đã duyệt; ngôn ngữ chưa có bản hiện hành thì trả bản tiếng Việt kèm `isFallback`. */
     summary: (slug: string, { signal, lang }: LanguageOptions = {}) => get<PublicSummary>(DISCOVERY_ENDPOINTS.summary(slug), { lang }, signal),
+
+    /** Mô hình 3D đang hiển thị của di sản (miễn phí). 404 `MODEL_UNAVAILABLE` khi không có mô hình hiển thị: trình xem quay về bộ ảnh. */
+    model: (slug: string, { signal }: RequestSignal = {}) => get<PublicModel>(DISCOVERY_ENDPOINTS.model(slug), undefined, signal),
   };
 }
 
@@ -299,6 +306,7 @@ export type DiscoveryApi = ReturnType<typeof createDiscoveryApi>;
 export const PREVIEW_ENDPOINTS = {
   heritage: (code: string) => `/preview/heritages/${encodeURIComponent(code)}`,
   timeline: (code: string) => `/preview/heritages/${encodeURIComponent(code)}/timeline`,
+  model: (code: string) => `/preview/heritages/${encodeURIComponent(code)}/model`,
 } as const;
 
 /** Bản nháp di sản như trang công khai sẽ hiện, kèm hạn của mã xem trước. */
@@ -318,6 +326,10 @@ export function createPreviewApi(client: ApiClient) {
 
     timeline: async (code: string, { signal, lang }: LanguageOptions = {}) =>
       (await client.request<PublicTimeline>(PREVIEW_ENDPOINTS.timeline(code), { signal, query: { lang } })).data,
+
+    /** Mô hình 3D của bản nháp (cùng điều kiện mở như bản nháp). 404 `MODEL_UNAVAILABLE` khi di sản chưa có mô hình hiển thị. */
+    model: async (code: string, { signal }: RequestSignal = {}) =>
+      (await client.request<PublicModel>(PREVIEW_ENDPOINTS.model(code), { signal })).data,
   };
 }
 

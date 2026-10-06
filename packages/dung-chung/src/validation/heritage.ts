@@ -66,7 +66,8 @@ export function parseDecimal(text: string): number | null {
   return /^-?\d+(\.\d+)?$/.test(value) ? Number(value) : Number.NaN;
 }
 
-function isHttpUrl(value: string): boolean {
+/** Đường dẫn http hoặc https hợp lệ. */
+export function isHttpUrl(value: string): boolean {
   try {
     const url = new URL(value.trim());
     return url.protocol === 'http:' || url.protocol === 'https:';

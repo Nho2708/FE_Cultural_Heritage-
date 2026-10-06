@@ -28,6 +28,7 @@ export const ERROR_CODES = {
   aiUnavailable: 'AI_UNAVAILABLE',
   translationBusy: 'TRANSLATION_BUSY',
   summaryUnavailable: 'SUMMARY_UNAVAILABLE',
+  modelUnavailable: 'MODEL_UNAVAILABLE',
   systemError: 'SYSTEM_ERROR',
 } as const;
 
