@@ -176,21 +176,22 @@ function Header({ attempt, session, onPause, onSubmit, compact }: { attempt: Stu
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   return (
-    <View style={[local.header, { paddingTop: insets.top + 8, backgroundColor: theme.color.surface, borderBottomColor: theme.color.border }]}>
+    <View style={[local.header, { paddingTop: insets.top + 8, backgroundColor: theme.color.surface, borderBottomColor: theme.color.border, gap: 4 }]}>
       <View style={[ui.row, { gap: 8 }]}>
         <Button label={t('hs.quiz.pause')} variant="ghost" onPress={onPause} />
-        <View style={ui.grow}>
-          {!compact ? (
-            <Txt variant="caption" numberOfLines={1}>
-              {attempt.lessonTitle}
-            </Txt>
-          ) : null}
-          <Txt variant="title" numberOfLines={1}>
-            {attempt.quizName}
-          </Txt>
-        </View>
+        <View style={ui.grow} />
         {attempt.showsClock ? <Clock session={session} /> : null}
         <Button label={t('hs.quiz.submit')} onPress={onSubmit} disabled={session.submitting} />
+      </View>
+      <View style={{ paddingHorizontal: 4, paddingBottom: 4 }}>
+        {!compact ? (
+          <Txt variant="caption" numberOfLines={1}>
+            {attempt.lessonTitle}
+          </Txt>
+        ) : null}
+        <Txt variant="title" numberOfLines={2}>
+          {attempt.quizName}
+        </Txt>
       </View>
     </View>
   );
