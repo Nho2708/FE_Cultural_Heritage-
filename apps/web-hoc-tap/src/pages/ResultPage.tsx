@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useLocation, useParams } from 'react-router';
 import { pathOf } from '../access/screens';
 import { lessonPath } from '../lessons/lessonData';
+import { AttemptRecommendations } from '../learn-home/Recommendations';
 import { SpeakButton } from '../learn-home/SpeakButton';
 import { QuestionReview } from '../quiz/QuestionReview';
 import { parseQuizId, resultQueryFn, resultQueryKey } from '../quiz/quizData';
@@ -129,6 +130,7 @@ function ResultLevelOne({ result, automatic, lessonCode }: { result: StudentAtte
         <Notice result={result} automatic={automatic} />
         <BadgeList badges={result.badges} level={1} />
         <Review result={result} title="Cùng xem đáp án nhé" />
+        <AttemptRecommendations level={1} attemptId={result.attemptId} id="goi-y" />
         <div className="grid gap-4 sm:grid-cols-2">
           <ButtonLink to={lessonCode ? lessonPath(lessonCode) : pathOf('learnHome')} variant="secondary" size="lg" className="rounded-full">
             {lessonCode ? 'Xem lại bài học' : 'Về trang học'}
@@ -195,6 +197,7 @@ function ResultLevelTwo({ result, automatic, lessonCode }: { result: StudentAtte
             <Actions result={result} lessonCode={lessonCode} />
           </aside>
         </div>
+        <AttemptRecommendations level={2} attemptId={result.attemptId} id="goi-y" />
       </div>
     </section>
   );
@@ -326,6 +329,7 @@ function ResultLevelThree({ result, automatic, lessonCode }: { result: StudentAt
             <Actions result={result} lessonCode={lessonCode} />
           </aside>
         </div>
+        <AttemptRecommendations level={3} attemptId={result.attemptId} id="goi-y" />
       </div>
     </section>
   );

@@ -7,6 +7,7 @@ import type {
   StudentAttemptRow,
   StudentHome,
   StudentProgress,
+  StudentRecommendations,
   StudentQuizIntro,
   StudentQuestionReview,
 } from '@dsvhvn/dung-chung/api';
@@ -186,6 +187,27 @@ export function progressOf(level: SchoolLevel, overrides: Partial<StudentProgres
     totalStars: level === 1 ? 7 : null,
     mastery: [],
     badges: [],
+    ...overrides,
+  };
+}
+
+/** "Gợi ý cho em" như máy chủ trả; mặc định không có gợi ý nào (các test của màn hình khác không cần khai báo riêng). */
+export function recommendationsOf(level: SchoolLevel = 2, overrides: Partial<StudentRecommendations> = {}): StudentRecommendations {
+  return {
+    level,
+    levelName: `Cấp ${level}`,
+    layout: level === 1 ? 'LARGE_CARDS' : level === 3 ? 'COMPACT' : 'STANDARD',
+    attemptId: null,
+    targetDifficulty: level === 1 ? 'EASY' : 'MEDIUM',
+    targetDifficultyName: level === 1 ? 'Dễ' : 'Trung bình',
+    nextQuizzes: [],
+    lessonsToReview: [],
+    heritagesToReview: [],
+    relatedHeritages: [],
+    newLessons: [],
+    reviewPraise: null,
+    message: null,
+    relatedFromFallback: false,
     ...overrides,
   };
 }

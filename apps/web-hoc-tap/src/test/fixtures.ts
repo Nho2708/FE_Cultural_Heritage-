@@ -1,11 +1,11 @@
 import type { SchoolLevel, StudentClassDetail, StudentProfile } from '@dsvhvn/dung-chung/api';
-import { ATTEMPT_ENDPOINTS, STUDENT_ENDPOINTS, studentCodeOf } from '@dsvhvn/dung-chung/api';
+import { ATTEMPT_ENDPOINTS, RECOMMENDATION_ENDPOINTS, STUDENT_ENDPOINTS, studentCodeOf } from '@dsvhvn/dung-chung/api';
 import type { StudentProfileWire } from '@dsvhvn/dung-chung/api';
 import { schoolLevelOfGrade } from '@dsvhvn/dung-chung/theme';
 import type { Session } from '@dsvhvn/dung-chung/auth';
 import { envelope as baseEnvelope, mockApi as baseMockApi, type FetchCall } from '@dsvhvn/dung-chung/testing';
 import { sessionStore } from '../lib/auth/session';
-import { homeOf } from './quizFixtures';
+import { homeOf, recommendationsOf } from './quizFixtures';
 
 export { envelope, type FetchCall } from '@dsvhvn/dung-chung/testing';
 
@@ -96,6 +96,10 @@ export function studentServer(student: StudentProfile) {
     if (call.path === STUDENT_ENDPOINTS.class) return baseEnvelope(200, { data: classroomOf(student) });
     // Trang học của em chưa có gì: các test của màn hình khác không cần khai báo riêng.
     if (call.path === ATTEMPT_ENDPOINTS.home) return baseEnvelope(200, { data: homeOf(levelOf(student)) });
+    // Gợi ý cho em mặc định rỗng (không hiện khối nào).
+    if (call.path === RECOMMENDATION_ENDPOINTS.student || /^\/student\/attempts\/\d+\/recommendations$/.test(call.path)) {
+      return baseEnvelope(200, { data: recommendationsOf(levelOf(student)) });
+    }
     return undefined;
   };
 }

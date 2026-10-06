@@ -5,12 +5,13 @@ import { classFacts, whoAmI } from './classroom';
 import { LearningSections } from './LearningSections';
 
 // Trang học của em — bản cấp 3 (khối 10-12): bố cục gọn, nhiều chữ, giống trang tài liệu. Thanh bên mục lục và một cột nội
-// dung rộng; đầu trang một dòng thông tin; danh sách dạng dòng, không thẻ hình, không linh vật. Mục lục chỉ có các mục
-// đã dựng; Bài học của em, Gợi ý, Huy hiệu thêm cùng chức năng học tập.
+// dung rộng; đầu trang một dòng thông tin; danh sách dạng dòng, không thẻ hình, không linh vật. Mục lục có Lớp của em,
+// Việc cần làm và Gợi ý.
 
 const TOC = [
   { id: 'lop-cua-em', label: 'Lớp của em' },
   { id: 'viec-can-lam', label: 'Việc cần làm' },
+  { id: 'goi-y', label: 'Gợi ý' },
 ];
 
 export function LevelThree({ user, classroom }: { user: StudentProfile; classroom: StudentClassDetail }) {

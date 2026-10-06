@@ -28,6 +28,7 @@ export function refreshAfterSubmit(queryClient: QueryClient) {
   void queryClient.invalidateQueries({ queryKey: progressQueryKey });
   void queryClient.invalidateQueries({ queryKey: historyQueryKey });
   void queryClient.invalidateQueries({ queryKey: ['student', 'lesson'] });
+  void queryClient.invalidateQueries({ queryKey: ['student', 'recommendations'] });
   queryClient.removeQueries({ queryKey: ['student', 'quiz-intro'] });
 }
 
