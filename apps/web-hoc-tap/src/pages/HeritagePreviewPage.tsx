@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { ADMIN_WEB_URL } from '../config/env';
+import { useLanguage } from '../i18n/context';
 import { previewApi, setPreviewToken } from '../lib/api/previewClient';
 import { DetailSkeleton, HeritageDetailView } from './HeritageDetailPage';
 
@@ -35,15 +36,16 @@ const EXPIRED = 'Bản xem trước chỉ dùng được trong thời gian ngắ
 
 export function HeritagePreviewPage() {
   const code = useParams().ma ?? '';
+  const lang = useLanguage();
   const [now, setNow] = useState(() => Date.now());
 
   const query = useQuery({
-    queryKey: ['preview', 'heritage', code],
+    queryKey: ['preview', 'heritage', code, lang],
     queryFn: async ({ signal }) => {
       const token = await requestPreviewToken({ adminOrigin: ADMIN_WEB_URL });
       if (token === null) throw new NoOpenerError();
       setPreviewToken(token);
-      return previewApi.heritage(code, { signal });
+      return previewApi.heritage(code, { signal, lang });
     },
     enabled: code !== '',
     retry: false,

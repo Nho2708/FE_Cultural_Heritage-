@@ -1,8 +1,8 @@
 import { cn } from '@dsvhvn/dung-chung';
 import { Icon } from '@dsvhvn/dung-chung/ui';
+import { useI18n } from '../i18n/context';
+import { formatCount } from '../i18n/format';
 import { pageWindow } from './pagination';
-
-const number = new Intl.NumberFormat('vi-VN');
 
 interface NumberedPaginationProps {
   page: number;
@@ -10,28 +10,26 @@ interface NumberedPaginationProps {
   totalItems: number;
   totalPages: number;
   onChange: (page: number) => void;
-  /** Đơn vị đếm, ví dụ "di sản": "Hiển thị 1–12 trên 20 di sản". */
-  unit: string;
 }
 
 const CELL = 'flex size-11 items-center justify-center rounded-sm type-control transition-colors';
 
-/** Phân trang có số trang: "Hiển thị 1–12 trên 20 di sản" bên trái, nút trang bên phải (trang đang xem tô nền). */
-export function NumberedPagination({ page, pageSize, totalItems, totalPages, onChange, unit }: NumberedPaginationProps) {
+/** Phân trang có số trang: "Hiển thị 1–12 trên 20 di sản" bên trái, nút trang bên phải (trang đang xem tô nền). Chữ theo ngôn ngữ đang chọn. */
+export function NumberedPagination({ page, pageSize, totalItems, totalPages, onChange }: NumberedPaginationProps) {
+  const { language, t } = useI18n();
   if (totalItems === 0) return null;
   const from = (page - 1) * pageSize + 1;
   const to = Math.min(page * pageSize, totalItems);
+  const count = (value: number) => formatCount(value, language);
   return (
-    <nav aria-label="Phân trang" className="flex flex-col items-center justify-between gap-3 py-3 dsvsm:flex-row">
-      <p className="type-body-s text-on-surface-muted">
-        Hiển thị {number.format(from)}–{number.format(to)} trên {number.format(totalItems)} {unit}
-      </p>
+    <nav aria-label={t.pagination.label} className="flex flex-col items-center justify-between gap-3 py-3 dsvsm:flex-row">
+      <p className="type-body-s text-on-surface-muted">{t.pagination.shown(count(from), count(to), count(totalItems))}</p>
       {totalPages > 1 && (
         <ul className="flex items-center gap-1">
           <li>
             <button
               type="button"
-              aria-label="Trang trước"
+              aria-label={t.pagination.previous}
               disabled={page <= 1}
               onClick={() => onChange(page - 1)}
               className={cn(CELL, 'border border-border hover:bg-surface-container disabled:opacity-40')}
@@ -48,7 +46,7 @@ export function NumberedPagination({ page, pageSize, totalItems, totalPages, onC
               <li key={item}>
                 <button
                   type="button"
-                  aria-label={`Trang ${item}`}
+                  aria-label={t.pagination.page(item)}
                   aria-current={item === page ? 'page' : undefined}
                   onClick={() => onChange(item)}
                   className={cn(
@@ -66,7 +64,7 @@ export function NumberedPagination({ page, pageSize, totalItems, totalPages, onC
           <li>
             <button
               type="button"
-              aria-label="Trang sau"
+              aria-label={t.pagination.next}
               disabled={page >= totalPages}
               onClick={() => onChange(page + 1)}
               className={cn(CELL, 'border border-border hover:bg-surface-container disabled:opacity-40')}

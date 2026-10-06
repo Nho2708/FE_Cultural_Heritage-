@@ -2,7 +2,7 @@ import type { HeritagePin } from '@dsvhvn/dung-chung/api';
 import type * as Leaflet from 'leaflet';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { clusterIcon, createBaseMap, loadLeaflet, pinIcon, type LeafletLib } from '@dsvhvn/dung-chung/map/base';
+import { MAP_LABELS_VI, clusterIcon, createBaseMap, loadLeaflet, pinIcon, type LeafletLib, type MapLabels } from '@dsvhvn/dung-chung/map/base';
 import { VIETNAM_BOUNDS } from '@dsvhvn/dung-chung/map/seas';
 
 // Bản đồ di sản: nền OpenStreetMap, ghim theo tọa độ (gom nhóm khi gần nhau), popup của ghim đang chọn dựng bằng React
@@ -24,9 +24,17 @@ interface HeritageMapProps {
   /** Đang lọc thì căn theo các ghim tìm được; không lọc thì hiện toàn cảnh cả nước và hai quần đảo. */
   fitToPins: boolean;
   renderPopup: (pin: HeritagePin) => ReactNode;
+  /** Chữ trên bản đồ theo ngôn ngữ giao diện; đổi ngôn ngữ thì phần tử cha đổi `key` để dựng lại bản đồ. */
+  labels?: MapLabels;
+  /** Tên hộp đóng popup (đọc cho trình đọc màn hình). */
+  closeLabel?: string;
+  /** Tên vùng bản đồ (đọc cho trình đọc màn hình). */
+  mapLabel?: string;
 }
 
-export default function HeritageMap({ pins, selectedSlug, onSelect, fitKey, fitToPins, renderPopup }: HeritageMapProps) {
+export default function HeritageMap({ pins, selectedSlug, onSelect, fitKey, fitToPins, renderPopup, labels = MAP_LABELS_VI, closeLabel = 'Đóng thẻ di sản', mapLabel = 'Bản đồ di sản' }: HeritageMapProps) {
+  const labelsRef = useRef(labels);
+  const closeLabelRef = useRef(closeLabel);
   const containerRef = useRef<HTMLElement>(null);
   const [engine, setEngine] = useState<Engine | null>(null);
   const [popupNode, setPopupNode] = useState<HTMLElement | null>(null);
@@ -48,7 +56,7 @@ export default function HeritageMap({ pins, selectedSlug, onSelect, fitKey, fitT
     void loadLeaflet().then((L) => {
       const element = containerRef.current;
       if (cancelled || !element) return;
-      const map = createBaseMap(L, element);
+      const map = createBaseMap(L, element, { labels: labelsRef.current });
       created = map;
       map.fitBounds(VIETNAM_BOUNDS);
       const cluster = L.markerClusterGroup({
@@ -141,7 +149,7 @@ export default function HeritageMap({ pins, selectedSlug, onSelect, fitKey, fitT
       popup.openOn(map);
       popupRef.current = popup;
       ignoreClose.current = false;
-      popup.getElement()?.querySelector('.leaflet-popup-close-button')?.setAttribute('aria-label', 'Đóng thẻ di sản');
+      popup.getElement()?.querySelector('.leaflet-popup-close-button')?.setAttribute('aria-label', closeLabelRef.current);
       setPopupNode(node);
     };
     // Ghim đang nằm trong nhóm thì phóng tới khi tách ra rồi mới mở popup.
@@ -156,7 +164,7 @@ export default function HeritageMap({ pins, selectedSlug, onSelect, fitKey, fitT
   const selected = selectedSlug ? pins.find((pin) => pin.slug === selectedSlug) : undefined;
   return (
     <>
-      <section ref={containerRef} aria-label="Bản đồ di sản" className="size-full bg-surface-container-low" />
+      <section ref={containerRef} aria-label={mapLabel} className="size-full bg-surface-container-low" />
       {popupNode && selected && createPortal(renderPopup(selected), popupNode)}
     </>
   );

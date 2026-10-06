@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { createBaseMap, loadLeaflet, pinIcon } from '@dsvhvn/dung-chung/map/base';
+import { createBaseMap, loadLeaflet, pinIcon, type MapLabels } from '@dsvhvn/dung-chung/map/base';
 
 // Bản đồ nhỏ ở trang chi tiết di sản: nền OpenStreetMap, một ghim đang chọn và tên địa phương bên cạnh. Không cuộn chuột
 // để phóng (không kẹt cuộn trang); trên màn hình cảm ứng tắt kéo bản đồ một ngón để trang vẫn cuộn được.
@@ -10,10 +10,13 @@ interface LocationMapProps {
   longitude: number;
   /** Tên địa phương hiện cạnh ghim. */
   label: string | null;
+  /** Chữ trên bản đồ theo ngôn ngữ giao diện; đổi ngôn ngữ thì phần tử cha đổi `key`. */
+  labels?: MapLabels;
 }
 
-export default function LocationMap({ latitude, longitude, label }: LocationMapProps) {
+export default function LocationMap({ latitude, longitude, label, labels }: LocationMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const labelsRef = useRef(labels);
 
   useEffect(() => {
     let cancelled = false;
@@ -21,7 +24,7 @@ export default function LocationMap({ latitude, longitude, label }: LocationMapP
     void loadLeaflet().then((L) => {
       const element = containerRef.current;
       if (cancelled || !element) return;
-      const map = createBaseMap(L, element, { scrollWheelZoom: false });
+      const map = createBaseMap(L, element, { scrollWheelZoom: false, labels: labelsRef.current });
       created = map;
       if (L.Browser.mobile) map.dragging.disable();
       map.setView([latitude, longitude], 7);

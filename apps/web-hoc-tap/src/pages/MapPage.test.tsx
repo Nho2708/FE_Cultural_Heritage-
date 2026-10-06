@@ -59,6 +59,7 @@ describe('Bản đồ di sản', () => {
       heritageType: 'TANGIBLE',
       recognitionLevel: 'UNESCO',
       period: 'MODERN',
+      lang: 'vi',
     });
     expect(screen.getByTestId('ban-do')).toHaveAttribute('data-fit', 'true');
     expect(screen.getByRole('button', { name: 'Bỏ từ khóa hue' })).toBeInTheDocument();

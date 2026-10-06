@@ -14,7 +14,7 @@ vi.mock('../discovery/LocationMap', () => ({
 }));
 
 const detailApi = (detail = detailOf()) =>
-  mockApi((call) => (call.path === `/public/heritages/${detail.slug}` ? envelope(200, { data: detail }) : undefined), publicApi());
+  mockApi((call) => (call.path.split('?')[0] === `/public/heritages/${detail.slug}` ? envelope(200, { data: detail }) : undefined), publicApi());
 
 describe('Chi tiết di sản', () => {
   it('tên, nhãn, ghi công ảnh đại diện và nội dung theo tiêu đề', async () => {
@@ -140,7 +140,7 @@ describe('Chi tiết di sản', () => {
   it('lỗi máy chủ báo kèm nút thử lại', async () => {
     let fail = true;
     mockApi((call) =>
-      call.path === `/public/heritages/${HUE.slug}`
+      call.path.split('?')[0] === `/public/heritages/${HUE.slug}`
         ? fail
           ? envelope(500, { errorCode: 'SYSTEM_ERROR', message: 'Đã có lỗi xảy ra. Vui lòng thử lại hoặc liên hệ quản trị viên.' })
           : envelope(200, { data: detailOf() })

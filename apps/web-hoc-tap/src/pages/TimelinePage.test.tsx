@@ -8,7 +8,7 @@ import { renderApp } from '../test/renderApp';
 // Dòng thời gian di sản: chọn di sản, rồi trục dọc các giai đoạn, mở một giai đoạn để xem sự kiện.
 
 const timelineApi = (timeline = timelineOf()) =>
-  mockApi((call) => (call.path === `/public/heritages/${timeline.slug}/timeline` ? envelope(200, { data: timeline }) : undefined), publicApi());
+  mockApi((call) => (call.path.split('?')[0] === `/public/heritages/${timeline.slug}/timeline` ? envelope(200, { data: timeline }) : undefined), publicApi());
 
 describe('Dòng thời gian di sản — chọn di sản', () => {
   it('chưa chọn di sản: danh sách di sản, mỗi thẻ dẫn tới dòng thời gian của di sản đó', async () => {
@@ -85,7 +85,7 @@ describe('Dòng thời gian di sản — trục các giai đoạn', () => {
 
   it('"Về trang di sản" và "Đổi di sản"', async () => {
     mockApi(
-      (call) => (call.path === `/public/heritages/${HUE.slug}/timeline` ? envelope(200, { data: timelineOf() }) : undefined),
+      (call) => (call.path.split('?')[0] === `/public/heritages/${HUE.slug}/timeline` ? envelope(200, { data: timelineOf() }) : undefined),
       publicApi({ '/public/heritages': () => envelope(200, { data: pagedOf([HUE, THANG_LONG], { pageSize: 100 }) }) }),
     );
     const user = userEvent.setup();

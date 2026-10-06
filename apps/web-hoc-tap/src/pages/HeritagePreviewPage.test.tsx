@@ -29,7 +29,7 @@ function adminOpener(token: string | null) {
 }
 
 const previewServer = (expiresAt: string, status: 'DRAFT' | 'ARCHIVED' = 'DRAFT') => (call: FetchCall) =>
-  call.path === `/preview/heritages/${CODE}`
+  call.path.split('?')[0] === `/preview/heritages/${CODE}`
     ? envelope(200, { data: { expiresAt, status, heritage: detailOf({ name: 'Bản nháp Cố đô Huế' }) } })
     : undefined;
 
@@ -52,7 +52,7 @@ describe('Xem trước di sản nháp', () => {
     expect(screen.getByRole('region', { name: 'Thông tin' })).toBeInTheDocument();
     expect(document.title).toContain('Bản xem trước');
 
-    const read = calls.filter((c) => c.path === `/preview/heritages/${CODE}`);
+    const read = calls.filter((c) => c.path.split('?')[0] === `/preview/heritages/${CODE}`);
     expect(read).toHaveLength(1);
     expect(read[0]!.authorization).toBe('Bearer token-quan-tri');
     // Bản nháp chưa có trang bản đồ và dòng thời gian công khai: bỏ liên kết sang đó.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { filterFromParams, hasActiveFilter, keywordError, pageFromParams, paramsFromFilter, selectFilterCount, toSearch } from './filters';
+import { filterFromParams, hasActiveFilter, keywordInvalid, pageFromParams, paramsFromFilter, selectFilterCount, toSearch } from './filters';
 
 describe('bộ lọc khám phá trên địa chỉ trang', () => {
   it('đọc từ khóa và từng bộ lọc hợp lệ', () => {
@@ -34,12 +34,12 @@ describe('bộ lọc khám phá trên địa chỉ trang', () => {
     expect(hasActiveFilter({ keyword: 'hue' })).toBe(true);
   });
 
-  it('từ khóa ngoài 2-100 ký tự báo cùng câu với máy chủ; để trống thì không lỗi', () => {
-    expect(keywordError('a')).toBe('Từ khóa không hợp lệ: phải dài 2-100 ký tự.');
-    expect(keywordError('x'.repeat(101))).toBe('Từ khóa không hợp lệ: phải dài 2-100 ký tự.');
-    expect(keywordError('hu')).toBeNull();
-    expect(keywordError('x'.repeat(100))).toBeNull();
-    expect(keywordError('   ')).toBeNull();
-    expect(keywordError(undefined)).toBeNull();
+  it('từ khóa ngoài 2-100 ký tự là không hợp lệ; để trống thì không lỗi', () => {
+    expect(keywordInvalid('a')).toBe(true);
+    expect(keywordInvalid('x'.repeat(101))).toBe(true);
+    expect(keywordInvalid('hu')).toBe(false);
+    expect(keywordInvalid('x'.repeat(100))).toBe(false);
+    expect(keywordInvalid('   ')).toBe(false);
+    expect(keywordInvalid(undefined)).toBe(false);
   });
 });
