@@ -170,3 +170,35 @@ Nội dung bản dịch lấy từ bản AI giả lập (gắn tiền tố mã n
 | Xem trước | Bản nháp có mô hình: tab xem trước có nút Xem 3D (không có Tóm tắt và Nghe), trình xem tải mô hình bằng token quản trị; mô hình của di sản nháp không lộ ra API công khai | Đạt |
 
 Ghi chú: trình duyệt không giao diện vẽ 3D bằng phần mềm nên chỉ kiểm được kết quả đúng (khung vẽ có màu, góc nhìn đổi), không đo hiệu năng. Ảnh của Wikimedia Commons không tải được trong môi trường kiểm thử nên các khung ảnh trống (giao diện vẫn hiện chú thích và ghi công).
+
+## Gói và thanh toán VNPay (web quản trị)
+
+> Chạy ngày 07/10/2026 (+07) với backend nhánh `feature/DSVHVN-015-goi-thanh-toan-vnpay`. Kết quả: **44/44 bước đạt**, không có lỗi JavaScript trên trang, không có phản hồi 5xx.
+> Script: [`apps/web-quan-tri/scripts/smoke-goi.mjs`](../apps/web-quan-tri/scripts/smoke-goi.mjs) (`npm run smoke:goi -w @dsvhvn/web-quan-tri`).
+
+**Chưa thử với VNPay sandbox thật** (chưa có khóa cửa hàng và địa chỉ IPN công khai). Trang thanh toán của VNPay được thay bằng trang giả
+(trình duyệt không ra ngoài); IPN và lời trả về do script **tự ký bằng khóa thử** (HMAC-SHA512, cùng thuật toán của backend) rồi gọi vào API
+thật, đúng như VNPay làm. Phần chưa kiểm: trang thanh toán thật của VNPay, khóa thật, IPN từ máy chủ VNPay qua mạng công khai.
+
+| Mục | Giá trị |
+|---|---|
+| Trình duyệt | Microsoft Edge headless qua `playwright-core`; khung 1440 × 900 và 390 × 844 |
+| API | Bản build của backend, `ASPNETCORE_ENVIRONMENT=Development` (nạp hai gói mẫu), `http://localhost:5080`, LocalDB **database tạm** `dsvhvn_tam_a2_goi_fe` (**đã xóa sau khi chạy**), `Email__Mode=Log`, `Ai__Mode=Simulated`, `Storage__Provider=Local`, `VnPay__TmnCode` và `VnPay__HashSecret` là khóa thử |
+| Giao diện | `npx vite` trong `apps/web-quan-tri` (cổng 5173); đã tắt mọi tiến trình đã bật |
+| Chuẩn bị | Gọi thẳng API: tạo trường và quản trị trường, đặt mật khẩu qua thư giả trong log |
+
+| Nhóm | Bước | Kết quả |
+|---|---|---|
+| Quản trị hệ thống | Gói dịch vụ: bảng ba gói, giá `500.000 ₫`, công tắc gói Miễn phí bị khóa; tạo gói để trống báo bắt buộc từng ô; giá 0 cho gói trả phí bị chặn; tạo gói 750.000 ₫; sửa giá; đổi tên trùng báo dưới ô Tên; tắt bán phải xác nhận, bật lại không cần | Đạt |
+| Quản trị trường | Trường mới có gói Miễn phí: chỉ có Nâng cấp; Chọn gói không có gói Miễn phí, có ghi chú môi trường thử VNPay | Đạt |
+| | Chọn Cơ bản: loại Nâng cấp, 500.000 ₫, hiệu lực ngay; hộp xác nhận đúng câu; chuyển sang địa chỉ VNPay có chữ ký, `vnp_Amount` = số tiền × 100 | Đạt |
+| | IPN báo hủy → Kết quả "Chưa thanh toán"; **Thanh toán lại** tạo giao dịch mới; IPN thành công → "Thanh toán thành công" kèm hóa đơn, số tiền, mã giao dịch VNPay; IPN gửi lặp trả mã 02 | Đạt |
+| | Tab Hóa đơn: một hóa đơn Đã thanh toán, mở dòng thấy hai giao dịch (Thất bại, Thành công) | Đạt |
+| | Nâng cấp Nâng cao: trình duyệt về trước IPN → "Đang chờ xác nhận", IPN tới sau → trang tự đổi sang thành công không tải lại | Đạt |
+| | Hủy gói (hộp xác nhận câu của backend), thanh báo gói hết hiệu lực kèm Mua gói, kích hoạt gói Miễn phí (xác nhận, ngay lập tức, không qua VNPay) | Đạt |
+| | Bỏ dở thanh toán: thẻ yêu cầu mua chưa thanh toán, khóa Nâng cấp, Chọn gói khóa gói kèm lý do; Hủy yêu cầu → hóa đơn Đã hủy | Đạt |
+| | Mua Cơ bản rồi **Gia hạn**: loại Gia hạn, hiệu lực là khoảng ngày sau khi gói hết; báo gói gia hạn chờ, khóa Gia hạn, không có Hủy gói | Đạt |
+| | Lời trả về sai chữ ký: chuyển `?error=invalid`, báo liên kết không hợp lệ | Đạt |
+| Quản trị hệ thống | Số trường đang dùng gói Cơ bản tăng thêm 1 sau khi trường mua | Đạt |
+| Điện thoại | 390px: tab Gói và hạn mức và Chọn gói không tràn ngang | Đạt |
+

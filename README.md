@@ -22,6 +22,7 @@ luồng lớp, học sinh và tài khoản học sinh: [`docs/lop-hoc-sinh.md`](
 luồng bài học cho lớp theo cấp, AI soạn nội dung, mã bài học: [`docs/bai-hoc-theo-cap.md`](docs/bai-hoc-theo-cap.md);
 luồng đa ngôn ngữ, AI dịch và tóm tắt di sản, duyệt bản dịch, nghe thuyết minh: [`docs/da-ngon-ngu.md`](docs/da-ngon-ngu.md);
 luồng mô hình 3D di sản (tab Mô hình 3D, trình xem dùng chung, nút Xem 3D): [`docs/mo-hinh-3d.md`](docs/mo-hinh-3d.md);
+luồng gói và thanh toán VNPay (Gói dịch vụ, Trường và gói, Chọn gói và thanh toán, Kết quả thanh toán): [`docs/goi-thanh-toan.md`](docs/goi-thanh-toan.md);
 kiểm thử trên trình duyệt thật: [`docs/kiem-thu-trinh-duyet.md`](docs/kiem-thu-trinh-duyet.md).
 
 ## Yêu cầu
