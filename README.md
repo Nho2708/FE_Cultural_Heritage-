@@ -13,8 +13,10 @@ Repo gồm **hai ứng dụng web** và **một gói dùng chung**, quản lý b
 | `@dsvhvn/web-hoc-tap` | `apps/web-hoc-tap` | Học di sản | 5174 | Khách (khám phá di sản công khai) và học sinh (khu học), giao diện theo cấp học 1 / 2 / 3 |
 | `@dsvhvn/dung-chung` | `packages/dung-chung` | — | — | Design token và bộ giao diện theo cấp, component giao diện web, lớp gọi API, kiểu dữ liệu, phiên đăng nhập, kiểm tra hợp lệ, câu thông báo |
 
-App mobile (React Native + Expo, chỉ phần học) sẽ dùng lại lớp gọi API, kiểu dữ liệu, kiểm tra hợp lệ, câu thông báo và
-token bộ giao diện của gói dùng chung; component giao diện web không dùng được trên React Native.
+**App mobile** (React Native + Expo, một app hai chế độ: Khách tham quan và Học sinh) nằm ở [`apps/app-mobile`](apps/app-mobile) nhưng **không thuộc npm workspaces**: Expo SDK 57 cố định React 19.2.3
+còn hai web dùng React 19.3, nên app cài phụ thuộc riêng (`cd apps/app-mobile && npm install`). App dùng lại lớp gọi API, kiểu dữ liệu, kiểm tra hợp lệ, danh mục ngôn ngữ, bộ token theo cấp,
+logic làm bài và hợp đồng thông điệp với trang nhúng của gói dùng chung (chỉ các mô-đun TypeScript thuần); component giao diện web không dùng được trên React Native.
+Hướng dẫn chạy trên Expo Go (Android và iPhone): [`apps/app-mobile/README.md`](apps/app-mobile/README.md), chi tiết và kết quả kiểm: [`docs/app-mobile.md`](docs/app-mobile.md).
 
 Backend: [`BE_Cultural_Heritage-`](../BE_Cultural_Heritage-) (ASP.NET Core 9, tiền tố API `/api/v1`, CSDL v3).
 Chi tiết từng ứng dụng: [`docs/web-quan-tri.md`](docs/web-quan-tri.md), [`docs/web-hoc-tap.md`](docs/web-hoc-tap.md), [`docs/kham-pha-di-san.md`](docs/kham-pha-di-san.md) (khám phá di sản công khai);
@@ -29,6 +31,7 @@ luồng bài kiểm tra của bài học, nhân bản bài học kèm bài kiể
 luồng học tập của học sinh theo cấp (làm bài, kết quả, tiến độ): [`docs/hoc-tap-theo-cap.md`](docs/hoc-tap-theo-cap.md);
 luồng thống kê và gợi ý (kết quả bài kiểm tra, tiến độ, thành thạo, hồ sơ học tập, gợi ý cho em): [`docs/thong-ke-goi-y.md`](docs/thong-ke-goi-y.md);
 luồng quản trị và tổng quan (Tổng quan trường, Tổng quan và doanh thu, Kiểm duyệt ngân hàng câu hỏi): [`docs/quan-tri-tong-quan.md`](docs/quan-tri-tong-quan.md);
+app mobile hai chế độ: [`docs/app-mobile.md`](docs/app-mobile.md);
 kiểm thử trên trình duyệt thật: [`docs/kiem-thu-trinh-duyet.md`](docs/kiem-thu-trinh-duyet.md).
 
 ## Yêu cầu
@@ -67,6 +70,8 @@ mật khẩu được ghi ra log của API. Tài khoản học sinh do giáo vi�
 | `npm run build` | Build hai web ra `apps/*/dist/` (gói dùng chung không build riêng, Vite dịch thẳng mã nguồn) |
 | `npm run gen:tokens` | Sinh `packages/dung-chung/src/styles/tokens.css` và `theme.css` từ `packages/dung-chung/design/tokens.json` |
 | `npm run check:tokens` | Kiểm hai tệp CSS còn khớp `tokens.json` |
+| `npm run mobile:typecheck` · `mobile:lint` · `mobile:test` | Kiểm app mobile (cần `npm install` trong `apps/app-mobile` trước) |
+| `npm run mobile:start` | Chạy Expo cho app mobile (in mã QR cho Expo Go) |
 | `npm run smoke -w @dsvhvn/web-quan-tri` | Kiểm thử web quản trị trên Edge/Chrome thật với API thật; cần `API_LOG`, `ADMIN_PASSWORD` |
 | `npm run smoke:di-san -w @dsvhvn/web-quan-tri` | Kiểm thử luồng Kho di sản trên Edge/Chrome thật; cần `ADMIN_PASSWORD`, chạy với database tạm mới |
 | `npm run smoke:xem-truoc -w @dsvhvn/web-quan-tri` | Kiểm thử xem trước di sản và "Xem như học sinh" trên Edge/Chrome thật; cần `ADMIN_PASSWORD`, `TEACHER_LOGIN`, `TEACHER_PASSWORD`, chạy với database tạm (xem `docs/xem-truoc.md`) |

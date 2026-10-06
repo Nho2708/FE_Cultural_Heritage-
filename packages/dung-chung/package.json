@@ -20,6 +20,7 @@
     "./heritage-text": "./src/heritageText.ts",
     "./model3d": "./src/model3d/index.ts",
     "./lesson": "./src/lesson/index.ts",
+    "./lesson-data": "./src/lesson/lessonData.ts",
     "./theme": "./src/theme/index.ts",
     "./ui": "./src/ui/index.ts",
     "./testing": "./src/testing/api.ts",

@@ -45,6 +45,7 @@ describe('hợp đồng thông điệp với trang nhúng', () => {
 
   it('địa chỉ trang 3D mã hóa mã di sản và so được origin', () => {
     expect(embedModelUrl('http://web.test:5174', 'a b')).toBe('http://web.test:5174/nhung/3d/a%20b');
+    expect(embedModelUrl('http://web.test:5174/', 'hue', 'zh-Hans')).toBe('http://web.test:5174/nhung/3d/hue?lang=zh-Hans');
     expect(originOf('http://web.test:5174/nhung/ban-do?x=1')).toBe('http://web.test:5174');
     expect(originOf('không phải địa chỉ')).toBeNull();
   });
