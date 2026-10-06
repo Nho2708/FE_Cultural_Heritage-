@@ -35,6 +35,7 @@ import { HeritageActionDialog } from '../../components/heritage/HeritageActionDi
 import { HERITAGE_FIELDS, EDITOR_TABS, EMPTY_HERITAGE, formFieldOf, heritageBody, heritageValuesOf, readTab, sameHeritage, tabOfMissing, type EditorTab } from '../../components/heritage/heritageForm';
 import { HeritageStatusBadge } from '../../components/heritage/HeritageStatusBadge';
 import { MediaTab } from '../../components/heritage/MediaTab';
+import { ModelTab } from '../../components/model/ModelTab';
 import { ReferencesTab } from '../../components/heritage/ReferencesTab';
 import { TimelineTab } from '../../components/heritage/TimelineTab';
 import { TranslationsTab } from '../../components/translation/TranslationsTab';
@@ -45,7 +46,7 @@ import { queryKeys } from '../../lib/api/queryKeys';
 // Biên tập di sản — quản trị hệ thống. Hai trạng thái:
 //   /quan-tri/di-san/moi   tạo mới: chỉ tab Thông tin chung; "Lưu nháp" tạo di sản ở trạng thái Nháp (chỉ tên bắt buộc)
 //                          rồi chuyển sang trang sửa để thêm ảnh, giai đoạn, nguồn.
-//   /quan-tri/di-san/:diSan  bốn tab (Thông tin chung, Ảnh và media, Dòng thời gian, Nguồn tham chiếu; tab nằm trên URL
+//   /quan-tri/di-san/:diSan  sáu tab (Thông tin chung, Ảnh và media, Dòng thời gian, Nguồn tham chiếu, Bản dịch và tóm tắt, Mô hình 3D; tab nằm trên URL
 //                          ?tab=). "Lưu nháp" / "Lưu", "Xuất bản", "Ẩn", "Hiện lại" tùy trạng thái. Xuất bản và hiện lại
 //                          chỉ thành công khi đủ điều kiện; thiếu thì báo phần còn thiếu, không đổi gì. Di sản đang xuất
 //                          bản vẫn sửa được nhưng sửa xong phải còn đủ điều kiện.
@@ -406,6 +407,8 @@ function Workspace({ heritage }: { heritage: HeritageDetail | null }) {
             <TimelineTab heritage={heritage} onChanged={refreshDetail} />
           ) : tab === 'ban-dich' ? (
             <TranslationsTab heritage={heritage} />
+          ) : tab === 'mo-hinh-3d' ? (
+            <ModelTab heritage={heritage} />
           ) : (
             <ReferencesTab heritage={heritage} onChanged={refreshDetail} />
           )}

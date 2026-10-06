@@ -20,6 +20,9 @@ export const queryKeys = {
   heritageList: (query: HeritageListQuery) => ['admin', 'heritages', 'list', query] as const,
   heritage: (id: number) => ['admin', 'heritages', 'detail', id] as const,
 
+  /** Mô hình 3D của một di sản (tab Mô hình 3D); làm mới cùng danh sách di sản vì cột và bộ lọc "có mô hình 3D" đọc từ đó. */
+  heritageModels: (heritageId: number) => ['admin', 'heritages', 'models', heritageId] as const,
+
   /** Bản dịch và tóm tắt: bảng của một di sản, hàng chờ duyệt, số đếm các tab, nội dung hai cột (làm mới cả nhóm sau khi dịch, sửa, duyệt, từ chối). */
   translations: ['admin', 'translations'] as const,
   translationOverview: (heritageId: number) => ['admin', 'translations', 'overview', heritageId] as const,

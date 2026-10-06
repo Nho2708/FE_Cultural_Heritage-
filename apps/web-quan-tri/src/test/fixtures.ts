@@ -7,6 +7,7 @@ import type {
   HeritageDetail,
   HeritageEvent,
   HeritageMedia,
+  HeritageModel,
   HeritageReference,
   HeritageSummary,
   HeritageTimeline,
@@ -151,6 +152,30 @@ export function heritageReferenceOf(id: number, overrides: Partial<HeritageRefer
     url: 'https://dsvh.gov.vn/tai-lieu',
     sourceType: 'WEBSITE',
     sourceTypeLabel: 'Website',
+    ...overrides,
+  };
+}
+
+export function heritageModelOf(id: number, overrides: Partial<HeritageModel> = {}): HeritageModel {
+  return {
+    id,
+    heritageId: 1,
+    title: 'Cổng Ngọ Môn',
+    fileUrl: `/files/models/${'a1b2c3d4e5f60718293a4b5c6d7e8f9'}${id}.glb`,
+    fileFormat: 'GLB',
+    fileSizeBytes: 4_404_019,
+    posterUrl: null,
+    license: 'CC BY 4.0',
+    licenseUrl: 'https://creativecommons.org/licenses/by/4.0/',
+    author: 'Nguyễn Văn An',
+    sourceUrl: 'https://sketchfab.com/3d-models/ngo-mon',
+    credit: 'Nguyễn Văn An · CC BY 4.0 · https://sketchfab.com/3d-models/ngo-mon',
+    status: 'DRAFT',
+    statusLabel: 'Nháp',
+    isVisibleToPublic: false,
+    sortOrder: null,
+    createdAt: '2026-10-06T15:04:34.9Z',
+    updatedAt: '2026-10-06T16:05:00Z',
     ...overrides,
   };
 }

@@ -11,6 +11,8 @@ import type {
   HeritageEvent,
   HeritageInput,
   HeritageMedia,
+  HeritageModel,
+  HeritageModelInput,
   HeritageReference,
   HeritageSummary,
   HeritageTimeline,
@@ -43,6 +45,7 @@ import type {
   TranslationQueuePage,
   TranslationQueueQuery,
   TranslationState,
+  UpdateHeritageModelInput,
   UpdateSummaryInput,
   UpdateTranslationInput,
   UserStatus,
@@ -172,6 +175,8 @@ export interface HeritageListQuery extends PageQuery {
   status?: ContentStatus | '';
   /** Tình trạng bản dịch của di sản (cột và bộ lọc ở Quản lý di sản). */
   translationState?: TranslationState | '';
+  /** true: chỉ di sản có mô hình 3D đang hiển thị; false: chỉ di sản chưa có; bỏ trống: tất cả. */
+  hasModel?: boolean;
 }
 
 const order = (ids: readonly number[]) => ({ method: 'PUT', body: { ids } }) as const;
@@ -275,6 +280,46 @@ export const adminMediaApi = {
 
   orderForEvent: (eventId: number, ids: readonly number[]) =>
     apiRequest<HeritageMedia[]>(`/admin/events/${eventId}/media/order`, order(ids)),
+};
+
+/**
+ * Mô hình 3D của di sản (tab Mô hình 3D, chỉ quản trị hệ thống). Mỗi di sản có tối đa một mô hình đang hiển thị: hiện mô hình thứ hai là 422.
+ * Tải tệp lên (multipart): `file` (.glb, tối đa 15 MB) cùng `title`, `posterUrl`, `author`, `license`, `licenseUrl`, `sourceUrl`, `show`.
+ */
+export const adminModelsApi = {
+  list: (heritageId: number) => apiRequest<HeritageModel[]>(`/admin/heritages/${heritageId}/models`),
+
+  /** Khai báo bằng đường dẫn của tệp .glb đã có trong kho tệp. */
+  create: (heritageId: number, body: HeritageModelInput) =>
+    apiRequest<HeritageModel>(`/admin/heritages/${heritageId}/models`, { method: 'POST', body }),
+
+  upload: (heritageId: number, body: FormData, options: UploadOptions = {}) =>
+    apiRequest<HeritageModel>(`/admin/heritages/${heritageId}/models/upload`, {
+      method: 'POST',
+      body,
+      onUploadProgress: options.onProgress,
+      signal: options.signal,
+    }),
+
+  /** Sửa thông tin và ghi công (thay toàn bộ); `fileUrl` có giá trị thì thay tệp bằng tệp khác đã có trong kho. */
+  update: (id: number, body: UpdateHeritageModelInput) =>
+    apiRequest<HeritageModel>(`/admin/models/${id}`, { method: 'PUT', body }),
+
+  /** Thay tệp bằng tệp .glb tải lên (multipart, chỉ có `file`); thông tin và ghi công giữ nguyên, tệp cũ vẫn nằm trong kho. */
+  replaceFile: (id: number, body: FormData, options: UploadOptions = {}) =>
+    apiRequest<HeritageModel>(`/admin/models/${id}/file`, {
+      method: 'PUT',
+      body,
+      onUploadProgress: options.onProgress,
+      signal: options.signal,
+    }),
+
+  show: (id: number) => apiRequest<HeritageModel>(`/admin/models/${id}/show`, { method: 'POST' }),
+
+  hide: (id: number) => apiRequest<HeritageModel>(`/admin/models/${id}/hide`, { method: 'POST' }),
+
+  /** Gỡ (xóa mềm); tệp trong kho được giữ lại. */
+  remove: (id: number) => apiRequest<null>(`/admin/models/${id}`, { method: 'DELETE' }),
 };
 
 /** Nguồn tham chiếu của di sản. */

@@ -11,6 +11,7 @@ import {
   TRANSLATION_STATE_LABEL,
 } from '@dsvhvn/dung-chung';
 import {
+  Badge,
   Blank,
   Button,
   ButtonLink,
@@ -71,6 +72,14 @@ const LEVEL_OPTIONS = options('Tất cả cấp xếp hạng', RECOGNITION_LEVEL
 const STATUS_OPTIONS = options('Tất cả trạng thái', HERITAGE_STATUS_LABEL, STATUS_SLUG);
 const TRANSLATION_OPTIONS = options('Tất cả tình trạng bản dịch', TRANSLATION_STATE_LABEL, TRANSLATION_SLUG);
 
+/** Bộ lọc "có mô hình 3D": `co` là có mô hình đang hiển thị, `chua-co` là chưa có; bỏ trống là tất cả. */
+const MODEL_OPTIONS = [
+  { value: '', label: 'Tất cả (có hoặc chưa có 3D)' },
+  { value: 'co', label: 'Có mô hình 3D' },
+  { value: 'chua-co', label: 'Chưa có mô hình 3D' },
+];
+const hasModelOf = (param: string | null): boolean | undefined => (param === 'co' ? true : param === 'chua-co' ? false : undefined);
+
 function Thumbnail({ url }: { url: string | null }) {
   return (
     <span className="flex size-12 items-center justify-center overflow-hidden rounded-sm bg-surface-container-high">
@@ -94,8 +103,10 @@ export default function HeritagesPage() {
   const recognitionLevel = LEVEL_SLUG.fromSlug(params.get('cap'));
   const status = STATUS_SLUG.fromSlug(params.get('trang-thai'));
   const translationState = TRANSLATION_SLUG.fromSlug(params.get('ban-dich'));
-  const query: HeritageListQuery = { keyword, provinceId, heritageType, recognitionLevel, status, translationState, page, pageSize: PAGE_SIZE };
-  const filtered = Boolean(keyword || provinceId || heritageType || recognitionLevel || status || translationState);
+  const modelParam = params.get('mo-hinh-3d');
+  const hasModel = hasModelOf(modelParam);
+  const query: HeritageListQuery = { keyword, provinceId, heritageType, recognitionLevel, status, translationState, hasModel, page, pageSize: PAGE_SIZE };
+  const filtered = Boolean(keyword || provinceId || heritageType || recognitionLevel || status || translationState || hasModel !== undefined);
 
   const list = useQuery({
     queryKey: queryKeys.heritageList(query),
@@ -143,7 +154,7 @@ export default function HeritagesPage() {
             onSearch={(value) => update({ 'tu-khoa': value })}
           />
         </div>
-        <div className="grid gap-3 dsvsm:grid-cols-2 dsvlg:grid-cols-5">
+        <div className="grid gap-3 dsvsm:grid-cols-2 dsvlg:grid-cols-3 dsvxl:grid-cols-6">
           <SelectField
             label="Tỉnh, thành phố"
             name="tinh"
@@ -179,6 +190,13 @@ export default function HeritagesPage() {
             options={TRANSLATION_OPTIONS}
             onChange={(e) => update({ 'ban-dich': e.target.value })}
           />
+          <SelectField
+            label="Mô hình 3D"
+            name="mo-hinh-3d"
+            value={hasModel === undefined ? '' : modelParam!}
+            options={MODEL_OPTIONS}
+            onChange={(e) => update({ 'mo-hinh-3d': e.target.value })}
+          />
         </div>
       </div>
 
@@ -194,7 +212,7 @@ export default function HeritagesPage() {
             action={
               <Button
                 variant="secondary"
-                onClick={() => update({ 'tu-khoa': null, tinh: null, loai: null, cap: null, 'trang-thai': null, 'ban-dich': null })}
+                onClick={() => update({ 'tu-khoa': null, tinh: null, loai: null, cap: null, 'trang-thai': null, 'ban-dich': null, 'mo-hinh-3d': null })}
               >
                 Bỏ bộ lọc
               </Button>
@@ -223,6 +241,7 @@ export default function HeritagesPage() {
                 <Th>Cấp xếp hạng</Th>
                 <Th>Trạng thái</Th>
                 <Th>Bản dịch</Th>
+                <Th>Mô hình 3D</Th>
                 <Th className="text-right">Số giai đoạn</Th>
                 <Th className="text-right">Số nguồn</Th>
                 <Th>Cập nhật</Th>
@@ -247,6 +266,7 @@ export default function HeritagesPage() {
                     <HeritageStatusBadge status={item.status} />
                   </Td>
                   <Td>{item.translationState ? <TranslationStateBadge state={item.translationState} /> : <Blank />}</Td>
+                  <Td>{item.hasModel ? <Badge tone="success">Có 3D</Badge> : <Blank />}</Td>
                   <Td className="text-right type-mono-label">{item.timelineCount}</Td>
                   <Td className="text-right type-mono-label">{item.referenceCount}</Td>
                   <Td className="type-mono-label whitespace-nowrap">{formatDate(item.updatedAt ?? item.createdAt)}</Td>
