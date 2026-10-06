@@ -2,6 +2,7 @@ const shared = '<rootDir>/../../packages/dung-chung/src';
 
 module.exports = {
   preset: 'jest-expo',
+  setupFiles: ['<rootDir>/jest.setup.js'],
   roots: ['<rootDir>/src', '<rootDir>/app'],
   moduleNameMapper: {
     '^@dsvhvn/dung-chung$': `${shared}/index.ts`,

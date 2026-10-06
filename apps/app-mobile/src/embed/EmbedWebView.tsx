@@ -42,7 +42,10 @@ export function EmbedWebView({ url, onMessage, onFail, label }: EmbedWebViewProp
         onMessage={handleMessage}
         onLoadEnd={() => setLoading(false)}
         onError={onFail}
-        onHttpError={onFail}
+        // Chỉ lỗi của chính trang nhúng mới tính (Android còn báo cả ảnh nền bản đồ hoặc biểu tượng trang tải lỗi).
+        onHttpError={(event) => {
+          if (originOf(event.nativeEvent.url) === origin && event.nativeEvent.url.split('?')[0] === url.split('?')[0]) onFail();
+        }}
         javaScriptEnabled
         domStorageEnabled
         allowsInlineMediaPlayback

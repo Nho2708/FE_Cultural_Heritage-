@@ -2,6 +2,8 @@ import type { LearningTheme } from '@dsvhvn/dung-chung/theme';
 import type { ReactNode } from 'react';
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -70,14 +72,15 @@ export function Screen({ children, scroll = true, flush = false, noTopInset = tr
     return <View style={[container, { paddingHorizontal: padding }, style]}>{children}</View>;
   }
   return (
-    <View style={container}>
+    // Bàn phím iOS không đẩy nội dung lên như Android nên cần đệm khi gõ ở ô nhập (đăng nhập, nhập mã).
+    <KeyboardAvoidingView style={container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
         contentContainerStyle={[{ padding, paddingBottom: padding + Math.max(insets.bottom, 12), gap: theme.spacing.block }, style]}
         keyboardShouldPersistTaps="handled"
       >
         {children}
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
