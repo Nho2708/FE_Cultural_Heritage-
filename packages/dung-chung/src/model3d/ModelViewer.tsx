@@ -31,6 +31,8 @@ export interface ModelViewerProps {
   fallback: ReactNode;
   onFailure?: (reason: ModelViewerFailure) => void;
   onLoaded?: () => void;
+  /** Tiến trình tải, 0 đến 1 (app mobile hiện thanh tiến trình riêng bên ngoài khung nhúng). */
+  onProgress?: (fraction: number) => void;
   /** Lớp của khung xem (cần có chiều cao). */
   className?: string;
 }
@@ -71,7 +73,7 @@ export function ModelViewer(props: ModelViewerProps) {
   return <Viewer key={props.src} {...props} />;
 }
 
-function Viewer({ src, poster, labels, fallback, onFailure, onLoaded, className }: ModelViewerProps) {
+function Viewer({ src, poster, labels, fallback, onFailure, onLoaded, onProgress, className }: ModelViewerProps) {
   const [defined, setDefined] = useState(false);
   const [unsupported] = useState(() => !supportsWebGL());
   const [loadFailed, setLoadFailed] = useState(false);
@@ -80,11 +82,11 @@ function Viewer({ src, poster, labels, fallback, onFailure, onLoaded, className 
   const [element, setElement] = useState<ModelViewerElement | null>(null);
   const elementRef = useRef<ModelViewerElement | null>(null);
   const resets = useRef(0);
-  const callbacks = useRef({ onFailure, onLoaded });
+  const callbacks = useRef({ onFailure, onLoaded, onProgress });
   const failure: ModelViewerFailure | null = unsupported ? 'unsupported' : loadFailed ? 'load-error' : null;
 
   useEffect(() => {
-    callbacks.current = { onFailure, onLoaded };
+    callbacks.current = { onFailure, onLoaded, onProgress };
   });
 
   const fail = useCallback(() => {
@@ -122,7 +124,11 @@ function Viewer({ src, poster, labels, fallback, onFailure, onLoaded, className 
     };
     const onProgress = (event: Event) => {
       const total = (event as CustomEvent<{ totalProgress?: number }>).detail?.totalProgress;
-      if (typeof total === 'number') setProgress(Math.max(0, Math.min(1, total)));
+      if (typeof total === 'number') {
+        const fraction = Math.max(0, Math.min(1, total));
+        setProgress(fraction);
+        callbacks.current.onProgress?.(fraction);
+      }
     };
     element.addEventListener('progress', onProgress);
     element.addEventListener('load', done);
