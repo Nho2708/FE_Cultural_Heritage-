@@ -33,7 +33,7 @@ export const ACTOR_ROLE_LABEL: Record<ActorRole, string> = {
   SYSTEM: 'Hệ thống',
 };
 
-/** Nhãn 21 mã thao tác cho bộ lọc của màn hình Nhật ký thao tác (máy chủ trả sẵn nhãn trên từng dòng). */
+/** Nhãn 24 mã thao tác cho bộ lọc của màn hình Nhật ký thao tác (máy chủ trả sẵn nhãn trên từng dòng). */
 export const AUDIT_ACTION_LABEL: Record<AuditAction, string> = {
   LOGIN: 'Đăng nhập web quản trị',
   LOGIN_LOCKED_OUT: 'Tạm khóa đăng nhập do sai 5 lần',
@@ -45,6 +45,9 @@ export const AUDIT_ACTION_LABEL: Record<AuditAction, string> = {
   ACCOUNT_DELETED: 'Xóa tài khoản giáo viên',
   HERITAGE_PUBLISHED: 'Xuất bản di sản',
   HERITAGE_ARCHIVED: 'Ẩn di sản',
+  HERITAGE_PREVIEW_ISSUED: 'Cấp liên kết xem trước bản nháp di sản',
+  TRANSLATION_APPROVED: 'Duyệt bản dịch hoặc tóm tắt di sản',
+  TRANSLATION_REJECTED: 'Từ chối bản dịch hoặc tóm tắt di sản',
   STUDENT_ACCOUNTS_CREATED: 'Thêm học sinh và tạo tài khoản',
   STUDENT_PASSWORD_RESET: 'Đặt lại mật khẩu học sinh',
   STUDENT_DEACTIVATED: 'Vô hiệu hoặc xóa học sinh',
@@ -64,6 +67,8 @@ export const AUDIT_TARGET_LABEL: Record<string, string> = {
   organizations: 'Trường',
   subscriptions: 'Đăng ký gói',
   heritages: 'Di sản',
+  heritage_translations: 'Bản dịch di sản',
+  heritage_summaries: 'Tóm tắt di sản',
   students: 'Học sinh',
   classes: 'Lớp học',
   quizzes: 'Bài kiểm tra',

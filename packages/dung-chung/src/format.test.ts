@@ -47,7 +47,7 @@ describe('định dạng hiển thị', () => {
   });
 
   it('đủ nhãn tiếng Việt cho 21 mã thao tác của nhật ký, cùng nhãn với backend', () => {
-    expect(Object.keys(AUDIT_ACTION_LABEL)).toHaveLength(21);
+    expect(Object.keys(AUDIT_ACTION_LABEL)).toHaveLength(24);
     expect(AUDIT_ACTION_LABEL.LOGIN).toBe('Đăng nhập web quản trị');
     expect(AUDIT_ACTION_LABEL.STUDENT_DEACTIVATED).toBe('Vô hiệu hoặc xóa học sinh');
     expect(ACTOR_ROLE_LABEL.STUDENT).toBe('Học sinh');

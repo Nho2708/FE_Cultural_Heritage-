@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { envelope, mockApi } from '../testing/api';
 import { createApiClient } from './client';
-import { createDiscoveryApi } from './discovery';
+import { createDiscoveryApi, createPreviewApi } from './discovery';
 
 const api = createDiscoveryApi(createApiClient({ baseUrl: 'http://api.test/api/v1', getAccessToken: () => 'access-dang-nhap' }));
 
@@ -51,5 +51,41 @@ describe('khám phá di sản công khai', () => {
     const calls = mockApi(() => envelope(200, { data: { provinces: [] } }));
     await api.filters();
     expect(calls[0]!.path).toBe('/public/filters');
+  });
+
+  it('mọi endpoint nội dung di sản gửi ngôn ngữ trong tham số lang; bỏ trống thì không gửi', async () => {
+    const calls = mockApi(() => envelope(200, { data: {} }));
+    await api.home({ lang: 'ko' });
+    await api.search({ keyword: 'hue' }, { page: 1 }, { lang: 'zh-Hans' });
+    await api.map({}, { lang: 'ja' });
+    await api.detail('co-do-hue', { lang: 'en' });
+    await api.timeline('co-do-hue', { lang: 'en' });
+    await api.summary('co-do-hue', { lang: 'vi' });
+    await api.home();
+    expect(calls.map((c) => c.path)).toEqual([
+      '/public/home?lang=ko',
+      '/public/heritages?keyword=hue&page=1&lang=zh-Hans',
+      '/public/heritages/map?lang=ja',
+      '/public/heritages/co-do-hue?lang=en',
+      '/public/heritages/co-do-hue/timeline?lang=en',
+      '/public/heritages/co-do-hue/summary?lang=vi',
+      '/public/home',
+    ]);
+  });
+
+  it('danh sách ngôn ngữ và tóm tắt không gắn token', async () => {
+    const calls = mockApi(() => envelope(200, { data: [] }));
+    await api.languages();
+    await api.summary('quan/ho');
+    expect(calls.map((c) => c.path)).toEqual(['/public/languages', '/public/heritages/quan%2Fho/summary']);
+    expect(calls.every((c) => c.authorization === undefined)).toBe(true);
+  });
+
+  it('xem trước bản nháp cũng nhận lang', async () => {
+    const calls = mockApi(() => envelope(200, { data: {} }));
+    const preview = createPreviewApi(createApiClient({ baseUrl: 'http://api.test/api/v1', getAccessToken: () => 'quan-tri' }));
+    await preview.heritage('ma-xem-truoc', { lang: 'ko' });
+    await preview.timeline('ma-xem-truoc');
+    expect(calls.map((c) => c.path)).toEqual(['/preview/heritages/ma-xem-truoc?lang=ko', '/preview/heritages/ma-xem-truoc/timeline']);
   });
 });
