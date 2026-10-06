@@ -64,6 +64,12 @@ export const zhHans: Strings = {
     results: '{{count}} 条结果',
     loadMore: '查看更多',
     keywordShort: '关键词至少需要 2 个字符。',
+    moreFilters: '更多筛选',
+    province: '省、市',
+    level: '等级',
+    period: '时期',
+    chooseProvince: '选择省或市',
+    anyProvince: '全部省市',
   },
   detail: {
     summary: '摘要',

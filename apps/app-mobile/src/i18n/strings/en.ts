@@ -64,6 +64,12 @@ export const en: Strings = {
     results: '{{count}} results',
     loadMore: 'Show more',
     keywordShort: 'Keyword needs at least 2 characters.',
+    moreFilters: 'More filters',
+    province: 'Province, city',
+    level: 'Ranking',
+    period: 'Period',
+    chooseProvince: 'Choose a province or city',
+    anyProvince: 'All provinces',
   },
   detail: {
     summary: 'Summary',

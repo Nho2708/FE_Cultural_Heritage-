@@ -106,8 +106,12 @@ export default function HeritageDetail() {
           {data.hasTimeline ? (
             <Button label={t('detail.timeline')} variant="secondary" onPress={() => router.push({ pathname: '/di-san/[slug]/dong-thoi-gian', params: { slug: data.slug } })} />
           ) : null}
-          {canMap && mode === 'guest' ? (
-            <Button label={t('detail.onMap')} variant="secondary" onPress={() => router.push({ pathname: '/(khach)/ban-do', params: { chon: data.slug } })} />
+          {canMap ? (
+            <Button
+              label={t('detail.onMap')}
+              variant="secondary"
+              onPress={() => router.push({ pathname: mode === 'guest' ? '/(khach)/ban-do' : '/ban-do-di-san', params: { chon: data.slug } })}
+            />
           ) : null}
         </View>
 
