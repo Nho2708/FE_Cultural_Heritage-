@@ -3,6 +3,9 @@ import { createBrowserRouter, type RouteObject } from 'react-router';
 import { RequireAccess } from '../access/RequireAccess';
 import { SCREENS, screen, type ScreenKey } from '../access/screens';
 import { FullScreenLayout, MainLayout, RootLayout } from '../components/layout/Layouts';
+import { EmbedLayout } from '../embed/EmbedLayout';
+import { EmbedMapPage } from '../embed/EmbedMapPage';
+import { EmbedModelPage } from '../embed/EmbedModelPage';
 import { ChangePasswordPage } from '../pages/ChangePasswordPage';
 import { NotFoundPage, RouteErrorPage } from '../pages/errors/ErrorPages';
 import { HeritageDetailPage } from '../pages/HeritageDetailPage';
@@ -64,6 +67,14 @@ export const routes: RouteObject[] = [
         children: [...screenRoutes((fullScreen) => !fullScreen), { path: '*', element: <NotFoundPage /> }],
       },
       { element: <FullScreenLayout />, children: screenRoutes((fullScreen) => fullScreen) },
+      // Trang nhúng cho app mobile (WebView): bản đồ và trình xem 3D, công khai, không thanh điều hướng.
+      {
+        element: <EmbedLayout />,
+        children: [
+          { path: 'nhung/ban-do', element: <EmbedMapPage /> },
+          { path: 'nhung/3d/:slug', element: <EmbedModelPage /> },
+        ],
+      },
     ],
   },
 ];
