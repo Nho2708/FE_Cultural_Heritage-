@@ -344,7 +344,7 @@ function PaymentList() {
                   <Td className="type-mono-label whitespace-nowrap">{p.createdAt ? formatDateTime(p.createdAt) : <Blank />}</Td>
                   <Td>{p.organizationName ?? <Blank />}</Td>
                   <Td className="type-mono-label whitespace-nowrap">{p.invoiceNumber ?? <Blank />}</Td>
-                  <Td>{p.planName ?? <Blank />}</Td>
+                  <Td className="whitespace-nowrap">{p.planName ?? <Blank />}</Td>
                   <Td className="text-right type-mono-label whitespace-nowrap">{formatMoney(p.amount) || <Blank />}</Td>
                   <Td>
                     <PaymentStatusBadge status={p.status} />
