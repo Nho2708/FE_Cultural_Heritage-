@@ -182,6 +182,7 @@ export const ko: Strings = {
     agency: '발행 기관',
     accessed: '접속일',
     loading: '유산을 불러오는 중…',
+    view3d: '3D로 보기',
     summary: '요약',
     listen: '듣기',
     noSummary: '이 유산에는 아직 요약이 없습니다. 아래의 전체 내용은 그대로 읽을 수 있습니다.',
@@ -216,6 +217,24 @@ export const ko: Strings = {
     unsupportedHint: '아래의 글은 그대로 읽을 수 있습니다.',
     shortLabel: '듣기용 짧은 버전',
     sourceNote: '저장된 유산 내용을 요약한 것이며, 보는 동안 새로 만들지 않습니다.',
+  },
+
+  model: {
+    kicker: '3D 모델',
+    viewerAria: (name) => `${name}의 3D 모델`,
+    hint: '드래그하여 회전하고, 스크롤하거나 두 손가락으로 모아 확대·축소하세요. 방향키로도 회전할 수 있습니다.',
+    loading: '3D 모델을 불러오는 중…',
+    progress: (percent) => `3D 모델을 불러오는 중: ${percent}%`,
+    resetView: '시점 초기화',
+    credit: '출처 표기',
+    license: '라이선스 보기',
+    source: '원본 보기',
+    unavailable: '3D 모델을 불러올 수 없습니다. 유산의 사진 모음을 대신 볼 수 있습니다.',
+    photos: '유산 사진 모음',
+    noPhotos: '이 유산에는 아직 사진이 없습니다.',
+    heavyTitle: '용량이 큰 모델입니다',
+    heavyText: (size) => `이 모델은 약 ${size}입니다. 모바일 네트워크 또는 데이터 절약 모드를 사용 중이라 불러오면 데이터가 많이 소모될 수 있습니다.`,
+    loadAnyway: '그래도 불러오기',
   },
 
   timeline: {

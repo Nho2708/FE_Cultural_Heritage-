@@ -182,6 +182,7 @@ export const ja: Strings = {
     agency: '発行機関',
     accessed: 'アクセス日',
     loading: '遺産を読み込み中…',
+    view3d: '3Dで見る',
     summary: '要約',
     listen: '聞く',
     noSummary: 'この遺産にはまだ要約がありません。下の本文はそのままお読みいただけます。',
@@ -216,6 +217,24 @@ export const ja: Strings = {
     unsupportedHint: '下の文章はそのままお読みいただけます。',
     shortLabel: '聞くための短い版',
     sourceNote: '保存済みの遺産の内容から作った要約です。表示するときに新しく生成することはありません。',
+  },
+
+  model: {
+    kicker: '3Dモデル',
+    viewerAria: (name) => `${name}の3Dモデル`,
+    hint: 'ドラッグで回転、スクロールまたはピンチで拡大・縮小できます。矢印キーでも回転できます。',
+    loading: '3Dモデルを読み込んでいます…',
+    progress: (percent) => `3Dモデルを読み込み中：${percent}%`,
+    resetView: '視点をリセット',
+    credit: 'クレジット',
+    license: 'ライセンスを見る',
+    source: '出典を見る',
+    unavailable: '3Dモデルを読み込めませんでした。代わりに遺産の写真ギャラリーをご覧いただけます。',
+    photos: '遺産の写真ギャラリー',
+    noPhotos: 'この遺産にはまだ写真がありません。',
+    heavyTitle: 'このモデルは容量が大きいです',
+    heavyText: (size) => `このモデルは約 ${size} あります。モバイル回線またはデータ節約モードのため、読み込むとデータ通信量がかかる場合があります。`,
+    loadAnyway: 'このまま読み込む',
   },
 
   timeline: {

@@ -186,6 +186,7 @@ export const vi = {
     agency: 'Cơ quan phát hành',
     accessed: 'Truy cập',
     loading: 'Đang tải di sản…',
+    view3d: 'Xem 3D',
     summary: 'Tóm tắt',
     listen: 'Nghe',
     noSummary: 'Di sản này chưa có tóm tắt. Bạn vẫn có thể đọc nội dung đầy đủ bên dưới.',
@@ -220,6 +221,24 @@ export const vi = {
     unsupportedHint: 'Bạn vẫn đọc được toàn bộ chữ bên dưới.',
     shortLabel: 'Bản ngắn để nghe',
     sourceNote: 'Tóm tắt từ nội dung đã lưu của di sản, không tạo mới khi xem.',
+  },
+
+  model: {
+    kicker: 'MÔ HÌNH 3D',
+    viewerAria: (name: string) => `Mô hình 3D của ${name}`,
+    hint: 'Kéo để xoay, cuộn hoặc chụm hai ngón để phóng to, thu nhỏ. Có thể dùng phím mũi tên để xoay.',
+    loading: 'Đang tải mô hình 3D…',
+    progress: (percent: number) => `Đang tải mô hình 3D: ${percent}%`,
+    resetView: 'Đặt lại góc nhìn',
+    credit: 'Ghi công',
+    license: 'Xem giấy phép',
+    source: 'Xem nguồn',
+    unavailable: 'Không tải được mô hình 3D. Bạn có thể xem bộ ảnh của di sản.',
+    photos: 'Bộ ảnh của di sản',
+    noPhotos: 'Di sản này chưa có ảnh.',
+    heavyTitle: 'Mô hình này khá nặng',
+    heavyText: (size: string) => `Mô hình nặng khoảng ${size}. Bạn đang dùng mạng di động hoặc chế độ tiết kiệm dữ liệu nên việc tải có thể tốn dung lượng.`,
+    loadAnyway: 'Vẫn tải mô hình',
   },
 
   timeline: {
