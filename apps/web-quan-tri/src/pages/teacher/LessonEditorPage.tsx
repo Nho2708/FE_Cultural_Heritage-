@@ -1,4 +1,4 @@
-import { LESSON_LIMITS, LESSON_SECTION_LABEL, LESSON_STATUS_LABEL, MESSAGES, formatDateTime, splitApiError } from '@dsvhvn/dung-chung';
+import { LESSON_LIMITS, LESSON_SECTION_LABEL, LESSON_STATUS_LABEL, MESSAGES, QUIZ_STATUS_LABEL, formatDateTime, splitApiError } from '@dsvhvn/dung-chung';
 import { ApiError, errorMessage, type LessonDetail, type LessonImageOption, type LessonLength, type LessonSectionType } from '@dsvhvn/dung-chung/api';
 import {
   Button,
@@ -23,6 +23,7 @@ import { DuplicateLessonDialog } from '../../components/lesson/DuplicateLessonDi
 import { ImagePickerDialog } from '../../components/lesson/ImagePickerDialog';
 import { CodeDisplay, LessonStatusBadge, PlanNotice } from '../../components/lesson/LessonBits';
 import { LessonCodeDialog, type CodeTarget } from '../../components/lesson/LessonCodeDialog';
+import { CreateQuizDialog } from '../../components/quiz/CreateQuizDialog';
 import {
   addLabel,
   addableTypes,
@@ -42,6 +43,7 @@ import { SectionCard } from '../../components/lesson/SectionCard';
 import { AreaPage, PageHeader } from '../../components/layout/PageHeader';
 import { lessonsApi } from '../../lib/api/lessonEndpoints';
 import { queryKeys } from '../../lib/api/queryKeys';
+import { quizzesApi } from '../../lib/api/quizEndpoints';
 
 // Soạn bài học — giáo viên. Cấp của bài là cấp của lớp (không đổi sau khi tạo), khung nội dung đổi theo cấp: cấp 1 các bước câu
 // chuyện mỗi bước một hình; cấp 2 bài đọc, hình có chú thích, mốc thời gian lấy từ dòng thời gian của di sản; cấp 3 bài phân tích, trích
@@ -106,6 +108,11 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
     queryFn: () => lessonsApi.materials(lessonId).then((r) => r.data),
   });
 
+  const quizzes = useQuery({
+    queryKey: queryKeys.quizList({ lessonId, page: 1, pageSize: 50 }),
+    queryFn: () => quizzesApi.list({ lessonId, page: 1, pageSize: 50 }).then((r) => r.data),
+  });
+
   const [lesson, setLesson] = useState<LessonDetail>(initial);
   const [form, setForm] = useState<LessonFormState>(() => formOf(initial));
   const [saved, setSaved] = useState<LessonFormState>(() => formOf(initial));
@@ -120,6 +127,7 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
   const [pickingKey, setPickingKey] = useState<string | null>(null);
   const [codeTarget, setCodeTarget] = useState<CodeTarget | null>(null);
   const [copying, setCopying] = useState(false);
+  const [creatingQuiz, setCreatingQuiz] = useState(false);
   const [confirmArchive, setConfirmArchive] = useState(false);
   const [confirmCompose, setConfirmCompose] = useState(false);
 
@@ -550,6 +558,29 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
             <p className="mt-3 type-body-m text-on-surface">
               {lesson.quizCount === 0 ? 'Bài học chưa có bài kiểm tra nào.' : `${lesson.quizCount} bài kiểm tra.`}
             </p>
+            {quizzes.data && quizzes.data.items.length > 0 && (
+              <ul className="mt-3 flex flex-col gap-2" aria-label="Các bài kiểm tra của bài">
+                {quizzes.data.items.map((quiz) => (
+                  <li key={quiz.id} className="flex items-center justify-between gap-3 type-body-s">
+                    <TextLink to={PATHS.quiz(quiz.id)} className="min-w-0 font-medium">
+                      {quiz.name}
+                    </TextLink>
+                    <span className="shrink-0 text-on-surface-variant">{quiz.status ? QUIZ_STATUS_LABEL[quiz.status] : ''}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="mt-3">
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={lesson.status === 'ARCHIVED' || !lesson.aiQuota.hasEffectivePlan}
+                onClick={() => (dirty ? toast.error('Hãy lưu bài học trước khi tạo bài kiểm tra.') : setCreatingQuiz(true))}
+              >
+                <Icon name="plus" size={16} />
+                Tạo bài kiểm tra
+              </Button>
+            </div>
             <p className="mt-2 type-body-s text-on-surface-variant">
               Bài đã có bài kiểm tra thì chỉ lưu trữ được, không xóa. Bài học còn bài kiểm tra đang mở thì chưa lưu trữ được.
             </p>
@@ -570,6 +601,18 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
         />
       )}
       {codeTarget && <LessonCodeDialog target={codeTarget} onClose={() => setCodeTarget(null)} />}
+      {creatingQuiz && (
+        <CreateQuizDialog
+          fixedLessonId={lesson.id}
+          onCreated={(quiz, message) => {
+            setCreatingQuiz(false);
+            toast.success(message ?? MESSAGES.success('Tạo bài kiểm tra'));
+            void queryClient.invalidateQueries({ queryKey: queryKeys.quizzes });
+            void navigate(PATHS.quiz(quiz.id));
+          }}
+          onClose={() => setCreatingQuiz(false)}
+        />
+      )}
       {copying && (
         <DuplicateLessonDialog
           source={{
@@ -579,6 +622,7 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
             className: lesson.className,
             schoolLevel: lesson.schoolLevel,
             heritageCount: lesson.heritages.length,
+            quizCount: lesson.quizCount,
             isPublished: lesson.status === 'PUBLISHED',
           }}
           onDone={(result) => {
