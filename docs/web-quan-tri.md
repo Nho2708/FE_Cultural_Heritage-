@@ -8,7 +8,7 @@ trường, quản lý trường, nhật ký thao tác — trên API của backen
 | Mục | Giá trị |
 |---|---|
 | Chức năng | Đăng nhập web quản trị · Đặt mật khẩu qua email · Hồ sơ cá nhân · Quản lý thông tin trường · Quản lý tài khoản giáo viên · Xem nhật ký thao tác |
-| Màn hình dựng | Lớp học · Chi tiết lớp (tab Học sinh), Thêm học sinh, Phiếu đăng nhập ([lop-hoc-sinh.md](lop-hoc-sinh.md)) · Đăng nhập · Quên và đặt mật khẩu · Hồ sơ cá nhân · Trường và gói (tab Thông tin trường) · Giáo viên của trường · Biểu mẫu tài khoản · Quản lý trường · Chi tiết trường · Nhật ký thao tác · trang 403, 404, lỗi hệ thống |
+| Màn hình dựng | Lớp học · Chi tiết lớp (tab Học sinh), Thêm học sinh, Phiếu đăng nhập ([lop-hoc-sinh.md](lop-hoc-sinh.md)) · Đăng nhập · Quên và đặt mật khẩu · Hồ sơ cá nhân · Trường và gói (ba tab), Chọn gói và thanh toán, Kết quả thanh toán, Gói dịch vụ ([goi-thanh-toan.md](goi-thanh-toan.md)) · Giáo viên của trường · Biểu mẫu tài khoản · Quản lý trường · Chi tiết trường · Nhật ký thao tác · trang 403, 404, lỗi hệ thống |
 | Backend | `BE_Cultural_Heritage-`, tài liệu `docs/nen-tang-to-chuc.md` |
 
 ## 1. Route và màn hình
@@ -39,13 +39,16 @@ Ba khu làm việc và màn hình của chúng tách chunk riêng, chỉ tải s
 | `/dat-mat-khau?token=…` | Đặt mật khẩu | Khách | Kiểm liên kết trước, hiện tên đăng nhập và hạn; mật khẩu mới + nhập lại; dùng chung cho tài khoản mới (48 giờ) và quên mật khẩu (30 phút). Hỏng → báo lỗi + "Gửi lại liên kết". Xong → Đăng nhập, tên đăng nhập điền sẵn |
 | `/tai-khoan` | Hồ sơ cá nhân | 3 vai trò | `?tab=thong-tin` (mặc định) · `doi-mat-khau`. Sửa họ tên, số điện thoại, ảnh (đường dẫn); email, tên đăng nhập, vai trò, trường chỉ đọc. Đổi mật khẩu: mật khẩu mới phải khác mật khẩu cũ, nhận access token mới |
 | `/truong` | Tổng quan trường | ORG_ADMIN | Tới khi dựng: chuyển tới Giáo viên của trường |
-| `/truong/thong-tin` | Trường và gói, tab Thông tin trường | ORG_ADMIN | Tên trường chỉ đọc; sửa địa chỉ, số điện thoại, email. Gói hiện tại hiện chỉ đọc bên cạnh |
+| `/truong/thong-tin` | Trường và gói | ORG_ADMIN | `?tab=` Thông tin trường (mặc định: tên chỉ đọc, sửa địa chỉ, số điện thoại, email) · `goi-va-han-muc` · `hoa-don`. Mua, gia hạn, nâng cấp, hủy gói qua VNPay: [goi-thanh-toan.md](goi-thanh-toan.md) |
+| `/truong/chon-goi` | Chọn gói và thanh toán | ORG_ADMIN | Thẻ gói đang bán, khối xác nhận theo loại thao tác, hộp xác nhận rồi chuyển sang VNPay; `?goi=` chọn sẵn gói |
+| `/truong/ket-qua-thanh-toan` | Kết quả thanh toán | ORG_ADMIN | VNPay đưa trình duyệt về; chỉ đọc trạng thái do IPN ghi nhận, tự kiểm tra lại khi đang chờ |
 | `/truong/giao-vien` | Giáo viên của trường | ORG_ADMIN | Bảng + bộ đếm "x / tối đa giáo viên"; "Thêm giáo viên" khóa khi đủ hạn mức hoặc không có gói hiệu lực; khóa / mở, xóa mềm; tìm, lọc trạng thái, trang trên URL |
 | (hộp thoại) | Biểu mẫu tài khoản | ORG_ADMIN (giáo viên), ADMIN (quản trị trường) | Họ tên, tên đăng nhập, email, số điện thoại; vai trò cố định theo nơi mở; lỗi trùng dưới đúng ô |
 | `/quan-tri` | Tổng quan và doanh thu | ADMIN | Tới khi dựng: chuyển tới Quản lý trường |
 | `/quan-tri/truong` | Quản lý trường | ADMIN | Bảng trường; tìm, lọc; "Tạo trường"; ngừng trường |
 | `/quan-tri/truong/moi` | Chi tiết trường, tạo mới | ADMIN | Thông tin trường + quản trị trường đầu tiên trong một lần lưu; lỗi `orgAdmin.*` hiện dưới đúng ô |
 | `/quan-tri/truong/:truong` | Chi tiết trường, xem / sửa | ADMIN | Sửa thông tin (khóa khi trường đã ngừng); gói hiện tại chỉ đọc; quản trị trường: khóa / mở, thêm; ngừng trường |
+| `/quan-tri/goi` | Gói dịch vụ | ADMIN | Bảng gói, tạo và sửa ở khung bên phải, bật tắt bán; gói Miễn phí bị khóa; không có thao tác xóa |
 | `/quan-tri/nhat-ky` | Nhật ký thao tác | ADMIN | Chỉ đọc. Lọc người làm, vai trò (có Học sinh, Hệ thống), hành động (21 mã), đối tượng, từ ngày / đến ngày (gõ ngày/tháng/năm, giờ Việt Nam); mở dòng xem giá trị cũ / mới bằng nhãn tiếng Việt |
 | (tại chỗ) | 403 | — | Giữ URL; hiện trong khu làm việc của chính người dùng |
 | `*` | 404 | Mọi người | Có cả trong từng khu làm việc |
@@ -75,6 +78,8 @@ thống → Quản lý trường. Test kiểm số màn hình theo cột ma tr�
 | Quên và đặt mật khẩu | `POST /auth/forgot-password` · `POST /auth/password-token/check` · `POST /auth/set-password` |
 | Hồ sơ cá nhân | `GET /me` (khi mở ứng dụng) · `PUT /me` · `PUT /me/password` |
 | Trường và gói, thanh báo gói | `GET /org` · `PUT /org` |
+| Gói và hạn mức, Chọn gói và thanh toán, Hóa đơn và giao dịch, Kết quả thanh toán | `GET /org/billing` · `/org/plans` · `/org/plans/{id}/quote` · `POST /org/billing/checkout` · `/org/billing/free-plan` · `/org/subscriptions/{id}/cancel` · `GET /org/invoices` · `/org/invoices/{id}` · `POST /org/invoices/{id}/pay` · `GET /org/payments/{id}` |
+| Gói dịch vụ | `GET` / `POST /admin/plans` · `PUT /admin/plans/{id}` · `POST /admin/plans/{id}/enable` · `/disable` |
 | Giáo viên của trường, Biểu mẫu tài khoản | `GET /org/teachers?keyword&status&page&pageSize` · `POST /org/teachers` · `POST /org/teachers/{id}/lock` · `/unlock` · `DELETE /org/teachers/{id}` |
 | Quản lý trường | `GET /admin/organizations?keyword&status&page&pageSize` · `DELETE /admin/organizations/{id}` |
 | Chi tiết trường | `POST /admin/organizations` · `GET` / `PUT /admin/organizations/{id}` · `POST /admin/organizations/{id}/org-admins` · `…/org-admins/{userId}/lock` · `/unlock` |
@@ -114,7 +119,7 @@ trị chỉ gắn chúng với phiên của mình (`src/lib/api/client.ts`, `src
 | 1 | Trang khám phá công khai (`/`, `/di-san`, `/ban-do`, `/dong-thoi-gian`) và lối vào bằng mã đã chuyển sang web học tập; ở đây các đường dẫn đó là 404 | Quyết định tách hai ứng dụng: web quản trị gộp, web học tập riêng |
 | 2 | Hồ sơ cá nhân hiện trong khu làm việc của vai trò; trang 403 hiện trong khu của chính người dùng | Web quản trị không còn thanh điều hướng công khai; người dùng luôn có thanh bên và menu tài khoản của mình |
 | 3 | Đăng xuất về màn hình Đăng nhập | Web quản trị không có trang chủ công khai |
-| 4 | Trường và gói chỉ có tab "Thông tin trường"; gói hiện tại hiện chỉ đọc cạnh biểu mẫu | Tab gói, hóa đơn làm cùng chức năng mua gói qua VNPay |
+| 4 | Trường và gói có ba tab (Thông tin trường, Gói và hạn mức, Hóa đơn và giao dịch); chưa có bảng "Lịch sử gói" | Backend chưa có API liệt kê đăng ký cũ ([goi-thanh-toan.md](goi-thanh-toan.md)) |
 | 5 | Thanh báo gói hết hiệu lực chỉ có ở khu quản trị trường | Giáo viên chưa có API đọc gói của trường; thêm cùng đồng hồ hạn mức AI |
 | 6 | Trang 404 dùng câu trung tính "Không tìm thấy trang" | Danh mục thông báo chưa có câu riêng cho 404 — **đề nghị bổ sung** (backend cũng đề nghị) |
 | 7 | Ô ngày ở Nhật ký thao tác là ô chữ "ngày/tháng/năm" | `<input type="date">` hiện "mm/dd/yyyy" trên trình duyệt tiếng Anh |
