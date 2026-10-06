@@ -40,6 +40,18 @@ describe('khám phá di sản công khai', () => {
     expect(calls[0]!.path).toBe('/public/heritages/map?keyword=hue&heritageType=NATURAL');
   });
 
+  it('chỉ tóm tắt mang token của học sinh (máy chủ mở thẳng cổng quảng cáo cho học sinh); mọi API khám phá khác không mang token', async () => {
+    const calls = mockApi(() => envelope(200, { data: {} }));
+    await api.summary('co-do-hue', { lang: 'en' });
+    await api.detail('co-do-hue');
+    await api.model('co-do-hue');
+    expect(calls.map((c) => [c.path, c.authorization])).toEqual([
+      ['/public/heritages/co-do-hue/summary?lang=en', 'Bearer access-dang-nhap'],
+      ['/public/heritages/co-do-hue', undefined],
+      ['/public/heritages/co-do-hue/model', undefined],
+    ]);
+  });
+
   it('chi tiết và timeline mã hóa slug trên đường dẫn', async () => {
     const calls = mockApi(() => envelope(200, { data: {} }));
     await api.detail('quan-the/di tich');
@@ -73,12 +85,12 @@ describe('khám phá di sản công khai', () => {
     ]);
   });
 
-  it('danh sách ngôn ngữ và tóm tắt không gắn token', async () => {
+  it('danh sách ngôn ngữ không gắn token; tóm tắt mã hóa slug và mang token của học sinh nếu có phiên', async () => {
     const calls = mockApi(() => envelope(200, { data: [] }));
     await api.languages();
     await api.summary('quan/ho');
     expect(calls.map((c) => c.path)).toEqual(['/public/languages', '/public/heritages/quan%2Fho/summary']);
-    expect(calls.every((c) => c.authorization === undefined)).toBe(true);
+    expect(calls.map((c) => c.authorization)).toEqual([undefined, 'Bearer access-dang-nhap']);
   });
 
   it('xem trước bản nháp cũng nhận lang', async () => {

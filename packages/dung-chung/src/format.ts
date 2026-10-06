@@ -33,7 +33,7 @@ export const ACTOR_ROLE_LABEL: Record<ActorRole, string> = {
   SYSTEM: 'Hệ thống',
 };
 
-/** Nhãn 26 mã thao tác cho bộ lọc của màn hình Nhật ký thao tác (máy chủ trả sẵn nhãn trên từng dòng). */
+/** Nhãn 27 mã thao tác cho bộ lọc của màn hình Nhật ký thao tác (máy chủ trả sẵn nhãn trên từng dòng). */
 export const AUDIT_ACTION_LABEL: Record<AuditAction, string> = {
   LOGIN: 'Đăng nhập web quản trị',
   LOGIN_LOCKED_OUT: 'Tạm khóa đăng nhập do sai 5 lần',
@@ -61,6 +61,7 @@ export const AUDIT_ACTION_LABEL: Record<AuditAction, string> = {
   SUBSCRIPTION_CHANGED: 'Đổi gói của trường',
   BILLING_STATUS_CHANGED: 'Hệ thống đổi trạng thái gói, hóa đơn, giao dịch',
   IPN_REJECTED: 'Từ chối IPN',
+  AD_REWARD_REJECTED: 'Từ chối phần thưởng quảng cáo',
 };
 
 /** `audit_logs.target_type` là tên bảng (AuditTargets của backend); giao diện hiện tên tiếng Việt. */
@@ -79,6 +80,7 @@ export const AUDIT_TARGET_LABEL: Record<string, string> = {
   plans: 'Gói dịch vụ',
   invoices: 'Hóa đơn',
   payments: 'Giao dịch',
+  ad_unlocks: 'Lượt mở khóa bằng quảng cáo',
 };
 
 /** Khóa trong `old_value` / `new_value` (JSON rút gọn do backend ghi) sang nhãn tiếng Việt. */

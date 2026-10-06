@@ -29,6 +29,10 @@ export const ERROR_CODES = {
   translationBusy: 'TRANSLATION_BUSY',
   summaryUnavailable: 'SUMMARY_UNAVAILABLE',
   modelUnavailable: 'MODEL_UNAVAILABLE',
+  adUnlockRequired: 'AD_UNLOCK_REQUIRED',
+  adRewardRejected: 'AD_REWARD_REJECTED',
+  adRewardRateLimited: 'AD_REWARD_RATE_LIMITED',
+  adUnavailable: 'AD_UNAVAILABLE',
   systemError: 'SYSTEM_ERROR',
 } as const;
 
@@ -41,14 +45,24 @@ export class ApiError extends Error {
   /** Lỗi theo trường, khóa camelCase trùng tên trường của request; biểu mẫu lồng nhau nối bằng dấu chấm. */
   readonly fieldErrors: Record<string, string>;
   readonly traceId: string | null;
+  /** Số giây máy chủ yêu cầu chờ (tiêu đề `Retry-After` của phản hồi 429); null khi không có hoặc trình duyệt không cho đọc (khác nguồn gốc mà máy chủ không công bố tiêu đề). */
+  readonly retryAfterSeconds: number | null;
 
-  constructor(status: number, code: string, message: string, fieldErrors: Record<string, string> = {}, traceId: string | null = null) {
+  constructor(
+    status: number,
+    code: string,
+    message: string,
+    fieldErrors: Record<string, string> = {},
+    traceId: string | null = null,
+    retryAfterSeconds: number | null = null,
+  ) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.code = code;
     this.fieldErrors = fieldErrors;
     this.traceId = traceId;
+    this.retryAfterSeconds = retryAfterSeconds;
   }
 }
 
@@ -68,8 +82,12 @@ export interface RequestOptions {
   query?: Record<string, QueryValue>;
   /** Chỉ khi gửi FormData: gọi mỗi khi có thêm byte được gửi đi, `fraction` từ 0 đến 1 (dùng XMLHttpRequest vì fetch không báo tiến độ gửi). */
   onUploadProgress?: (fraction: number) => void;
-  /** Endpoint cần đăng nhập: gắn Bearer. Mặc định true. */
-  auth?: boolean;
+  /**
+   * Endpoint cần đăng nhập: gắn Bearer (mặc định `true`; chưa đăng nhập thì không gọi mạng). `false`: endpoint công khai, không bao giờ gắn token.
+   * `'optional'`: endpoint công khai mà máy chủ cư xử khác với học sinh đã đăng nhập (ví dụ cổng quảng cáo mở thẳng cho học sinh): gắn Bearer nếu đang có phiên,
+   * không có thì vẫn gọi như khách.
+   */
+  auth?: boolean | 'optional';
   /** Tiêu đề thêm cho riêng yêu cầu này (ví dụ mã thiết bị của khách); ghi đè tiêu đề chung của ứng dụng cùng tên. */
   headers?: Record<string, string>;
   signal?: AbortSignal;
@@ -179,6 +197,12 @@ function sendWithProgress(
   });
 }
 
+/** `Retry-After` dạng số giây của một phản hồi; không có, không phải số nguyên dương hoặc không đọc được thì null. */
+function retryAfterOf(response: Response): number | null {
+  const seconds = Number(response.headers.get('Retry-After'));
+  return Number.isInteger(seconds) && seconds > 0 ? seconds : null;
+}
+
 export function createApiClient({ baseUrl, getAccessToken, onUnauthorized, extraHeaders }: ApiClientOptions): ApiClient {
   async function send(path: string, options: RequestOptions, accessToken: string | null): Promise<Response> {
     const headers: Record<string, string> = {
@@ -209,9 +233,10 @@ export function createApiClient({ baseUrl, getAccessToken, onUnauthorized, extra
 
   /** Gửi yêu cầu kèm token (nếu endpoint cần) và đổi phản hồi lỗi thành ApiError; trả phản hồi khi thành công. */
   async function exchange(path: string, options: RequestOptions): Promise<{ response: Response; token: string | null }> {
-    const needsAuth = options.auth ?? true;
+    const mode = options.auth ?? true;
     let token: string | null = null;
-    if (needsAuth) {
+    if (mode === 'optional') token = getAccessToken();
+    else if (mode) {
       token = getAccessToken();
       // Chưa đăng nhập hoặc token đã quá hạn: không gọi mạng, route guard sẽ đưa về màn hình đăng nhập.
       if (!token) throw new ApiError(401, ERROR_CODES.forbidden, MESSAGES.forbidden);
@@ -234,6 +259,7 @@ export function createApiClient({ baseUrl, getAccessToken, onUnauthorized, extra
       envelope.message ?? MESSAGES.systemError,
       envelope.errors ?? {},
       envelope.traceId,
+      retryAfterOf(response),
     );
   }
 

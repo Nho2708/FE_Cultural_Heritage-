@@ -64,6 +64,13 @@ describe('tầng gọi API dùng chung', () => {
     expect(calls[0]?.authorization).toBeUndefined();
   });
 
+  it("auth 'optional': có phiên thì gắn Bearer, không có phiên thì vẫn gọi như khách", async () => {
+    const calls = mockApi(() => envelope(200, { data: {} }));
+    await clientWith('access-hoc-sinh').client.request('/public/heritages/co-do-hue/summary', { auth: 'optional' });
+    await clientWith(null).client.request('/public/heritages/co-do-hue/summary', { auth: 'optional' });
+    expect(calls.map((c) => c.authorization)).toEqual(['Bearer access-hoc-sinh', undefined]);
+  });
+
   it('bỏ tham số rỗng khỏi query', () => {
     expect(withQuery('/org/teachers', { keyword: '', status: undefined, page: 2, pageSize: 20 })).toBe(
       '/org/teachers?page=2&pageSize=20',
