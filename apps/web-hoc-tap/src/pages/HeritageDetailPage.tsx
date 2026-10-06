@@ -13,7 +13,7 @@ import { useHeritageDetail } from '../discovery/queries';
 import { Thumbnail } from '../discovery/Thumbnail';
 import { useI18n } from '../i18n/context';
 import { coordinatesText, localizeDateText } from '../i18n/format';
-import { HERITAGE_TYPE_NAME, provinceName, RECOGNITION_LEVEL_NAME } from '../i18n/taxonomy';
+import { HERITAGE_TYPE_NAME, provinceName, RECOGNITION_LEVEL_NAME } from '@dsvhvn/dung-chung/i18n';
 
 // Chi tiết di sản (công khai): ảnh đại diện có ghi công, nhãn, nội dung, thông tin, bản đồ nhỏ, thư viện ảnh kèm ghi công
 // tách ba phần, dòng thời gian rút gọn và nguồn tham khảo. `:diSan` là slug. Di sản nháp, đã ẩn hoặc không có → 404.

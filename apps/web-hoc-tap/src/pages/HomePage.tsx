@@ -15,7 +15,7 @@ import { useHeritageDetail, useHome } from '../discovery/queries';
 import { Thumbnail } from '../discovery/Thumbnail';
 import { useI18n } from '../i18n/context';
 import { formatCount, listFlags } from '../i18n/format';
-import { HERITAGE_TYPE_NAME, REGION_LONG_NAME, type RegionValue } from '../i18n/taxonomy';
+import { HERITAGE_TYPE_NAME, REGION_LONG_NAME, type RegionValue } from '@dsvhvn/dung-chung/i18n';
 import { useAuth } from '../lib/auth/context';
 
 // Trang chủ khám phá (công khai): ảnh lớn đầu trang, ô tìm kiếm, lối vào bản đồ và dòng thời gian, di sản nổi bật (tối

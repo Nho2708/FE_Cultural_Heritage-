@@ -16,7 +16,7 @@ import { useHeritageTimeline, usePickerHeritages } from '../discovery/queries';
 import { Thumbnail } from '../discovery/Thumbnail';
 import { useI18n } from '../i18n/context';
 import { localizeDateText } from '../i18n/format';
-import { provinceName } from '../i18n/taxonomy';
+import { provinceName } from '@dsvhvn/dung-chung/i18n';
 
 // Dòng thời gian di sản (công khai). Không có `:diSan`: chọn một di sản (tìm nhanh theo tên). Có `:diSan`: trục dọc các
 // giai đoạn theo thứ tự; mở một giai đoạn để xem sự kiện (năm, tháng/ngày nếu có, mô tả, ảnh kèm ghi công). Mỗi di sản
