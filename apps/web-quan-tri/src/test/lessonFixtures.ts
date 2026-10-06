@@ -146,6 +146,8 @@ export function lessonRowOf(id: number, overrides: Partial<LessonRow> = {}): Les
     accessCode: null,
     heritages: [{ id: 11, slug: 'quan-the-co-do-hue', name: 'Quần thể di tích Cố đô Huế', thumbnailUrl: null, status: 'PUBLISHED' }],
     quizCount: 0,
+    difficulty: null,
+    difficultyLabel: 'Chưa có bài kiểm tra',
     createdAt: '2026-10-05T01:00:00Z',
     updatedAt: '2026-10-05T02:00:00Z',
     ...overrides,

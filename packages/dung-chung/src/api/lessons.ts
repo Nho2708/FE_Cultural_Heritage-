@@ -1,4 +1,5 @@
 import type { ContentStatus, HeritageType } from './heritage';
+import type { QuestionDifficulty } from './questions';
 import type { SchoolLevel } from './types';
 
 // Kiểu dữ liệu của luồng Bài học cho lớp theo cấp: giáo viên soạn (khu giáo viên của web quản trị) và học sinh mở bằng mã
@@ -51,6 +52,10 @@ export interface LessonRow {
   accessCode: string | null;
   heritages: LessonHeritageRef[];
   quizCount: number;
+  /** Độ khó của bài tính từ câu trong các bài kiểm tra chưa xóa (mức nhiều câu nhất, hòa thì mức cao hơn); null khi bài chưa có bài kiểm tra có câu. */
+  difficulty: QuestionDifficulty | null;
+  /** "Dễ", "Trung bình", "Khó" hoặc "Chưa có bài kiểm tra". */
+  difficultyLabel: string;
   createdAt: string | null;
   updatedAt: string | null;
 }
@@ -130,6 +135,8 @@ export interface LessonListFilter {
   classId?: number | '';
   status?: ContentStatus | '';
   heritageType?: HeritageType | '';
+  /** Chỉ bài có độ khó này; bài chưa có bài kiểm tra không khớp mức nào. */
+  difficulty?: QuestionDifficulty | '';
   keyword?: string;
   page?: number;
   pageSize?: number;
@@ -172,6 +179,10 @@ export interface DuplicateLessonResult {
   lesson: LessonDetail;
   skippedHeritages: number;
   levelNotice: string | null;
+  /** Số bài kiểm tra đã chép thành bản nháp (khi chọn chép kèm bài kiểm tra). */
+  copiedQuizzes: number;
+  /** Số câu hỏi bị bỏ khi chép bài kiểm tra: câu đã ẩn hoặc không dùng được ở cấp của lớp đích. */
+  skippedQuestions: number;
   message: string;
 }
 

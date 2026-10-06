@@ -66,6 +66,7 @@ const PATHS = {
   play: 'M6 4l14 8-14 8Z',
   refresh: 'M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16M8 16H3v5',
   list: 'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',
+  'bar-chart': 'M12 20V10M18 20V4M6 20v-4',
 } as const;
 
 export type IconName = keyof typeof PATHS;
