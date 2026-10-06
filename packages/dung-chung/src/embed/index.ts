@@ -116,8 +116,10 @@ export function embedMapUrl(baseUrl: string, filter: DiscoveryFilter, language: 
   return `${baseUrl.replace(/\/+$/, '')}${EMBED_PATHS.map}?${params.toString()}`;
 }
 
-export function embedModelUrl(baseUrl: string, slug: string): string {
-  return `${baseUrl.replace(/\/+$/, '')}${EMBED_PATHS.model(slug)}`;
+/** Địa chỉ trang xem 3D nhúng; `language` để chữ hướng dẫn trong trình xem theo ngôn ngữ khách đã chọn. */
+export function embedModelUrl(baseUrl: string, slug: string, language?: LanguageCode): string {
+  const query = language ? `?${EMBED_PARAM.language}=${encodeURIComponent(language)}` : '';
+  return `${baseUrl.replace(/\/+$/, '')}${EMBED_PATHS.model(slug)}${query}`;
 }
 
 /** Bộ lọc và ngôn ngữ đọc lại từ tham số của địa chỉ trang nhúng (phía trang web). */

@@ -1,19 +1,13 @@
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Alert, View } from 'react-native';
+import { View } from 'react-native';
 import { SCHOOL_LEVEL_LABEL } from '@dsvhvn/dung-chung/theme';
+import { confirmAction } from '../../src/components/confirm';
 import { Button, Card, Divider, Screen, Txt } from '../../src/components/ui';
 import { APP_CHANNEL, APP_VERSION } from '../../src/config/env';
 import { useApp, useAuth } from '../../src/state/AppProvider';
 
 // Của em: hồ sơ (mã học sinh, lớp, cấp học, trường), đổi mật khẩu, đăng xuất, đổi sang chế độ Khách tham quan (cũng đăng xuất vì token không ở lại trên máy khi không còn dùng).
-
-function ask(title: string, yes: string, no: string, onYes: () => void) {
-  Alert.alert(title, undefined, [
-    { text: no, style: 'cancel' },
-    { text: yes, style: 'destructive', onPress: onYes },
-  ]);
-}
 
 export default function Account() {
   const { t } = useTranslation();
@@ -52,7 +46,7 @@ export default function Account() {
         variant="secondary"
         full
         onPress={() =>
-          ask(t('hs.account.signOutConfirm'), t('hs.account.yes'), t('hs.account.no'), () => {
+          confirmAction(t('hs.account.signOutConfirm'), undefined, t('hs.account.yes'), t('hs.account.no'), () => {
             signOut();
             router.replace('/');
           })
@@ -62,7 +56,7 @@ export default function Account() {
         label={t('hs.account.switchToVisitor')}
         variant="ghost"
         onPress={() =>
-          ask(t('hs.account.switchConfirm'), t('hs.account.yes'), t('hs.account.no'), () => {
+          confirmAction(t('hs.account.switchConfirm'), undefined, t('hs.account.yes'), t('hs.account.no'), () => {
             chooseMode('guest');
             router.replace('/');
           })
