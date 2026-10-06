@@ -10,3 +10,5 @@ export type * from './questions';
 export { QUESTION_ENDPOINTS, createQuestionsApi } from './questions';
 export type * from './quizzes';
 export { QUIZ_ENDPOINTS, createQuizzesApi } from './quizzes';
+export type * from './attempts';
+export { ATTEMPT_ENDPOINTS, createAttemptsApi } from './attempts';
