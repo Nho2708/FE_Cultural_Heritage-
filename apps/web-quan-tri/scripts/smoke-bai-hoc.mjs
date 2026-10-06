@@ -189,7 +189,8 @@ try {
 
   await teacherPage.goto(`${ADMIN_WEB}/giao-vien/bai-hoc`);
   await teacherPage.getByRole('heading', { level: 1, name: 'Bài học' }).waitFor();
-  check('Bài học của tôi: chưa có bài nào', await teacherPage.getByText('Thầy cô chưa có bài học nào.').isVisible());
+  await teacherPage.getByText('Thầy cô chưa có bài học nào.').waitFor();
+  check('Bài học của tôi: chưa có bài nào', true);
 
   // ---- Lớp khối 3 (cấp 1) ----
   code3 = await teacherCreatesLesson(teacherPage, class3.name, `Di sản qua lời kể của bạn Na ${stamp}`, 'cap-1');

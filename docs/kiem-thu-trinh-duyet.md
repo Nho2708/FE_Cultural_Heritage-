@@ -314,3 +314,30 @@ khi trình duyệt đóng yêu cầu đang chạy (chuyển trang giữa chừng
 | 390px: Kiểm duyệt không tràn ngang (bảng cuộn trong khung) | Đạt |
 
 Ghi chú: lần chạy đầu phát hiện trang Tổng quan hệ thống tràn ngang ở 390px vì ô lưới không co theo bảng; đã sửa (cột lưới `minmax(0, 1fr)`) và chạy lại.
+
+## Nhánh tích hợp: chạy lại các luồng chính sau khi gộp hai chuỗi nhánh (web quản trị và web học tập)
+
+> Chạy ngày 07/10/2026 (+07) với backend và giao diện nhánh `feature/DSVHVN-018-tich-hop` (gộp chuỗi gói và thanh toán VNPay với chuỗi bài kiểm tra, học tập, thống kê, tổng quan).
+> Kết quả: **mọi script đạt**, không có lỗi JavaScript trên trang, trình duyệt không nhận phản hồi 5xx.
+
+| Mục | Giá trị |
+|---|---|
+| Trình duyệt | Microsoft Edge headless qua `playwright-core`; khung 1440 × 900 và 390 × 844 |
+| API | Bản build của backend, `ASPNETCORE_ENVIRONMENT=Development`, `http://localhost:5080`, LocalDB **database tạm** `dsvhvn_tam_a2_tich_hop` (tạo mới, áp đủ chín migration theo thứ tự, nạp di sản đợt 1, **đã xóa sau khi chạy**), `Email__Mode=Log`, `Ai__Mode=Simulated`, `Storage__Provider=Local`, khóa VNPay thử |
+| Giao diện | `npx vite --port 5173` (web quản trị) và `--port 5174` (web học tập), `VITE_API_BASE_URL=http://localhost:5080/api/v1`; đã tắt mọi tiến trình đã bật |
+
+| Luồng | Script | Kết quả |
+|---|---|---|
+| Đăng nhập quản trị, quản lý trường, giáo viên, đặt mật khẩu, nhật ký | `smoke.mjs` (web quản trị) | 45/45 |
+| Bài học cho lớp theo cấp, học sinh mở bài bằng mã | `smoke-bai-hoc.mjs` | 29/29 |
+| Bài kiểm tra của bài học (bỏ phần chờ tự đóng) | `smoke-bai-kiem-tra.mjs` | 47/47 |
+| Học sinh làm bài theo cấp: nút trên trang bài học mở hộp thoại Bắt đầu bài kiểm tra (bố cục bài học dùng chung) | `smoke-lam-bai.mjs` (bỏ phần chờ hết giờ) | 40/40 |
+| Khám phá công khai nhiều ngôn ngữ (Hàn, Anh, Nhật, Trung), duyệt bản dịch | `smoke-da-ngon-ngu.mjs` | 42/42 |
+| Gói và thanh toán VNPay (IPN ký bằng khóa thử) | `smoke-goi.mjs` | 44/44 |
+| Thống kê và gợi ý | `smoke-thong-ke-goi-y.mjs` | 51/51 |
+| Tổng quan và doanh thu: tab Doanh thu có số tiền từ các giao dịch vừa thanh toán ở `smoke-goi.mjs`, biểu đồ theo kỳ, danh sách 6 giao dịch | `smoke-quan-tri-tong-quan.mjs` | 44/44 |
+| Tạo lớp khối 6 và thêm một học sinh bằng giao diện, phiếu đăng nhập hiện mã học sinh và mật khẩu tạm | thao tác tay | Đạt |
+
+Ghi chú: sau khi gộp, trang mặc định của quản trị hệ thống là Tổng quan (`/quan-tri`) và của quản trị trường là Tổng quan trường (`/truong`), nên `smoke.mjs` đổi các bước chờ trang mặc định;
+`smoke-bai-hoc.mjs` chờ danh sách bài học tải xong rồi mới kiểm câu "chưa có bài nào". Log của API có vài dòng `SqlException` "Operation cancelled by user" khi trình duyệt hủy yêu cầu
+lúc chuyển trang; đó là hủy yêu cầu, không phải lỗi của chức năng.
