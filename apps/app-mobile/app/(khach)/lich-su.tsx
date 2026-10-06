@@ -2,7 +2,8 @@ import { LANGUAGES } from '@dsvhvn/dung-chung/i18n';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Alert, Pressable, StyleSheet, Switch, View } from 'react-native';
+import { Pressable, StyleSheet, Switch, View } from 'react-native';
+import { confirmAction } from '../../src/components/confirm';
 import { Button, Card, Divider, Notice, Screen, Section, Txt, styles as ui } from '../../src/components/ui';
 import { API_BASE_URL, APP_CHANNEL, APP_VERSION } from '../../src/config/env';
 import { useHistory } from '../../src/guest/HistoryProvider';
@@ -19,13 +20,6 @@ const GROUPS: Array<{ kind: HistoryKind; title: 'searches' | 'viewed' | 'listene
   { kind: 'listen', title: 'listened' },
   { kind: 'model', title: 'viewed3d' },
 ];
-
-function confirm(title: string, message: string, ok: string, cancel: string, onOk: () => void) {
-  Alert.alert(title, message, [
-    { text: cancel, style: 'cancel' },
-    { text: ok, style: 'destructive', onPress: onOk },
-  ]);
-}
 
 export default function HistoryAndSettings() {
   const { t } = useTranslation();
@@ -55,7 +49,7 @@ export default function HistoryAndSettings() {
     <Screen>
       <Section
         title={t('history.title')}
-        right={history.entries.length > 0 ? <Button label={t('history.clearAll')} variant="ghost" onPress={() => confirm(t('history.clearAll'), t('history.clearConfirm'), t('common.clear'), t('common.cancel'), history.clear)} /> : null}
+        right={history.entries.length > 0 ? <Button label={t('history.clearAll')} variant="ghost" onPress={() => confirmAction(t('history.clearAll'), t('history.clearConfirm'), t('common.clear'), t('common.cancel'), history.clear)} /> : null}
       >
         {history.entries.length === 0 ? (
           <Notice text={t('history.empty')} />

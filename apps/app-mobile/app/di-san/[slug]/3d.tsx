@@ -19,7 +19,7 @@ import { Photo } from '../../../src/components/Heritage';
 export default function Model3D() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const { t } = useTranslation();
-  const { mode } = useApp();
+  const { mode, language } = useApp();
   const theme = useTheme();
   const router = useRouter();
   const history = useHistory();
@@ -65,13 +65,12 @@ export default function Model3D() {
   return (
     <View style={[styles.fill, { backgroundColor: theme.color.background }]}>
       <View style={styles.fill}>
-        <EmbedWebView url={embedModelUrl(WEB_BASE_URL, slug)} label={data.title ?? t('model.title')} onMessage={onMessage} onFail={() => setFailed(true)} />
+        <EmbedWebView url={embedModelUrl(WEB_BASE_URL, slug, language)} label={data.title ?? t('model.title')} onMessage={onMessage} onFail={() => setFailed(true)} />
         {!loaded && progress > 0 ? (
           <View style={[styles.progress, { backgroundColor: theme.color.primary, width: `${Math.round(progress * 100)}%` }]} accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: Math.round(progress * 100) }} />
         ) : null}
       </View>
       <View style={{ padding: theme.spacing.inline, gap: 4 }}>
-        <Txt variant="caption">{t('model.hint')}</Txt>
         <Txt variant="caption" muted>
           {t('model.credit')}: {data.author} · {t('model.license')}: {data.license}
         </Txt>
