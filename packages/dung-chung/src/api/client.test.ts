@@ -33,6 +33,18 @@ describe('tầng gọi API dùng chung', () => {
     expect(headers['X-Correlation-Id']).toMatch(/^[A-Za-z0-9-]{8,64}$/);
   });
 
+  it('thêm header do ứng dụng cung cấp vào mọi yêu cầu', async () => {
+    const fetch = vi.fn<(input: RequestInfo | URL, init?: RequestInit) => Promise<Response>>(async () => envelope(200, { data: {}, message: null }));
+    vi.stubGlobal('fetch', fetch);
+    const client = createApiClient({ baseUrl: BASE, getAccessToken: () => null, extraHeaders: () => ({ 'X-Device-Id': 'device-1', 'X-App-Channel': 'expo-go' }) });
+
+    await client.request('/public/home', { auth: false });
+
+    const headers = fetch.mock.calls[0]![1]!.headers as Record<string, string>;
+    expect(headers['X-Device-Id']).toBe('device-1');
+    expect(headers['X-App-Channel']).toBe('expo-go');
+  });
+
   it('endpoint công khai không gắn Bearer dù đang đăng nhập', async () => {
     const calls = mockApi(() => envelope(200, { message: MESSAGES.forgotPasswordAccepted }));
     const { client } = clientWith('access-1');

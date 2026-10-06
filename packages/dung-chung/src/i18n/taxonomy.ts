@@ -1,4 +1,5 @@
-import type { HeritagePeriod, HeritageType, LanguageCode, RecognitionLevel } from '@dsvhvn/dung-chung/api';
+import type { HeritagePeriod, LanguageCode } from '../api/discovery';
+import type { HeritageType, RecognitionLevel } from '../api/heritage';
 
 // Tên của danh mục cố định (loại di sản, cấp xếp hạng, vùng, thời kỳ, 34 tỉnh thành) ở năm ngôn ngữ. Máy chủ không dịch các tên này: chúng nằm
 // trong tệp chuỗi của giao diện, tra theo giá trị enum hoặc theo tên tiếng Việt mà máy chủ trả (tên lạ thì giữ nguyên chữ máy chủ trả).

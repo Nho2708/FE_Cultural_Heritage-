@@ -2,7 +2,7 @@ import { cn } from '@dsvhvn/dung-chung';
 import type { HeritageCard as HeritageCardData } from '@dsvhvn/dung-chung/api';
 import { Link } from 'react-router';
 import { useI18n } from '../i18n/context';
-import { HERITAGE_TYPE_NAME, provinceName } from '../i18n/taxonomy';
+import { HERITAGE_TYPE_NAME, provinceName } from '@dsvhvn/dung-chung/i18n';
 import { cardSubtitle } from './format';
 import { heritagePath } from './paths';
 import { Thumbnail } from './Thumbnail';

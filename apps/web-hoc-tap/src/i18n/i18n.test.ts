@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { detectLanguage, LANGUAGES, parseLanguage } from './languages';
 import { coordinatesText, formatCount, formatYearText, localizeDateText, periodRangeText } from './format';
 import { STRINGS } from './strings';
-import { HERITAGE_TYPE_NAME, PERIOD_NAME, PROVINCE_COUNT, provinceName, RECOGNITION_LEVEL_NAME, REGION_NAME } from './taxonomy';
+import { HERITAGE_TYPE_NAME, PERIOD_NAME, PROVINCE_COUNT, provinceName, RECOGNITION_LEVEL_NAME, REGION_NAME } from '@dsvhvn/dung-chung/i18n';
 
 // Năm ngôn ngữ của phần công khai: đọc mã (cùng quy tắc với máy chủ), mặc định theo trình duyệt, tệp chuỗi đủ khóa, tên danh mục và định dạng.
 
