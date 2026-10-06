@@ -341,3 +341,32 @@ Ghi chú: lần chạy đầu phát hiện trang Tổng quan hệ thống tràn 
 Ghi chú: sau khi gộp, trang mặc định của quản trị hệ thống là Tổng quan (`/quan-tri`) và của quản trị trường là Tổng quan trường (`/truong`), nên `smoke.mjs` đổi các bước chờ trang mặc định;
 `smoke-bai-hoc.mjs` chờ danh sách bài học tải xong rồi mới kiểm câu "chưa có bài nào". Log của API có vài dòng `SqlException` "Operation cancelled by user" khi trình duyệt hủy yêu cầu
 lúc chuyển trang; đó là hủy yêu cầu, không phải lỗi của chức năng.
+
+## Quảng cáo Google có thưởng (web học tập và web quản trị)
+
+> Chạy ngày 07/10/2026 (+07) với backend và giao diện nhánh `feature/DSVHVN-021-quang-cao-google`. Kết quả: **45/45 bước đạt**, không có lỗi JavaScript trên trang, không có phản hồi 5xx.
+> Script: [`apps/web-hoc-tap/scripts/smoke-quang-cao.mjs`](../apps/web-hoc-tap/scripts/smoke-quang-cao.mjs) (`npm run smoke:quang-cao -w @dsvhvn/web-hoc-tap`). Chi tiết luồng: [quang-cao-google.md](quang-cao-google.md).
+
+| Mục | Giá trị |
+|---|---|
+| Trình duyệt | Microsoft Edge headless qua `playwright-core`; khung 1440 × 900 và 390 × 844 (tiếng Hàn) |
+| API | Bản build của backend, `ASPNETCORE_ENVIRONMENT=Development`, `http://localhost:5080`, LocalDB **database tạm** `dsvhvn_tam_a2_ui_quang_cao` (**đã xóa sau khi chạy**), `Ads__GateEnabled=true`, `Email__Mode=Log`, `Ai__Mode=Simulated`, `Storage__Provider=Local` |
+| Quảng cáo | **Quảng cáo có thưởng thật của Google** tải qua Internet, đơn vị thử `/22639388115/rewarded_web_example` (video thử "Linear VPAID"), không sinh doanh thu. Không có tài khoản AdMob hay Ad Manager thật |
+| Giao diện | `npx vite --port 5173` (web quản trị) và `--port 5174` (web học tập), `VITE_API_BASE_URL=http://localhost:5080/api/v1`; đã tắt mọi tiến trình đã bật |
+| Chuẩn bị | Gọi thẳng API: xuất bản ba di sản (hai có tóm tắt tiếng Việt đã duyệt, một không có), một trường, giáo viên, lớp và một học sinh. Mọi thao tác của khách, học sinh, quản trị đi qua giao diện |
+
+| Nhóm | Bước | Kết quả |
+|---|---|---|
+| Lời mời | Di sản chưa mở khóa: tóm tắt trả 403, hộp thoại hiện lời mời nói rõ 24 giờ, đúng di sản, nội dung khác vẫn miễn phí, ghi chú của Google, nút Xem quảng cáo và Để sau; chưa bấm thì chưa xin mã giao dịch và **chưa có yêu cầu nào tới máy chủ quảng cáo của Google**; "Để sau" đóng hộp thoại | Đạt |
+| Quảng cáo thật | Bấm Xem quảng cáo: mã giao dịch một lần, thư viện nạp lúc đó, quảng cáo thử hiện trên trang, hộp thoại tạm đóng; yêu cầu dùng đúng đơn vị thử và `npa=1` (không cá nhân hóa) | Đạt |
+| | Đóng quảng cáo khi chưa được cấp thưởng: báo chưa xem hết, không báo máy chủ, không mở khóa, có nút Xem lại quảng cáo | Đạt |
+| | Xem lại và xem đủ rồi đóng: trình duyệt báo máy chủ đúng một lần (slug, mã giao dịch, đơn vị), máy chủ ghi 24 giờ, tóm tắt hiện, dòng "Đã mở khóa đến", địa chỉ trang không còn `#goog_rewarded`; tab Nghe dùng chung lượt mở khóa | Đạt |
+| Chống gian lận | Mã bị sửa: 400; gửi lại đúng mã: 200 không ghi thêm; mã của di sản này dùng cho di sản khác: 400; di sản đang mở khóa không mời thêm, hạn không bị kéo dài | Đạt |
+| Phạm vi mở khóa | Tải lại vẫn mở; tiếng Anh vẫn mở (mọi ngôn ngữ); di sản khác và thiết bị khác vẫn bị khóa; di sản chưa có tóm tắt không hiện cổng | Đạt |
+| Hết hạn | Rút hạn còn 8 giây (sửa `expires_at` trong database tạm): hộp thoại đang mở quay về lời mời, nội dung cũ biến mất, máy chủ cũng báo hết hạn | Đạt |
+| Điện thoại | 390px tiếng Hàn: lời mời bằng tiếng Hàn, không tràn ngang | Đạt |
+| Học sinh | Mở thẳng tóm tắt, không có lời mời, không gọi API quảng cáo, không gửi mã thiết bị, không nạp thư viện của Google | Đạt |
+| Web quản trị | Mục Khách và quảng cáo ở thanh bên; số lượt mở khóa, bảng mạng Ad Manager "Trình duyệt báo", di sản nhiều nhất, lượt bị từ chối theo lý do (khớp hai lần gian lận), thiết bị khách hoạt động: khớp với API; hai liên kết sang Google, không có doanh thu; 390px không tràn ngang | Đạt |
+
+Ghi chú: lần chạy đầu phát hiện (1) học sinh vẫn bị cổng chặn vì yêu cầu tóm tắt không mang token nên máy chủ không nhận ra học sinh (test dùng máy chủ giả không bắt được lỗi này); đã thêm chế độ `auth: 'optional'` cho riêng yêu cầu tóm tắt;
+(2) Google để lại `#goog_rewarded` trên địa chỉ trang sau khi quảng cáo đóng; đã gỡ sau khi quảng cáo xong. Log của API có vài dòng `SqlException` "Operation cancelled by user" khi trình duyệt hủy yêu cầu lúc chuyển trang, đó là hủy yêu cầu.

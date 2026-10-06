@@ -25,7 +25,7 @@ ma trận phân quyền. Khóa màn hình đặt theo nghĩa (`login`, `schoolTe
 | Hồ sơ cá nhân | `/tai-khoan` | Ba vai trò | Hiện trong khu làm việc của người đang đăng nhập |
 | Giáo viên | `/giao-vien` | TEACHER | Thanh bên: Lớp học · Bài học · Ngân hàng câu hỏi · Bài kiểm tra. Bài học (danh sách, tạo, soạn, mã bài học, nhân bản) dựng ở [bai-hoc-theo-cap.md](bai-hoc-theo-cap.md). Bài kiểm tra (danh sách, soạn và phát hành, chọn câu từ ngân hàng) dựng ở [bai-kiem-tra.md](bai-kiem-tra.md) |
 | Quản trị trường | `/truong` | ORG_ADMIN | Thanh bên: Trường và gói · Giáo viên (thêm "Tổng quan" khi màn hình này được dựng) |
-| Quản trị hệ thống | `/quan-tri` | ADMIN | Thanh bên: Trường · Di sản · Câu hỏi · Gói dịch vụ · Nhật ký; dark mode theo hệ điều hành |
+| Quản trị hệ thống | `/quan-tri` | ADMIN | Thanh bên: Tổng quan · Trường · Di sản · Bản dịch · Câu hỏi · Gói dịch vụ · Khách và quảng cáo · Nhật ký; dark mode theo hệ điều hành |
 
 Ba khu làm việc và màn hình của chúng tách chunk riêng, chỉ tải sau khi cổng khu cho qua. Chân thanh bên của mọi khu có
 "Mở trang khám phá di sản" dẫn sang web học tập.
@@ -49,6 +49,7 @@ Ba khu làm việc và màn hình của chúng tách chunk riêng, chỉ tải s
 | `/quan-tri/truong/moi` | Chi tiết trường, tạo mới | ADMIN | Thông tin trường + quản trị trường đầu tiên trong một lần lưu; lỗi `orgAdmin.*` hiện dưới đúng ô |
 | `/quan-tri/truong/:truong` | Chi tiết trường, xem / sửa | ADMIN | Sửa thông tin (khóa khi trường đã ngừng); gói hiện tại chỉ đọc; quản trị trường: khóa / mở, thêm; ngừng trường |
 | `/quan-tri/goi` | Gói dịch vụ | ADMIN | Bảng gói, tạo và sửa ở khung bên phải, bật tắt bán; gói Miễn phí bị khóa; không có thao tác xóa |
+| `/quan-tri/khach-va-quang-cao` | Khách và quảng cáo (thống kê khách và lượt mở khóa bằng quảng cáo) | ADMIN | Chỉ đọc, hai tab, lọc khoảng ngày; không có doanh thu. Chi tiết ở [quang-cao-google.md](quang-cao-google.md) |
 | `/quan-tri/nhat-ky` | Nhật ký thao tác | ADMIN | Chỉ đọc. Lọc người làm, vai trò (có Học sinh, Hệ thống), hành động (21 mã), đối tượng, từ ngày / đến ngày (gõ ngày/tháng/năm, giờ Việt Nam); mở dòng xem giá trị cũ / mới bằng nhãn tiếng Việt |
 | (tại chỗ) | 403 | — | Giữ URL; hiện trong khu làm việc của chính người dùng |
 | `*` | 404 | Mọi người | Có cả trong từng khu làm việc |
@@ -83,6 +84,7 @@ thống → Quản lý trường. Test kiểm số màn hình theo cột ma tr�
 | Giáo viên của trường, Biểu mẫu tài khoản | `GET /org/teachers?keyword&status&page&pageSize` · `POST /org/teachers` · `POST /org/teachers/{id}/lock` · `/unlock` · `DELETE /org/teachers/{id}` |
 | Quản lý trường | `GET /admin/organizations?keyword&status&page&pageSize` · `DELETE /admin/organizations/{id}` |
 | Chi tiết trường | `POST /admin/organizations` · `GET` / `PUT /admin/organizations/{id}` · `POST /admin/organizations/{id}/org-admins` · `…/org-admins/{userId}/lock` · `/unlock` |
+| Khách và quảng cáo | `GET /admin/ads/stats?from&to` |
 | Nhật ký thao tác | `GET /admin/audit-logs?actor&actorRole&action&targetType&from&to&page&pageSize` |
 
 ### Khớp API của backend trên CSDL v3
