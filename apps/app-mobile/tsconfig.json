@@ -24,6 +24,7 @@
       "@dsvhvn/dung-chung/i18n": ["../../packages/dung-chung/src/i18n/index.ts"],
       "@dsvhvn/dung-chung/heritage-text": ["../../packages/dung-chung/src/heritageText.ts"],
       "@dsvhvn/dung-chung/embed": ["../../packages/dung-chung/src/embed/index.ts"],
+      "@dsvhvn/dung-chung/lesson-data": ["../../packages/dung-chung/src/lesson/lessonData.ts"],
       "@dsvhvn/dung-chung/speech": ["../../packages/dung-chung/src/speech/index.ts"],
       "@dsvhvn/dung-chung/theme": ["../../packages/dung-chung/src/theme/index.ts"],
       "@/*": ["./src/*"]
