@@ -49,6 +49,8 @@ export const studentVi = {
     recommendations: 'Gợi ý cho em',
     nextQuizzes: 'Bài nên làm tiếp',
     review: 'Nên ôn lại',
+    reviewLesson: 'Bài nên ôn',
+    newLesson: 'Bài mới',
     related: 'Có thể em thích',
     mascotGreeting: 'Chào em! Hôm nay mình học gì nào?',
   },

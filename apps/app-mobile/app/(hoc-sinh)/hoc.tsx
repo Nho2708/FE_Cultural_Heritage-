@@ -2,8 +2,9 @@ import type { StudentHome, StudentLessonRef, StudentOpenQuiz } from '@dsvhvn/dun
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Badge, Button, Card, EmptyState, ErrorState, Loading, Notice, Section, Txt, styles as ui } from '../../src/components/ui';
+import { Badge, Button, Card, EmptyState, ErrorState, Loading, Section, Txt, styles as ui } from '../../src/components/ui';
 import { remainingText, starsText } from '../../src/hocsinh/format';
+import { Recommendations } from '../../src/hocsinh/Recommendations';
 import { useStudentHome, useStudentRecommendations } from '../../src/hocsinh/queries';
 import { useTheme } from '../../src/theme/ThemeProvider';
 
@@ -153,30 +154,7 @@ export default function StudentHomeScreen() {
         )}
       </Section>
 
-      {level !== 1 && recommendations.data ? (
-        <Section title={t('hs.home.recommendations')}>
-          {recommendations.data.message ? <Notice text={recommendations.data.message} /> : null}
-          {recommendations.data.reviewPraise ? <Notice text={recommendations.data.reviewPraise} /> : null}
-          {recommendations.data.nextQuizzes.slice(0, 3).map((quiz) => (
-            <Card key={quiz.quizId} onPress={() => (quiz.needsLessonCode ? openLesson(codeOf(quiz.lessonId)) : openQuiz(quiz.quizId))} accessibilityLabel={quiz.name ?? ''}>
-              <View style={{ padding: 12, gap: 2 }}>
-                <Txt variant="label">{t('hs.home.nextQuizzes')}: {quiz.name}</Txt>
-                <Txt variant="caption">{quiz.reason}</Txt>
-              </View>
-            </Card>
-          ))}
-          {recommendations.data.heritagesToReview.slice(0, 3).map((heritage) =>
-            heritage.slug ? (
-              <Card key={heritage.heritageId} onPress={() => router.push({ pathname: '/di-san/[slug]', params: { slug: heritage.slug! } })} accessibilityLabel={heritage.name ?? ''}>
-                <View style={{ padding: 12, gap: 2 }}>
-                  <Txt variant="label">{t('hs.home.review')}: {heritage.name}</Txt>
-                  <Txt variant="caption">{heritage.reason}</Txt>
-                </View>
-              </Card>
-            ) : null,
-          )}
-        </Section>
-      ) : null}
+      {recommendations.data ? <Recommendations data={recommendations.data} lessonCodeOf={codeOf} /> : null}
 
       {data.recentBadges.length > 0 ? (
         <Section title={t('hs.home.recentBadges')}>
