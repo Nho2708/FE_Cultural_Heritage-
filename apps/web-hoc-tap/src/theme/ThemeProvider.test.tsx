@@ -1,8 +1,10 @@
+import { ATTEMPT_ENDPOINTS } from '@dsvhvn/dung-chung/api';
 import { LEARNING_THEMES } from '@dsvhvn/dung-chung/theme';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
-import { mockApi, studentOf, studentServer } from '../test/fixtures';
+import { envelope, mockApi, studentOf, studentServer } from '../test/fixtures';
+import { progressOf } from '../test/quizFixtures';
 import { renderApp, signInAs } from '../test/renderApp';
 
 // Bộ giao diện theo cấp học: cùng bố cục, cùng component, chỉ khác giá trị token ghi trên <html>.
@@ -34,7 +36,7 @@ describe('bộ giao diện theo cấp học', () => {
     expect(cssVar('--dsv-color-primary')).toBe(LEARNING_THEMES[key].color.primary);
     expect(cssVar('--dsv-text-body-m-size')).toBe(body);
     expect(cssVar('--dsv-touch-target')).toBe(touch);
-    expect(document.querySelector('figure[data-bo-hinh]')).toHaveAttribute('data-bo-hinh', set);
+    await waitFor(() => expect(document.querySelector('figure[data-bo-hinh]')).toHaveAttribute('data-bo-hinh', set));
   });
 
   it('trang khám phá công khai luôn dùng bộ mặc định kể cả khi học sinh đã đăng nhập; vào khu học thì đổi theo cấp', async () => {
@@ -88,16 +90,20 @@ describe('khu học chỉ cho học sinh đã đăng nhập', () => {
     expect(router.state.location.state).toEqual({ from: '/hoc' });
   });
 
-  it('học sinh đã đăng nhập mở Học sinh đăng nhập thì về trang học; màn hình chưa dựng hiện "đang xây dựng"', async () => {
+  it('học sinh đã đăng nhập mở Học sinh đăng nhập thì về trang học; mở Tiến độ thì thấy tiến độ của em', async () => {
     signInAs(studentOf(7));
-    mockApi(studentServer(studentOf(7)));
+    mockApi(
+      studentServer(studentOf(7)),
+      (call) => (call.path === ATTEMPT_ENDPOINTS.progress ? envelope(200, { data: progressOf(2) }) : undefined),
+      (call) => (call.path.startsWith(ATTEMPT_ENDPOINTS.history) ? envelope(200, { data: { items: [], page: 1, pageSize: 100, totalItems: 0, totalPages: 0 } }) : undefined),
+    );
     const first = renderApp('/dang-nhap');
     await waitFor(() => expect(first.router.state.location.pathname).toBe('/hoc'));
     first.unmount();
 
     renderApp('/tien-do');
     expect(await screen.findByRole('heading', { level: 1, name: 'Tiến độ của em' })).toBeInTheDocument();
-    expect(screen.getByText('ĐANG XÂY DỰNG')).toBeInTheDocument();
+    expect(document.querySelector('[data-bo-cuc]')).toHaveAttribute('data-bo-cuc', 'cap-2');
   });
 
   it('đường dẫn lạ hiện trang 404; trang quản trị không có ở web học tập', async () => {

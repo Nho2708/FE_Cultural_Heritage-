@@ -1,10 +1,10 @@
-import { MESSAGES } from '@dsvhvn/dung-chung';
 import type { StudentClassDetail, StudentProfile } from '@dsvhvn/dung-chung/api';
 import { SCHOOL_LEVEL_LABEL } from '@dsvhvn/dung-chung/theme';
-import { ButtonLink, InlineMessage } from '@dsvhvn/dung-chung/ui';
+import { ButtonLink } from '@dsvhvn/dung-chung/ui';
 import { pathOf } from '../access/screens';
 import { Illustration } from '../theme/Illustration';
 import { classFacts, whoAmI } from './classroom';
+import { LearningSections } from './LearningSections';
 
 // Trang học của em — bản cấp 2 (khối 6-9): bố cục cân bằng chữ và hình, hai cột. Cột chính: lời chào, thông tin của em và
 // khối Lớp của em; cột phụ: lối vào ô nhập mã bài học. Các khối bài kiểm tra đang chờ, bài học của em, gợi ý và huy hiệu
@@ -22,6 +22,8 @@ export function LevelTwo({ user, classroom }: { user: StudentProfile; classroom:
       <p className="mt-3 type-body-s text-on-surface-variant">{whoAmI(user)}</p>
 
       <div className="mt-8 grid gap-(--dsv-block-gap) lg:grid-cols-[1fr_320px]">
+        <div className="flex min-w-0 flex-col gap-(--dsv-block-gap)">
+        <LearningSections level={2} />
         <section aria-labelledby="lop-cua-em">
           <h2 id="lop-cua-em" className="type-h2 text-on-surface">
             Lớp của em
@@ -34,10 +36,8 @@ export function LevelTwo({ user, classroom }: { user: StudentProfile; classroom:
               </div>
             ))}
           </dl>
-          <InlineMessage tone="info" className="mt-4">
-            {MESSAGES.studentNoAttemptsYet}
-          </InlineMessage>
         </section>
+        </div>
 
         <aside className="h-fit rounded-md bg-primary-container p-(--dsv-inline-gap) text-on-primary-container">
           <h2 className="type-h3">Mã bài học</h2>
