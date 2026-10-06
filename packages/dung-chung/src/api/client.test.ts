@@ -45,6 +45,18 @@ describe('tầng gọi API dùng chung', () => {
     expect(headers['X-App-Channel']).toBe('expo-go');
   });
 
+  it('header riêng của từng yêu cầu được gửi kèm và ghi đè header chung cùng tên', async () => {
+    const fetch = vi.fn<(input: RequestInfo | URL, init?: RequestInit) => Promise<Response>>(async () => envelope(200, { data: {}, message: null }));
+    vi.stubGlobal('fetch', fetch);
+    const client = createApiClient({ baseUrl: BASE, getAccessToken: () => null, extraHeaders: () => ({ 'X-Device-Key': 'chung', 'X-App': 'web' }) });
+
+    await client.request('/public/guest/history', { auth: false, headers: { 'X-Device-Key': 'rieng' } });
+
+    const headers = fetch.mock.calls[0]![1]!.headers as Record<string, string>;
+    expect(headers['X-Device-Key']).toBe('rieng');
+    expect(headers['X-App']).toBe('web');
+  });
+
   it('endpoint công khai không gắn Bearer dù đang đăng nhập', async () => {
     const calls = mockApi(() => envelope(200, { message: MESSAGES.forgotPasswordAccepted }));
     const { client } = clientWith('access-1');

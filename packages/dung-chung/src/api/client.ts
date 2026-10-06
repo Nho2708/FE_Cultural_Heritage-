@@ -70,6 +70,8 @@ export interface RequestOptions {
   onUploadProgress?: (fraction: number) => void;
   /** Endpoint cần đăng nhập: gắn Bearer. Mặc định true. */
   auth?: boolean;
+  /** Tiêu đề thêm cho riêng yêu cầu này (ví dụ mã thiết bị của khách); ghi đè tiêu đề chung của ứng dụng cùng tên. */
+  headers?: Record<string, string>;
   signal?: AbortSignal;
 }
 
@@ -183,6 +185,7 @@ export function createApiClient({ baseUrl, getAccessToken, onUnauthorized, extra
       Accept: 'application/json',
       'X-Correlation-Id': correlationId(),
       ...extraHeaders?.(),
+      ...options.headers,
     };
     const isForm = typeof FormData !== 'undefined' && options.body instanceof FormData;
     if (options.body !== undefined && !isForm) headers['Content-Type'] = 'application/json';
