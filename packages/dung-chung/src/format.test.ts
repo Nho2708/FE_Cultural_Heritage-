@@ -46,8 +46,8 @@ describe('định dạng hiển thị', () => {
     expect(parseVietnameseDate('09/26/2026')).toBeNull();
   });
 
-  it('đủ nhãn tiếng Việt cho 21 mã thao tác của nhật ký, cùng nhãn với backend', () => {
-    expect(Object.keys(AUDIT_ACTION_LABEL)).toHaveLength(24);
+  it('đủ nhãn tiếng Việt cho 25 mã thao tác của nhật ký, cùng nhãn với backend', () => {
+    expect(Object.keys(AUDIT_ACTION_LABEL)).toHaveLength(25);
     expect(AUDIT_ACTION_LABEL.LOGIN).toBe('Đăng nhập web quản trị');
     expect(AUDIT_ACTION_LABEL.STUDENT_DEACTIVATED).toBe('Vô hiệu hoặc xóa học sinh');
     expect(ACTOR_ROLE_LABEL.STUDENT).toBe('Học sinh');

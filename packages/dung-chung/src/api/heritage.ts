@@ -42,6 +42,8 @@ export interface HeritageSummary {
   referenceCount: number;
   /** Tình trạng bản dịch: chưa dịch, có bản cần dịch lại, có bản chờ duyệt, hoặc đã dịch xong. */
   translationState?: TranslationState;
+  /** Di sản có mô hình 3D đang hiển thị (cột và bộ lọc ở Quản lý di sản). */
+  hasModel?: boolean;
   createdAt: string | null;
   updatedAt: string | null;
 }
