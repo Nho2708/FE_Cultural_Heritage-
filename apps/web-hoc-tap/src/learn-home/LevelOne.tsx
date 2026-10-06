@@ -1,9 +1,8 @@
 import { studentCodeOf, type StudentClassDetail, type StudentProfile } from '@dsvhvn/dung-chung/api';
 import { ButtonLink, Icon } from '@dsvhvn/dung-chung/ui';
 import { pathOf } from '../access/screens';
-import { Illustration } from '../theme/Illustration';
+import { Illustration, SpeakButton } from '@dsvhvn/dung-chung/lesson';
 import { classFacts } from './classroom';
-import { SpeakButton } from './SpeakButton';
 
 // Trang học của em — bản cấp 1 (khối 1-5): một cột, nút to, ít chữ, nhiều hình, nút loa đọc to. Chỉ có khối chào, thẻ lớp
 // của em và nút "Nhập mã bài học"; các khối bài chơi, gợi ý, huy hiệu, số sao dựng cùng chức năng học tập. Không có bảng,

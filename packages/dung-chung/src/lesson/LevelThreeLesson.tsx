@@ -1,14 +1,20 @@
-import type { StudentLesson } from '@dsvhvn/dung-chung/api';
-import { ButtonLink, Icon } from '@dsvhvn/dung-chung/ui';
+import type { StudentLesson } from '../api';
+import { ButtonLink, Icon, type IconName } from '../ui';
 import { Link } from 'react-router';
-import { pathOf } from '../access/screens';
-import { heritagePath, mapPathOf, timelinePath } from '../discovery/paths';
 import { milestonesOf, sectionsOf } from './lessonData';
+import { useLessonLinks } from './lessonLinks';
 import { LessonFigure, Paragraphs, QuizList } from './LessonParts';
 
 // Bài học — bố cục cấp 3 (khối 10-12): trang tài liệu. Mục lục cố định ở bên trái, một cột nội dung rộng, đề mục và đường kẻ phân
 // cách, đoạn trích tư liệu gốc có khung và nguồn, câu hỏi gợi suy nghĩ (không chấm điểm, không lưu câu trả lời), liên kết di sản,
 // bài kiểm tra dạng dòng. Không linh vật, không thẻ hình lớn.
+
+interface LinkRow {
+  key: string;
+  to: string;
+  icon: IconName;
+  label: string;
+}
 
 interface TocItem {
   id: string;
@@ -16,6 +22,7 @@ interface TocItem {
 }
 
 export function LevelThreeLesson({ lesson }: { lesson: StudentLesson }) {
+  const links = useLessonLinks();
   const readings = sectionsOf(lesson, 'READING');
   const milestones = milestonesOf(lesson);
   const excerpts = sectionsOf(lesson, 'SOURCE_EXCERPT');
@@ -32,11 +39,20 @@ export function LevelThreeLesson({ lesson }: { lesson: StudentLesson }) {
     { id: 'bai-kiem-tra', label: 'Bài kiểm tra của bài' },
   ];
   const first = lesson.heritages[0];
+  const firstTo = first ? links.heritage(first.slug) : null;
+  const mapped = lesson.heritages.find((h) => h.latitude !== null && h.longitude !== null && links.map(h.slug));
+  const linkRows: LinkRow[] = [
+    ...(first && firstTo ? [{ key: 'chi-tiet', to: firstTo, icon: 'file-text' as const, label: `Chi tiết di sản: ${first.name}` }] : []),
+    ...(mapped ? [{ key: `ban-do-${mapped.id}`, to: links.map(mapped.slug)!, icon: 'map' as const, label: 'Xem vị trí trên bản đồ di sản' }] : []),
+    ...lesson.heritages
+      .filter((h) => h.hasTimeline && links.timeline(h.slug))
+      .map((h) => ({ key: `dong-thoi-gian-${h.id}`, to: links.timeline(h.slug)!, icon: 'clock' as const, label: `Dòng thời gian của di sản: ${h.name}` })),
+  ];
   const images = sectionsOf(lesson, 'IMAGE').filter((s) => s.imageUrl);
 
   return (
     <section className="dsv-content dsv-section" data-bo-cuc="cap-3" aria-labelledby="tieu-de-bai">
-      <title>{`${lesson.title ?? 'Bài học'} · Học di sản`}</title>
+      {!links.preview && <title>{`${lesson.title ?? 'Bài học'} · Học di sản`}</title>}
       <div className="grid gap-(--dsv-block-gap) lg:grid-cols-[240px_minmax(0,1fr)]">
         <div className="h-fit lg:sticky lg:top-20">
           <nav aria-label="Mục lục" className="rounded-md border border-border bg-surface p-2">
@@ -54,12 +70,14 @@ export function LevelThreeLesson({ lesson }: { lesson: StudentLesson }) {
               ))}
             </ul>
           </nav>
-          <p className="mt-3 px-1">
-            <ButtonLink to={pathOf('learnHome')} variant="link">
-              <Icon name="arrow-left" size={16} />
-              Trang học của em
-            </ButtonLink>
-          </p>
+          {links.home && (
+            <p className="mt-3 px-1">
+              <ButtonLink to={links.home} variant="link">
+                <Icon name="arrow-left" size={16} />
+                Trang học của em
+              </ButtonLink>
+            </p>
+          )}
         </div>
 
         <article className="min-w-0">
@@ -179,40 +197,21 @@ export function LevelThreeLesson({ lesson }: { lesson: StudentLesson }) {
             </h2>
             {lesson.heritages.length === 0 ? (
               <p className="mt-3 type-body-m text-on-surface-variant">Chưa có di sản đang hiển thị.</p>
+            ) : linkRows.length === 0 ? (
+              <p className="mt-3 type-body-m text-on-surface-variant">
+                Di sản của bài: {lesson.heritages.map((h) => h.name).join(', ')}.
+              </p>
             ) : (
               <ul className="mt-3 divide-y divide-border rounded-md border border-border bg-surface type-body-m">
-                {first && (
-                  <li>
-                    <Link className="flex items-center gap-3 px-4 py-3 hover:bg-surface-container-low" to={heritagePath(first.slug)}>
-                      <Icon name="file-text" size={18} />
-                      <span className="min-w-0 flex-1">Chi tiết di sản: {first.name}</span>
+                {linkRows.map((row) => (
+                  <li key={row.key}>
+                    <Link className="flex items-center gap-3 px-4 py-3 hover:bg-surface-container-low" to={row.to}>
+                      <Icon name={row.icon} size={18} />
+                      <span className="min-w-0 flex-1">{row.label}</span>
                       <Icon name="chevron-right" size={18} />
                     </Link>
                   </li>
-                )}
-                {lesson.heritages
-                  .filter((h) => h.latitude !== null && h.longitude !== null)
-                  .slice(0, 1)
-                  .map((h) => (
-                    <li key={`ban-do-${h.id}`}>
-                      <Link className="flex items-center gap-3 px-4 py-3 hover:bg-surface-container-low" to={mapPathOf(h.slug)}>
-                        <Icon name="map" size={18} />
-                        <span className="min-w-0 flex-1">Xem vị trí trên bản đồ di sản</span>
-                        <Icon name="chevron-right" size={18} />
-                      </Link>
-                    </li>
-                  ))}
-                {lesson.heritages
-                  .filter((h) => h.hasTimeline)
-                  .map((h) => (
-                    <li key={`dong-thoi-gian-${h.id}`}>
-                      <Link className="flex items-center gap-3 px-4 py-3 hover:bg-surface-container-low" to={timelinePath(h.slug)}>
-                        <Icon name="clock" size={18} />
-                        <span className="min-w-0 flex-1">Dòng thời gian của di sản: {h.name}</span>
-                        <Icon name="chevron-right" size={18} />
-                      </Link>
-                    </li>
-                  ))}
+                ))}
               </ul>
             )}
           </section>

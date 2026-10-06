@@ -1,16 +1,15 @@
 import { isWellFormedLessonCode, normalizeLessonCode } from '@dsvhvn/dung-chung';
 import { ApiError, errorMessage } from '@dsvhvn/dung-chung/api';
+import { LessonLinksProvider, LessonView, type LessonLinks, type LessonPosition } from '@dsvhvn/dung-chung/lesson';
 import { ButtonLink, ErrorState, LoadingState } from '@dsvhvn/dung-chung/ui';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router';
 import { pathOf } from '../access/screens';
+import { heritagePath, mapPathOf, timelinePath } from '../discovery/paths';
 import { useAuth } from '../lib/auth/context';
-import { lessonQueryFn, lessonQueryKey } from '../lessons/lessonData';
-import { LevelOneLesson } from '../lessons/LevelOneLesson';
-import { LevelThreeLesson } from '../lessons/LevelThreeLesson';
-import { LevelTwoLesson } from '../lessons/LevelTwoLesson';
-import { rememberLesson } from '../lessons/recent';
+import { lessonQueryFn, lessonQueryKey, quizPath } from '../lessons/lessonData';
+import { readPosition, rememberLesson, writePosition } from '../lessons/recent';
 
 // Bài học (mở bằng mã trên đường dẫn /bai-hoc/<mã>): lấy bài từ máy chủ rồi chọn bố cục theo cấp của lớp em (cấp 1 kể chuyện từng
 // bước, cấp 2 bài đọc và dòng thời gian, cấp 3 tài liệu). Học sinh không chọn bố cục. Mã sai, bài chưa xuất bản hoặc không thuộc
@@ -35,6 +34,16 @@ function CodeProblem({ message }: { message: string }) {
   );
 }
 
+/** Đường dẫn thật của khu học: mở di sản, bản đồ, dòng thời gian, làm bài kiểm tra, về trang học. */
+const STUDENT_LINKS: LessonLinks = {
+  heritage: heritagePath,
+  map: mapPathOf,
+  timeline: timelinePath,
+  quiz: quizPath,
+  home: pathOf('learnHome'),
+  preview: false,
+};
+
 export function LessonPage() {
   const { user } = useAuth();
   const code = normalizeLessonCode(useParams().maBaiHoc ?? '');
@@ -46,6 +55,18 @@ export function LessonPage() {
   useEffect(() => {
     if (lesson && userId !== undefined) rememberLesson(userId, { code: lesson.accessCode, title: lesson.title ?? 'Bài học' });
   }, [lesson, userId]);
+
+  const lessonCode = lesson?.accessCode;
+  const initialPosition = useMemo(
+    () => (lessonCode !== undefined && userId !== undefined ? readPosition(userId, lessonCode) : undefined),
+    [lessonCode, userId],
+  );
+  const savePosition = useCallback(
+    (position: LessonPosition) => {
+      if (lessonCode !== undefined && userId !== undefined) writePosition(userId, lessonCode, position);
+    },
+    [lessonCode, userId],
+  );
 
   if (!valid) return <CodeProblem message="Mã bài học gồm 8 ký tự, bắt đầu bằng BH. Em hãy kiểm tra lại mã thầy cô đã đưa." />;
   if (query.isError) {
@@ -66,12 +87,9 @@ export function LessonPage() {
     );
   }
 
-  switch (lesson.schoolLevel) {
-    case 1:
-      return <LevelOneLesson key={lesson.id} lesson={lesson} userId={userId} />;
-    case 2:
-      return <LevelTwoLesson key={lesson.id} lesson={lesson} />;
-    default:
-      return <LevelThreeLesson key={lesson.id} lesson={lesson} />;
-  }
+  return (
+    <LessonLinksProvider links={STUDENT_LINKS}>
+      <LessonView lesson={lesson} initialPosition={initialPosition} onPositionChange={savePosition} />
+    </LessonLinksProvider>
+  );
 }

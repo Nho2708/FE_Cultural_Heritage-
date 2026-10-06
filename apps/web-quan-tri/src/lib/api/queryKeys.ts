@@ -30,6 +30,8 @@ export const queryKeys = {
   lessonList: (filter: LessonListFilter) => ['teacher', 'lessons', 'list', filter] as const,
   lessonDetail: (id: number) => ['teacher', 'lessons', 'detail', id] as const,
   lessonMaterials: (id: number) => ['teacher', 'lessons', 'materials', id] as const,
+  /** Bài như học sinh của lớp thấy (giáo viên xem trước); không giữ lại khi đóng. */
+  lessonPreview: (id: number) => ['teacher', 'lessons', 'preview', id] as const,
   aiQuota: ['teacher', 'lessons', 'ai-quota'] as const,
   /** Di sản đã xuất bản để chọn cho bài học. */
   publishedHeritages: (filter: unknown) => ['teacher', 'published-heritages', filter] as const,

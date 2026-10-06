@@ -147,6 +147,15 @@ export interface HeritageDetail {
   references: HeritageReference[];
 }
 
+/** Mã xem trước bản nháp do quản trị hệ thống xin: mở trang xem trước trên web học tập trước khi hết hạn. */
+export interface HeritagePreviewLink {
+  code: string;
+  /** Đường dẫn trên web học tập, dạng `/xem-truoc/di-san/{mã}`. */
+  path: string;
+  expiresAt: string;
+  expiresInMinutes: number;
+}
+
 export interface TimelineInput {
   name: string;
   description: string | null;

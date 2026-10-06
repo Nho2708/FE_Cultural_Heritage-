@@ -6,6 +6,7 @@ import { FullScreenLayout, MainLayout, RootLayout } from '../components/layout/L
 import { ChangePasswordPage } from '../pages/ChangePasswordPage';
 import { NotFoundPage, RouteErrorPage } from '../pages/errors/ErrorPages';
 import { HeritageDetailPage } from '../pages/HeritageDetailPage';
+import { HeritagePreviewPage } from '../pages/HeritagePreviewPage';
 import { EnterCodePage } from '../pages/EnterCodePage';
 import { HomePage } from '../pages/HomePage';
 import { LearnHomePage } from '../pages/LearnHomePage';
@@ -27,6 +28,7 @@ const BUILT: Partial<Record<ScreenKey, ReactNode>> = {
   search: <SearchPage />,
   map: <MapPage />,
   heritage: <HeritageDetailPage />,
+  heritagePreview: <HeritagePreviewPage />,
   timeline: <TimelinePage />,
   login: <LoginPage />,
   changePassword: <ChangePasswordPage />,

@@ -14,7 +14,7 @@ import { useLocation } from 'react-router';
 import { isLessonPath } from '../access/access';
 import { ADMIN_WEB_URL } from '../config/env';
 import { useAuth } from '../lib/auth/context';
-import { Illustration } from '../theme/Illustration';
+import { Illustration } from '@dsvhvn/dung-chung/lesson';
 
 // Học sinh đăng nhập: ô "Mã học sinh" (tự viết hoa, bỏ khoảng trắng và dấu gạch) + mật khẩu có nút hiện / ẩn. Sai mã
 // hoặc mật khẩu luôn cùng một câu, không cho biết sai ô nào (tài khoản người lớn đăng nhập ở đây cũng nhận câu đó);

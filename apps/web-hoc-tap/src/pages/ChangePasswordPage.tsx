@@ -16,7 +16,7 @@ import { RETURN_PARAM, safeReturnPath } from '../access/access';
 import { pathOf } from '../access/screens';
 import { studentApi } from '../lib/api/client';
 import { useAuth } from '../lib/auth/context';
-import { Illustration } from '../theme/Illustration';
+import { Illustration } from '@dsvhvn/dung-chung/lesson';
 
 // Đổi mật khẩu của học sinh — hai chế độ trên cùng một màn hình:
 //   Bắt buộc (lần đầu đăng nhập, hoặc sau khi giáo viên đặt lại): lời chào và thanh báo đặt mật khẩu mới, mật khẩu mới

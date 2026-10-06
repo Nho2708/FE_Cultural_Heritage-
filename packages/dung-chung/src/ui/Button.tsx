@@ -96,6 +96,22 @@ export function ButtonLink({ variant = 'primary', size = 'md', fullWidth, classN
   );
 }
 
+interface ExternalButtonLinkProps extends Omit<ComponentProps<'a'>, 'target' | 'rel'> {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  href: string;
+  children: ReactNode;
+}
+
+/** Liên kết ra trang khác (web khác hoặc tệp) mang hình dạng Button; luôn mở ở tab mới, không để trang mới điều khiển trang này. */
+export function ExternalButtonLink({ variant = 'primary', size = 'md', className, children, ...rest }: ExternalButtonLinkProps) {
+  return (
+    <a className={buttonClasses(variant, size, className)} target="_blank" rel="noopener noreferrer" {...rest}>
+      {children}
+    </a>
+  );
+}
+
 // PillLink: nút kêu gọi hành động dạng viên thuốc của trang công khai. Cao 36, đệm 8/24, bo 4px, chữ control. Không có biến thể khác.
 const PILL =
   'relative inline-flex h-9 items-center justify-center rounded-xs px-6 py-2 whitespace-nowrap type-control ' +

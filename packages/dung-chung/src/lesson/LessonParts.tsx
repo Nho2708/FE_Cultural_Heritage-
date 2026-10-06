@@ -1,8 +1,8 @@
-import { formatDateTime } from '@dsvhvn/dung-chung';
-import type { LessonImageCredit, StudentHeritageCard, StudentQuiz, StudentQuizState } from '@dsvhvn/dung-chung/api';
-import { Badge, ButtonLink, Icon, TextLink, type BadgeTone } from '@dsvhvn/dung-chung/ui';
-import { heritagePath, mapPathOf, timelinePath } from '../discovery/paths';
-import { canTakeQuiz, paragraphsOf, quizActionLabel, quizPath } from './lessonData';
+import { formatDateTime } from '../format';
+import type { LessonImageCredit, StudentHeritageCard, StudentQuiz, StudentQuizState } from '../api';
+import { Badge, ButtonLink, Icon, TextLink, type BadgeTone } from '../ui';
+import { canTakeQuiz, paragraphsOf, quizActionLabel } from './lessonData';
+import { useLessonLinks } from './lessonLinks';
 
 // Phần dùng chung của ba bố cục bài học: đoạn văn, hình kèm chú thích và ghi công, danh sách bài kiểm tra kèm trạng thái với
 // riêng em, thẻ di sản,. Ba cấp khác nhau ở bố cục và kích thước, cùng dùng các phần này.
@@ -82,6 +82,7 @@ interface QuizListProps {
 }
 
 export function QuizList({ code, quizzes, variant }: QuizListProps) {
+  const links = useLessonLinks();
   if (quizzes.length === 0) {
     return <p className="type-body-m text-on-surface-variant">Bài học này chưa có bài kiểm tra nào.</p>;
   }
@@ -90,8 +91,9 @@ export function QuizList({ code, quizzes, variant }: QuizListProps) {
       {quizzes.map((quiz) => {
         const action = quizActionLabel(quiz);
         const when = quizWhen(quiz);
-        const link = canTakeQuiz(quiz) && action && (
-          <ButtonLink to={quizPath(code, quiz.id)} size={variant === 'large' ? 'lg' : 'md'} variant={variant === 'row' ? 'primary' : 'primary'}>
+        const quizTo = links.quiz(code, quiz.id);
+        const link = canTakeQuiz(quiz) && action && quizTo && (
+          <ButtonLink to={quizTo} size={variant === 'large' ? 'lg' : 'md'} variant={variant === 'row' ? 'primary' : 'primary'}>
             {variant === 'large' && <Icon name="play" size={22} />}
             {action}
           </ButtonLink>
@@ -133,6 +135,7 @@ export function QuizList({ code, quizzes, variant }: QuizListProps) {
 
 /** Thẻ di sản của bài (chỉ di sản đang xuất bản): chi tiết, bản đồ, dòng thời gian. */
 export function HeritageLinks({ heritages, compact }: { heritages: StudentHeritageCard[]; compact?: boolean }) {
+  const links = useLessonLinks();
   if (heritages.length === 0) return <p className="type-body-m text-on-surface-variant">Chưa có di sản đang hiển thị.</p>;
   return (
     <ul className="flex flex-col gap-3">
@@ -149,11 +152,13 @@ export function HeritageLinks({ heritages, compact }: { heritages: StudentHerita
           <div className="min-w-0 flex-1 p-4">
             <p className="type-label text-on-surface">{h.name}</p>
             {h.provinceName && <p className="mt-1 type-body-s text-on-surface-variant">{h.provinceName}</p>}
-            <p className="mt-3 flex flex-wrap gap-x-4 gap-y-2 type-body-s">
-              <TextLink to={heritagePath(h.slug)}>Xem chi tiết</TextLink>
-              {h.latitude !== null && h.longitude !== null && <TextLink to={mapPathOf(h.slug)}>Xem trên bản đồ</TextLink>}
-              {h.hasTimeline && <TextLink to={timelinePath(h.slug)}>Dòng thời gian</TextLink>}
-            </p>
+            {(links.heritage(h.slug) || links.map(h.slug) || links.timeline(h.slug)) && (
+              <p className="mt-3 flex flex-wrap gap-x-4 gap-y-2 type-body-s">
+                {links.heritage(h.slug) && <TextLink to={links.heritage(h.slug)!}>Xem chi tiết</TextLink>}
+                {h.latitude !== null && h.longitude !== null && links.map(h.slug) && <TextLink to={links.map(h.slug)!}>Xem trên bản đồ</TextLink>}
+                {h.hasTimeline && links.timeline(h.slug) && <TextLink to={links.timeline(h.slug)!}>Dòng thời gian</TextLink>}
+              </p>
+            )}
           </div>
         </li>
       ))}

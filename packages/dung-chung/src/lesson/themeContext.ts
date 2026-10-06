@@ -1,4 +1,4 @@
-import { LEARNING_THEMES, type LearningTheme } from '@dsvhvn/dung-chung/theme';
+import { LEARNING_THEMES, type LearningTheme } from '../theme';
 import { createContext, useContext } from 'react';
 
 export const LearningThemeContext = createContext<LearningTheme>(LEARNING_THEMES['mac-dinh']);

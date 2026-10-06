@@ -7,6 +7,7 @@ import type {
   ContentStatus,
   EventInput,
   HeritageDetail,
+  HeritagePreviewLink,
   HeritageEvent,
   HeritageInput,
   HeritageMedia,
@@ -190,6 +191,9 @@ export const adminHeritagesApi = {
   archive: (id: number) => apiRequest<HeritageDetail>(`/admin/heritages/${id}/archive`, { method: 'POST' }),
 
   restore: (id: number) => apiRequest<HeritageDetail>(`/admin/heritages/${id}/restore`, { method: 'POST' }),
+
+  /** Xin mã xem trước bản nháp (hết hạn sau ít phút). Di sản đã xuất bản không cấp (422): mở trang công khai. */
+  issuePreview: (id: number) => apiRequest<HeritagePreviewLink>(`/admin/heritages/${id}/preview`, { method: 'POST' }),
 };
 
 /** Giai đoạn và sự kiện của một di sản (Biểu mẫu giai đoạn và sự kiện, tab Dòng thời gian). */

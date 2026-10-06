@@ -3,7 +3,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { classOf, envelope, mockApi, userOf, type FetchCall } from '../../test/fixtures';
-import { draftOf, lessonOf, materialsOf, quotaOf, sectionOf } from '../../test/lessonFixtures';
+import { draftOf, lessonOf, materialsOf, quizOf, quotaOf, sectionOf, studentLessonOf, studentSectionOf } from '../../test/lessonFixtures';
 import { renderApp, signInAs } from '../../test/renderApp';
 
 // Soạn bài học: khung nội dung đổi theo cấp của lớp, AI soạn bản nháp, lưu, điều kiện xuất bản, mã bài học, bài đã lưu trữ.
@@ -319,5 +319,116 @@ describe('Soạn bài học — lưu, xuất bản, mã bài học', () => {
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/giao-vien/bai-hoc/8'));
     expect(calls.find((c) => c.path === '/teacher/lessons/5/duplicate')?.body).toEqual({ targetClassId: 2 });
+  });
+});
+
+describe('Soạn bài học — xem như học sinh', () => {
+  const previewOf = (lesson: ReturnType<typeof studentLessonOf>, status: 'DRAFT' | 'PUBLISHED' = 'DRAFT') =>
+    envelope(200, { data: { lesson, status, quizzesViewOnly: true } });
+
+  it('cấp 1: hộp thoại dựng bố cục kể chuyện từng bước với bộ giao diện cấp 1, không có liên kết sang trang công khai', async () => {
+    signInAs('TEACHER');
+    const calls = api(lessonOf({ level: 1 }), (call) =>
+      call.path === '/teacher/lessons/5/preview'
+        ? previewOf(
+            studentLessonOf(1, {
+              accessCode: '',
+              sections: [studentSectionOf({ type: 'STORY', title: 'Ngọ Môn là cổng chính.', body: 'Hôm nay Na đến Ngọ Môn.' })],
+              quizzes: [{ ...quizOf(3), state: 'OPEN', stateLabel: 'Đang mở' }],
+            }),
+          )
+        : undefined,
+    );
+    const user = userEvent.setup();
+    renderApp('/giao-vien/bai-hoc/5');
+
+    await user.click(await screen.findByRole('button', { name: 'Xem như học sinh' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Xem như học sinh' });
+
+    expect(await within(dialog).findByText(/Bạn đang xem bài như học sinh lớp 4A1 \(Cấp 1\)/)).toBeInTheDocument();
+    expect(within(dialog).getByText(/không lưu kết quả/)).toBeInTheDocument();
+    expect(within(dialog).getByText(/chưa có mã bài học/)).toBeInTheDocument();
+    expect(dialog.querySelector('[data-bo-cuc="cap-1"]')).not.toBeNull();
+    expect(dialog.querySelector('[data-bo-giao-dien="cap-1"]')).not.toBeNull();
+    expect(within(dialog).getByRole('list', { name: 'Các bước của bài' })).toBeInTheDocument();
+    expect(within(dialog).getByText('Hôm nay Na đến Ngọ Môn.')).toBeInTheDocument();
+    // Không mở trang công khai của di sản: không có liên kết nào trong hộp thoại.
+    expect(within(dialog).queryAllByRole('link')).toHaveLength(0);
+    // Chỉ đọc: chỉ một lời gọi xem trước, không ghi gì.
+    expect(calls.filter((c) => c.path === '/teacher/lessons/5/preview')).toHaveLength(1);
+    expect(calls.some((c) => c.method !== 'GET')).toBe(false);
+  });
+
+  it('cấp 3: bố cục tài liệu có mục lục, bài kiểm tra chỉ để xem (không nút làm bài)', async () => {
+    signInAs('TEACHER');
+    api(lessonOf({ level: 3, status: 'PUBLISHED', accessCode: 'BH7F3K2Q' }), (call) =>
+      call.path === '/teacher/lessons/5/preview'
+        ? previewOf(
+            studentLessonOf(3, {
+              sections: [
+                studentSectionOf({ type: 'READING', title: 'Bối cảnh', body: 'Đoạn phân tích.' }),
+                studentSectionOf({ type: 'SOURCE_EXCERPT', body: 'Đóng đô ở Đại La.', sourceCitation: 'Chiếu dời đô', sortOrder: 2 }),
+              ],
+              quizzes: [{ ...quizOf(3), state: 'OPEN', stateLabel: 'Đang mở' }],
+            }),
+            'PUBLISHED',
+          )
+        : undefined,
+    );
+    const user = userEvent.setup();
+    renderApp('/giao-vien/bai-hoc/5');
+
+    await user.click(await screen.findByRole('button', { name: 'Xem như học sinh' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Xem như học sinh' });
+    expect(await within(dialog).findByRole('navigation', { name: 'Mục lục' })).toBeInTheDocument();
+    expect(dialog.querySelector('[data-bo-cuc="cap-3"]')).not.toBeNull();
+    expect(dialog.querySelector('[data-bo-giao-dien="cap-3"]')).not.toBeNull();
+    expect(within(dialog).getByText('Kiểm tra số 3')).toBeInTheDocument();
+    expect(within(dialog).queryByRole('link', { name: 'Làm bài' })).not.toBeInTheDocument();
+    expect(within(dialog).queryByText(/chưa có mã bài học/)).not.toBeInTheDocument();
+    // Liên kết trong trang chỉ là mục lục của chính bài (neo #), không đi ra ngoài.
+    for (const link of within(dialog).queryAllByRole('link')) expect(link.getAttribute('href')).toMatch(/^#/);
+  });
+
+  it('cấp 2: bố cục ba tab (Đọc bài, Dòng thời gian, Bài kiểm tra)', async () => {
+    signInAs('TEACHER');
+    api(lessonOf({ level: 2 }), (call) =>
+      call.path === '/teacher/lessons/5/preview'
+        ? previewOf(studentLessonOf(2, { sections: [studentSectionOf({ type: 'READING', body: 'Bài đọc cấp 2.' })] }))
+        : undefined,
+    );
+    const user = userEvent.setup();
+    renderApp('/giao-vien/bai-hoc/5');
+
+    await user.click(await screen.findByRole('button', { name: 'Xem như học sinh' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Xem như học sinh' });
+    expect(await within(dialog).findByRole('tab', { name: 'Đọc bài' })).toBeInTheDocument();
+    expect(within(dialog).getByRole('tab', { name: 'Dòng thời gian của bài' })).toBeInTheDocument();
+    expect(dialog.querySelector('[data-bo-cuc="cap-2"]')).not.toBeNull();
+    expect(within(dialog).getByText('Bài đọc cấp 2.')).toBeInTheDocument();
+  });
+
+  it('có thay đổi chưa lưu thì nhắc lưu trước, không mở hộp thoại', async () => {
+    signInAs('TEACHER');
+    const calls = api(lessonOf({ level: 2 }));
+    const user = userEvent.setup();
+    renderApp('/giao-vien/bai-hoc/5');
+
+    await user.type(await screen.findByLabelText('Tiêu đề'), ' mới');
+    await user.click(screen.getByRole('button', { name: 'Xem như học sinh' }));
+    expect(await screen.findByText('Hãy lưu bài học trước khi xem như học sinh.')).toBeInTheDocument();
+    expect(calls.some((c) => c.path.endsWith('/preview'))).toBe(false);
+  });
+
+  it('máy chủ từ chối: hộp thoại báo lỗi', async () => {
+    signInAs('TEACHER');
+    api(lessonOf({ level: 2 }), (call) =>
+      call.path === '/teacher/lessons/5/preview' ? envelope(404, { errorCode: ERROR_CODES.blocked, message: 'Không thể xem bài học. Không tìm thấy bài học.' }) : undefined,
+    );
+    const user = userEvent.setup();
+    renderApp('/giao-vien/bai-hoc/5');
+    await user.click(await screen.findByRole('button', { name: 'Xem như học sinh' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Xem như học sinh' });
+    expect(await within(dialog).findByText('Không thể xem bài học. Không tìm thấy bài học.')).toBeInTheDocument();
   });
 });

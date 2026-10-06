@@ -3,7 +3,7 @@ import type { StudentClassDetail, StudentProfile } from '@dsvhvn/dung-chung/api'
 import { SCHOOL_LEVEL_LABEL } from '@dsvhvn/dung-chung/theme';
 import { ButtonLink, InlineMessage } from '@dsvhvn/dung-chung/ui';
 import { pathOf } from '../access/screens';
-import { Illustration } from '../theme/Illustration';
+import { Illustration } from '@dsvhvn/dung-chung/lesson';
 import { classFacts, whoAmI } from './classroom';
 
 // Trang học của em — bản cấp 2 (khối 6-9): bố cục cân bằng chữ và hình, hai cột. Cột chính: lời chào, thông tin của em và

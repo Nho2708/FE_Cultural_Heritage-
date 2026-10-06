@@ -39,6 +39,7 @@ import {
   type SectionState,
 } from '../../components/lesson/lessonForm';
 import { SectionCard } from '../../components/lesson/SectionCard';
+import { StudentPreviewDialog } from '../../components/lesson/StudentPreviewDialog';
 import { AreaPage, PageHeader } from '../../components/layout/PageHeader';
 import { lessonsApi } from '../../lib/api/lessonEndpoints';
 import { queryKeys } from '../../lib/api/queryKeys';
@@ -120,6 +121,7 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
   const [pickingKey, setPickingKey] = useState<string | null>(null);
   const [codeTarget, setCodeTarget] = useState<CodeTarget | null>(null);
   const [copying, setCopying] = useState(false);
+  const [previewing, setPreviewing] = useState(false);
   const [confirmArchive, setConfirmArchive] = useState(false);
   const [confirmCompose, setConfirmCompose] = useState(false);
 
@@ -281,6 +283,14 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
               <Icon name="sparkles" size={16} />
               Sinh câu hỏi bằng AI
             </ButtonLink>
+            <Button
+              variant="secondary"
+              disabled={busy}
+              onClick={() => (dirty ? toast.error('Hãy lưu bài học trước khi xem như học sinh.') : setPreviewing(true))}
+            >
+              <Icon name="eye" size={16} />
+              Xem như học sinh
+            </Button>
             <Button
               variant="secondary"
               disabled={busy || !planOk}
@@ -570,6 +580,7 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
         />
       )}
       {codeTarget && <LessonCodeDialog target={codeTarget} onClose={() => setCodeTarget(null)} />}
+      <StudentPreviewDialog lessonId={lesson.id} open={previewing} onClose={() => setPreviewing(false)} />
       {copying && (
         <DuplicateLessonDialog
           source={{

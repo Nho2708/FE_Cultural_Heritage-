@@ -8,6 +8,7 @@ import {
   type LessonLength,
   type LessonListFilter,
   type LessonMaterials,
+  type LessonPreview,
   type LessonRow,
   type Paged,
   type PublishLessonResult,
@@ -56,6 +57,9 @@ export const lessonsApi = {
   /** AI soạn bản nháp đúng cấp của lớp; không tự lưu hay xuất bản. */
   compose: (lessonId: number, length: LessonLength) =>
     apiRequest<LessonDraft>(`/teacher/lessons/${lessonId}/ai/compose`, { method: 'POST', body: { length } }),
+
+  /** "Xem như học sinh": bài đúng như học sinh của lớp thấy, kể cả bài Nháp; chỉ đọc, không ghi gì. */
+  previewAsStudent: (lessonId: number) => apiRequest<LessonPreview>(`/teacher/lessons/${lessonId}/preview`),
 
   aiQuota: () => apiRequest<AiQuota>('/teacher/lessons/ai-quota'),
 };

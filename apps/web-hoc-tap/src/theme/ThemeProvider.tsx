@@ -4,7 +4,7 @@ import { useMatches } from 'react-router';
 import { isRouteHandle } from '../app/routeHandle';
 import { useAuth } from '../lib/auth/context';
 import { applyTheme } from './applyTheme';
-import { LearningThemeContext } from './context';
+import { LearningThemeContext } from '@dsvhvn/dung-chung/lesson';
 
 // Chọn bộ giao diện và ghi các biến CSS của bộ đó lên thẻ <html>. Bộ theo cấp học của học sinh chỉ dùng ở khu học
 // (trang học, nhập mã, bài học, làm bài kiểm tra, kết quả, tiến độ, đổi mật khẩu); các trang khám phá công khai (trang

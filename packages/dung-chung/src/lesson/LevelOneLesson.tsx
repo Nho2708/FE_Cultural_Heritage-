@@ -1,14 +1,12 @@
-import { cn } from '@dsvhvn/dung-chung';
-import type { StudentLesson } from '@dsvhvn/dung-chung/api';
-import { Button, ButtonLink, Icon, InlineMessage, TextLink, type IconName } from '@dsvhvn/dung-chung/ui';
+import { cn } from '../cn';
+import type { StudentLesson } from '../api';
+import { Button, ButtonLink, Icon, InlineMessage, TextLink, type IconName } from '../ui';
 import { useEffect, useState } from 'react';
-import { pathOf } from '../access/screens';
-import { heritagePath } from '../discovery/paths';
-import { SpeakButton } from '../learn-home/SpeakButton';
-import { Illustration } from '../theme/Illustration';
+import { Illustration } from './Illustration';
 import { sectionsOf } from './lessonData';
+import { useLessonLinks } from './lessonLinks';
 import { HeritageLinks, LessonFigure, QuizList } from './LessonParts';
-import { readPosition, writePosition } from './recent';
+import { SpeakButton } from './SpeakButton';
 import { useSpeech } from './useSpeech';
 
 // Bài học — bố cục cấp 1 (khối 1-5): kể chuyện từng bước, mỗi bước một hình lớn và một đoạn ngắn, chữ to, nút lớn, nút loa đọc to
@@ -26,7 +24,22 @@ function clamp(value: number, max: number) {
   return Math.min(Math.max(value, 0), Math.max(max, 0));
 }
 
-export function LevelOneLesson({ lesson, userId }: { lesson: StudentLesson; userId: number }) {
+/** Bước đang dừng: `step` là chỉ số bước, `part` là đoạn trong bước Nghe chuyện. */
+export interface LessonPosition {
+  step: number;
+  part: number;
+}
+
+interface LevelOneLessonProps {
+  lesson: StudentLesson;
+  /** Bước em đang dừng lần trước (nhớ trên máy). Không có thì bắt đầu từ đầu bài. */
+  initialPosition?: LessonPosition;
+  /** Gọi mỗi khi em sang bước hoặc đoạn khác để máy nhớ. Xem trước không truyền. */
+  onPositionChange?: (position: LessonPosition) => void;
+}
+
+export function LevelOneLesson({ lesson, initialPosition, onPositionChange }: LevelOneLessonProps) {
+  const links = useLessonLinks();
   const steps = lesson.layout.steps;
   const story = sectionsOf(lesson, 'STORY');
   const gallery = [
@@ -36,15 +49,15 @@ export function LevelOneLesson({ lesson, userId }: { lesson: StudentLesson; user
   const parts = story.length > 0 ? story.map((s) => ({ text: s.body ?? '', url: s.imageUrl, caption: s.title, image: s.image })) : [{ text: lesson.summary ?? '', url: null, caption: null, image: null }];
 
   const [position, setPosition] = useState(() => {
-    const saved = readPosition(userId, lesson.accessCode);
+    const saved = initialPosition ?? { step: 0, part: 0 };
     const step = clamp(saved.step, steps.length - 1);
     return { step, part: step === 0 ? clamp(saved.part, parts.length - 1) : 0 };
   });
   const speech = useSpeech();
 
   useEffect(() => {
-    writePosition(userId, lesson.accessCode, position);
-  }, [userId, lesson.accessCode, position]);
+    onPositionChange?.(position);
+  }, [onPositionChange, position]);
 
   const stepKey = steps[position.step]?.key ?? 'LISTEN_STORY';
   const part = parts[position.part] ?? parts[0]!;
@@ -58,16 +71,19 @@ export function LevelOneLesson({ lesson, userId }: { lesson: StudentLesson; user
     else go({ step: Math.min(position.step + 1, steps.length - 1), part: 0 });
   };
   const firstHeritage = lesson.heritages[0];
+  const firstHeritageTo = firstHeritage ? links.heritage(firstHeritage.slug) : null;
 
   return (
     <section className="dsv-content dsv-section" data-bo-cuc="cap-1" aria-labelledby="tieu-de-bai">
-      <title>{`${lesson.title ?? 'Bài học'} · Học di sản`}</title>
+      {!links.preview && <title>{`${lesson.title ?? 'Bài học'} · Học di sản`}</title>}
       <div className="mx-auto flex max-w-[960px] flex-col gap-(--dsv-block-gap)">
         <div className="flex flex-wrap items-center gap-4">
-          <ButtonLink to={pathOf('learnHome')} variant="secondary" size="lg" className="rounded-full">
-            <Icon name="arrow-left" size={22} />
-            Trang học
-          </ButtonLink>
+          {links.home && (
+            <ButtonLink to={links.home} variant="secondary" size="lg" className="rounded-full">
+              <Icon name="arrow-left" size={22} />
+              Trang học
+            </ButtonLink>
+          )}
           <h1 id="tieu-de-bai" className="type-h1 min-w-0 flex-1 text-on-surface">
             {lesson.title}
           </h1>
@@ -133,7 +149,7 @@ export function LevelOneLesson({ lesson, userId }: { lesson: StudentLesson; user
                   )}
                 </div>
               )}
-              {firstHeritage && <TextLink to={heritagePath(firstHeritage.slug)}>Xem về di sản này</TextLink>}
+              {firstHeritageTo && <TextLink to={firstHeritageTo}>Xem về di sản này</TextLink>}
             </div>
           </article>
         )}
@@ -219,9 +235,15 @@ export function LevelOneLesson({ lesson, userId }: { lesson: StudentLesson; user
             </Button>
           )}
           {stepKey === 'EARN_STARS' ? (
-            <ButtonLink to={pathOf('learnHome')} size="lg" className="flex-1 rounded-full">
-              Về trang học
-            </ButtonLink>
+            links.home ? (
+              <ButtonLink to={links.home} size="lg" className="flex-1 rounded-full">
+                Về trang học
+              </ButtonLink>
+            ) : (
+              <Button size="lg" className="flex-1 rounded-full" onClick={() => go({ step: 0, part: 0 })}>
+                Xem lại từ đầu
+              </Button>
+            )
           ) : (
             <Button size="lg" className="flex-1 rounded-full" onClick={next}>
               Tiếp nhé
@@ -229,9 +251,11 @@ export function LevelOneLesson({ lesson, userId }: { lesson: StudentLesson; user
           )}
         </div>
 
-        <InlineMessage tone="info">
-          Em ra ngoài giữa chừng cũng không sao. Lần sau vào lại trên máy này, bài sẽ mở đúng bước em đang dừng.
-        </InlineMessage>
+        {!links.preview && (
+          <InlineMessage tone="info">
+            Em ra ngoài giữa chừng cũng không sao. Lần sau vào lại trên máy này, bài sẽ mở đúng bước em đang dừng.
+          </InlineMessage>
+        )}
       </div>
     </section>
   );
