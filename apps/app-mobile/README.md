@@ -40,7 +40,21 @@ Backend cần chạy với `--urls http://0.0.0.0:5080` (hoặc cổng khác) đ
 
 Dùng bản Expo Go hỗ trợ **SDK 57** (cập nhật Expo Go trong cửa hàng ứng dụng nếu app báo không tương thích). Hồ sơ dựng APK qua EAS (`development`, `preview`) có sẵn ở [`eas.json`](eas.json), chưa gắn tài khoản Expo của nhóm.
 
-Quảng cáo Google có thưởng (AdMob) **chưa làm**: cần bản dựng phát triển qua EAS, không chạy trong Expo Go. Nơi gắn cổng quảng cáo: [`src/ads/gate.ts`](src/ads/gate.ts).
+### Chế độ Khách và quảng cáo
+
+Ở chế độ Khách, mọi yêu cầu gửi `X-Device-Key` (UUID v4 sinh ở lần mở đầu, giữ trong SecureStore) và `X-Client-Platform` (`ANDROID` hoặc `IOS`). Máy chủ nhờ đó tự ghi lịch sử (xem ở tab Lịch sử và cài đặt: xem, xóa từng mục, xóa hết),
+tính "Gợi ý cho bạn" và "Gần bạn" (chỉ khi khách cho phép vị trí; tọa độ đi trong thân yêu cầu, không lưu). Chế độ Học sinh không gửi mã thiết bị và không bao giờ có quảng cáo.
+
+Tóm tắt và nghe thuyết minh đi qua cổng quảng cáo có thưởng của máy chủ (`Ads:GateEnabled`). Khi máy chủ trả 403 `AD_UNLOCK_REQUIRED`, app hiện lời mời ([`src/components/AdGatePanel.tsx`](src/components/AdGatePanel.tsx));
+khách xem hết quảng cáo thì app hỏi `GET /public/ads/unlock?slug=` mỗi 2 giây (tối đa 20 giây) và chỉ mở khi **máy chủ** báo đã mở (Google gọi xác minh phía máy chủ về backend). Logic ở [`src/ads/gate.ts`](src/ads/gate.ts), phần gọi SDK ở [`src/ads/rewarded.ts`](src/ads/rewarded.ts).
+
+- **Expo Go không có AdMob.** Ở đó app gửi thêm `X-Ads-Unavailable: true`; backend ở môi trường phát triển (`Ads:AllowNoAdsDeclaration` = true) mở thẳng tóm tắt và nghe, app hiện ghi chú "chạy trong Expo Go nên chưa có quảng cáo".
+  Nếu backend không bật cờ này (môi trường thật) mà cổng bật, app hiện "cần bản dựng phát triển để xem quảng cáo" và không mở được.
+- **Bật AdMob** bằng bản dựng phát triển: `react-native-google-mobile-ads` đã khai trong `package.json` và `app.json` với **mã ứng dụng thử do Google công bố** (`ca-app-pub-3940256099942544~...`). Chạy
+  `eas build --profile development --platform android` (hoặc `ios`, cần tài khoản Apple Developer), cài bản dựng lên máy rồi `npx expo start --dev-client`. Đơn vị quảng cáo **không** nằm trong app: lấy từ
+  `GET /public/ads/config`; ở môi trường phát triển backend trả **đơn vị thử của Google** (`.../5224354917` Android, `.../1712485313` iOS). Không dùng mã quảng cáo thật khi phát triển và không tự bấm quảng cáo thật (vi phạm chính sách của Google).
+- Để lượt xem mở khóa được, backend phải bật `Ads__GateEnabled=true` và địa chỉ `https://<máy chủ công khai>/api/v1/ads/admob/ssv` phải khai ở AdMob (dùng đường hầm khi chạy trên máy cá nhân); khách có hộp đồng ý UMP của Google ở EU và UK, nội dung giới hạn mức G.
+
 Bản APK dùng API `http://` (không `https://`) cần cho phép cleartext (plugin `expo-build-properties`, `android.usesCleartextTraffic`); Expo Go không cần.
 
 ## Cấu trúc
@@ -60,15 +74,15 @@ app/                         Expo Router (đường dẫn viết bằng tiếng 
 src/
   config/        địa chỉ API, web, phiên bản, kênh (expo-go / apk)
   state/         dịch vụ (API, phiên đăng nhập, mã thiết bị) và trạng thái toàn app
-  storage/       nơi lưu: SecureStore (token, mã thiết bị) và AsyncStorage (lựa chọn, lịch sử)
+  storage/       nơi lưu: SecureStore (token, mã thiết bị) và AsyncStorage (lựa chọn)
   i18n/          react-i18next, năm bộ chữ phần công khai, chữ khu học (chỉ tiếng Việt)
   theme/         bộ token theo cấp học của gói dùng chung → đối tượng theme
   components/    thành phần giao diện đọc token (nút, thẻ, ô nhập, thẻ di sản, tóm tắt)
-  guest/         truy vấn khám phá, lịch sử trên máy, gợi ý, "Gần bạn"
+  guest/         truy vấn khám phá, lịch sử, gợi ý, "Gần bạn" gọi API của khách
   speech/        Narrator (đọc từng câu, tô sáng, tạm dừng, tốc độ) trên expo-speech
   embed/         WebView mở trang nhúng, chỉ đúng origin của web học tập
   hocsinh/       bài học ba cấp, làm bài tám dạng câu, phiên làm bài (lưu từng câu, tự nộp)
-  ads/           cổng quảng cáo (giữ chỗ)
+  ads/           cổng quảng cáo có thưởng (AdMob ở bản dựng phát triển)
 ```
 
 ## Lệnh

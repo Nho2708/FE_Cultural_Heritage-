@@ -117,6 +117,11 @@ export interface Strings {
     notReady: string;
     reward: string;
     placeholder: string;
+    needBuild: string;
+    verifying: string;
+    closedEarly: string;
+    rejected: string;
+    network: string;
   };
   model: { title: string; loading: string; unavailable: string; credit: string; license: string; hint: string; backToGallery: string };
   map: { title: string; loading: string; unavailable: string; open: string; listInstead: string; withoutLocation: string };
@@ -194,7 +199,7 @@ export const vi: Strings = {
     byType: 'Theo loại di sản',
     byRegion: 'Theo vùng miền',
     nearby: 'Gần bạn',
-    nearbyAsk: 'Cho phép dùng vị trí để xem các di sản gần bạn. Vị trí chỉ dùng để tính khoảng cách trên máy này, không được lưu.',
+    nearbyAsk: 'Cho phép dùng vị trí để xem các di sản gần bạn. Vị trí chỉ dùng để tính khoảng cách, không được lưu.',
     nearbyAllow: 'Cho phép vị trí',
     nearbyDenied: 'Bạn chưa cho phép dùng vị trí. Bạn bật lại được trong cài đặt của điện thoại.',
     nearbyEmpty: 'Chưa tìm thấy di sản có tọa độ gần bạn.',
@@ -264,6 +269,11 @@ export const vi: Strings = {
     notReady: 'Quảng cáo chưa sẵn sàng. Bạn thử lại sau nhé.',
     reward: 'Phần thưởng: mở tóm tắt và nghe của di sản này trong 24 giờ.',
     placeholder: 'Bản này chạy trong Expo Go nên chưa có quảng cáo. Tóm tắt và nghe đang mở sẵn.',
+    needBuild: 'Cần bản dựng phát triển để xem quảng cáo. Bản này chạy trong Expo Go nên chưa mở được tóm tắt và nghe thuyết minh.',
+    verifying: 'Đang chờ xác nhận phần thưởng...',
+    closedEarly: 'Bạn chưa xem hết quảng cáo nên chưa mở được.',
+    rejected: 'Chưa mở được tóm tắt. Bạn thử lại sau nhé.',
+    network: 'Không kết nối được. Bạn kiểm tra mạng rồi thử lại nhé.',
   },
   model: {
     title: 'Mô hình 3D',
@@ -291,8 +301,8 @@ export const vi: Strings = {
     viewed3d: 'Đã xem 3D',
     remove: 'Xóa mục này',
     clearAll: 'Xóa toàn bộ lịch sử',
-    clearConfirm: 'Xóa toàn bộ lịch sử tìm kiếm và xem trên máy này? Gợi ý của bạn sẽ trở về mặc định.',
-    retention: 'Lịch sử chỉ lưu trên máy này và tự xóa sau 90 ngày.',
+    clearConfirm: 'Xóa toàn bộ lịch sử tìm kiếm và xem của thiết bị này? Gợi ý của bạn sẽ trở về mặc định.',
+    retention: 'Lịch sử gắn với mã thiết bị ẩn danh, không gắn với tên hay tài khoản, và tự xóa sau 90 ngày. Bạn xóa từng mục hoặc xóa hết là xóa thật.',
   },
   settings: {
     title: 'Cài đặt',

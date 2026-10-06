@@ -1,21 +1,18 @@
-import type { HeritagePin } from '@dsvhvn/dung-chung/api';
+import type { HeritageCard } from '@dsvhvn/dung-chung/api';
 import { useQuery } from '@tanstack/react-query';
 import * as Location from 'expo-location';
 import { useCallback, useMemo } from 'react';
 import { useApp } from '../state/AppProvider';
-import { nearest, type Coordinates, type WithDistance } from './nearby';
-import { useMapPins } from './queries';
+import type { WithDistance } from './nearby';
 
-// "Gần bạn" trên trang chủ của khách: xin quyền vị trí khi dùng ứng dụng, lấy vị trí hiện tại, tính khoảng cách tới các ghim bản đồ ngay trên máy.
-// Vị trí chỉ nằm trong bộ nhớ (giữ tối đa một phút) và không bao giờ được lưu hay gửi đi.
+// "Gần bạn" trên trang chủ của khách: chỉ khi khách cho phép, xin quyền vị trí khi dùng ứng dụng rồi gửi tọa độ trong thân yêu cầu để máy chủ tính khoảng cách.
+// Máy chủ không lưu vị trí; app giữ vị trí trong bộ nhớ tối đa một phút và không ghi xuống máy.
 
 export type NearbyStatus = 'off' | 'locating' | 'denied' | 'ready' | 'error';
 
 class LocationDenied extends Error {}
 
-const NO_FILTER = {};
-
-async function currentPosition(): Promise<Coordinates> {
+async function currentPosition(): Promise<{ latitude: number; longitude: number }> {
   const permission = await Location.getForegroundPermissionsAsync();
   const granted = permission.granted || (await Location.requestForegroundPermissionsAsync()).granted;
   if (!granted) throw new LocationDenied();
@@ -24,38 +21,26 @@ async function currentPosition(): Promise<Coordinates> {
 }
 
 export function useNearby() {
-  const { locationEnabled, setLocationEnabled } = useApp();
-  const position = useQuery({
-    queryKey: ['nearby', 'position'],
+  const { locationEnabled, setLocationEnabled, language, services } = useApp();
+  const result = useQuery({
+    queryKey: ['nearby', language],
     enabled: locationEnabled,
     retry: false,
     gcTime: 60_000,
     staleTime: 5 * 60_000,
-    queryFn: currentPosition,
+    queryFn: async ({ signal }) => services.guestApi.nearby(await currentPosition(), { signal, lang: language }),
   });
-  const pins = useMapPins(NO_FILTER, locationEnabled && position.isSuccess);
 
-  const error: unknown = position.error;
-  const status: NearbyStatus = !locationEnabled
-    ? 'off'
-    : position.isLoading
-      ? 'locating'
-      : error instanceof LocationDenied
-        ? 'denied'
-        : position.isError
-          ? 'error'
-          : 'ready';
+  const error: unknown = result.error;
+  const status: NearbyStatus = !locationEnabled ? 'off' : result.isLoading ? 'locating' : error instanceof LocationDenied ? 'denied' : result.isError ? 'error' : 'ready';
 
-  const items: Array<WithDistance<HeritagePin>> = useMemo(
-    () => (position.data && pins.data ? nearest(position.data, pins.data.pins, 6) : []),
-    [position.data, pins.data],
-  );
+  const items: Array<WithDistance<HeritageCard>> = useMemo(() => (result.data?.items ?? []).map((entry) => ({ item: entry.heritage, meters: entry.distanceMeters })), [result.data]);
 
   /** Khách bấm "Cho phép vị trí" (hoặc thử lại). */
   const locate = useCallback(() => {
     setLocationEnabled(true);
-    void position.refetch();
-  }, [setLocationEnabled, position]);
+    void result.refetch();
+  }, [setLocationEnabled, result]);
 
-  return { status, items, locate, isLoading: status === 'locating' || (status === 'ready' && pins.isLoading) };
+  return { status, items, locate, isLoading: status === 'locating' };
 }

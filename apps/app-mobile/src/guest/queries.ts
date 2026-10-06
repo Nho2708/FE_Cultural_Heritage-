@@ -1,9 +1,6 @@
-import type { DiscoveryFilter, HeritageCard, HeritageType } from '@dsvhvn/dung-chung/api';
+import type { DiscoveryFilter, HeritageCard } from '@dsvhvn/dung-chung/api';
 import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
 import { useApp } from '../state/AppProvider';
-import { pickRecommendations, excludedSlugs, typesToQuery } from './recommend';
-import { topTypes, type HistoryEntry } from './historyCore';
 
 // Truy vấn dữ liệu khám phá công khai của chế độ Khách. Mọi truy vấn nội dung di sản mang theo ngôn ngữ đang chọn (`lang`) và đưa nó vào khóa bộ nhớ đệm:
 // đổi ngôn ngữ thì tải lại theo ngôn ngữ mới. Danh mục bộ lọc không phụ thuộc ngôn ngữ (giao diện tự dịch tên). Học sinh đã đăng nhập luôn nhận tiếng Việt.
@@ -87,20 +84,18 @@ export function useModel(slug: string | undefined) {
   });
 }
 
-/** "Gợi ý cho bạn": cùng loại với di sản khách quan tâm; chưa có lịch sử thì dùng di sản nổi bật của trang chủ. */
-export function useRecommendations(history: readonly HistoryEntry[], featured: readonly HeritageCard[] | undefined) {
+/**
+ * "Gợi ý cho bạn": máy chủ chọn di sản giống những gì khách đã quan tâm (theo lịch sử của thiết bị); chưa có lịch sử hoặc máy chủ lỗi thì dùng di sản nổi bật của trang chủ.
+ * `refreshKey` đổi khi lịch sử đổi để gợi ý được tính lại.
+ */
+export function useRecommendations(refreshKey: number, featured: readonly HeritageCard[] | undefined) {
   const { language, services } = useApp();
-  const [now] = useState(() => Date.now());
-  const types: HeritageType[] = typesToQuery(topTypes(history, now));
-  const excluded = excludedSlugs(history);
   const query = useQuery({
-    queryKey: ['discovery', 'recommend', language, types],
-    enabled: types.length > 0,
-    queryFn: async ({ signal }) =>
-      Promise.all(types.map(async (heritageType) => (await services.discoveryApi.search({ heritageType }, { page: 1, pageSize: 12 }, { signal, lang: language })).items)),
+    queryKey: ['guest', 'recommend', language, refreshKey],
+    retry: false,
+    queryFn: ({ signal }) => services.guestApi.recommendations(services.deviceId, { signal, lang: language }),
   });
-  if (types.length === 0) return { cards: (featured ?? []).slice(0, 6), personal: false, isLoading: false };
-  const lists = query.data ?? [];
-  const personal = pickRecommendations(lists, excluded);
-  return { cards: personal.length > 0 ? personal : (featured ?? []).slice(0, 6), personal: personal.length > 0, isLoading: query.isLoading };
+  const items = query.data?.items.map((item) => item.heritage) ?? [];
+  const personal = Boolean(query.data?.isPersonalized) && items.length > 0;
+  return { cards: personal ? items : (featured ?? []).slice(0, 6), personal, isLoading: query.isLoading };
 }

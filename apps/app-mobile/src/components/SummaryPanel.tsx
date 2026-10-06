@@ -4,16 +4,18 @@ import { splitParagraphs } from '@dsvhvn/dung-chung/speech';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
-import { useAdGate } from '../ads/gate';
+import { isUnlockRequired } from '../ads/gate';
+import { adsAvailable } from '../ads/rewarded';
 import { useSummary } from '../guest/queries';
 import { SPEEDS } from '../speech/narrator';
 import { useNarration } from '../speech/useNarration';
 import { useApp } from '../state/AppProvider';
 import { useTheme } from '../theme/ThemeProvider';
+import { AdGatePanel } from './AdGatePanel';
 import { Badge, Button, Card, Chip, ErrorState, Loading, Notice, Txt, styles as ui } from './ui';
 
 // Tóm tắt di sản: bản chi tiết để đọc và bản ngắn để nghe, lưu sẵn theo ngôn ngữ (không gọi AI khi xem). Bản Hàn, Trung, Nhật gắn nhãn "bản dịch máy"; ngôn ngữ chưa có
-// tóm tắt thì hiện tiếng Việt kèm thông báo. Nghe bằng giọng của điện thoại, tô sáng câu đang đọc. Mở tóm tắt và nghe đi qua cổng quảng cáo (hiện chưa có quảng cáo).
+// tóm tắt thì hiện tiếng Việt kèm thông báo. Nghe bằng giọng của điện thoại, tô sáng câu đang đọc. Máy chủ khóa tóm tắt và nghe bằng cổng quảng cáo có thưởng (403 cần mở khóa): khi đó hiện lời mời xem quảng cáo thay nội dung.
 
 export type SummaryTab = 'read' | 'listen';
 
@@ -27,9 +29,8 @@ export function SummaryPanel({ slug, initialTab, onListen }: Props) {
   const { t } = useTranslation();
   const { language } = useApp();
   const theme = useTheme();
-  const gate = useAdGate();
   const [tab, setTab] = useState<SummaryTab>(initialTab);
-  const summary = useSummary(slug, !gate.locked);
+  const summary = useSummary(slug, true);
 
   const speechTag = languageOption(summary.data?.localization.language ?? language).speechTag;
   const shortText = summary.data?.shortText ?? '';
@@ -42,6 +43,7 @@ export function SummaryPanel({ slug, initialTab, onListen }: Props) {
   }, [tab, stopNarration]);
 
   if (summary.isLoading) return <Loading label={t('common.loading')} />;
+  if (isUnlockRequired(summary.error)) return <AdGatePanel slug={slug} onUnlocked={() => void summary.refetch()} />;
   if (summary.isError || !summary.data) {
     const unavailable = summary.error instanceof ApiError && summary.error.status === 404;
     return <ErrorState message={unavailable ? t('summary.unavailable') : t('common.offline')} retryLabel={t('common.retry')} onRetry={unavailable ? undefined : () => void summary.refetch()} />;
@@ -59,7 +61,7 @@ export function SummaryPanel({ slug, initialTab, onListen }: Props) {
         <Txt variant="title" accessibilityRole="header">
           {data.name}
         </Txt>
-        {gate.placeholder ? (
+        {!adsAvailable() ? (
           <Txt variant="caption" muted>
             {t('ad.placeholder')}
           </Txt>

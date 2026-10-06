@@ -92,7 +92,7 @@ function deviceLanguage(): LanguageCode {
 function Ready({ initial, modeRef, children }: { initial: Loaded; modeRef: { current: AppMode | null }; children: ReactNode }) {
   const [chosenLanguage, setChosenLanguage] = useState(initial.chosenLanguage);
   const [mode, setMode] = useState(initial.mode);
-  const [locationEnabled, setLocation] = useState(initial.locationEnabled);
+  const [locationAllowed, setLocation] = useState(initial.locationEnabled);
   const { services } = initial;
   const queryClient = useQueryClient();
   const snapshot = useSyncExternalStore(services.sessionStore.subscribe, services.sessionStore.getSnapshot, services.sessionStore.getSnapshot);
@@ -111,6 +111,12 @@ function Ready({ initial, modeRef, children }: { initial: Loaded; modeRef: { cur
   useEffect(() => {
     if (i18n.language !== language) void i18n.changeLanguage(language);
   }, [language]);
+
+  // Chế độ Khách: đăng ký thiết bị ở máy chủ và đồng bộ ngôn ngữ, cờ "Gần bạn" (chỉ cờ, không có tọa độ). Lỗi mạng bỏ qua, lần sau gửi lại.
+  useEffect(() => {
+    if (mode !== 'guest' || services.platform === 'WEB') return;
+    void services.guestApi.register(services.deviceId, { platform: services.platform, language, locationAllowed }, { platform: services.platform }).catch(() => undefined);
+  }, [mode, language, locationAllowed, services]);
 
   const chooseLanguage = useCallback((code: LanguageCode) => {
     setChosenLanguage(code);
@@ -136,8 +142,8 @@ function Ready({ initial, modeRef, children }: { initial: Loaded; modeRef: { cur
   const signOut = useCallback(() => services.sessionStore.clear(), [services]);
 
   const value = useMemo<AppState>(
-    () => ({ chosenLanguage, language, mode, locationEnabled, services, chooseLanguage, chooseMode, setLocationEnabled, signOut }),
-    [chosenLanguage, language, mode, locationEnabled, services, chooseLanguage, chooseMode, setLocationEnabled, signOut],
+    () => ({ chosenLanguage, language, mode, locationEnabled: locationAllowed, services, chooseLanguage, chooseMode, setLocationEnabled, signOut }),
+    [chosenLanguage, language, mode, locationAllowed, services, chooseLanguage, chooseMode, setLocationEnabled, signOut],
   );
 
   return (

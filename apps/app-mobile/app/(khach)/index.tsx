@@ -29,7 +29,7 @@ export default function GuestHome() {
   const router = useRouter();
   const home = useHome();
   const history = useHistory();
-  const recommendations = useRecommendations(history.entries, home.data?.featured);
+  const recommendations = useRecommendations(history.entries.length, home.data?.featured);
   const nearby = useNearby();
   const [keyword, setKeyword] = useState('');
 
@@ -101,7 +101,7 @@ export default function GuestHome() {
             {nearby.items.map(({ item, meters }) => (
               <HeritageTile
                 key={item.slug}
-                card={{ ...item, recognizedYear: null }}
+                card={item}
                 width={TILE_WIDTH}
                 extra={t('home.nearbyDistance', { distance: formatDistance(meters, language) })}
                 onPress={() => open(item.slug)}
