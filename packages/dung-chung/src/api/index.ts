@@ -4,6 +4,7 @@ export * from './studentApi';
 export { studentCodeOf } from './types';
 export type * from './types';
 export type * from './heritage';
+export type * from './billing';
 export type * from './classroom';
 export type * from './lessons';
 export type * from './models';
