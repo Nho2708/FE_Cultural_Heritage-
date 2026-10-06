@@ -1,3 +1,4 @@
+import type { PaymentStatus } from './billing';
 import type { ApiClient } from './client';
 import type { AiQuota } from './lessons';
 import type { QuestionDetail, QuestionDifficulty, QuestionReviewStatus, QuestionRow, QuestionType } from './questions';
@@ -11,6 +12,7 @@ export const OVERVIEW_ENDPOINTS = {
   school: '/org/overview',
   system: '/admin/overview',
   trend: '/admin/overview/trend',
+  payments: '/admin/overview/payments',
   quality: '/admin/questions/quality',
   question: (id: number) => `/admin/questions/${id}`,
   hide: (id: number) => `/admin/questions/${id}/hide`,
@@ -90,8 +92,11 @@ export interface SystemOverview {
   };
   ai: { total: number; byTeachers: number; byAdmin: number; thisMonth: number };
   plans: SystemPlanUsage[];
-  /** Phần doanh thu: `available` false khi chưa có thanh toán; `message` nói rõ chỗ sẽ nối. */
-  revenue: { available: boolean; message: string };
+  /**
+   * Doanh thu từ giao dịch VNPay thành công theo ngày thanh toán giờ Việt Nam (đồng): từ trước tới nay, tháng này, hôm nay, số giao dịch
+   * thành công. `message` nhắc doanh thu quảng cáo xem ở bảng điều khiển của Google.
+   */
+  revenue: { available: boolean; message: string; total: number; thisMonth: number; today: number; succeededPayments: number };
 }
 
 export type TrendGranularity = 'DAY' | 'MONTH';
@@ -106,6 +111,8 @@ export interface SystemTrendPoint {
   quizzesPublished: number;
   attemptsFinished: number;
   aiRequests: number;
+  /** Doanh thu (đồng) của giao dịch thành công trả trong kỳ. */
+  revenue: number;
 }
 
 export interface SystemTrend {
@@ -120,6 +127,32 @@ export interface TrendQuery {
   from?: string;
   to?: string;
   granularity?: TrendGranularity;
+}
+
+/** Một giao dịch thanh toán của tab Doanh thu (mọi trường). `paidAt` chỉ có ở giao dịch thành công. */
+export interface SystemPayment {
+  id: number;
+  invoiceId: number;
+  invoiceNumber: string | null;
+  organizationId: number;
+  organizationName: string | null;
+  planName: string | null;
+  providerCode: string | null;
+  providerTransactionId: string | null;
+  amount: number | null;
+  status: PaymentStatus | null;
+  createdAt: string | null;
+  paidAt: string | null;
+}
+
+/** Lọc danh sách giao dịch: trạng thái, trường, khoảng ngày tạo giao dịch (`yyyy-MM-dd` giờ Việt Nam, gồm cả hai đầu), trang. */
+export interface SystemPaymentQuery {
+  status?: PaymentStatus | '';
+  organizationId?: number | '';
+  from?: string;
+  to?: string;
+  page?: number;
+  pageSize?: number;
 }
 
 export type QuestionQualitySort = 'NEWEST' | 'LOWEST_RATE';
@@ -167,6 +200,18 @@ export function createOverviewApi(client: ApiClient) {
     system: () => request<SystemOverview>(OVERVIEW_ENDPOINTS.system),
     trend: (query: TrendQuery = {}) =>
       request<SystemTrend>(OVERVIEW_ENDPOINTS.trend, { query: { from: query.from, to: query.to, granularity: query.granularity } }),
+    /** Quản trị hệ thống: giao dịch thanh toán của mọi trường, mới nhất trước. */
+    payments: (query: SystemPaymentQuery = {}) =>
+      request<Paged<SystemPayment>>(OVERVIEW_ENDPOINTS.payments, {
+        query: {
+          status: query.status || undefined,
+          organizationId: query.organizationId === '' ? undefined : query.organizationId,
+          from: query.from,
+          to: query.to,
+          page: query.page,
+          pageSize: query.pageSize,
+        },
+      }),
   };
 }
 

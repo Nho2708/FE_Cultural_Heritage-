@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Kiểm thử luồng Quản trị và tổng quan trên trình duyệt thật với API thật: quản trị trường xem Tổng quan trường (số tổng, không có tên người),
-// quản trị hệ thống xem Tổng quan và doanh thu (tab Tổng quan, biểu đồ theo thời gian, tab Doanh thu chưa nối thanh toán), Kiểm duyệt ngân hàng câu hỏi
+// quản trị hệ thống xem Tổng quan và doanh thu (tab Tổng quan, biểu đồ theo thời gian, tab Doanh thu: doanh thu từ giao dịch VNPay thành công và danh sách giao dịch), Kiểm duyệt ngân hàng câu hỏi
 // (câu cần xem lại từ lượt làm bài thật, xem chỉ đọc, ẩn có lý do, hiện lại, nhật ký thao tác), chặn chéo vai trò và bố cục màn hình hẹp.
 //
 // Cần: API (nhánh quản trị và tổng quan) đang chạy trên CSDL TẠM với Email__Mode=Log (không gửi thư thật) và Ai:Mode=Simulated, web quản trị đang chạy
@@ -291,8 +291,10 @@ try {
   await shot(adminPage, '4-bieu-do-theo-thang');
 
   await adminPage.getByRole('tab', { name: 'Doanh thu' }).click();
-  await adminPage.getByText('Doanh thu theo kỳ sẽ có khi nối thanh toán').waitFor();
-  check('Tab Doanh thu: ghi rõ chờ nối gói và thanh toán, không có số doanh thu', (await adminPage.locator('main, body').first().innerText()).includes('VNPay') && !/\d\.\d{3}\.\d{3}\s*₫/.test(await adminPage.locator('body').innerText()));
+  await adminPage.getByRole('region', { name: 'Doanh thu từ gói dịch vụ' }).waitFor();
+  check('Tab Doanh thu: thẻ doanh thu tháng này, từ trước tới nay, số giao dịch thành công tính từ VNPay', (await adminPage.getByRole('region', { name: 'Doanh thu từ gói dịch vụ' }).innerText()).includes('VNPay'));
+  await adminPage.getByRole('figure', { name: 'Doanh thu theo ngày' }).waitFor();
+  check('Tab Doanh thu: biểu đồ doanh thu theo kỳ và danh sách giao dịch (hoặc báo chưa có)', (await adminPage.getByRole('table', { name: 'Giao dịch thanh toán' }).count()) + (await adminPage.getByText('Chưa có giao dịch thanh toán nào.').count()) === 1);
   check('Tab Doanh thu: liên kết sang bảng điều khiển AdMob và Ad Manager (tab mới)', (await adminPage.locator('a[target="_blank"][href*="admob"], a[target="_blank"][href*="admanager"]').count()) === 2);
   check('Tab Doanh thu giữ trên URL (?tab=doanh-thu)', adminPage.url().includes('tab=doanh-thu'));
   await shot(adminPage, '5-doanh-thu');

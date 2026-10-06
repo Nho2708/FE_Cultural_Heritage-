@@ -81,11 +81,14 @@ export function TrendBars({
   granularity,
   metric,
   metricLabel,
+  format = formatCount,
 }: {
   points: SystemTrendPoint[];
   granularity: TrendGranularity;
   metric: keyof Omit<SystemTrendPoint, 'period'>;
   metricLabel: string;
+  /** Cách viết một giá trị (mặc định số đếm; doanh thu viết bằng tiền). */
+  format?: (value: number) => string;
 }) {
   const values = points.map((p) => p[metric]);
   const max = Math.max(1, ...values);
@@ -96,7 +99,7 @@ export function TrendBars({
         {points.map((p, i) => {
           const value = values[i] ?? 0;
           return (
-            <div key={p.period} className="flex h-full min-w-0 flex-1 flex-col justify-end" title={`${trendPeriodFull(p.period, granularity)}: ${formatCount(value)}`}>
+            <div key={p.period} className="flex h-full min-w-0 flex-1 flex-col justify-end" title={`${trendPeriodFull(p.period, granularity)}: ${format(value)}`}>
               <span
                 className={value > 0 ? 'block rounded-t-xs bg-primary' : 'block h-0.5 rounded-xs bg-border-strong'}
                 style={value > 0 ? { height: `${Math.max(2, (value / max) * 100)}%` } : undefined}
@@ -113,7 +116,7 @@ export function TrendBars({
         ))}
       </div>
       <p className="mt-2 type-body-s text-on-surface-variant">
-        {values.every((v) => v === 0) ? 'Chưa có số liệu trong khoảng này.' : `Cột cao nhất: ${formatCount(max)} ${metricLabel.toLocaleLowerCase('vi')}.`}
+        {values.every((v) => v === 0) ? 'Chưa có số liệu trong khoảng này.' : `Cột cao nhất: ${format(max)} ${metricLabel.toLocaleLowerCase('vi')}.`}
       </p>
       <table className="sr-only">
         <caption>{`${metricLabel} theo ${granularity === 'MONTH' ? 'tháng' : 'ngày'}`}</caption>
@@ -121,7 +124,7 @@ export function TrendBars({
           {points.map((p, i) => (
             <tr key={p.period}>
               <th scope="row">{trendPeriodFull(p.period, granularity)}</th>
-              <td>{formatCount(values[i] ?? 0)}</td>
+              <td>{format(values[i] ?? 0)}</td>
             </tr>
           ))}
         </tbody>

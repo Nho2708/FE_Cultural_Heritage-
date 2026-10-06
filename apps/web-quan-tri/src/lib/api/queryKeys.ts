@@ -1,4 +1,4 @@
-import type { ClassMasteryFilter, QuestionQualityFilter, TrendQuery, ClassRecommendationFilter, LessonListFilter, QuestionListFilter, QuizCandidateFilter, QuizListFilter } from '@dsvhvn/dung-chung/api';
+import type { ClassMasteryFilter, QuestionQualityFilter, SystemPaymentQuery, TrendQuery, ClassRecommendationFilter, LessonListFilter, QuestionListFilter, QuizCandidateFilter, QuizListFilter } from '@dsvhvn/dung-chung/api';
 import type { ClassListQuery, StudentListQuery } from './classroomEndpoints';
 import type { LanguageCode, TranslationQueueQuery } from '@dsvhvn/dung-chung/api';
 import type { AuditLogQuery, HeritageListQuery, InvoiceListQuery, OrganizationListQuery, TeacherListQuery } from './endpoints';
@@ -98,6 +98,7 @@ export const queryKeys = {
   schoolOverview: ['org', 'overview'] as const,
   systemOverview: ['admin', 'overview'] as const,
   systemTrend: (query: TrendQuery) => ['admin', 'overview', 'trend', query] as const,
+  systemPayments: (query: SystemPaymentQuery) => ['admin', 'overview', 'payments', query] as const,
 
   /** Kiểm duyệt ngân hàng câu hỏi của quản trị hệ thống: danh sách kèm chất lượng và chi tiết chỉ đọc. */
   moderation: ['admin', 'moderation'] as const,

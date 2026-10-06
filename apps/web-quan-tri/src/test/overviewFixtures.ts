@@ -1,10 +1,12 @@
 import type {
   OverviewClass,
+  Paged,
   QuestionQualityPage,
   QuestionQualityRow,
   QuestionRow,
   SchoolOverview,
   SystemOverview,
+  SystemPayment,
   SystemTrend,
   SystemTrendPoint,
 } from '@dsvhvn/dung-chung/api';
@@ -71,23 +73,30 @@ export function systemOverviewOf(overrides: Partial<SystemOverview> = {}): Syste
       { planId: 2, planName: 'Cơ bản', price: 1990000, isActive: true, activeSchools: 5, expiringSoonSchools: 0 },
       { planId: 3, planName: 'Nâng cao', price: 3990000, isActive: false, activeSchools: 2, expiringSoonSchools: 0 },
     ],
-    revenue: { available: false, message: 'Doanh thu theo kỳ sẽ có khi nối gói dịch vụ và thanh toán VNPay. Doanh thu quảng cáo xem ở bảng điều khiển Google.' },
+    revenue: {
+      available: true,
+      message: 'Doanh thu tính từ giao dịch VNPay thành công theo ngày thanh toán. Doanh thu quảng cáo xem ở bảng điều khiển Google AdMob và Google Ad Manager.',
+      total: 12940000,
+      thisMonth: 3980000,
+      today: 1990000,
+      succeededPayments: 7,
+    },
     ...overrides,
   };
 }
 
 function pointOf(period: string, overrides: Partial<SystemTrendPoint> = {}): SystemTrendPoint {
-  return { period, newSchools: 0, newTeachers: 0, newStudents: 0, lessonsCreated: 0, quizzesPublished: 0, attemptsFinished: 0, aiRequests: 0, ...overrides };
+  return { period, newSchools: 0, newTeachers: 0, newStudents: 0, lessonsCreated: 0, quizzesPublished: 0, attemptsFinished: 0, aiRequests: 0, revenue: 0, ...overrides };
 }
 
 export function trendOf(overrides: Partial<SystemTrend> = {}): SystemTrend {
-  const points = [pointOf('2026-10-05', { attemptsFinished: 10 }), pointOf('2026-10-06'), pointOf('2026-10-07', { attemptsFinished: 25 })];
+  const points = [pointOf('2026-10-05', { attemptsFinished: 10 }), pointOf('2026-10-06'), pointOf('2026-10-07', { attemptsFinished: 25, revenue: 1990000 })];
   return {
     from: '2026-10-05',
     to: '2026-10-07',
     granularity: 'DAY',
     points,
-    totals: pointOf('', { attemptsFinished: 35 }),
+    totals: pointOf('', { attemptsFinished: 35, revenue: 1990000 }),
     ...overrides,
   };
 }
@@ -118,4 +127,26 @@ export function qualityPageOf(items: QuestionQualityRow[], overrides: Partial<Qu
     lowCorrectPercent: 30,
     ...overrides,
   };
+}
+
+export function paymentOf(id: number, overrides: Partial<SystemPayment> = {}): SystemPayment {
+  return {
+    id,
+    invoiceId: 100 + id,
+    invoiceNumber: `HD20261007-00000${id}`,
+    organizationId: 7,
+    organizationName: 'Trường THCS Lê Lợi',
+    planName: 'Cơ bản',
+    providerCode: 'VNPAY',
+    providerTransactionId: `1499900${id}`,
+    amount: 1990000,
+    status: 'SUCCEEDED',
+    createdAt: '2026-10-07T01:00:00Z',
+    paidAt: '2026-10-07T01:02:00Z',
+    ...overrides,
+  };
+}
+
+export function paymentPageOf(items: SystemPayment[]): Paged<SystemPayment> {
+  return { items, page: 1, pageSize: 20, totalItems: items.length, totalPages: items.length ? 1 : 0 };
 }
