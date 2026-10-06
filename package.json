@@ -20,7 +20,11 @@
     "test": "npm run test --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
     "gen:tokens": "npm run gen:tokens -w @dsvhvn/dung-chung",
-    "check:tokens": "npm run check:tokens -w @dsvhvn/dung-chung"
+    "check:tokens": "npm run check:tokens -w @dsvhvn/dung-chung",
+    "mobile:start": "npm run start --prefix apps/app-mobile",
+    "mobile:typecheck": "npm run typecheck --prefix apps/app-mobile",
+    "mobile:lint": "npm run lint --prefix apps/app-mobile",
+    "mobile:test": "npm run test --prefix apps/app-mobile"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
