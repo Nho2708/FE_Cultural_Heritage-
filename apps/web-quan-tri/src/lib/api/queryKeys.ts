@@ -1,4 +1,4 @@
-import type { ClassMasteryFilter, ClassRecommendationFilter, LessonListFilter, QuestionListFilter, QuizCandidateFilter, QuizListFilter } from '@dsvhvn/dung-chung/api';
+import type { ClassMasteryFilter, QuestionQualityFilter, TrendQuery, ClassRecommendationFilter, LessonListFilter, QuestionListFilter, QuizCandidateFilter, QuizListFilter } from '@dsvhvn/dung-chung/api';
 import type { ClassListQuery, StudentListQuery } from './classroomEndpoints';
 import type { AuditLogQuery, HeritageListQuery, OrganizationListQuery, TeacherListQuery } from './endpoints';
 
@@ -64,6 +64,16 @@ export const queryKeys = {
   classMastery: (classId: number, filter: ClassMasteryFilter) => ['teacher', 'statistics', 'class', classId, 'mastery', filter] as const,
   classSuggestions: (classId: number, filter: ClassRecommendationFilter) => ['teacher', 'statistics', 'class', classId, 'suggestions', filter] as const,
   studentProfile: (classId: number, studentId: number) => ['teacher', 'statistics', 'class', classId, 'student', studentId] as const,
+
+  /** Tổng quan: của trường (quản trị trường) và của hệ thống kèm biểu đồ theo thời gian (quản trị hệ thống). */
+  schoolOverview: ['org', 'overview'] as const,
+  systemOverview: ['admin', 'overview'] as const,
+  systemTrend: (query: TrendQuery) => ['admin', 'overview', 'trend', query] as const,
+
+  /** Kiểm duyệt ngân hàng câu hỏi của quản trị hệ thống: danh sách kèm chất lượng và chi tiết chỉ đọc. */
+  moderation: ['admin', 'moderation'] as const,
+  moderationList: (filter: QuestionQualityFilter) => ['admin', 'moderation', 'list', filter] as const,
+  moderationDetail: (id: number) => ['admin', 'moderation', 'detail', id] as const,
 
   auditLogs: (query: AuditLogQuery) => ['admin', 'audit-logs', query] as const,
 };

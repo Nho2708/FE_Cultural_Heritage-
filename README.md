@@ -23,6 +23,7 @@ luồng bài học cho lớp theo cấp, AI soạn nội dung, mã bài học: [
 luồng bài kiểm tra của bài học, nhân bản bài học kèm bài kiểm tra, độ khó của bài học: [`docs/bai-kiem-tra.md`](docs/bai-kiem-tra.md);
 luồng học tập của học sinh theo cấp (làm bài, kết quả, tiến độ): [`docs/hoc-tap-theo-cap.md`](docs/hoc-tap-theo-cap.md);
 luồng thống kê và gợi ý (kết quả bài kiểm tra, tiến độ, thành thạo, hồ sơ học tập, gợi ý cho em): [`docs/thong-ke-goi-y.md`](docs/thong-ke-goi-y.md);
+luồng quản trị và tổng quan (Tổng quan trường, Tổng quan và doanh thu, Kiểm duyệt ngân hàng câu hỏi): [`docs/quan-tri-tong-quan.md`](docs/quan-tri-tong-quan.md);
 kiểm thử trên trình duyệt thật: [`docs/kiem-thu-trinh-duyet.md`](docs/kiem-thu-trinh-duyet.md).
 
 ## Yêu cầu

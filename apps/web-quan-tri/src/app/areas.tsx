@@ -26,6 +26,9 @@ export const StudentRecordPage = lazy(() => import('../pages/teacher/StudentReco
 export const QuizEditorPage = lazy(() => import('../pages/teacher/QuizEditorPage'));
 export const AiQuestionsPage = lazy(() => import('../pages/teacher/AiQuestionsPage'));
 export const LessonEditorPage = lazy(() => import('../pages/teacher/LessonEditorPage'));
+export const SchoolOverviewPage = lazy(() => import('../pages/school/SchoolOverviewPage'));
+export const OverviewPage = lazy(() => import('../pages/admin/OverviewPage'));
+export const QuestionModerationPage = lazy(() => import('../pages/admin/QuestionModerationPage'));
 export const AuditLogPage = lazy(() => import('../pages/admin/AuditLogPage'));
 
 function AreaFallback() {

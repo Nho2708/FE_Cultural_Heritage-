@@ -61,6 +61,7 @@ const ACTION_SLUG = slugMap<AuditAction>({
   QUIZ_PUBLISHED: 'phat-hanh-bai-kiem-tra',
   QUIZ_CLOSED: 'dong-bai-kiem-tra',
   QUESTION_HIDDEN: 'an-cau-hoi',
+  QUESTION_RESTORED: 'hien-lai-cau-hoi',
   PLAN_UPDATED: 'cap-nhat-goi',
   SUBSCRIPTION_CHANGED: 'doi-goi',
   BILLING_STATUS_CHANGED: 'doi-trang-thai-thanh-toan',

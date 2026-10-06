@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { sessionStore } from '../lib/auth/session';
 import { envelope, mockApi } from '../test/fixtures';
+import { schoolOverviewOf, systemOverviewOf, trendOf } from '../test/overviewFixtures';
 import { renderApp, signInAs } from '../test/renderApp';
 
 // Route guard chạy trên cây route thật của ứng dụng (src/app/router.tsx), không dựng cây giả.
@@ -14,6 +15,9 @@ beforeEach(() => {
     const session = sessionStore.getSession();
     if (call.path === '/me' && session) return envelope(200, { data: session.user });
     if (call.path === '/org') return envelope(200, { data: null });
+    if (call.path === '/org/overview') return envelope(200, { data: schoolOverviewOf() });
+    if (call.path === '/admin/overview') return envelope(200, { data: systemOverviewOf() });
+    if (call.path.startsWith('/admin/overview/trend')) return envelope(200, { data: trendOf() });
     if (call.path.startsWith('/org/teachers'))
       return envelope(200, {
         data: { items: [], page: 1, pageSize: 20, totalItems: 0, totalPages: 0, quota: { used: 0, max: 10, planName: 'Miễn phí', canAddTeacher: true } },
@@ -85,34 +89,34 @@ describe('route guard theo ma trận phân quyền', () => {
     expect(screen.getByRole('navigation', { name: 'Khu giáo viên' })).toBeInTheDocument();
   });
 
-  it('tới khi có màn hình tổng quan: /truong mở Giáo viên của trường, /quan-tri mở Quản lý trường', async () => {
+  it('/truong mở Tổng quan trường, /quan-tri mở Tổng quan và doanh thu, không chuyển hướng', async () => {
     signInAs('ORG_ADMIN');
     const first = renderApp('/truong');
-    expect(await screen.findByRole('heading', { level: 1, name: 'Giáo viên của trường' })).toBeInTheDocument();
-    expect(first.router.state.location.pathname).toBe('/truong/giao-vien');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Tổng quan trường' })).toBeInTheDocument();
+    expect(first.router.state.location.pathname).toBe('/truong');
     first.unmount();
 
     signInAs('ADMIN');
     const second = renderApp('/quan-tri');
-    expect(await screen.findByRole('heading', { level: 1, name: 'Quản lý trường' })).toBeInTheDocument();
-    expect(second.router.state.location.pathname).toBe('/quan-tri/truong');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Tổng quan' })).toBeInTheDocument();
+    expect(second.router.state.location.pathname).toBe('/quan-tri');
   });
 
   it('người đã đăng nhập mở Đăng nhập hoặc / được chuyển về trang mặc định của vai trò', async () => {
     signInAs('ADMIN');
     const first = renderApp('/dang-nhap');
-    await waitFor(() => expect(first.router.state.location.pathname).toBe('/quan-tri/truong'));
+    await waitFor(() => expect(first.router.state.location.pathname).toBe('/quan-tri'));
     first.unmount();
 
     const second = renderApp('/');
-    await waitFor(() => expect(second.router.state.location.pathname).toBe('/quan-tri/truong'));
+    await waitFor(() => expect(second.router.state.location.pathname).toBe('/quan-tri'));
   });
 
   it('thanh bên chỉ hiện mục vai trò mở được; Hồ sơ cá nhân hiện trong khu của vai trò; có lối sang trang khám phá', async () => {
     signInAs('ORG_ADMIN');
     const first = renderApp('/truong/thong-tin');
     const nav = await screen.findByRole('navigation', { name: 'Quản trị trường' });
-    expect([...nav.querySelectorAll('a')].map((a) => a.textContent)).toEqual(['Trường và gói', 'Giáo viên']);
+    expect([...nav.querySelectorAll('a')].map((a) => a.textContent)).toEqual(['Tổng quan', 'Trường và gói', 'Giáo viên']);
     expect(screen.getByRole('link', { name: /Mở trang khám phá di sản/ })).toHaveAttribute('target', '_blank');
     first.unmount();
 

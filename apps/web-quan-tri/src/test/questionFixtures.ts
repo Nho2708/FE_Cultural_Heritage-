@@ -43,6 +43,7 @@ export function accessOf(overrides: Partial<QuestionAccess> = {}): QuestionAcces
     canReject: false,
     canDuplicate: true,
     canHide: false,
+    canRestore: false,
     ...overrides,
   };
 }

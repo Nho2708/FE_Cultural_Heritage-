@@ -16,7 +16,8 @@
     "smoke:di-san": "node scripts/smoke-di-san.mjs",
     "smoke:bai-hoc": "node scripts/smoke-bai-hoc.mjs",
     "smoke:bai-kiem-tra": "node scripts/smoke-bai-kiem-tra.mjs",
-    "smoke:thong-ke-goi-y": "node scripts/smoke-thong-ke-goi-y.mjs"
+    "smoke:thong-ke-goi-y": "node scripts/smoke-thong-ke-goi-y.mjs",
+    "smoke:quan-tri-tong-quan": "node scripts/smoke-quan-tri-tong-quan.mjs"
   },
   "dependencies": {
     "@dsvhvn/dung-chung": "0.1.0",
