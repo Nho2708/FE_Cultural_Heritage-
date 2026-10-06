@@ -266,8 +266,8 @@ interface LanguageOptions extends RequestSignal {
 }
 
 export function createDiscoveryApi(client: ApiClient) {
-  const get = async <T>(path: string, query?: Record<string, string | number | undefined>, signal?: AbortSignal) =>
-    (await client.request<T>(path, { auth: false, query, signal })).data;
+  const get = async <T>(path: string, query?: Record<string, string | number | undefined>, signal?: AbortSignal, auth: false | 'optional' = false) =>
+    (await client.request<T>(path, { auth, query, signal })).data;
 
   return {
     /** Năm ngôn ngữ của bộ chọn. Danh mục cố định, máy chủ cho lưu tạm 1 giờ. */
@@ -290,8 +290,12 @@ export function createDiscoveryApi(client: ApiClient) {
 
     timeline: (slug: string, { signal, lang }: LanguageOptions = {}) => get<PublicTimeline>(DISCOVERY_ENDPOINTS.timeline(slug), { lang }, signal),
 
-    /** Tóm tắt theo ngôn ngữ. 404 `SUMMARY_UNAVAILABLE` khi chưa có tóm tắt tiếng Việt đã duyệt; ngôn ngữ chưa có bản hiện hành thì trả bản tiếng Việt kèm `isFallback`. */
-    summary: (slug: string, { signal, lang }: LanguageOptions = {}) => get<PublicSummary>(DISCOVERY_ENDPOINTS.summary(slug), { lang }, signal),
+    /**
+     * Tóm tắt theo ngôn ngữ. 404 `SUMMARY_UNAVAILABLE` khi chưa có tóm tắt tiếng Việt đã duyệt; ngôn ngữ chưa có bản hiện hành thì trả bản tiếng Việt kèm `isFallback`.
+     * Khách chưa mở khóa bằng quảng cáo nhận 403 `AD_UNLOCK_REQUIRED`. **Gắn token của học sinh nếu đang có phiên**: máy chủ nhận ra học sinh theo phiên đăng nhập
+     * (không theo khai báo của máy khách) để mở thẳng, không qua cổng quảng cáo.
+     */
+    summary: (slug: string, { signal, lang }: LanguageOptions = {}) => get<PublicSummary>(DISCOVERY_ENDPOINTS.summary(slug), { lang }, signal, 'optional'),
 
     /** Mô hình 3D đang hiển thị của di sản (miễn phí). 404 `MODEL_UNAVAILABLE` khi không có mô hình hiển thị: trình xem quay về bộ ảnh. */
     model: (slug: string, { signal }: RequestSignal = {}) => get<PublicModel>(DISCOVERY_ENDPOINTS.model(slug), undefined, signal),

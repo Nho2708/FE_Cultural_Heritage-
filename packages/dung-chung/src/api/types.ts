@@ -21,7 +21,7 @@ export type OrganizationState = 'ACTIVE' | 'DEACTIVATED';
 /** `audit_logs.actor_role`: bốn vai trò và `SYSTEM` (tác vụ nền, cổng thanh toán). */
 export type ActorRole = Role | 'SYSTEM';
 
-/** 26 mã thao tác của nhật ký. */
+/** 27 mã thao tác của nhật ký. */
 export type AuditAction =
   | 'LOGIN'
   | 'LOGIN_LOCKED_OUT'
@@ -48,7 +48,8 @@ export type AuditAction =
   | 'PLAN_UPDATED'
   | 'SUBSCRIPTION_CHANGED'
   | 'BILLING_STATUS_CHANGED'
-  | 'IPN_REJECTED';
+  | 'IPN_REJECTED'
+  | 'AD_REWARD_REJECTED';
 
 export interface OrganizationRef {
   id: number;
