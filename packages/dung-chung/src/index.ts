@@ -16,3 +16,4 @@ export * from './validation/fields';
 export * from './validation/heritage';
 export * from './validation/password';
 export * from './validation/studentCode';
+export * from './statistics';
