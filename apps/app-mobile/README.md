@@ -32,6 +32,25 @@ npx expo start                    # in mã QR
 
 Backend cần chạy với `--urls http://0.0.0.0:5080` (hoặc cổng khác) để điện thoại trong cùng Wi-Fi gọi được; web học tập chạy `npm run dev:hoc-tap -- --host` ở thư mục gốc.
 
+### Chạy trên điện thoại từng bước (Windows)
+
+1. Điện thoại cài hoặc **cập nhật Expo Go** (bản hỗ trợ SDK 57). Điện thoại và máy tính **cùng một mạng Wi-Fi**.
+2. Lấy IP của máy tính: chạy `ipconfig`, lấy dòng `IPv4 Address` của card Wi-Fi (ví dụ `192.168.1.10`). Sửa `.env` của app:
+   `EXPO_PUBLIC_API_BASE_URL=http://192.168.1.10:5080/api/v1` và `EXPO_PUBLIC_WEB_BASE_URL=http://192.168.1.10:5174`.
+3. Mở tường lửa Windows cho ba cổng (chạy PowerShell **với quyền Administrator**, một lần):
+   `netsh advfirewall firewall add rule name="DSVHVN dev" dir=in action=allow protocol=TCP localport=5080,5174,8081 profile=private`
+   và đặt mạng Wi-Fi đang dùng là **Private network** trong Settings → Network.
+4. Backend (thư mục `BE_Cultural_Heritage-`): `dotnet run --project src/DSVHVN.Api --launch-profile http --urls http://0.0.0.0:5080`.
+   Kiểm từ điện thoại: mở trình duyệt điện thoại vào `http://192.168.1.10:5080/swagger` phải thấy trang Swagger.
+5. Web học tập (thư mục gốc FE, cho bản đồ và 3D): `npm run dev:hoc-tap -- --host`.
+6. App: `cd apps/app-mobile`, `npm install`, `npx expo start`, rồi quét mã QR (Android: trong Expo Go; iPhone: bằng Camera).
+   Mạng trường/quán cà phê thường chặn máy trong cùng Wi-Fi nói chuyện với nhau — khi đó dùng `npx expo start --tunnel` cho app, nhưng API vẫn phải gọi được (bước 4); cách chắc nhất là phát Wi-Fi từ điện thoại hoặc dùng Wi-Fi ở nhà.
+
+Lỗi thường gặp:
+- *"Project is incompatible with this version of Expo Go"*: cập nhật Expo Go trong cửa hàng ứng dụng (app dùng SDK 57).
+- Quét QR xong quay mãi rồi báo *"Could not connect to the development server"*: máy tính và điện thoại khác mạng, hoặc tường lửa chặn cổng 8081 (bước 3) — thử `--tunnel`.
+- App mở được nhưng báo lỗi mạng ở mọi màn hình: sai IP trong `.env`, backend chạy `localhost` thay vì `0.0.0.0`, hoặc tường lửa chặn 5080. Sửa `.env` thì phải tắt `npx expo start` và chạy lại.
+
 ### Expo Go
 
 - **Android**: cài Expo Go từ Google Play, mở và quét mã QR của `npx expo start` (điện thoại và máy tính cùng Wi-Fi). Không có Wi-Fi chung thì dùng `npx expo start --tunnel`.
