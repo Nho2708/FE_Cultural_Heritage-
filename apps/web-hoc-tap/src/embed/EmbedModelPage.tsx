@@ -59,7 +59,7 @@ export function EmbedModelPage() {
   return (
     <div className="flex size-full flex-col gap-2 p-2">
       <title>{t.documentTitle(model.title?.trim() || t.model.kicker)}</title>
-      <ModelViewer src={src} poster={safeUrl(model.posterUrl)} labels={labels} className="h-[calc(100dvh-110px)]" fallback={<InlineMessage tone="warning">{t.model.unavailable}</InlineMessage>} onFailure={onFailure} onLoaded={onLoaded} onProgress={onProgress} />
+      <ModelViewer src={src} poster={safeUrl(model.posterUrl)} labels={labels} rootClassName="h-full min-h-0" className="min-h-0 flex-1" fallback={<InlineMessage tone="warning">{t.model.unavailable}</InlineMessage>} onFailure={onFailure} onLoaded={onLoaded} onProgress={onProgress} />
     </div>
   );
 }
