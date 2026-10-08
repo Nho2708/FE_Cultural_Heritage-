@@ -23,7 +23,8 @@
           "iosAppId": "ca-app-pub-3940256099942544~1458002511",
           "userTrackingPermission": "Học di sản dùng nhận dạng quảng cáo để hiện quảng cáo phù hợp mọi lứa tuổi."
         }
-      ]
+      ],
+      "expo-image"
     ],
     "ios": {
       "supportsTablet": true,

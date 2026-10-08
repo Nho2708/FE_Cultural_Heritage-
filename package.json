@@ -13,8 +13,8 @@
     "apps/web-hoc-tap"
   ],
   "scripts": {
-    "dev:quan-tri": "npm run dev -w @dsvhvn/web-quan-tri",
-    "dev:hoc-tap": "npm run dev -w @dsvhvn/web-hoc-tap",
+    "dev:quan-tri": "npm run dev -w @dsvhvn/web-quan-tri --",
+    "dev:hoc-tap": "npm run dev -w @dsvhvn/web-hoc-tap --",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
