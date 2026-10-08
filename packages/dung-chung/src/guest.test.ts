@@ -26,6 +26,12 @@ describe('mã thiết bị của khách', () => {
     expect(key).toBe('ffffffff-ffff-4fff-bfff-ffffffffffff');
   });
 
+  it('truyền bộ sinh riêng thì dùng bộ đó, kể cả khi môi trường có randomUUID', () => {
+    const key = createDeviceKey((bytes) => bytes.fill(0));
+    expect(isDeviceKey(key)).toBe(true);
+    expect(key).toBe('00000000-0000-4000-8000-000000000000');
+  });
+
   it('không có bộ sinh ngẫu nhiên an toàn thì báo lỗi, không dùng Math.random', () => {
     vi.stubGlobal('crypto', {});
     expect(() => createDeviceKey()).toThrow(/bộ sinh số ngẫu nhiên an toàn/);

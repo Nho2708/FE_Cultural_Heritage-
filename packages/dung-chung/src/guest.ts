@@ -7,12 +7,18 @@ export function isDeviceKey(value: unknown): value is string {
   return typeof value === 'string' && DEVICE_KEY.test(value);
 }
 
-/** Sinh mã thiết bị mới (UUID phiên bản 4) bằng bộ sinh ngẫu nhiên mật mã của môi trường; không có thì ném lỗi thay vì dùng Math.random. */
-export function createDeviceKey(): string {
+/**
+ * Sinh mã thiết bị mới (UUID phiên bản 4) bằng bộ sinh ngẫu nhiên mật mã; không có thì ném lỗi thay vì dùng Math.random.
+ * Mặc định dùng bộ sinh của môi trường; app truyền `fillRandom` của expo-crypto vì trình duyệt chỉ có `crypto.randomUUID` trên https hoặc localhost,
+ * còn bản web mở trên điện thoại qua IP mạng nội bộ thì không có.
+ */
+export function createDeviceKey(fillRandom?: (bytes: Uint8Array<ArrayBuffer>) => unknown): string {
   const c = globalThis.crypto;
-  if (typeof c?.randomUUID === 'function') return c.randomUUID();
-  if (typeof c?.getRandomValues !== 'function') throw new Error('Môi trường không có bộ sinh số ngẫu nhiên an toàn để tạo mã thiết bị.');
-  const bytes = c.getRandomValues(new Uint8Array(16));
+  if (!fillRandom && typeof c?.randomUUID === 'function') return c.randomUUID();
+  const fill = fillRandom ?? (typeof c?.getRandomValues === 'function' ? (bytes: Uint8Array<ArrayBuffer>) => c.getRandomValues(bytes) : undefined);
+  if (!fill) throw new Error('Môi trường không có bộ sinh số ngẫu nhiên an toàn để tạo mã thiết bị.');
+  const bytes = new Uint8Array(16);
+  fill(bytes);
   bytes[6] = (bytes[6]! & 0x0f) | 0x40;
   bytes[8] = (bytes[8]! & 0x3f) | 0x80;
   const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0'));

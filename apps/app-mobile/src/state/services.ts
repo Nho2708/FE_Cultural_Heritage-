@@ -1,6 +1,6 @@
-import { randomUUID } from 'expo-crypto';
+import { getRandomValues } from 'expo-crypto';
 import { Platform } from 'react-native';
-import { MESSAGES } from '@dsvhvn/dung-chung';
+import { createDeviceKey, MESSAGES } from '@dsvhvn/dung-chung';
 import {
   createAdsApi,
   createApiClient,
@@ -48,7 +48,7 @@ function isStudentProfile(value: unknown): value is StudentProfile {
 async function loadDeviceId(): Promise<string> {
   const stored = await secure.get(KEYS.deviceId);
   if (stored) return stored;
-  const created = randomUUID();
+  const created = createDeviceKey(getRandomValues);
   await secure.set(KEYS.deviceId, created);
   return created;
 }
