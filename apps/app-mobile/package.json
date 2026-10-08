@@ -11,7 +11,7 @@
     "typecheck": "tsc -p tsconfig.json",
     "test": "jest",
     "lint": "oxlint -c .oxlintrc.json --deny-warnings src app",
-    "doctor": "expo-doctor",
+    "doctor": "npx expo-doctor",
     "export:web": "expo export --platform web"
   },
   "dependencies": {
