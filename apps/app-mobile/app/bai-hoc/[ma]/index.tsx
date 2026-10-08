@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import { Button, Loading, Txt, styles as ui } from '../../../src/components/ui';
 import { useLessonByCode } from '../../../src/hocsinh/queries';
+import { serverErrorText } from '../../../src/hocsinh/serverErrorText';
 import { LevelOneLesson, LevelThreeLesson, LevelTwoLesson, type LessonPosition } from '../../../src/hocsinh/LevelLessons';
 import { KEYS, prefs } from '../../../src/storage/keyValue';
 import { useTheme } from '../../../src/theme/ThemeProvider';
@@ -45,7 +46,7 @@ export default function LessonScreen() {
 
   if (lesson.isLoading || (level === 1 && saved === undefined && lesson.data)) return <Loading label={t('hs.common.loading')} />;
   if (lesson.isError || !lesson.data) {
-    const message = lesson.error instanceof ApiError ? lesson.error.message : t('hs.common.error');
+    const message = serverErrorText(lesson.error, t('hs.common.error'));
     return (
       <View style={ui.center}>
         <Txt style={ui.centerText}>{message}</Txt>
