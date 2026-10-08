@@ -1,10 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Redirect } from 'expo-router';
 import { Tabs } from 'expo-router/js-tabs';
 import { useTranslation } from 'react-i18next';
 import type { ColorValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useApp } from '../../src/state/AppProvider';
+import { GuardRedirect } from '../../src/components/GuardRedirect';
+import { entryHref } from '../../src/navigation/entry';
+import { useApp, useAuth } from '../../src/state/AppProvider';
 import { useTheme } from '../../src/theme/ThemeProvider';
 
 // Chế độ Khách tham quan: bốn tab (Trang chủ, Tìm kiếm, Bản đồ, Lịch sử và cài đặt). Không cần đăng nhập; vào nhầm khi đang ở chế độ Học sinh thì về điểm vào.
@@ -18,11 +19,12 @@ function icon(name: IconName, focusedName: IconName) {
 }
 
 export default function GuestLayout() {
-  const { mode } = useApp();
+  const { chosenLanguage, mode } = useApp();
+  const { session } = useAuth();
   const { t } = useTranslation();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
-  if (mode !== 'guest') return <Redirect href="/" />;
+  if (mode !== 'guest') return <GuardRedirect href={entryHref({ chosenLanguage, mode, hasSession: Boolean(session), mustChangePassword: Boolean(session?.user.mustChangePassword) })} />;
   return (
     <Tabs
       screenOptions={{

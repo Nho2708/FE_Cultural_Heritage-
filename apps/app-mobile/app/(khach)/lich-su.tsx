@@ -119,10 +119,7 @@ export default function HistoryAndSettings() {
             <Button
               label={t('settings.switchToStudent')}
               variant="secondary"
-              onPress={() => {
-                chooseMode('student');
-                router.replace('/');
-              }}
+              onPress={() => chooseMode('student')}
             />
           </View>
         </Card>

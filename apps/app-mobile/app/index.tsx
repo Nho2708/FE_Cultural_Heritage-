@@ -1,4 +1,5 @@
 import { Redirect } from 'expo-router';
+import { entryHref } from '../src/navigation/entry';
 import { useApp, useAuth } from '../src/state/AppProvider';
 
 // Điểm vào: lần đầu chọn ngôn ngữ rồi chế độ; những lần sau mở thẳng chế độ đã chọn. Học sinh chưa đăng nhập (hoặc phiên đã hết) về màn hình Đăng nhập,
@@ -7,10 +8,5 @@ import { useApp, useAuth } from '../src/state/AppProvider';
 export default function Index() {
   const { chosenLanguage, mode } = useApp();
   const { session } = useAuth();
-  if (!chosenLanguage && mode !== 'student') return <Redirect href="/chon-ngon-ngu" />;
-  if (!mode) return <Redirect href="/chon-che-do" />;
-  if (mode === 'guest') return <Redirect href="/(khach)" />;
-  if (!session) return <Redirect href="/dang-nhap" />;
-  if (session.user.mustChangePassword) return <Redirect href="/doi-mat-khau" />;
-  return <Redirect href="/(hoc-sinh)/hoc" />;
+  return <Redirect href={entryHref({ chosenLanguage, mode, hasSession: Boolean(session), mustChangePassword: Boolean(session?.user.mustChangePassword) })} />;
 }
