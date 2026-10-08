@@ -35,6 +35,8 @@ export interface ModelViewerProps {
   onProgress?: (fraction: number) => void;
   /** Lớp của khung xem (cần có chiều cao). */
   className?: string;
+  /** Lớp của khối ngoài cùng (khung xem cùng dòng gợi ý và nút đặt lại); trang nhúng dùng để khung xem lấp phần chiều cao còn lại thay vì đoán trước chiều cao của chữ. */
+  rootClassName?: string;
 }
 
 /** Các thành phần của `<model-viewer>` mà trình xem dùng. */
@@ -73,7 +75,7 @@ export function ModelViewer(props: ModelViewerProps) {
   return <Viewer key={props.src} {...props} />;
 }
 
-function Viewer({ src, poster, labels, fallback, onFailure, onLoaded, onProgress, className }: ModelViewerProps) {
+function Viewer({ src, poster, labels, fallback, onFailure, onLoaded, onProgress, className, rootClassName }: ModelViewerProps) {
   const [defined, setDefined] = useState(false);
   const [unsupported] = useState(() => !supportsWebGL());
   const [loadFailed, setLoadFailed] = useState(false);
@@ -162,7 +164,7 @@ function Viewer({ src, poster, labels, fallback, onFailure, onLoaded, onProgress
   const autoRotate = !prefersReducedMotion();
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className={cn('flex flex-col gap-3', rootClassName)}>
       <div className={cn('relative overflow-hidden rounded-md bg-surface-container-high', className)}>
         {defined && (
           <model-viewer
