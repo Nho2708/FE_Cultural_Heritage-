@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Redirect } from 'expo-router';
 import { Tabs } from 'expo-router/js-tabs';
 import { useTranslation } from 'react-i18next';
 import type { ColorValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { GuardRedirect } from '../../src/components/GuardRedirect';
+import { entryHref } from '../../src/navigation/entry';
 import { useApp, useAuth } from '../../src/state/AppProvider';
 import { useTheme } from '../../src/theme/ThemeProvider';
 
@@ -19,14 +20,13 @@ function icon(name: IconName, focusedName: IconName) {
 }
 
 export default function StudentLayout() {
-  const { mode } = useApp();
+  const { chosenLanguage, mode } = useApp();
   const { session } = useAuth();
   const { t } = useTranslation();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
-  if (mode !== 'student') return <Redirect href="/" />;
-  if (!session) return <Redirect href="/dang-nhap" />;
-  if (session.user.mustChangePassword) return <Redirect href="/doi-mat-khau" />;
+  const entry = entryHref({ chosenLanguage, mode, hasSession: Boolean(session), mustChangePassword: Boolean(session?.user.mustChangePassword) });
+  if (mode !== 'student' || !session || session.user.mustChangePassword) return <GuardRedirect href={entry} />;
   return (
     <Tabs
       screenOptions={{

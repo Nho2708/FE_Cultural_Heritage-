@@ -56,10 +56,7 @@ export default function Account() {
         label={t('hs.account.switchToVisitor')}
         variant="ghost"
         onPress={() =>
-          confirmAction(t('hs.account.switchConfirm'), undefined, t('hs.account.yes'), t('hs.account.no'), () => {
-            chooseMode('guest');
-            router.replace('/');
-          })
+          confirmAction(t('hs.account.switchConfirm'), undefined, t('hs.account.yes'), t('hs.account.no'), () => chooseMode('guest'))
         }
       />
       <Txt variant="caption" muted>
