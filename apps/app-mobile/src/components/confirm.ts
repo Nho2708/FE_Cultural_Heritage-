@@ -6,7 +6,8 @@ export function confirmAction(title: string, message: string | undefined, yes: s
     if (typeof window !== 'undefined' && window.confirm([title, message].filter(Boolean).join('\n\n'))) onYes();
     return;
   }
-  Alert.alert(title, message, [
+  // Hộp thoại Android cắt tiêu đề sau hai dòng (câu hỏi "Đồng ý không?" ở cuối bị mất): câu dài không kèm lời nhắn thì đưa vào phần nội dung, để tiêu đề trống.
+  Alert.alert(message === undefined ? '' : title, message ?? title, [
     { text: no, style: 'cancel' },
     { text: yes, style: 'destructive', onPress: onYes },
   ]);
