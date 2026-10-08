@@ -114,3 +114,43 @@ src/
 | `npm run doctor` | `expo-doctor` (21 kiểm tra) |
 | `npm run export:web` | build thử bản web (`expo export --platform web`) |
 | `npx expo export --platform android` / `ios` | build thử gói JavaScript cho điện thoại |
+
+## Kiểm thử trên máy ảo Android
+
+Chạy app thật trong Expo Go trên máy ảo, đi qua các hành trình chính bằng [Maestro](https://maestro.mobile.dev) rồi báo đạt hoặc không đạt từng luồng.
+Các luồng nằm ở [`e2e/`](e2e/) (YAML, mở app qua `exp://10.0.2.2:8081`); phần dùng chung ở `e2e/chung/`.
+
+| Luồng | Nội dung |
+|---|---|
+| `khach-tham-quan` | chọn tiếng Anh và chế độ Khách, trang chủ, tìm "thang long", chi tiết, tóm tắt, nghe, xem 3D, bản đồ, lịch sử (xoá từng mục và xoá hết) |
+| `hoc-sinh-dang-nhap-sai` | bỏ trống và nhập sai mật khẩu |
+| `hoc-sinh-khoi-3` | cấp 1: đăng nhập mật khẩu tạm, đổi mật khẩu bắt buộc, nhập mã bài học, học từng bước, bài chơi bốn dạng câu, kết quả bằng sao |
+| `hoc-sinh-khoi-11` | cấp 3: bài dạng tài liệu, bài kiểm tra có giờ ba dạng câu, điểm và phân tích |
+
+**Chạy một lệnh** (PowerShell 7, từ thư mục gốc FE; cần cổng 5080, 5174, 8081 đang rảnh):
+
+```powershell
+pwsh -File apps/app-mobile/scripts/chay-kiem-thu-may-ao.ps1                          # mọi luồng
+pwsh -File apps/app-mobile/scripts/chay-kiem-thu-may-ao.ps1 -Flows khach-tham-quan   # một luồng
+pwsh -File apps/app-mobile/scripts/chay-kiem-thu-may-ao.ps1 -KeepRunning             # giữ máy ảo, dịch vụ và cơ sở dữ liệu tạm để xem lại
+```
+
+Script làm lần lượt: bật máy ảo `dsvhvn_pixel` (tự tạo AVD pixel_7 nếu chưa có; dùng `-gpu host` vì GPU phần mềm làm WebGL của trình xem 3D sập), chạy backend trên **cơ sở dữ liệu tạm**
+`dsvhvn_tam_app_<giờ>` (LocalDB; email ghi log, AI giả lập, lưu tệp trong máy, CORS thêm `http://10.0.2.2:5174`), nạp dữ liệu thử bằng [`scripts/seed-du-lieu-thu.py`](scripts/seed-du-lieu-thu.py)
+(di sản đã xuất bản kèm bản dịch, tóm tắt và mô hình 3D; trường, giáo viên, lớp khối 3, 8, 11, học sinh, bài học và bài kiểm tra đã phát hành), chạy web học tập, chạy Metro với
+`EXPO_PUBLIC_API_BASE_URL=http://10.0.2.2:5080/api/v1` và `EXPO_PUBLIC_WEB_BASE_URL=http://10.0.2.2:5174` (đặt bằng biến môi trường, không sửa `.env` của điện thoại thật),
+chạy từng luồng Maestro (xoá dữ liệu Expo Go trước mỗi luồng, chạy lại tối đa ba lần nếu máy ảo hoặc trình điều khiển Maestro rớt kết nối), rồi tắt mọi tiến trình đã bật và xoá cơ sở dữ liệu tạm.
+Ảnh chụp từng bước nằm trong thư mục tạm mà script in ra cuối cùng (`ket-qua/<luồng>/.../takeScreenshot/`). Maestro tự tải về `%USERPROFILE%\tools\maestro` ở lần đầu.
+
+Chạy tay từng phần khi sửa lỗi: bật máy ảo, `adb shell pm clear host.exp.exponent`, giữ Metro đang chạy, rồi
+`maestro --device emulator-5554 test -e STUDENT_CODE=... apps/app-mobile/e2e/<luồng>.yaml`. Lệnh `maestro` cần biến `JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8` để đọc đúng chữ có dấu.
+Luồng học sinh dùng tài khoản một lần (đăng nhập lần đầu đổi mật khẩu, bài kiểm tra chỉ làm một lần) nên mỗi lần chạy phải nạp dữ liệu mới.
+
+**Lưu ý khi chạy với máy ảo hoặc điện thoại:**
+- Máy tính là `10.0.2.2` trong máy ảo. Web học tập phải chạy với `VITE_API_BASE_URL=http://10.0.2.2:5080/api/v1` (trang bản đồ và 3D trong WebView gọi API từ chính địa chỉ này), `npm run dev:hoc-tap -- --host`
+  và backend phải cho phép origin của web đó (`Cors__AllowedOrigins__N=http://10.0.2.2:5174`). Với điện thoại thật thay `10.0.2.2` bằng IP của máy tính.
+- Script chỉ gắn vào `emulator-5554`. Nếu đang cắm hoặc kết nối không dây điện thoại thật qua adb thì phải luôn truyền `--device` (script đã làm), kẻo Maestro cài trình điều khiển lên nhầm điện thoại.
+
+**Không kiểm được trên máy ảo:** giọng đọc thật (máy ảo không có giọng tiếng Việt, app báo "điện thoại chưa có giọng"), vị trí thật ("Gần bạn" cần cấp quyền và tọa độ giả lập),
+quảng cáo AdMob và hộp đồng ý của Google (cần bản dựng phát triển, Expo Go không có mô-đun quảng cáo), cảm ứng nhiều ngón khi chụm để phóng to mô hình 3D, hiệu năng thật của thiết bị yếu.
+Nút bánh răng nổi của Expo Go che một phần góc phải đầu màn hình (ví dụ nút Nộp bài của cấp 3); chỉ có trong Expo Go, bản dựng thật không có.

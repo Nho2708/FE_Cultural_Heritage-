@@ -1,0 +1,90 @@
+# Cấp 1 (khối 3): học từng bước (Nghe chuyện, Xem hình), làm bài chơi bốn dạng câu (đúng/sai, chọn hình, ghép cặp, sắp xếp), nộp bài, xem sao.
+# Bắt đầu từ màn hình bài học vừa mở.
+appId: host.exp.exponent
+---
+- takeScreenshot: khoi3-05-bai-hoc
+- repeat:
+    while:
+      notVisible: "Bài chơi của em"
+    times: 14
+    commands:
+      - scrollUntilVisible:
+          element: "Tiếp nhé"
+      - tapOn: "Tiếp nhé"
+- takeScreenshot: khoi3-06-bai-choi
+- tapOn: "Làm bài"
+- takeScreenshot: khoi3-07-gioi-thieu-bai
+- tapOn: "Bắt đầu"
+# Câu 1: đúng/sai kèm hình
+- tapOn: "Đúng"
+- takeScreenshot: khoi3-08-cau-dung-sai
+- scrollUntilVisible:
+    element: "Tiếp nhé"
+- tapOn: "Tiếp nhé"
+# Câu 2: chọn hình theo tên (chạm đúng ô hình, không phải câu hỏi)
+- tapOn: "Cổng Đoan Môn"
+- takeScreenshot: khoi3-09-cau-chon-hinh
+- scrollUntilVisible:
+    element: "Tiếp nhé"
+- tapOn: "Tiếp nhé"
+# Câu 3: ghép ba hình với ba tên
+- scrollUntilVisible:
+    element: "Hình 1.*"
+    direction: UP
+- tapOn: "Hình 1.*"
+- scrollUntilVisible:
+    element: "Điện Kính Thiên"
+- tapOn: "Điện Kính Thiên"
+- scrollUntilVisible:
+    element: "Hình 2.*"
+    direction: UP
+- tapOn: "Hình 2.*"
+- scrollUntilVisible:
+    element: "Cổng Đoan Môn"
+- tapOn: "Cổng Đoan Môn"
+- scrollUntilVisible:
+    element: "Hình 3.*"
+    direction: UP
+- tapOn: "Hình 3.*"
+- scrollUntilVisible:
+    element: "Khu khảo cổ"
+- tapOn: "Khu khảo cổ"
+- takeScreenshot: khoi3-10-cau-ghep-cap
+- scrollUntilVisible:
+    element: "Tiếp nhé"
+- tapOn: "Tiếp nhé"
+# Câu 4: sắp xếp bốn sự kiện theo thời gian
+- tapOn: "Năm 1010: dời đô"
+- tapOn: "Năm 1070: lập Văn Miếu"
+- tapOn: "Năm 1428: Lê Lợi lên ngôi"
+- scrollUntilVisible:
+    element: "Năm 2010: UNESCO ghi danh"
+- tapOn: "Năm 2010: UNESCO ghi danh"
+- takeScreenshot: khoi3-11-cau-sap-xep
+- scrollUntilVisible:
+    element: "Xong rồi!"
+- tapOn: "Xong rồi!"
+# Đã trả lời hết thì nộp luôn; còn câu bỏ trống thì có hộp xác nhận.
+- runFlow:
+    when:
+      visible: "Em làm xong rồi chứ?"
+    commands:
+      - tapOn: "Nộp bài"
+- extendedWaitUntil:
+    visible: "(Hoan hô.*|Em cố gắng.*)"
+    timeout: 30000
+- takeScreenshot: khoi3-12-ket-qua-sao
+- assertVisible: "Xem lại bài"
+- scrollUntilVisible:
+    element: "Về trang học"
+- takeScreenshot: khoi3-13-xem-lai-bai
+- tapOn: "Về trang học"
+- extendedWaitUntil:
+    visible: "Mở bài"
+    timeout: 30000
+- takeScreenshot: khoi3-14-trang-hoc-sau-bai
+- tapOn: "Tiến độ"
+- extendedWaitUntil:
+    visible: "Tiến độ của em"
+    timeout: 30000
+- takeScreenshot: khoi3-15-tien-do

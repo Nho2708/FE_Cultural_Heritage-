@@ -1,0 +1,8 @@
+# Từ màn hình đăng nhập học sinh: đăng nhập (đã đổi mật khẩu) rồi nhập mã bài học (biến STUDENT_CODE, STUDENT_PASSWORD, LESSON_CODE).
+appId: host.exp.exponent
+---
+- runFlow: dang-nhap-hoc-sinh.yaml
+- extendedWaitUntil:
+    visible: "Nhập mã"
+    timeout: 30000
+- runFlow: nhap-ma-bai-hoc.yaml
