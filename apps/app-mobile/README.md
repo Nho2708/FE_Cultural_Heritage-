@@ -128,7 +128,8 @@ Cách này cho điện thoại gọi `localhost` như máy tính nên không c�
    adb -s <số hiệu> reverse tcp:5080 tcp:5080
    adb -s <số hiệu> reverse tcp:5174 tcp:5174
    ```
-3. Chạy backend ở cổng 5080 và web học tập ở cổng 5174 (`VITE_API_BASE_URL=http://localhost:5080/api/v1`), rồi Metro trong `apps/app-mobile` với biến môi trường của tiến trình:
+3. Chạy backend ở cổng 5080 và web học tập ở cổng 5174 (`VITE_API_BASE_URL=http://localhost:5080/api/v1`). Web học tập chạy bằng `npm run dev:hoc-tap -- --host 127.0.0.1`:
+   để mặc định thì Vite có thể chỉ nghe trên `::1` (IPv6) và trang bản đồ, 3D mở qua `adb reverse` sẽ không tải được. Sau đó chạy Metro trong `apps/app-mobile` với biến môi trường của tiến trình:
    `EXPO_PUBLIC_API_BASE_URL=http://localhost:5080/api/v1` và `EXPO_PUBLIC_WEB_BASE_URL=http://localhost:5174`, lệnh `npx expo start` (không thêm `--android`).
 4. Mở app trong Expo Go: `adb -s <số hiệu> shell am start -a android.intent.action.VIEW -d exp://127.0.0.1:8081 host.exp.exponent`.
 5. Xong thì `adb -s <số hiệu> reverse --remove-all`.
