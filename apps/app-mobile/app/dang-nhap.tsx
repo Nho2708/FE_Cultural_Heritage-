@@ -2,9 +2,9 @@ import { MESSAGES, collectErrors, normalizeCode, splitApiError, validateRequired
 import { ApiError, ERROR_CODES } from '@dsvhvn/dung-chung/api';
 import { sessionFromLogin } from '@dsvhvn/dung-chung/auth';
 import { Redirect, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { View, type TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Field } from '../src/components/Field';
 import { Button, Notice, Screen, Txt } from '../src/components/ui';
@@ -28,6 +28,7 @@ export default function StudentLogin() {
   const insets = useSafeAreaInsets();
   const [studentCode, setStudentCode] = useState('');
   const [password, setPassword] = useState('');
+  const passwordRef = useRef<TextInput>(null);
   const [errors, setErrors] = useState<Partial<Record<FieldName, string>>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -79,9 +80,12 @@ export default function StudentLogin() {
         textContentType="username"
         autoComplete="username"
         returnKeyType="next"
+        submitBehavior="submit"
+        onSubmitEditing={() => passwordRef.current?.focus()}
         error={errors.studentCode}
       />
       <Field
+        ref={passwordRef}
         label={t('hs.login.passwordLabel')}
         value={password}
         onChangeText={setPassword}

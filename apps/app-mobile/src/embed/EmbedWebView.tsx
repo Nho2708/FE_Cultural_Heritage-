@@ -42,6 +42,8 @@ export function EmbedWebView({ url, onMessage, onFail, label }: EmbedWebViewProp
         onMessage={handleMessage}
         onLoadEnd={() => setLoading(false)}
         onError={onFail}
+        // Tiến trình vẽ của WebView bị hệ thống dừng (thiếu bộ nhớ, GPU lỗi): không để người dùng nhìn trang trắng mãi, quay về danh sách hoặc bộ ảnh.
+        onRenderProcessGone={onFail}
         // Chỉ lỗi của chính trang nhúng mới tính (Android còn báo cả ảnh nền bản đồ hoặc biểu tượng trang tải lỗi).
         onHttpError={(event) => {
           if (originOf(event.nativeEvent.url) === origin && event.nativeEvent.url.split('?')[0] === url.split('?')[0]) onFail();
