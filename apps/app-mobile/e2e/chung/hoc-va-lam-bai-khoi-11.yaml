@@ -1,0 +1,47 @@
+# Cấp 3 (khối 11): đọc bài dạng tài liệu (nội dung chính, tư liệu gốc, câu hỏi gợi suy nghĩ), làm bài kiểm tra có giờ ba dạng câu
+# (một đáp án, nhiều mệnh đề đúng/sai, đọc tư liệu), nộp bài, xem điểm và phân tích. Bắt đầu từ màn hình bài học vừa mở.
+appId: host.exp.exponent
+---
+- takeScreenshot: khoi11-05-bai-hoc
+- scrollUntilVisible:
+    element: "Làm bài"
+    speed: 95
+    timeout: 90000
+- takeScreenshot: khoi11-06-cuoi-bai-hoc
+- tapOn: "Làm bài"
+- takeScreenshot: khoi11-07-gioi-thieu-bai
+- tapOn: "Bắt đầu"
+# Câu 1: một đáp án đúng
+- tapOn: "Năm 2010"
+- takeScreenshot: khoi11-08-cau-mot-dap-an
+- tapOn: "Câu sau"
+# Câu 2: ba mệnh đề đúng/sai
+- tapOn:
+    text: "Đúng"
+    index: 0
+- tapOn:
+    text: "Sai"
+    index: 1
+- tapOn:
+    text: "Đúng"
+    index: 2
+- takeScreenshot: khoi11-09-cau-nhieu-menh-de
+- tapOn: "Câu sau"
+# Câu 3: đọc tư liệu rồi chọn
+- takeScreenshot: khoi11-10-cau-doc-tu-lieu
+- tapOn: "Lý Thái Tổ"
+# Nút nổi của Expo Go che phần phải nút Nộp bài trên đầu màn hình nên chạm vào phần bên trái của nút.
+- tapOn:
+    point: "77%,9%"
+- extendedWaitUntil:
+    visible: "Nộp bài?"
+    timeout: 15000
+- takeScreenshot: khoi11-11-xac-nhan-nop
+- tapOn:
+    point: "50%,84%"
+- extendedWaitUntil:
+    visible: "(Điểm.*|.*điểm.*)"
+    timeout: 30000
+- takeScreenshot: khoi11-12-ket-qua
+- scroll
+- takeScreenshot: khoi11-13-phan-tich

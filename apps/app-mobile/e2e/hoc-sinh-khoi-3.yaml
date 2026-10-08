@@ -1,0 +1,12 @@
+# Hành trình học sinh khối 3 (cấp 1): đăng nhập lần đầu bằng mật khẩu tạm, đổi mật khẩu bắt buộc, nhập mã bài học, học từng bước,
+# làm bài chơi, xem kết quả bằng sao, trang học và tiến độ.
+# Biến: STUDENT_CODE, STUDENT_PASSWORD (mật khẩu tạm), NEW_PASSWORD, LESSON_CODE.
+appId: host.exp.exponent
+env:
+  SHOT_PREFIX: khoi3
+---
+- runFlow: chung/mo-app.yaml
+- runFlow: chung/vao-hoc-sinh.yaml
+- runFlow: chung/dang-nhap-lan-dau.yaml
+- runFlow: chung/nhap-ma-bai-hoc.yaml
+- runFlow: chung/hoc-va-lam-bai-khoi-3.yaml

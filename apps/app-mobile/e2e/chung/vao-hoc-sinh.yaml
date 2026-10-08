@@ -1,0 +1,10 @@
+# Từ trạng thái sạch tới màn hình đăng nhập học sinh (giao diện tiếng Việt).
+# Cần: mo-app.yaml đã chạy.
+appId: host.exp.exponent
+---
+- tapOn: "Tiếng Việt"
+- assertVisible: "Em sẽ dùng app thế nào.*|Bạn sẽ dùng app thế nào.*|.*dùng app.*"
+- tapOn:
+    text: "Học sinh"
+    index: 1
+- assertVisible: "Học sinh đăng nhập"

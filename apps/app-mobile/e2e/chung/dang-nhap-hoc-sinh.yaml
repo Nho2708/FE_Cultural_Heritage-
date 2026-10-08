@@ -1,0 +1,9 @@
+# Đăng nhập bằng mã học sinh và mật khẩu (biến STUDENT_CODE, STUDENT_PASSWORD), từ màn hình đăng nhập học sinh.
+appId: host.exp.exponent
+---
+- tapOn: "Ví dụ: HS8K2QX7"
+- inputText: ${STUDENT_CODE}
+- pressKey: Enter
+- inputText: ${STUDENT_PASSWORD}
+- hideKeyboard
+- tapOn: "Đăng nhập"

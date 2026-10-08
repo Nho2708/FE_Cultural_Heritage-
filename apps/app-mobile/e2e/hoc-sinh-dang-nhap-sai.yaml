@@ -1,0 +1,21 @@
+# Học sinh nhập sai mật khẩu và bỏ trống mật khẩu: app báo lỗi bằng lời, không vào được. Biến: STUDENT_CODE.
+appId: host.exp.exponent
+---
+- runFlow: chung/mo-app.yaml
+- runFlow: chung/vao-hoc-sinh.yaml
+- tapOn: "Ví dụ: HS8K2QX7"
+- inputText: ${STUDENT_CODE}
+- hideKeyboard
+- tapOn: "Đăng nhập"
+- assertVisible: "Vui lòng nhập mật khẩu."
+- takeScreenshot: dang-nhap-sai-01-thieu-mat-khau
+- tapOn: "Ví dụ: HS8K2QX7"
+- pressKey: Enter
+- inputText: "SaiMatKhau123"
+- hideKeyboard
+- tapOn: "Đăng nhập"
+- extendedWaitUntil:
+    visible: "Mã học sinh hoặc mật khẩu chưa đúng.*"
+    timeout: 20000
+- takeScreenshot: dang-nhap-sai-02-sai-mat-khau
+- assertNotVisible: "Trang học"

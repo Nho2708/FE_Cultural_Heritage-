@@ -1,0 +1,27 @@
+# Đăng nhập lần đầu bằng mật khẩu tạm, đổi mật khẩu bắt buộc, tới trang học. Cần STUDENT_CODE, STUDENT_PASSWORD (mật khẩu tạm), NEW_PASSWORD.
+# Tiền tố của ảnh chụp là biến SHOT_PREFIX.
+appId: host.exp.exponent
+---
+- takeScreenshot: ${SHOT_PREFIX}-01-dang-nhap
+- runFlow: dang-nhap-hoc-sinh.yaml
+- extendedWaitUntil:
+    visible: "Chào .*"
+    timeout: 30000
+- assertVisible: "Mật khẩu mới"
+- takeScreenshot: ${SHOT_PREFIX}-02-doi-mat-khau-bat-buoc
+- tapOn:
+    text: "Mật khẩu mới"
+    index: 1
+- inputText: ${NEW_PASSWORD}
+- hideKeyboard
+- tapOn:
+    text: "Nhập lại mật khẩu mới"
+    index: 1
+- inputText: ${NEW_PASSWORD}
+- hideKeyboard
+- takeScreenshot: ${SHOT_PREFIX}-03-da-nhap-mat-khau
+- tapOn: "Đặt mật khẩu và bắt đầu học"
+- extendedWaitUntil:
+    visible: "Nhập mã"
+    timeout: 30000
+- takeScreenshot: ${SHOT_PREFIX}-04-trang-hoc

@@ -1,0 +1,94 @@
+# Hành trình khách tham quan (giao diện tiếng Anh): chọn ngôn ngữ và chế độ, trang chủ, tìm kiếm, chi tiết di sản,
+# tóm tắt và nghe, xem 3D, bản đồ, lịch sử.
+appId: host.exp.exponent
+---
+- runFlow: chung/mo-app.yaml
+- tapOn: "English"
+- assertVisible: "How will you use the app?"
+- takeScreenshot: khach-01-chon-che-do
+- tapOn:
+    text: "Visitor"
+    index: 1
+- extendedWaitUntil:
+    visible: "Discover the cultural heritage of Viet Nam"
+    timeout: 60000
+- takeScreenshot: khach-02-trang-chu
+- tapOn: "Search"
+- tapOn: "Search by name, province, period…"
+# Tìm kiếm chạy khi bấm phím tìm của bàn phím (không tự tìm khi gõ).
+- inputText: "thang long"
+- pressKey: Enter
+- takeScreenshot: khach-03-tim-kiem
+- scrollUntilVisible:
+    element: ".*Hoàng thành Thăng Long.*"
+    timeout: 60000
+- tapOn: ".*Hoàng thành Thăng Long.*"
+- extendedWaitUntil:
+    visible: "Summary"
+    timeout: 30000
+- takeScreenshot: khach-04-chi-tiet
+- assertVisible: ".*Khu Trung tâm Hoàng thành.*"
+- tapOn: "Summary"
+- extendedWaitUntil:
+    visible: "This build runs in Expo Go.*"
+    timeout: 30000
+- takeScreenshot: khach-05-tom-tat
+- tapOn: "Listen"
+- scroll
+- tapOn: "▶ Listen"
+- extendedWaitUntil:
+    visible: "(Pause|Stop|Your phone has no.*|This device cannot read aloud.*)"
+    timeout: 20000
+- takeScreenshot: khach-06-nghe-thuyet-minh
+- scrollUntilVisible:
+    element: "View 3D"
+    direction: UP
+- tapOn: "View 3D"
+- extendedWaitUntil:
+    visible: "3D model"
+    timeout: 30000
+- extendedWaitUntil:
+    notVisible: "Loading model…"
+    timeout: 60000
+# Trên máy ảo, WebGL phần mềm có thể làm tiến trình vẽ của WebView sập: khi đó app phải quay về bộ ảnh thay vì treo trang trắng.
+- extendedWaitUntil:
+    visible: "(Reset view|This site has no 3D model.*)"
+    timeout: 60000
+- extendedWaitUntil:
+    notVisible: "Loading the 3D model…"
+    timeout: 60000
+- takeScreenshot: khach-07-mo-hinh-3d
+- back
+- scrollUntilVisible:
+    element: "Show on map"
+    direction: UP
+- tapOn: "Show on map"
+- extendedWaitUntil:
+    notVisible: "Loading map…"
+    timeout: 60000
+- assertNotVisible: "The map could not be loaded.*"
+- takeScreenshot: khach-08-ban-do-di-san
+- tapOn: "Home"
+- tapOn: "Map"
+- extendedWaitUntil:
+    notVisible: "Loading map…"
+    timeout: 60000
+- assertNotVisible: "The map could not be loaded.*"
+- takeScreenshot: khach-09-ban-do
+- tapOn: "History"
+- extendedWaitUntil:
+    visible: "Your history"
+    timeout: 30000
+- takeScreenshot: khach-10-lich-su
+- assertVisible: "Listened"
+- assertVisible: "Viewed in 3D"
+- tapOn:
+    text: "Remove this item"
+    index: 0
+- takeScreenshot: khach-11-lich-su-xoa-mot-muc
+- tapOn: "Clear all history"
+- assertVisible: "Clear all search and viewing history.*"
+- takeScreenshot: khach-12-xac-nhan-xoa-het
+- tapOn: "(?i)^clear$"
+- assertVisible: "No history yet.*"
+- takeScreenshot: khach-13-lich-su-trong
