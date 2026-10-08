@@ -76,6 +76,8 @@ export default function StudentLogin() {
         value={studentCode}
         onChangeText={(value) => setStudentCode(normalizeCode(value))}
         placeholder={t('hs.login.codePlaceholder')}
+        // Mã gồm chữ in hoa và số ngẫu nhiên: bàn phím tiếng Việt kiểu Telex biến "UW" thành "Ư", "AS" thành "Á"... nên dùng kiểu nhập không gõ dấu (Android; iOS bỏ qua).
+        keyboardType="visible-password"
         autoCapitalize="characters"
         textContentType="username"
         autoComplete="username"

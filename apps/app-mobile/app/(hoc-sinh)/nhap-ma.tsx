@@ -50,6 +50,8 @@ export default function EnterCode() {
         value={value}
         onChangeText={(text) => setValue(normalizeCode(text))}
         placeholder={t('hs.code.placeholder')}
+        // Mã gồm chữ in hoa và số ngẫu nhiên: bàn phím tiếng Việt kiểu Telex biến "UW" thành "Ư", "AS" thành "Á"... nên dùng kiểu nhập không gõ dấu (Android; iOS bỏ qua).
+        keyboardType="visible-password"
         autoCapitalize="characters"
         returnKeyType="go"
         onSubmitEditing={() => void submit()}
