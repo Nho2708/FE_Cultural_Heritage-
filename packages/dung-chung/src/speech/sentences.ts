@@ -1,11 +1,14 @@
+import { markdownToPlainText } from './plainText';
+
 // Tách chữ thành câu để đọc từng câu và tô sáng câu đang đọc. Dùng Intl.Segmenter của trình duyệt (hiểu dấu câu của cả năm ngôn ngữ, kể
-// cả "。" của tiếng Trung, Nhật); trình duyệt cũ không có thì tách theo dấu kết câu.
+// cả "。" của tiếng Trung, Nhật); trình duyệt cũ không có thì tách theo dấu kết câu. Chữ có ký hiệu Markdown (tóm tắt do AI viết, nội dung di sản) được đưa về văn bản thuần trước,
+// nên giọng đọc không bao giờ đọc ra "##", "**" hay gạch đầu dòng; tiêu đề thành một câu riêng.
 
 const FALLBACK_PATTERN = /[^.!?。！？…]+(?:[.!?。！？…]+["')\]”’」』]*)?\s*/gu;
 
 /** Các câu của đoạn chữ, bỏ khoảng trắng thừa và câu rỗng. Chữ rỗng trả danh sách rỗng. */
 export function splitSentences(text: string, locale: string): string[] {
-  const clean = text.replace(/\s+/g, ' ').trim();
+  const clean = markdownToPlainText(text).replace(/\s+/g, ' ').trim();
   if (clean === '') return [];
   if (typeof Intl !== 'undefined' && 'Segmenter' in Intl) {
     try {
@@ -19,9 +22,9 @@ export function splitSentences(text: string, locale: string): string[] {
   return (clean.match(FALLBACK_PATTERN) ?? [clean]).map((part) => part.trim()).filter(Boolean);
 }
 
-/** Tách bản tóm tắt chi tiết thành các đoạn (cách nhau dòng trống) để hiện ở tab Đọc. */
+/** Tách bản tóm tắt chi tiết thành các đoạn (cách nhau dòng trống) để hiện ở tab Đọc; ký hiệu Markdown nếu có bị bỏ. */
 export function splitParagraphs(text: string): string[] {
-  return text
+  return markdownToPlainText(text)
     .split(/\r?\n\s*\r?\n|\r?\n/)
     .map((part) => part.trim())
     .filter(Boolean);
