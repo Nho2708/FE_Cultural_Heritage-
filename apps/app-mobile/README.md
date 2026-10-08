@@ -115,6 +115,28 @@ src/
 | `npm run export:web` | build thử bản web (`expo export --platform web`) |
 | `npx expo export --platform android` / `ios` | build thử gói JavaScript cho điện thoại |
 
+## Chạy trên điện thoại Android qua cáp hoặc gỡ lỗi không dây (adb reverse)
+
+Cách này cho điện thoại gọi `localhost` như máy tính nên không cần cùng Wi-Fi, không cần mở tường lửa, không cần sửa `.env`.
+
+1. Bật **Tùy chọn nhà phát triển** rồi **Gỡ lỗi USB** (cắm cáp) hoặc **Gỡ lỗi không dây** (cùng Wi-Fi). Không dây: chọn "Ghép nối thiết bị bằng mã ghép nối", rồi trên máy tính chạy
+   `adb pair <ip>:<cổng ghép nối>` và nhập mã; sau đó `adb connect <ip>:<cổng kết nối>` (cổng kết nối hiện ở màn hình Gỡ lỗi không dây và đổi mỗi lần bật lại).
+   Có nhiều thiết bị cùng nối thì mọi lệnh `adb` phải kèm `-s <số hiệu>`.
+2. Chuyển cổng từ điện thoại về máy tính (Metro, backend, web học tập), chạy lại sau mỗi lần nối lại:
+   ```
+   adb -s <số hiệu> reverse tcp:8081 tcp:8081
+   adb -s <số hiệu> reverse tcp:5080 tcp:5080
+   adb -s <số hiệu> reverse tcp:5174 tcp:5174
+   ```
+3. Chạy backend ở cổng 5080 và web học tập ở cổng 5174 (`VITE_API_BASE_URL=http://localhost:5080/api/v1`), rồi Metro trong `apps/app-mobile` với biến môi trường của tiến trình:
+   `EXPO_PUBLIC_API_BASE_URL=http://localhost:5080/api/v1` và `EXPO_PUBLIC_WEB_BASE_URL=http://localhost:5174`, lệnh `npx expo start` (không thêm `--android`).
+4. Mở app trong Expo Go: `adb -s <số hiệu> shell am start -a android.intent.action.VIEW -d exp://127.0.0.1:8081 host.exp.exponent`.
+5. Xong thì `adb -s <số hiệu> reverse --remove-all`.
+
+Lưu ý: Xiaomi/MIUI chặn cài ứng dụng qua adb nếu chưa bật "Cài đặt qua USB" (và đăng nhập tài khoản Xiaomi), nên Maestro, vốn cài trình điều khiển lên điện thoại, sẽ bị "Install canceled by user"; chỉ dùng Maestro trên máy ảo
+hoặc bật "Cài đặt qua USB" trước. Trên MIUI, `adb shell uiautomator dump` có thể bị hệ thống tắt giữa chừng; khi đó đọc cây giao diện bằng `dumpsys activity top` hoặc chụp ảnh `adb exec-out screencap -p`.
+Lệnh `adb shell input text` chỉ gõ được chữ không dấu.
+
 ## Kiểm thử trên máy ảo Android
 
 Chạy app thật trong Expo Go trên máy ảo, đi qua các hành trình chính bằng [Maestro](https://maestro.mobile.dev) rồi báo đạt hoặc không đạt từng luồng.
