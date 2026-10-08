@@ -54,7 +54,9 @@ export default function StudentLogin() {
     } catch (error) {
       const failure = splitApiError<FieldName>(error, ['studentCode', 'password']);
       setErrors(failure.fields);
-      setFormError(unexpectedLoginError(error) ? MESSAGES.systemError : failure.form);
+      setFormError(
+        error instanceof ApiError && error.status === 0 ? t('hs.common.error') : unexpectedLoginError(error) ? MESSAGES.systemError : failure.form,
+      );
       setPassword('');
       setSubmitting(false);
     }

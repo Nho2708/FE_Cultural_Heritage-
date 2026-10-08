@@ -2,6 +2,7 @@ import { clockOffsetMs, hasAnswer, secondsLeft, submissionToSave, unansweredPosi
 import { ApiError, type AttemptQuestion, type QuestionSubmission, type StudentApi, type StudentAttempt, type StudentAttemptResult } from '@dsvhvn/dung-chung/api';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState } from 'react-native';
+import { serverErrorText } from './serverErrorText';
 
 // Phiên làm bài của một lượt (cùng cách làm với web học tập): giữ câu trả lời của em, lưu từng câu lên máy chủ ngay khi em chọn (ghi đè cả câu), thử lại khi mất kết nối,
 // đếm ngược theo giờ máy chủ và tự nộp khi hết giờ, nộp bài. Câu trả lời trên màn hình luôn là bản mới nhất em vừa thao tác; bản lưu trên máy chủ chỉ đuổi theo.
@@ -182,7 +183,7 @@ export function useQuizAttempt(
       const { data } = await apiRef.current.submit(attempt.id);
       finish(data, timeUp.current);
     } catch (error) {
-      if (!finished.current) setSubmitError(error instanceof ApiError ? error.message : messagesRef.current.submitFailed);
+      if (!finished.current) setSubmitError(serverErrorText(error, messagesRef.current.submitFailed));
     } finally {
       setSubmitting(false);
     }

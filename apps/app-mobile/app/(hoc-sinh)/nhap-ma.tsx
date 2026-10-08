@@ -1,11 +1,11 @@
 import { normalizeCode } from '@dsvhvn/dung-chung';
-import { ApiError } from '@dsvhvn/dung-chung/api';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Field } from '../../src/components/Field';
 import { Button, Notice, Screen, Txt } from '../../src/components/ui';
+import { serverErrorText } from '../../src/hocsinh/serverErrorText';
 import { useAuth, useServices } from '../../src/state/AppProvider';
 
 // Nhập mã bài học: em chỉ gõ mã (viết hoa, bỏ khoảng trắng và dấu gạch). Máy chủ kiểm mã, bài đã xuất bản và bài thuộc lớp của em; sai thì báo chung một câu và giới hạn
@@ -32,7 +32,7 @@ export default function EnterCode() {
       setValue('');
       router.push({ pathname: '/bai-hoc/[ma]', params: { ma: code } });
     } catch (failure) {
-      setError(failure instanceof ApiError ? failure.message : t('hs.common.error'));
+      setError(serverErrorText(failure, t('hs.common.error')));
     } finally {
       setLoading(false);
     }

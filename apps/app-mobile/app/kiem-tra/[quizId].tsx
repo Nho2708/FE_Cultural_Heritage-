@@ -8,6 +8,7 @@ import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Badge, Button, ErrorState, Loading, Notice, Screen, Txt, styles as ui } from '../../src/components/ui';
 import { QuizRunner } from '../../src/hocsinh/QuizRunner';
+import { serverErrorText } from '../../src/hocsinh/serverErrorText';
 import { useAuth, useServices } from '../../src/state/AppProvider';
 
 // Làm bài kiểm tra: giới thiệu (tên, số câu, thời gian, giờ đóng, "em chỉ làm một lần", nút theo việc em làm được lúc này), rồi làm bài toàn màn hình theo bố cục của cấp,
@@ -39,8 +40,10 @@ export default function TakeQuiz() {
   const goHome = () => router.replace('/(hoc-sinh)/hoc');
   const finished = (result: StudentAttemptResult) => {
     queryClient.setQueryData(['student', session.user.id, 'result', result.attemptId], result);
-    void queryClient.invalidateQueries({ queryKey: ['student', session.user.id, 'home'] });
-    void queryClient.invalidateQueries({ queryKey: ['student', session.user.id, 'progress'] });
+    // Mọi màn hình đọc kết quả hay trạng thái bài kiểm tra phải lấy lại sau khi nộp (bài học còn ghi "Đang mở", gợi ý còn ghi "chưa có bài làm").
+    for (const part of ['home', 'progress', 'history', 'recommendations', 'lesson']) {
+      void queryClient.invalidateQueries({ queryKey: ['student', session.user.id, part] });
+    }
     void queryClient.invalidateQueries({ queryKey: ['student', session.user.id, 'quiz', quizId] });
     router.replace({ pathname: '/ket-qua/[luot]', params: { luot: String(result.attemptId) } });
   };
@@ -49,7 +52,7 @@ export default function TakeQuiz() {
 
   if (intro.isLoading) return <Loading label={t('hs.common.loading')} />;
   if (intro.isError || !intro.data) {
-    const message = intro.error instanceof ApiError ? intro.error.message : t('hs.common.error');
+    const message = serverErrorText(intro.error, t('hs.common.error'));
     return <ErrorState message={message} retryLabel={t('hs.common.retry')} onRetry={() => void intro.refetch()} />;
   }
   const data: StudentQuizIntro = intro.data;
@@ -68,7 +71,7 @@ export default function TakeQuiz() {
         router.replace({ pathname: '/ket-qua/[luot]', params: { luot: String(data.attemptId) } });
         return;
       }
-      setStartError(error instanceof ApiError ? error.message : t('hs.common.error'));
+      setStartError(serverErrorText(error, t('hs.common.error')));
     } finally {
       setStarting(false);
     }
