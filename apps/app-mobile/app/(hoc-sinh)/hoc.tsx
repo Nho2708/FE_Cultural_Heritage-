@@ -16,7 +16,9 @@ function Mascot({ level }: { level: 1 | 2 | 3 }) {
   if (level === 3) return null;
   return (
     <View style={[local.mascot, { backgroundColor: theme.color.accent, borderRadius: theme.radius.card }]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      <Text style={{ fontSize: level === 1 ? 52 : 34 }}>{level === 1 ? '🐲' : '🧭'}</Text>
+      <Text allowFontScaling={false} style={{ fontSize: level === 1 ? 52 : 34 }}>
+        {level === 1 ? '🐲' : '🧭'}
+      </Text>
     </View>
   );
 }
