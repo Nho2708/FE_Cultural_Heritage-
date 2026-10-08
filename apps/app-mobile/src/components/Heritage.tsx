@@ -1,6 +1,7 @@
 import type { HeritageCard } from '@dsvhvn/dung-chung/api';
 import { useState } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image } from 'expo-image';
+import { StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { cardLine, imageUrl, typeName } from '../guest/format';
 import { useApp } from '../state/AppProvider';
@@ -9,6 +10,9 @@ import { Badge, Card, Notice, Txt } from './ui';
 
 // Thẻ di sản dùng ở trang chủ, tìm kiếm và gợi ý; ảnh thu nhỏ vừa đủ độ rộng, lỗi hoặc không có ảnh thì hiện nền giữ chỗ.
 
+// Wikimedia Commons (nguồn ảnh di sản) từ chối yêu cầu mang tên trình khách mặc định của Android (HTTP 403) nên phải khai tên ứng dụng (Image của React Native không cho đổi User-Agent, expo-image thì được) và địa chỉ liên hệ.
+const IMAGE_HEADERS = { 'User-Agent': 'HocDiSan/0.1 (capstone FA26SE171; quangnho278@gmail.com) React-Native' };
+
 export function Photo({ url, width = 500, height, style }: { url: string | null | undefined; width?: number; height: number; style?: object }) {
   const theme = useTheme();
   const [failed, setFailed] = useState(false);
@@ -16,7 +20,7 @@ export function Photo({ url, width = 500, height, style }: { url: string | null 
   if (!source || failed) {
     return <View style={[{ height, backgroundColor: theme.color.surfaceContainerLow }, style]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants" />;
   }
-  return <Image source={{ uri: source }} style={[{ height, width: '100%', backgroundColor: theme.color.surfaceContainerLow }, style]} resizeMode="cover" onError={() => setFailed(true)} accessibilityIgnoresInvertColors />;
+  return <Image source={{ uri: source, headers: IMAGE_HEADERS }} style={[{ height, width: '100%', backgroundColor: theme.color.surfaceContainerLow }, style]} contentFit="cover" onError={() => setFailed(true)} accessibilityIgnoresInvertColors />;
 }
 
 interface TileProps {

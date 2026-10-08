@@ -1,3 +1,4 @@
+import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { Platform } from 'react-native';
 
 // Quảng cáo có thưởng của Google (AdMob) qua `react-native-google-mobile-ads`. Mô-đun này là mã gốc nên KHÔNG có trong Expo Go: ở đó `require` thất bại và app
@@ -23,7 +24,8 @@ let cached: AdsModule | null | undefined;
 
 function adsModule(): AdsModule | null {
   if (cached !== undefined) return cached;
-  if (Platform.OS === 'web') {
+  // Expo Go không chứa mô-đun quảng cáo: gọi `require` ở đó làm Metro báo lỗi đỏ dù đã bắt, nên không thử.
+  if (Platform.OS === 'web' || Constants.executionEnvironment === ExecutionEnvironment.StoreClient) {
     cached = null;
     return cached;
   }
