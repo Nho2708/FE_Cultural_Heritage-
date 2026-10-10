@@ -1,5 +1,6 @@
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { Platform } from 'react-native';
+import { parseTestDeviceIds } from './testDevices';
 
 // Quảng cáo có thưởng của Google (AdMob) qua `react-native-google-mobile-ads`. Mô-đun này là mã gốc nên KHÔNG có trong Expo Go: ở đó `require` thất bại và app
 // coi như không có quảng cáo (gửi `X-Ads-Unavailable` để máy chủ ở môi trường phát triển mở thẳng, hoặc hiện ghi chú cần bản dựng phát triển).
@@ -58,7 +59,12 @@ export async function showRewardedAd(unitId: string, deviceKey: string, heritage
   try {
     // Hộp đồng ý của Google (UMP) cho khách ở EU và UK; nội dung quảng cáo giới hạn mức phù hợp mọi lứa tuổi.
     await ads.AdsConsent?.gatherConsent().catch(() => undefined);
-    await ads.default().setRequestConfiguration({ maxAdContentRating: ads.MaxAdContentRating.G });
+    // Máy thử khai lúc dựng (EXPO_PUBLIC_ADMOB_TEST_DEVICE_IDS): Google chỉ trả quảng cáo thử cho các máy này, kể cả với đơn vị quảng cáo thật.
+    const testDeviceIdentifiers = parseTestDeviceIds(process.env.EXPO_PUBLIC_ADMOB_TEST_DEVICE_IDS);
+    await ads.default().setRequestConfiguration({
+      maxAdContentRating: ads.MaxAdContentRating.G,
+      ...(testDeviceIdentifiers.length > 0 ? { testDeviceIdentifiers } : {}),
+    });
     await ads.default().initialize();
   } catch {
     return 'failed';
