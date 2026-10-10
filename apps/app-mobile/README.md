@@ -72,6 +72,8 @@ khách xem hết quảng cáo thì app hỏi `GET /public/ads/unlock?slug=` mỗ
 - **Bật AdMob** bằng bản dựng phát triển: `react-native-google-mobile-ads` đã khai trong `package.json` và `app.json` với **mã ứng dụng thử do Google công bố** (`ca-app-pub-3940256099942544~...`). Chạy
   `eas build --profile development --platform android` (hoặc `ios`, cần tài khoản Apple Developer), cài bản dựng lên máy rồi `npx expo start --dev-client`. Đơn vị quảng cáo **không** nằm trong app: lấy từ
   `GET /public/ads/config`; ở môi trường phát triển backend trả **đơn vị thử của Google** (`.../5224354917` Android, `.../1712485313` iOS). Không dùng mã quảng cáo thật khi phát triển và không tự bấm quảng cáo thật (vi phạm chính sách của Google).
+  Bản dựng dùng tài khoản AdMob của nhóm đặt mã ứng dụng lúc dựng bằng biến môi trường `ADMOB_ANDROID_APP_ID`, `ADMOB_IOS_APP_ID` ([`app.config.ts`](app.config.ts)); không đặt thì giữ mã thử.
+  Muốn thử trọn luồng mở khóa với đơn vị thật thì khai điện thoại là **thiết bị thử** trong AdMob (Settings → Test devices) để Google chỉ trả quảng cáo thử.
 - Để lượt xem mở khóa được, backend phải bật `Ads__GateEnabled=true` và địa chỉ `https://<máy chủ công khai>/api/v1/ads/admob/ssv` phải khai ở AdMob (dùng đường hầm khi chạy trên máy cá nhân); khách có hộp đồng ý UMP của Google ở EU và UK, nội dung giới hạn mức G.
 
 Bản APK dùng API `http://` (không `https://`) cần cho phép cleartext (plugin `expo-build-properties`, `android.usesCleartextTraffic`); Expo Go không cần.

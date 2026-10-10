@@ -10,3 +10,7 @@ expo-env.d.ts
 *.p12
 *.key
 *.mobileprovision
+
+# Thư mục native sinh ra bởi expo prebuild khi dựng tại máy (không lưu vào kho)
+/android
+/ios
