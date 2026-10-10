@@ -73,7 +73,12 @@ khách xem hết quảng cáo thì app hỏi `GET /public/ads/unlock?slug=` mỗ
   `eas build --profile development --platform android` (hoặc `ios`, cần tài khoản Apple Developer), cài bản dựng lên máy rồi `npx expo start --dev-client`. Đơn vị quảng cáo **không** nằm trong app: lấy từ
   `GET /public/ads/config`; ở môi trường phát triển backend trả **đơn vị thử của Google** (`.../5224354917` Android, `.../1712485313` iOS). Không dùng mã quảng cáo thật khi phát triển và không tự bấm quảng cáo thật (vi phạm chính sách của Google).
   Bản dựng dùng tài khoản AdMob của nhóm đặt mã ứng dụng lúc dựng bằng biến môi trường `ADMOB_ANDROID_APP_ID`, `ADMOB_IOS_APP_ID` ([`app.config.ts`](app.config.ts)); không đặt thì giữ mã thử.
-  Muốn thử trọn luồng mở khóa với đơn vị thật thì khai điện thoại là **thiết bị thử** trong AdMob (Settings → Test devices) để Google chỉ trả quảng cáo thử.
+  Muốn thử trọn luồng mở khóa với đơn vị thật thì khai điện thoại là **thiết bị thử** trong AdMob (Settings → Test devices) để Google chỉ trả quảng cáo thử, hoặc đặt
+  `EXPO_PUBLIC_ADMOB_TEST_DEVICE_IDS` lúc dựng bằng mã băm mà SDK in ra log ("Use RequestConfiguration.Builder().setTestDeviceIds(...)").
+- **Dựng APK tại máy** (không cần tài khoản Expo): đặt các biến trên cùng `EXPO_PUBLIC_API_BASE_URL` (địa chỉ HTTPS công khai của backend, vd đường hầm ngrok), chạy
+  `npx expo prebuild --platform android --no-install` rồi trong `android/` chạy `gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a`; tệp ra ở `android/app/build/outputs/apk/release/`.
+  Trên Windows phải bật đường dẫn dài (`LongPathsEnabled` = 1), vì đường dẫn biên dịch của reanimated dài tới 260 ký tự và ninja sẽ báo "build.ninja still dirty". `prebuild` sửa script
+  `android`, `ios` trong `package.json`: trả lại bằng `git checkout -- package.json`.
 - Để lượt xem mở khóa được, backend phải bật `Ads__GateEnabled=true` và địa chỉ `https://<máy chủ công khai>/api/v1/ads/admob/ssv` phải khai ở AdMob (dùng đường hầm khi chạy trên máy cá nhân); khách có hộp đồng ý UMP của Google ở EU và UK, nội dung giới hạn mức G.
 
 Bản APK dùng API `http://` (không `https://`) cần cho phép cleartext (plugin `expo-build-properties`, `android.usesCleartextTraffic`); Expo Go không cần.
