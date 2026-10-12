@@ -2,7 +2,7 @@ import { formatDateTime } from '../format';
 import type { LessonImageCredit, StudentHeritageCard, StudentQuiz, StudentQuizState } from '../api';
 import { Badge, Button, Icon, TextLink, type BadgeTone } from '../ui';
 import { useState } from 'react';
-import { canOpenQuiz, paragraphsOf, quizActionLabel } from './lessonData';
+import { canOpenQuiz, imageCreditLine, paragraphsOf, quizActionLabel } from './lessonData';
 import { useLessonLinks } from './lessonLinks';
 
 // Phần dùng chung của ba bố cục bài học: đoạn văn, hình kèm chú thích và ghi công, danh sách bài kiểm tra kèm trạng thái với
@@ -20,11 +20,6 @@ export function Paragraphs({ text, className }: { text: string | null | undefine
   );
 }
 
-function creditOf(image: LessonImageCredit | null): string {
-  if (!image) return '';
-  return [image.credit, image.author, image.license, image.source].filter(Boolean).join(' · ');
-}
-
 /** Hình kèm chú thích; ghi công nằm dưới chú thích, luôn hiện đủ để tôn trọng giấy phép ảnh. */
 export function LessonFigure({
   url,
@@ -38,7 +33,7 @@ export function LessonFigure({
   className?: string;
 }) {
   if (!url) return null;
-  const credit = creditOf(image);
+  const credit = imageCreditLine(image);
   return (
     <figure className={className}>
       <img src={url} alt={caption ?? image?.caption ?? ''} loading="lazy" className="w-full rounded-md object-cover" />

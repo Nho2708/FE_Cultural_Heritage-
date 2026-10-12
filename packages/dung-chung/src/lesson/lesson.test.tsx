@@ -1,9 +1,9 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it } from 'vitest';
-import type { SchoolLevel, StudentLesson, StudentQuiz } from '../api';
+import type { LessonImageCredit, SchoolLevel, StudentLesson, StudentQuiz } from '../api';
 import { LEARNING_THEMES } from '../theme';
-import { canOpenQuiz, canTakeQuiz, milestonesOf, paragraphsOf, quizActionLabel, sectionsOf } from './lessonData';
+import { canOpenQuiz, canTakeQuiz, imageCreditLine, milestonesOf, paragraphsOf, quizActionLabel, sectionsOf } from './lessonData';
 import { LessonLinksProvider } from './LessonLinksProvider';
 import { NO_LESSON_LINKS, type LessonLinks, type LessonQuizDialogProps } from './lessonLinks';
 import { lessonScopeStyle } from './lessonScopeStyle';
@@ -140,5 +140,31 @@ describe('bộ giao diện của một cấp ghi trên một khối', () => {
     expect(scope).not.toBeNull();
     expect(scope.style.getPropertyValue('--dsv-color-primary')).toBe(LEARNING_THEMES['cap-2'].color.primary);
     expect(document.documentElement.getAttribute('data-bo-giao-dien')).toBeNull();
+  });
+});
+
+describe('dòng ghi công của hình', () => {
+  const image: LessonImageCredit = { caption: null, credit: 'Daderot · CC0 · Wikimedia Commons', author: 'Daderot', license: 'CC0', source: 'Wikimedia Commons' };
+
+  it('dùng dòng máy chủ đã ghép sẵn, không nối thêm ba phần (tránh lặp "… · Daderot · CC0 · Wikimedia Commons" hai lần)', () => {
+    expect(imageCreditLine(image)).toBe('Daderot · CC0 · Wikimedia Commons');
+  });
+
+  it('không có dòng ghép sẵn thì ghép từ ba phần, bỏ phần trống; không có hình thì rỗng', () => {
+    expect(imageCreditLine({ ...image, credit: null })).toBe('Daderot · CC0 · Wikimedia Commons');
+    expect(imageCreditLine({ ...image, credit: '  ', license: null })).toBe('Daderot · Wikimedia Commons');
+    // Dữ liệu cũ: dòng ghi công tự do kèm một phần riêng chưa có trong dòng đó thì nối thêm phần đó.
+    expect(imageCreditLine({ credit: 'Quần thể di tích Cố đô Huế', author: null, license: 'CC BY-SA', source: null })).toBe('Quần thể di tích Cố đô Huế · CC BY-SA');
+    expect(imageCreditLine({ credit: null, author: null, license: null, source: null })).toBe('');
+    expect(imageCreditLine(null)).toBe('');
+  });
+
+  it('hình trong bài học cấp 2 hiện ghi công đúng một lần', () => {
+    const lesson = lessonOf(2, {
+      sections: [{ type: 'IMAGE', title: null, body: 'Cổng Ngọ Môn', imageUrl: 'https://anh.test/ngo-mon.jpg', image, milestoneYear: null, milestoneLabel: null, eventId: null, sourceCitation: null, sortOrder: 1 }],
+    });
+    show(lesson, REAL_LINKS);
+    const caption = document.querySelector('figcaption')!;
+    expect(caption.textContent).toBe('Cổng Ngọ Môn (Daderot · CC0 · Wikimedia Commons)');
   });
 });

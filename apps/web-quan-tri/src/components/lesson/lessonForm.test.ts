@@ -1,6 +1,6 @@
 import type { LessonFrame, LessonDetail } from '@dsvhvn/dung-chung/api';
 import { describe, expect, it } from 'vitest';
-import { applyDraft, bodyOf, checkForm, formOf, isDirty, mainWordCount, moveItem, newSection, sectionErrors } from './lessonForm';
+import { applyDraft, bodyOf, checkForm, creditLine, formOf, isDirty, mainWordCount, moveItem, newSection, sectionErrors } from './lessonForm';
 import { draftOf, frameOf, lessonOf, sectionOf } from '../../test/lessonFixtures';
 
 // Biểu mẫu Soạn bài học: đổi qua lại với dữ liệu máy chủ, kiểm điều kiện xuất bản theo khung của từng cấp.
@@ -137,5 +137,13 @@ describe('lỗi theo phần', () => {
     expect(errors.get(1)).toBe('Thiếu nội dung.');
     expect(errors.get(0)).toBe('Sai loại.');
     expect(errors.size).toBe(2);
+  });
+});
+
+describe('dòng ghi công của hình', () => {
+  it('dòng máy chủ đã ghép sẵn được dùng nguyên, không nối thêm tác giả, giấy phép, nguồn lần nữa', () => {
+    const image = { credit: 'Daderot · CC0 · Wikimedia Commons', author: 'Daderot', license: 'CC0', source: 'Wikimedia Commons' };
+    expect(creditLine(image)).toBe('Daderot · CC0 · Wikimedia Commons');
+    expect(creditLine({ ...image, credit: null })).toBe('Daderot · CC0 · Wikimedia Commons');
   });
 });
