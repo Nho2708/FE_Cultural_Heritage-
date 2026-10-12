@@ -1,10 +1,54 @@
-# Từ trạng thái sạch tới màn hình đăng nhập học sinh (giao diện tiếng Việt).
-# Cần: mo-app.yaml đã chạy.
+# Đưa app tới màn hình đăng nhập học sinh (giao diện tiếng Việt) từ bất kỳ trạng thái nào sau mo-app.yaml: lần mở đầu (chọn Tiếng Việt rồi Học sinh),
+# đang ở chế độ Khách (Cài đặt → chuyển sang chế độ Học sinh), đã đăng nhập (đăng xuất), hoặc màn đổi mật khẩu bắt buộc còn dở (đặt NEW_PASSWORD rồi đăng xuất).
 appId: host.exp.exponent
 ---
-- tapOn: "Tiếng Việt"
-- assertVisible: "Em sẽ dùng app thế nào.*|Bạn sẽ dùng app thế nào.*|.*dùng app.*"
-- tapOn:
-    text: "Học sinh"
-    index: 1
-- assertVisible: "Học sinh đăng nhập"
+- runFlow:
+    when:
+      visible: "(Choose a language|Chọn ngôn ngữ|언어 선택|选择语言|言語を選択)"
+    commands:
+      - tapOn: "Tiếng Việt"
+      - assertVisible: "Bạn dùng app như thế nào.*"
+      - tapOn:
+          text: "Học sinh"
+          index: 1
+- runFlow:
+    when:
+      visible: "(Home|Trang chủ|홈|首页|ホーム)"
+    commands:
+      - tapOn: "(History|Lịch sử|기록|历史|履歴)"
+      - scrollUntilVisible:
+          element: "(Switch to Student mode|Chuyển sang chế độ Học sinh|학생 모드로 전환|切换到学生模式|生徒モードに切り替える)"
+          timeout: 30000
+      - tapOn: "(Switch to Student mode|Chuyển sang chế độ Học sinh|학생 모드로 전환|切换到学生模式|生徒モードに切り替える)"
+- runFlow:
+    when:
+      visible: "Đặt mật khẩu và bắt đầu học"
+    commands:
+      - tapOn:
+          text: "Mật khẩu mới"
+          index: 1
+      - inputText: ${NEW_PASSWORD}
+      - hideKeyboard
+      - tapOn:
+          text: "Nhập lại mật khẩu mới"
+          index: 1
+      - inputText: ${NEW_PASSWORD}
+      - hideKeyboard
+      - tapOn: "Đặt mật khẩu và bắt đầu học"
+      - extendedWaitUntil:
+          visible: "Của em"
+          timeout: 30000
+- runFlow:
+    when:
+      visible: "Của em"
+    commands:
+      - tapOn: "Của em"
+      - runFlow:
+          when:
+            visible: "Đăng xuất"
+          commands:
+            - tapOn: "Đăng xuất"
+            - tapOn: "Đồng ý"
+- extendedWaitUntil:
+    visible: "Học sinh đăng nhập"
+    timeout: 20000

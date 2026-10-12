@@ -156,16 +156,25 @@ Các luồng nằm ở [`e2e/`](e2e/) (YAML, mở app qua `exp://10.0.2.2:8083`)
 | Luồng | Nội dung |
 |---|---|
 | `khach-tham-quan` | chọn tiếng Anh và chế độ Khách, trang chủ, tìm "thang long", chi tiết, tóm tắt, nghe, xem 3D, bản đồ, lịch sử (xoá từng mục và xoá hết) |
+| `khach-dong-thoi-gian` | hai thẻ Bản đồ, Dòng thời gian trên trang chủ; màn chọn di sản (tìm nhanh, từ khóa ngắn); dòng thời gian một di sản; tab Dòng thời gian |
+| `khach-ban-do` | bản đồ: chip loại, vùng; bảng Thêm bộ lọc (tỉnh, cấp xếp hạng, thời kỳ); nút Gần bạn trên bản đồ; nút mở dòng thời gian trong thẻ ghim |
+| `khach-goi-y` | Gợi ý cho bạn ở trang chủ và cuối trang chi tiết; màn Xem tất cả với tab Gợi ý và Gần bạn (xin quyền khi bấm; điện thoại đã cấp quyền thì thấy khoảng cách) |
+| `khach-cai-dat` | Cài đặt: mục Quảng cáo trong Expo Go (không có nút mở lại lựa chọn, app giải thích), phiên bản và kênh, địa chỉ máy chủ |
+| `khach-ngon-ngu` | đổi ngôn ngữ trong Cài đặt: Hàn, Nhật, Trung giản thể rồi Việt; chụp trang chủ, tìm kiếm, bản đồ, dòng thời gian, lịch sử từng ngôn ngữ |
 | `hoc-sinh-dang-nhap-sai` | bỏ trống và nhập sai mật khẩu |
+| `hoc-sinh-kham-pha` | học sinh khối 8: tab Khám phá (không có lịch sử, gợi ý, Gần bạn), bản đồ và dòng thời gian mở riêng, tìm kiếm, chi tiết không có khối gợi ý |
+| `hoc-sinh-ma-gan-day` | học sinh khối 3: bài cấp 1 có thanh tiến độ theo bước, công tắc Tự đọc to tắt bật; mã vừa mở hiện ở "Mã em đã mở gần đây", chạm để mở lại |
 | `hoc-sinh-khoi-3` | cấp 1: đăng nhập mật khẩu tạm, đổi mật khẩu bắt buộc, nhập mã bài học, học từng bước, bài chơi bốn dạng câu, kết quả bằng sao |
 | `hoc-sinh-khoi-11` | cấp 3: bài dạng tài liệu, bài kiểm tra có giờ ba dạng câu, điểm và phân tích |
+| `khach-gan-ban-tu-choi` | (không chạy mặc định) khách từ chối quyền vị trí: app báo và vẫn cho thử lại; cần Expo Go chưa có quyền vị trí (máy ảo mới hoặc đã `pm revoke`, cấp lại sau) |
 
 **Chạy một lệnh** (PowerShell 7, từ thư mục gốc FE; cần cổng 5080, 5174, 8083 đang rảnh):
 
 ```powershell
-pwsh -File apps/app-mobile/scripts/chay-kiem-thu-may-ao.ps1                          # mọi luồng
+pwsh -File apps/app-mobile/scripts/chay-kiem-thu-may-ao.ps1                          # mọi luồng trên máy ảo
 pwsh -File apps/app-mobile/scripts/chay-kiem-thu-may-ao.ps1 -Flows khach-tham-quan   # một luồng
 pwsh -File apps/app-mobile/scripts/chay-kiem-thu-may-ao.ps1 -KeepRunning             # giữ máy ảo, dịch vụ và cơ sở dữ liệu tạm để xem lại
+pwsh -File apps/app-mobile/scripts/chay-kiem-thu-may-ao.ps1 -RealDevice              # điện thoại thật đang nối adb (xem bên dưới)
 ```
 
 Script làm lần lượt: bật máy ảo `dsvhvn_pixel` (tự tạo AVD pixel_7 nếu chưa có; dùng `-gpu host` vì GPU phần mềm làm WebGL của trình xem 3D sập), chạy backend trên **cơ sở dữ liệu tạm**
@@ -178,6 +187,23 @@ chạy từng luồng Maestro (xoá dữ liệu Expo Go trước mỗi luồng, 
 Chạy tay từng phần khi sửa lỗi: bật máy ảo, `adb shell pm clear host.exp.exponent`, giữ Metro đang chạy, rồi
 `maestro --device emulator-5554 test -e STUDENT_CODE=... apps/app-mobile/e2e/<luồng>.yaml`. Lệnh `maestro` cần biến `JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8` để đọc đúng chữ có dấu.
 Luồng học sinh dùng tài khoản một lần (đăng nhập lần đầu đổi mật khẩu, bài kiểm tra chỉ làm một lần) nên mỗi lần chạy phải nạp dữ liệu mới.
+Địa chỉ Metro nhìn từ thiết bị đi vào luồng bằng biến `METRO_URL` (mặc định `exp://10.0.2.2:8083` của máy ảo; điện thoại thật qua adb reverse truyền `-e METRO_URL=exp://127.0.0.1:8083`).
+
+### Chạy các luồng trên điện thoại thật (`-RealDevice`)
+
+Cùng script, thêm `-RealDevice` (và `-Serial <số hiệu>` nếu nối nhiều máy). Script không bật máy ảo, không đổi cài đặt nào của điện thoại và **không xoá dữ liệu Expo Go**:
+điện thoại gọi máy tính qua `adb reverse` (backend, web học tập, Metro đều là `localhost` trên điện thoại), các luồng tự đưa app về trạng thái cần từ bất kỳ trạng thái nào
+(`e2e/chung/vao-khach.yaml`: về chế độ Khách với ngôn ngữ cho trước; `vao-hoc-sinh.yaml`: về màn đăng nhập học sinh, kể cả khi đang đăng nhập hay đang dở màn đổi mật khẩu bắt buộc).
+Xong thì script đóng Expo Go và bỏ các cổng đã chuyển. Đã chạy xanh cả 11 luồng trên Xiaomi Redmi Note 10 Pro (Android 13, MIUI) qua gỡ lỗi không dây.
+
+Lưu ý riêng khi dùng điện thoại:
+- Maestro cài lại trình điều khiển của nó mỗi lần chạy; MIUI hiện hộp "Cài đặt qua USB" và tự từ chối sau 10 giây. Bật "Cài đặt qua USB" trong Tùy chọn nhà phát triển và
+  bấm "Cài đặt" khi hộp hiện (tích "Nhớ lựa chọn của tôi" nếu muốn khỏi hỏi lại), nếu không Maestro báo `INSTALL_FAILED_USER_RESTRICTED`.
+- Nút bánh răng nổi của Expo Go kéo được và nhận cả vuốt; nó che góc phải trên và làm luồng chạm nhầm. Tắt nó trong menu nhà phát triển của Expo Go (lắc máy → "Tools button") trong lúc chạy, xong bật lại.
+- Màn hình điện thoại cao hơn máy ảo nên nhiều phần nằm dưới mép: luồng dùng `scrollUntilVisible` thay cho `assertVisible` với phần ở cuối trang, và không dùng `hideKeyboard`
+  sau phím Enter (bàn phím đã đóng thì Maestro gửi phím Back và thanh tab nhảy về Trang chủ). Hàng chip cuộn ngang vuốt bằng `swipe` bắt đầu cách mép màn hình (MIUI coi vuốt từ mép là Quay lại).
+- Luồng `khach-goi-y` và `khach-ban-do` dùng quyền vị trí đã cấp cho Expo Go (không hỏi lại); đường từ chối quyền ở `khach-gan-ban-tu-choi.yaml`, chạy tay sau khi `pm revoke` và cấp lại sau.
+- Tài khoản học sinh "mới" dùng một lần: chạy lại `hoc-sinh-khoi-3` hay `hoc-sinh-khoi-11` thì tạo học sinh mới bằng tài khoản giáo viên trong tệp dữ liệu thử hoặc chạy lại script.
 
 **Lưu ý khi chạy với máy ảo hoặc điện thoại:**
 - Máy tính là `10.0.2.2` trong máy ảo. Web học tập phải chạy với `VITE_API_BASE_URL=http://10.0.2.2:5080/api/v1` (trang bản đồ và 3D trong WebView gọi API từ chính địa chỉ này), `npm run dev:hoc-tap -- --host`

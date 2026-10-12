@@ -1,18 +1,25 @@
-﻿# Kiểm thử app trên máy ảo Android: bật máy ảo, backend trên cơ sở dữ liệu TẠM, nạp dữ liệu thử, web học tập, Metro, chạy các luồng Maestro, dọn dẹp.
+# Kiểm thử app trên máy ảo Android hoặc điện thoại thật: bật máy ảo (hoặc nối điện thoại qua adb), backend trên cơ sở dữ liệu TẠM, nạp dữ liệu thử,
+# web học tập, Metro, chạy các luồng Maestro, dọn dẹp.
 #
 # Dùng:
-#   pwsh -File apps/app-mobile/scripts/chay-kiem-thu-may-ao.ps1                       # chạy mọi luồng
+#   pwsh -File apps/app-mobile/scripts/chay-kiem-thu-may-ao.ps1                       # chạy mọi luồng trên máy ảo
 #   pwsh -File apps/app-mobile/scripts/chay-kiem-thu-may-ao.ps1 -Flows khach-tham-quan # chỉ một luồng (tên tệp trong e2e, không đuôi .yaml)
 #   pwsh -File ... -KeepRunning                                                        # chạy xong không tắt dịch vụ, không xoá cơ sở dữ liệu tạm
+#   pwsh -File ... -RealDevice [-Serial 192.168.1.6:40389]                             # điện thoại thật đã nối adb (cáp hoặc gỡ lỗi không dây), Expo Go đã cài
 #
 # Cần sẵn: Android SDK (%LOCALAPPDATA%\Android\Sdk) có emulator và system image, AVD (script tự tạo nếu chưa có), .NET SDK, Node, Python, SQL Server LocalDB, Java 17.
 # Maestro: script tự tải bản mới nhất từ GitHub (mobile-dev-inc/maestro) vào %USERPROFILE%\tools\maestro nếu chưa có.
-# Quan trọng: script CHỈ thao tác trên máy ảo (emulator-5554), không đụng tới điện thoại thật đang cắm hoặc kết nối không dây.
+#
+# Máy ảo: script chỉ thao tác trên emulator-5554, không đụng tới điện thoại thật đang cắm. Trước mỗi luồng xoá dữ liệu Expo Go (`pm clear`) để app ở trạng thái sạch.
+# Điện thoại thật (-RealDevice): không bật máy ảo, không đổi cài đặt nào của máy, KHÔNG xoá dữ liệu app (các luồng tự đưa app về trạng thái cần từ bất kỳ trạng thái nào:
+# qua màn chọn ngôn ngữ, đổi chế độ, đăng xuất); điện thoại gọi máy tính qua `adb reverse` nên backend, web học tập và Metro đều là `localhost` trên điện thoại.
 [CmdletBinding()]
 param(
-    [string[]] $Flows = @('khach-tham-quan', 'hoc-sinh-dang-nhap-sai', 'hoc-sinh-khoi-3', 'hoc-sinh-khoi-11'),
+    [string[]] $Flows = @('khach-tham-quan', 'khach-dong-thoi-gian', 'khach-ban-do', 'khach-goi-y', 'khach-cai-dat', 'khach-ngon-ngu', 'hoc-sinh-dang-nhap-sai', 'hoc-sinh-kham-pha', 'hoc-sinh-ma-gan-day', 'hoc-sinh-khoi-3', 'hoc-sinh-khoi-11'),
     [string] $AvdName = 'dsvhvn_pixel',
-    [string] $Serial = 'emulator-5554',
+    # Số hiệu thiết bị adb. Máy ảo mặc định emulator-5554; điện thoại thật bỏ trống thì script tự lấy thiết bị thật duy nhất đang nối.
+    [string] $Serial = '',
+    [switch] $RealDevice,
     [switch] $KeepRunning
 )
 
@@ -27,11 +34,15 @@ $work = Join-Path $env:TEMP ("dsvhvn-e2e-" + (Get-Date -Format 'yyyyMMddHHmmss')
 New-Item -ItemType Directory -Force $work | Out-Null
 $started = New-Object System.Collections.Generic.List[int]
 $startedEmulator = $false
+$reversed = $false
 $dbName = 'dsvhvn_tam_app_' + (Get-Date -Format 'yyyyMMddHHmm')
 $adminPassword = 'Tm' + ([guid]::NewGuid().ToString('N').Substring(0, 10)) + 'Aa1'
+# Máy tính nhìn từ thiết bị: máy ảo thấy máy tính ở 10.0.2.2; điện thoại thật đi qua `adb reverse` nên gọi localhost của chính nó.
+$pcHost = if ($RealDevice) { 'localhost' } else { '10.0.2.2' }
+$metroUrl = if ($RealDevice) { 'exp://127.0.0.1:8083' } else { 'exp://10.0.2.2:8083' }
+if (-not $Serial -and -not $RealDevice) { $Serial = 'emulator-5554' }
 
 $env:ANDROID_HOME = $sdk
-$env:ANDROID_SERIAL = $Serial
 $env:PATH = "$sdk\platform-tools;$sdk\emulator;$maestroHome\bin;$env:PATH"
 $env:JAVA_TOOL_OPTIONS = '-Dfile.encoding=UTF-8 -Dstdout.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8'
 $env:MAESTRO_CLI_NO_ANALYTICS = '1'
@@ -81,6 +92,22 @@ function Prepare-Emulator {
     foreach ($setting in 'window_animation_scale', 'transition_animation_scale', 'animator_duration_scale') { & adb -s $Serial shell settings put global $setting 0 | Out-Null }
 }
 
+# Điện thoại thật: lấy số hiệu nếu chưa truyền (thiết bị thật duy nhất đang nối), kiểm Expo Go đã cài, rồi chuyển ba cổng của điện thoại về máy tính.
+function Prepare-RealDevice {
+    $devices = @((& adb devices) | Select-String -Pattern '^(\S+)\s+device$' | ForEach-Object { $_.Matches[0].Groups[1].Value } | Where-Object { $_ -notmatch '^emulator-' })
+    if (-not $Serial) {
+        if ($devices.Count -eq 0) { throw 'Không thấy điện thoại nào nối adb (adb devices). Bật Gỡ lỗi USB hoặc Gỡ lỗi không dây rồi `adb connect <ip>:<cổng>`.' }
+        if ($devices.Count -gt 1) { throw "Có $($devices.Count) điện thoại đang nối ($($devices -join ', ')): truyền -Serial để chọn một." }
+        $script:Serial = $devices[0]
+    }
+    elseif ($devices -notcontains $Serial) { throw "Điện thoại $Serial chưa nối hoặc chưa sẵn sàng (adb devices)." }
+    Write-Host "Điện thoại thật: $Serial ($(& adb -s $Serial shell getprop ro.product.model))"
+    if (-not ((& adb -s $Serial shell pm list packages host.exp.exponent) -match 'host.exp.exponent')) { throw 'Điện thoại chưa cài Expo Go: cài từ Google Play (bản hỗ trợ SDK 57) rồi chạy lại.' }
+    Step 'Chuyển cổng điện thoại về máy tính (adb reverse)'
+    foreach ($port in 5080, 5174, 8083) { & adb -s $Serial reverse "tcp:$port" "tcp:$port" | Out-Null }
+    $script:reversed = $true
+}
+
 function Ensure-ExpoGo {
     if ((& adb -s $Serial shell pm list packages host.exp.exponent) -match 'host.exp.exponent') { return }
     # Không dùng `expo start --android`: khi có điện thoại thật cắm adb, Expo CLI mở Expo Go trên điện thoại thay vì máy ảo.
@@ -110,6 +137,11 @@ function Cleanup {
     foreach ($id in $started) { Stop-Tree $id }
     foreach ($port in 5080, 5174, 8083) { Stop-Port $port }
     if ($startedEmulator) { & adb -s $Serial emu kill 2>$null | Out-Null }
+    if ($reversed) {
+        # Điện thoại thật: đóng app và bỏ các cổng đã chuyển, không đụng gì khác trên máy.
+        & adb -s $Serial shell am force-stop host.exp.exponent 2>$null | Out-Null
+        foreach ($port in 5080, 5174, 8083) { & adb -s $Serial reverse --remove "tcp:$port" 2>$null | Out-Null }
+    }
     & sqlcmd -S '(localdb)\MSSQLLocalDB' -Q "IF DB_ID('$dbName') IS NOT NULL BEGIN ALTER DATABASE [$dbName] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [$dbName]; END" 2>$null | Out-Null
     Write-Host "Đã tắt tiến trình đã bật và xoá cơ sở dữ liệu tạm $dbName."
 }
@@ -121,8 +153,14 @@ foreach ($port in 5080, 5174, 8083) {
 try {
     Ensure-Maestro
     & adb start-server | Out-Null
-    Ensure-Emulator
-    Prepare-Emulator
+    if ($RealDevice) {
+        Prepare-RealDevice
+    }
+    else {
+        Ensure-Emulator
+        Prepare-Emulator
+    }
+    $env:ANDROID_SERIAL = $Serial
 
     Step "Backend trên cơ sở dữ liệu tạm $dbName"
     $env:ConnectionStrings__Default = "Server=(localdb)\MSSQLLocalDB;Database=$dbName;Trusted_Connection=True;TrustServerCertificate=True"
@@ -149,34 +187,44 @@ try {
     $data = Get-Content $fixture -Raw -Encoding utf8 | ConvertFrom-Json
 
     Step 'Web học tập (trang nhúng bản đồ, 3D)'
-    $env:VITE_API_BASE_URL = 'http://10.0.2.2:5080/api/v1'
+    $env:VITE_API_BASE_URL = "http://${pcHost}:5080/api/v1"
     Start-Background 'cmd' '/c npm run dev:hoc-tap -- --host' $feRoot (Join-Path $work 'web') | Out-Null
     Wait-Until { (Invoke-WebRequest 'http://localhost:5174/' -UseBasicParsing -TimeoutSec 5).StatusCode -eq 200 } 120 'web học tập sẵn sàng'
 
     Step 'Metro (Expo) cho app'
-    $env:EXPO_PUBLIC_API_BASE_URL = 'http://10.0.2.2:5080/api/v1'
-    $env:EXPO_PUBLIC_WEB_BASE_URL = 'http://10.0.2.2:5174'
+    $env:EXPO_PUBLIC_API_BASE_URL = "http://${pcHost}:5080/api/v1"
+    $env:EXPO_PUBLIC_WEB_BASE_URL = "http://${pcHost}:5174"
     $env:EXPO_NO_TELEMETRY = '1'
-    Ensure-ExpoGo
+    if (-not $RealDevice) { Ensure-ExpoGo }
     Start-Background 'cmd' '/c npx expo start --port 8083' $appDir (Join-Path $work 'metro') | Out-Null
     Wait-Until { (Get-Content "$work\metro.out" -Raw -ErrorAction SilentlyContinue) -match 'Waiting on http://localhost:8083' } 300 'Metro sẵn sàng (gói được dựng khi luồng đầu tiên mở app)'
 
     $e2e = Join-Path $appDir 'e2e'
+    $newPassword = 'EmHocDiSan2026'
     $envFor = @{
         'khach-tham-quan'        = @()
+        'khach-dong-thoi-gian'   = @()
+        'khach-ban-do'           = @()
+        'khach-goi-y'            = @()
+        'khach-cai-dat'          = @()
+        'khach-ngon-ngu'         = @()
         'hoc-sinh-dang-nhap-sai' = @("STUDENT_CODE=$($data.students.quen3.studentCode)")
-        'hoc-sinh-khoi-3'        = @("STUDENT_CODE=$($data.students.moi3.studentCode)", "STUDENT_PASSWORD=$($data.students.moi3.password)", 'NEW_PASSWORD=EmHocDiSan2026', "LESSON_CODE=$($data.lessons.'3'.code)")
-        'hoc-sinh-khoi-11'       = @("STUDENT_CODE=$($data.students.moi11.studentCode)", "STUDENT_PASSWORD=$($data.students.moi11.password)", 'NEW_PASSWORD=EmHocDiSan2026', "LESSON_CODE=$($data.lessons.'11'.code)")
+        'hoc-sinh-kham-pha'      = @("STUDENT_CODE=$($data.students.quen8.studentCode)", "STUDENT_PASSWORD=$($data.students.quen8.password)")
+        'hoc-sinh-ma-gan-day'    = @("STUDENT_CODE=$($data.students.quen3.studentCode)", "STUDENT_PASSWORD=$($data.students.quen3.password)", "LESSON_CODE=$($data.lessons.'3'.code)")
+        'hoc-sinh-khoi-3'        = @("STUDENT_CODE=$($data.students.moi3.studentCode)", "STUDENT_PASSWORD=$($data.students.moi3.password)", "NEW_PASSWORD=$newPassword", "LESSON_CODE=$($data.lessons.'3'.code)")
+        'hoc-sinh-khoi-11'       = @("STUDENT_CODE=$($data.students.moi11.studentCode)", "STUDENT_PASSWORD=$($data.students.moi11.password)", "NEW_PASSWORD=$newPassword", "LESSON_CODE=$($data.lessons.'11'.code)")
     }
     foreach ($flow in $Flows) {
         Step "Luồng $flow"
         $outDir = Join-Path $work "ket-qua\$flow"
-        $maestroArgs = @('--device', $Serial, 'test', '--test-output-dir', $outDir)
-        foreach ($pair in $envFor[$flow]) { $maestroArgs += @('-e', $pair) }
+        # Địa chỉ Metro nhìn từ thiết bị đi vào luồng bằng biến METRO_URL (luồng mặc định là địa chỉ của máy ảo). NEW_PASSWORD để luồng tự thoát màn đổi mật khẩu bắt buộc còn dở từ lần chạy trước.
+        $maestroArgs = @('--device', $Serial, 'test', '--test-output-dir', $outDir, '-e', "METRO_URL=$metroUrl", '-e', "NEW_PASSWORD=$newPassword")
+        foreach ($pair in $envFor[$flow]) { if ($pair -notlike 'NEW_PASSWORD=*') { $maestroArgs += @('-e', $pair) } }
         $maestroArgs += (Join-Path $e2e "$flow.yaml")
         $passed = $false
         for ($attempt = 1; $attempt -le 3 -and -not $passed; $attempt++) {
-            & adb -s $Serial shell pm clear host.exp.exponent | Out-Null
+            # Máy ảo: xoá dữ liệu Expo Go để app ở trạng thái sạch. Điện thoại thật: không xoá dữ liệu của máy, luồng tự đưa app về trạng thái cần.
+            if (-not $RealDevice) { & adb -s $Serial shell pm clear host.exp.exponent | Out-Null }
             $log = Join-Path $work "maestro-$flow-$attempt.txt"
             & "$maestroHome\bin\maestro.bat" @maestroArgs *> $log
             if ($LASTEXITCODE -eq 0) { $passed = $true; break }

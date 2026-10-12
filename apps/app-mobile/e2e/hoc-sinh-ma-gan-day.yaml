@@ -1,0 +1,61 @@
+# Học sinh khối 3 (cấp 1, đã đổi mật khẩu) mở bài bằng mã: bài cấp 1 có thanh tiến độ theo bước, tự đọc to với công tắc "Tự đọc to" tắt bật được;
+# quay lại màn Nhập mã thì thấy mã vừa mở trong "Mã em đã mở gần đây trên máy này" và chạm mã để mở lại. Biến: STUDENT_CODE, STUDENT_PASSWORD, LESSON_CODE.
+appId: host.exp.exponent
+---
+- runFlow: chung/mo-app.yaml
+- runFlow: chung/vao-hoc-sinh.yaml
+- runFlow: chung/dang-nhap-hoc-sinh.yaml
+- extendedWaitUntil:
+    visible: "Nhập mã"
+    timeout: 30000
+- runFlow: chung/nhap-ma-bai-hoc.yaml
+- extendedWaitUntil:
+    visible: "Bước 1 / .*"
+    timeout: 30000
+- assertVisible: "Đoạn 1 / .*"
+- takeScreenshot: ma-gan-day-01-bai-cap-1
+# Công tắc Tự đọc to (dưới đoạn chuyện, phải cuộn tới): mặc định bật (đọc ngay khi vào), tắt thì dừng đọc, bật lại được.
+- scrollUntilVisible:
+    element: "Tự đọc to"
+    timeout: 30000
+- assertVisible:
+    text: "Tự đọc to"
+    checked: true
+- tapOn:
+    text: "Tự đọc to"
+    checked: true
+- assertVisible:
+    text: "Tự đọc to"
+    checked: false
+- assertVisible: "Bấm loa để nghe đọc"
+- takeScreenshot: ma-gan-day-02-tat-tu-doc
+- tapOn:
+    text: "Tự đọc to"
+    checked: false
+- assertVisible:
+    text: "Tự đọc to"
+    checked: true
+# Bước tiếp: thanh tiến độ đổi bước.
+- scrollUntilVisible:
+    element: "Tiếp nhé"
+    timeout: 20000
+- tapOn: "Tiếp nhé"
+- extendedWaitUntil:
+    visible: "(Đoạn 2 / .*|Bước 2 / .*)"
+    timeout: 20000
+- takeScreenshot: ma-gan-day-03-buoc-tiep
+# Về màn Nhập mã: mã vừa mở nằm trong danh sách gần đây, chạm để mở lại.
+- back
+- extendedWaitUntil:
+    visible: "Mã em đã mở gần đây trên máy này"
+    timeout: 30000
+- assertVisible: ${LESSON_CODE}
+- assertVisible: "Mở lần cuối .*"
+- takeScreenshot: ma-gan-day-04-ma-gan-day
+- tapOn: ${LESSON_CODE}
+- extendedWaitUntil:
+    visible: "Bước .* / .*"
+    timeout: 30000
+- takeScreenshot: ma-gan-day-05-mo-lai
+- back
+- assertVisible: "Mã em đã mở gần đây trên máy này"

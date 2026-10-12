@@ -1,0 +1,71 @@
+# Khách xem dòng thời gian (giao diện tiếng Anh): hai thẻ lối vào Bản đồ và Dòng thời gian trên trang chủ, màn chọn di sản (tìm nhanh theo tên),
+# dòng thời gian của một di sản, rồi tab Dòng thời gian ở thanh tab.
+appId: host.exp.exponent
+---
+- runFlow: chung/mo-app.yaml
+- runFlow:
+    file: chung/vao-khach.yaml
+    env:
+      LANGUAGE_NAME: English
+- extendedWaitUntil:
+    visible: "Discover the cultural heritage of Viet Nam"
+    timeout: 60000
+- assertVisible: "Heritage map"
+- assertVisible: "See where heritage sites are on the map.*"
+- assertVisible: "Periods and events of each site.*"
+- takeScreenshot: dong-thoi-gian-01-trang-chu
+# Thẻ "Timeline" trên trang chủ đứng trước nhãn tab cùng tên trong cây giao diện.
+- tapOn:
+    text: "Timeline"
+    index: 0
+- extendedWaitUntil:
+    visible: "Each site has its own timeline.*"
+    timeout: 30000
+- extendedWaitUntil:
+    visible: "82 bia Tiến sĩ Văn Miếu – Quốc Tử Giám"
+    timeout: 30000
+- takeScreenshot: dong-thoi-gian-02-chon-di-san
+- scrollUntilVisible:
+    element: "Thành nhà Hồ"
+    timeout: 30000
+- scrollUntilVisible:
+    element: "Quick search by heritage name"
+    direction: UP
+    timeout: 30000
+- tapOn: "Quick search by heritage name"
+# Phím tìm của bàn phím vừa tìm vừa đóng bàn phím; không thêm hideKeyboard vì khi bàn phím đã đóng nó gửi phím Back và thanh tab nhảy về Trang chủ.
+- inputText: "thanh nha ho"
+- pressKey: Enter
+- extendedWaitUntil:
+    visible: "Thành nhà Hồ"
+    timeout: 30000
+- assertNotVisible: "Văn Miếu – Quốc Tử Giám"
+- takeScreenshot: dong-thoi-gian-03-tim-nhanh
+- tapOn: "Thành nhà Hồ"
+- extendedWaitUntil:
+    notVisible: "Loading…"
+    timeout: 30000
+- assertVisible: "Thành nhà Hồ"
+- assertNotVisible: "This heritage site has no timeline yet."
+- takeScreenshot: dong-thoi-gian-04-dong-thoi-gian
+- back
+- assertVisible: "Each site has its own timeline.*"
+- tapOn: "Home"
+- extendedWaitUntil:
+    visible: "Discover the cultural heritage of Viet Nam"
+    timeout: 30000
+# Tab Dòng thời gian ở thanh tab (nhãn tab đứng sau thẻ trên trang chủ).
+- tapOn:
+    text: "Timeline"
+    index: 1
+- extendedWaitUntil:
+    visible: "Each site has its own timeline.*"
+    timeout: 30000
+- takeScreenshot: dong-thoi-gian-05-tab
+# Từ khóa quá ngắn thì báo, không hỏi máy chủ (ô nhập còn từ khóa cũ vì tab giữ trạng thái: xoá trước).
+- tapOn: "Quick search by heritage name"
+- eraseText: 40
+- inputText: "t"
+- pressKey: Enter
+- assertVisible: "Keyword needs at least 2 characters."
+- takeScreenshot: dong-thoi-gian-06-tu-khoa-ngan

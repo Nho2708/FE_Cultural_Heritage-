@@ -37,8 +37,10 @@ appId: host.exp.exponent
     visible: "Nộp bài?"
     timeout: 15000
 - takeScreenshot: khoi11-11-xac-nhan-nop
+# Nút Nộp bài trong hộp xác nhận (nằm dưới câu nhắc), không phải nút cùng tên ở đầu màn hình; vị trí hộp khác nhau giữa máy ảo và điện thoại nên không chạm theo tọa độ.
 - tapOn:
-    point: "50%,84%"
+    text: "Nộp bài"
+    below: "Nộp xong em không làm lại được."
 - extendedWaitUntil:
     visible: "(Điểm.*|.*điểm.*)"
     timeout: 30000
