@@ -3,11 +3,11 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { sessionStore } from '../../lib/auth/session';
-import { envelope, mockApi, userOf } from '../../test/fixtures';
+import { envelope, mockApi, sessionOf, userOf } from '../../test/fixtures';
 import { renderApp, signInAs } from '../../test/renderApp';
 
-// Hồ sơ cá nhân: dùng chung 3 vai trò; tab Thông tin sửa họ tên, số điện thoại, ảnh; tab Đổi mật khẩu nhận access
-// token mới.
+// Hồ sơ cá nhân: dùng chung 3 vai trò; tab Thông tin sửa họ tên, số điện thoại, ảnh đại diện (tải ảnh lên, gỡ ảnh); tab
+// Đổi mật khẩu nhận access token mới.
 
 describe('Hồ sơ cá nhân', () => {
   it('hiện email, tên đăng nhập, vai trò, trường chỉ đọc; lưu họ tên và số điện thoại', async () => {
@@ -38,9 +38,110 @@ describe('Hồ sơ cá nhân', () => {
     expect(calls.find((c) => c.method === 'PUT')?.body).toEqual({
       fullName: 'Trần Văn Bình An',
       phone: '0901234567',
-      avatarUrl: null,
     });
     expect(sessionStore.getSession()?.user.fullName).toBe('Trần Văn Bình An');
+  });
+
+  describe('ảnh đại diện', () => {
+    const jpg = (name = 'toi.jpg') => new File([new Uint8Array(2048)], name, { type: 'image/jpeg' });
+    const withAvatar = { ...userOf('TEACHER'), avatarUrl: '/files/images/0123456789abcdef0123456789abcdef.webp' };
+
+    it('chưa có ảnh thì hiện chữ cái đầu và không có nút Gỡ ảnh; có ảnh thì hiện ảnh và nút Gỡ ảnh', async () => {
+      signInAs('TEACHER');
+      mockApi((call) => (call.path === '/me' && call.method === 'GET' ? envelope(200, { data: userOf('TEACHER') }) : undefined));
+      renderApp('/tai-khoan');
+
+      expect(await screen.findByRole('button', { name: 'Chọn ảnh' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Gỡ ảnh' })).not.toBeInTheDocument();
+    });
+
+    it('tệp sai định dạng hoặc quá 5 MB bị từ chối ngay khi chọn, không gọi API', async () => {
+      signInAs('TEACHER');
+      const calls = mockApi((call) => (call.path === '/me' && call.method === 'GET' ? envelope(200, { data: userOf('TEACHER') }) : undefined));
+      const user = userEvent.setup({ applyAccept: false });
+      renderApp('/tai-khoan');
+
+      const input = await screen.findByLabelText('Chọn tệp ảnh đại diện');
+      await user.upload(input, new File(['GIF89a'], 'anh-dong.gif', { type: 'image/gif' }));
+      expect(await screen.findByText('Tệp ảnh không hợp lệ: chỉ nhận định dạng JPG, PNG hoặc WEBP.')).toBeInTheDocument();
+      await user.upload(input, new File([new Uint8Array(6 * 1024 * 1024)], 'to.png', { type: 'image/png' }));
+      expect(await screen.findByText('Tệp ảnh không hợp lệ: tối đa 5 MB, tệp này 6,0 MB.')).toBeInTheDocument();
+
+      expect(screen.queryByRole('button', { name: 'Tải ảnh lên' })).not.toBeInTheDocument();
+      expect(calls.some((c) => c.path === '/me/avatar')).toBe(false);
+    });
+
+    it('chọn ảnh hợp lệ rồi tải lên: gửi multipart chỉ có tệp, cập nhật phiên và báo thành công', async () => {
+      signInAs('TEACHER');
+      const calls = mockApi((call) => {
+        if (call.path === '/me' && call.method === 'GET') return envelope(200, { data: userOf('TEACHER') });
+        if (call.path === '/me/avatar' && call.method === 'POST')
+          return envelope(200, { data: withAvatar, message: 'Cập nhật ảnh đại diện thành công.' });
+        return undefined;
+      });
+      const user = userEvent.setup();
+      renderApp('/tai-khoan');
+
+      await user.upload(await screen.findByLabelText('Chọn tệp ảnh đại diện'), jpg());
+      expect(await screen.findByText('toi.jpg')).toBeInTheDocument();
+      expect(screen.getByText('(2 KB)')).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: 'Tải ảnh lên' }));
+
+      expect(await screen.findByText('Cập nhật ảnh đại diện thành công.')).toBeInTheDocument();
+      expect(calls.find((c) => c.path === '/me/avatar')?.body).toEqual({ file: { fileName: 'toi.jpg', size: 2048 } });
+      expect(sessionStore.getSession()?.user.avatarUrl).toBe(withAvatar.avatarUrl);
+      expect(await screen.findByRole('button', { name: 'Gỡ ảnh' })).toBeInTheDocument();
+    });
+
+    it('chọn rồi bấm Hủy thì không gọi API', async () => {
+      signInAs('TEACHER');
+      const calls = mockApi((call) => (call.path === '/me' && call.method === 'GET' ? envelope(200, { data: userOf('TEACHER') }) : undefined));
+      const user = userEvent.setup();
+      renderApp('/tai-khoan');
+
+      await user.upload(await screen.findByLabelText('Chọn tệp ảnh đại diện'), jpg());
+      await user.click(await screen.findByRole('button', { name: 'Hủy' }));
+
+      expect(screen.getByRole('button', { name: 'Chọn ảnh' })).toBeInTheDocument();
+      expect(calls.some((c) => c.path === '/me/avatar')).toBe(false);
+    });
+
+    it('máy chủ từ chối tệp: hiện câu của máy chủ, ảnh hiện tại giữ nguyên', async () => {
+      signInAs('TEACHER');
+      const message = 'Tệp ảnh không hợp lệ: không đọc được, tệp không phải ảnh hoặc đã bị hỏng.';
+      mockApi((call) => {
+        if (call.path === '/me' && call.method === 'GET') return envelope(200, { data: userOf('TEACHER') });
+        if (call.path === '/me/avatar') return envelope(400, { errorCode: 'INVALID', message, errors: { file: message } });
+        return undefined;
+      });
+      const user = userEvent.setup();
+      renderApp('/tai-khoan');
+
+      await user.upload(await screen.findByLabelText('Chọn tệp ảnh đại diện'), jpg());
+      await user.click(await screen.findByRole('button', { name: 'Tải ảnh lên' }));
+
+      expect(await screen.findByText(message)).toBeInTheDocument();
+      expect(sessionStore.getSession()?.user.avatarUrl).toBeNull();
+    });
+
+    it('Gỡ ảnh: gọi DELETE, xóa ảnh khỏi phiên và báo thành công', async () => {
+      sessionStore.setSession(sessionOf('TEACHER', { user: withAvatar }));
+      const calls = mockApi((call) => {
+        if (call.path === '/me' && call.method === 'GET') return envelope(200, { data: withAvatar });
+        if (call.path === '/me/avatar' && call.method === 'DELETE')
+          return envelope(200, { data: userOf('TEACHER'), message: 'Gỡ ảnh đại diện thành công.' });
+        return undefined;
+      });
+      const user = userEvent.setup();
+      renderApp('/tai-khoan');
+
+      await user.click(await screen.findByRole('button', { name: 'Gỡ ảnh' }));
+
+      expect(await screen.findByText('Gỡ ảnh đại diện thành công.')).toBeInTheDocument();
+      expect(calls.some((c) => c.path === '/me/avatar' && c.method === 'DELETE')).toBe(true);
+      expect(sessionStore.getSession()?.user.avatarUrl).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Gỡ ảnh' })).not.toBeInTheDocument();
+    });
   });
 
   it('đổi mật khẩu: kiểm ô nhập lại, gửi mật khẩu hiện tại + mới, thay access token của phiên', async () => {

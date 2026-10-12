@@ -95,8 +95,20 @@ export const authApi = {
 export const profileApi = {
   get: () => apiRequest<StaffProfile>('/me'),
 
-  update: (body: { fullName: string; phone: string | null; avatarUrl: string | null }) =>
-    apiRequest<StaffProfile>('/me', { method: 'PUT', body }),
+  /** Sửa họ tên và số điện thoại; ảnh đại diện đổi riêng bằng `uploadAvatar` và `removeAvatar`. */
+  update: (body: { fullName: string; phone: string | null }) => apiRequest<StaffProfile>('/me', { method: 'PUT', body }),
+
+  /** Đổi ảnh đại diện bằng ảnh tải lên (multipart, chỉ có `file`; JPG, PNG, WEBP, tối đa 5 MB). Trả lại hồ sơ với `avatarUrl` mới. */
+  uploadAvatar: (body: FormData, options: UploadOptions = {}) =>
+    apiRequest<StaffProfile>('/me/avatar', {
+      method: 'POST',
+      body,
+      onUploadProgress: options.onProgress,
+      signal: options.signal,
+    }),
+
+  /** Gỡ ảnh đại diện; trả lại hồ sơ với `avatarUrl` là null. Tệp ảnh cũ vẫn nằm trong kho. */
+  removeAvatar: () => apiRequest<StaffProfile>('/me/avatar', { method: 'DELETE' }),
 
   /** Mật khẩu mới phải khác mật khẩu hiện tại. Token cũ hết dùng được; phiên hiện tại nhận access token mới. */
   changePassword: (body: { currentPassword: string; newPassword: string }) =>

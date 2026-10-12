@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import {
-  validateAvatarUrl,
   validateEmail,
   validateFullName,
   validateOptionalEmail,
@@ -52,11 +51,5 @@ describe('kiểm tra trường nhập', () => {
     expect(validateFullName('Ă'.repeat(256))).toBe('Họ tên không hợp lệ: tối đa 255 ký tự.');
     expect(validateFullName('Nguyễn Thị An')).toBeNull();
     expect(validateRequiredText('', 'tên trường', 'Tên trường', 255)).toBe('Vui lòng nhập tên trường.');
-  });
-
-  it('ảnh đại diện: trống hoặc đường dẫn http/https', () => {
-    expect(validateAvatarUrl('')).toBeNull();
-    expect(validateAvatarUrl('https://anh.vn/a.jpg')).toBeNull();
-    expect(validateAvatarUrl('javascript:alert(1)')).toMatch(/^Ảnh đại diện không hợp lệ: /);
   });
 });
