@@ -12,9 +12,9 @@ import { NearbyGate } from './NearbyGate';
 import { useMapPins } from './queries';
 import { useNearby } from './useNearby';
 
-// "Gần bạn" trên bản đồ (chỉ khách): nút nổi ở góc dưới bên phải. Bấm nút thì app mới hỏi quyền vị trí (nếu chưa cho phép), đưa bản đồ về vị trí của khách (chấm xanh) và hiện bảng tối đa 6 di sản
-// gần nhất kèm khoảng cách; chọn một dòng thì làm nổi ghim đó trên bản đồ, di sản không có trên bản đồ (do đang lọc) thì mở trang chi tiết. Bị từ chối quyền thì bảng báo nhẹ nhàng và cho thử lại.
-// Vị trí chỉ nằm trong bộ nhớ, không lưu.
+// "Gần bạn" trên bản đồ (chỉ khách): nút nổi ở góc dưới bên trái (góc phải là nút phóng to, thu nhỏ của bản đồ nhúng, nút nổi đặt đó sẽ che mất nút thu nhỏ). Bấm nút thì app mới hỏi quyền vị trí
+// (nếu chưa cho phép), đưa bản đồ về vị trí của khách (chấm xanh) và hiện bảng tối đa 6 di sản gần nhất kèm khoảng cách; chọn một dòng thì làm nổi ghim đó trên bản đồ, di sản không có trên bản đồ
+// (do đang lọc) thì mở trang chi tiết. Bị từ chối quyền thì bảng báo nhẹ nhàng và cho thử lại. Vị trí chỉ nằm trong bộ nhớ, không lưu.
 
 interface Props {
   /** Bộ lọc đang áp trên bản đồ, để biết di sản nào có ghim. */
@@ -77,6 +77,8 @@ export function MapNearby({ filter, onPosition, onFocus }: Props) {
       ) : null}
       <Button
         label={t('home.nearby')}
+        // Chấm vị trí của khách trong trang nhúng cũng mang tên "Gần bạn", nên nút có mã riêng để kiểm thử giao diện chạm đúng nút.
+        testID="nut-gan-ban-tren-ban-do"
         variant="secondary"
         loading={nearby.isLoading}
         style={[styles.fab, { backgroundColor: theme.color.surface }]}
@@ -90,8 +92,8 @@ export function MapNearby({ filter, onPosition, onFocus }: Props) {
 }
 
 const styles = StyleSheet.create({
-  overlay: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, justifyContent: 'flex-end', alignItems: 'flex-end', padding: 12, gap: 10 },
-  fab: { alignSelf: 'flex-end', elevation: 3, shadowColor: '#000000', shadowOpacity: 0.2, shadowRadius: 4, shadowOffset: { width: 0, height: 2 } },
+  overlay: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, justifyContent: 'flex-end', alignItems: 'flex-start', padding: 12, gap: 10 },
+  fab: { alignSelf: 'flex-start', elevation: 3, shadowColor: '#000000', shadowOpacity: 0.2, shadowRadius: 4, shadowOffset: { width: 0, height: 2 } },
   panel: { alignSelf: 'stretch', maxHeight: '55%' },
   panelBody: { padding: 14, gap: 8 },
 });
