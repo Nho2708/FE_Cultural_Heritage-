@@ -33,9 +33,10 @@ export function LevelTwoLesson({ lesson }: { lesson: StudentLesson }) {
         className="relative flex min-h-56 items-end bg-surface-container-low bg-cover bg-center"
         style={hero ? { backgroundImage: `linear-gradient(to top, rgb(0 0 0 / 0.75), rgb(0 0 0 / 0.1)), url("${hero}")` } : undefined}
       >
-        <div className={`dsv-content py-6 ${hero ? 'text-white' : 'text-on-surface'}`}>
+        {/* Trên ảnh đầu bài, chữ dùng token on-image (trắng): bảng màu Tailwind đã thay bằng token nên không có lớp text-white. */}
+        <div className={`dsv-content py-6 ${hero ? 'text-on-image' : 'text-on-surface'}`}>
           {links.home && (
-            <ButtonLink to={links.home} variant="link" className={hero ? 'text-white!' : undefined}>
+            <ButtonLink to={links.home} variant="link" className={hero ? 'text-on-image!' : undefined}>
               <Icon name="arrow-left" size={16} />
               Trang học của em
             </ButtonLink>
