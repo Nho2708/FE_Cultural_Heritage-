@@ -14,3 +14,6 @@ expo-env.d.ts
 # Thư mục native sinh ra bởi expo prebuild khi dựng tại máy (không lưu vào kho)
 /android
 /ios
+
+# APK dựng tại máy (scripts/dung-apk.ps1)
+/dist-apk
