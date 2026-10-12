@@ -66,5 +66,9 @@ export const lessonsApi = {
   aiQuota: () => apiRequest<AiQuota>('/teacher/lessons/ai-quota'),
 };
 
-/** Di sản đã xuất bản để chọn cho bài học: dùng API công khai (chỉ trả di sản đã xuất bản). */
-export const publishedHeritagesApi = createDiscoveryApi(apiClient);
+/**
+ * Di sản đã xuất bản để chọn cho bài học, câu hỏi, thống kê: dùng API công khai (chỉ trả di sản đã xuất bản). Web quản trị chỉ có
+ * tiếng Việt nên luôn xin bản tiếng Việt; không đặt thì máy chủ chọn theo Accept-Language của trình duyệt (trình duyệt tiếng Anh
+ * sẽ nhận "[en] Đô thị cổ Hội An").
+ */
+export const publishedHeritagesApi = createDiscoveryApi(apiClient, { lang: 'vi' });

@@ -265,37 +265,53 @@ interface LanguageOptions extends RequestSignal {
   lang?: LanguageCode;
 }
 
-export function createDiscoveryApi(client: ApiClient) {
+export interface DiscoveryApiOptions {
+  /**
+   * Ngôn ngữ gửi kèm (`lang`) ở mọi API có nội dung theo ngôn ngữ khi lời gọi không chỉ rõ. Web quản trị chỉ có tiếng Việt đặt `vi`
+   * để máy chủ không chọn theo Accept-Language của trình duyệt (trình duyệt tiếng Anh sẽ nhận tên di sản dạng "[en] …").
+   */
+  lang?: LanguageCode;
+}
+
+export function createDiscoveryApi(client: ApiClient, defaults: DiscoveryApiOptions = {}) {
   const get = async <T>(path: string, query?: Record<string, string | number | undefined>, signal?: AbortSignal, auth: false | 'optional' = false) =>
     (await client.request<T>(path, { auth, query, signal })).data;
+  const langOf = (lang: LanguageCode | undefined) => lang ?? defaults.lang;
 
   return {
     /** Năm ngôn ngữ của bộ chọn. Danh mục cố định, máy chủ cho lưu tạm 1 giờ. */
     languages: ({ signal }: RequestSignal = {}) => get<LanguageOption[]>(DISCOVERY_ENDPOINTS.languages, undefined, signal),
 
-    home: ({ signal, lang }: LanguageOptions = {}) => get<DiscoveryHome>(DISCOVERY_ENDPOINTS.home, { lang }, signal),
+    home: ({ signal, lang }: LanguageOptions = {}) => get<DiscoveryHome>(DISCOVERY_ENDPOINTS.home, { lang: langOf(lang) }, signal),
 
     /** Danh mục cho mọi ô lọc (tỉnh, vùng, loại, cấp xếp hạng, thời kỳ). Máy chủ cho lưu tạm 1 giờ. */
     filters: ({ signal }: RequestSignal = {}) => get<FilterCatalog>(DISCOVERY_ENDPOINTS.filters, undefined, signal),
 
     /** Tìm và lọc, phân trang (`pageSize` mặc định 20, tối đa 100). */
     search: (filter: DiscoveryFilter, paging: { page?: number; pageSize?: number } = {}, { signal, lang }: LanguageOptions = {}) =>
-      get<Paged<HeritageCard>>(DISCOVERY_ENDPOINTS.heritages, { ...filterQuery(filter), page: paging.page, pageSize: paging.pageSize, lang }, signal),
+      get<Paged<HeritageCard>>(
+        DISCOVERY_ENDPOINTS.heritages,
+        { ...filterQuery(filter), page: paging.page, pageSize: paging.pageSize, lang: langOf(lang) },
+        signal,
+      ),
 
     /** Ghim bản đồ theo cùng bộ lọc, không phân trang. */
     map: (filter: DiscoveryFilter, { signal, lang }: LanguageOptions = {}) =>
-      get<HeritageMapResult>(DISCOVERY_ENDPOINTS.map, { ...filterQuery(filter), lang }, signal),
+      get<HeritageMapResult>(DISCOVERY_ENDPOINTS.map, { ...filterQuery(filter), lang: langOf(lang) }, signal),
 
-    detail: (slug: string, { signal, lang }: LanguageOptions = {}) => get<PublicHeritageDetail>(DISCOVERY_ENDPOINTS.heritage(slug), { lang }, signal),
+    detail: (slug: string, { signal, lang }: LanguageOptions = {}) =>
+      get<PublicHeritageDetail>(DISCOVERY_ENDPOINTS.heritage(slug), { lang: langOf(lang) }, signal),
 
-    timeline: (slug: string, { signal, lang }: LanguageOptions = {}) => get<PublicTimeline>(DISCOVERY_ENDPOINTS.timeline(slug), { lang }, signal),
+    timeline: (slug: string, { signal, lang }: LanguageOptions = {}) =>
+      get<PublicTimeline>(DISCOVERY_ENDPOINTS.timeline(slug), { lang: langOf(lang) }, signal),
 
     /**
      * Tóm tắt theo ngôn ngữ. 404 `SUMMARY_UNAVAILABLE` khi chưa có tóm tắt tiếng Việt đã duyệt; ngôn ngữ chưa có bản hiện hành thì trả bản tiếng Việt kèm `isFallback`.
      * Khách chưa mở khóa bằng quảng cáo nhận 403 `AD_UNLOCK_REQUIRED`. **Gắn token của học sinh nếu đang có phiên**: máy chủ nhận ra học sinh theo phiên đăng nhập
      * (không theo khai báo của máy khách) để mở thẳng, không qua cổng quảng cáo.
      */
-    summary: (slug: string, { signal, lang }: LanguageOptions = {}) => get<PublicSummary>(DISCOVERY_ENDPOINTS.summary(slug), { lang }, signal, 'optional'),
+    summary: (slug: string, { signal, lang }: LanguageOptions = {}) =>
+      get<PublicSummary>(DISCOVERY_ENDPOINTS.summary(slug), { lang: langOf(lang) }, signal, 'optional'),
 
     /** Mô hình 3D đang hiển thị của di sản (miễn phí). 404 `MODEL_UNAVAILABLE` khi không có mô hình hiển thị: trình xem quay về bộ ảnh. */
     model: (slug: string, { signal }: RequestSignal = {}) => get<PublicModel>(DISCOVERY_ENDPOINTS.model(slug), undefined, signal),
