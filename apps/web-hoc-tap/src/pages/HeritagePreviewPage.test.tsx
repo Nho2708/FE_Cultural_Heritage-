@@ -1,5 +1,5 @@
 import { PREVIEW_TOKEN_REPLY, PREVIEW_TOKEN_REQUEST } from '@dsvhvn/dung-chung/auth';
-import { screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { detailOf, HUE, publicApi } from '../test/discoveryFixtures';
 import { envelope, mockApi, type FetchCall } from '../test/fixtures';
@@ -102,11 +102,35 @@ describe('Xem trước di sản nháp', () => {
   });
 
   it('đang xem thì mã hết hạn: nội dung được thay bằng thông báo hết hạn', async () => {
+    // Đồng hồ giả (vẫn trôi theo thời gian thật) để kết quả không phụ thuộc máy chạy test nhanh hay chậm.
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     adminOpener('token-quan-tri');
-    mockApi(previewServer(new Date(Date.now() + 1500).toISOString()), publicApi());
+    mockApi(previewServer(new Date(Date.now() + 60_000).toISOString()), publicApi());
     renderApp(`/xem-truoc/di-san/${CODE}`);
     expect(await screen.findByRole('heading', { level: 1, name: 'Bản nháp Cố đô Huế' })).toBeInTheDocument();
-    expect(await screen.findByRole('heading', { level: 1, name: 'Bản xem trước đã hết hạn' }, { timeout: 4000 })).toBeInTheDocument();
+    await act(async () => {
+      vi.advanceTimersByTime(61_000);
+    });
+    expect(await screen.findByRole('heading', { level: 1, name: 'Bản xem trước đã hết hạn' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { level: 1, name: 'Bản nháp Cố đô Huế' })).not.toBeInTheDocument();
+  });
+
+  it('bộ hẹn giờ chạy sớm hơn đồng hồ vẫn báo hết hạn (hẹn lại phần còn lại)', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    adminOpener('token-quan-tri');
+    mockApi(previewServer(new Date(Date.now() + 60_000).toISOString()), publicApi());
+    renderApp(`/xem-truoc/di-san/${CODE}`);
+    expect(await screen.findByRole('heading', { level: 1, name: 'Bản nháp Cố đô Huế' })).toBeInTheDocument();
+    // Đồng hồ lùi lại 5 ms so với bộ hẹn giờ: lúc bộ hẹn giờ chạy, Date.now() vẫn chưa tới giờ hết hạn.
+    const realNow = Date.now.bind(Date);
+    const spy = vi.spyOn(Date, 'now').mockImplementation(() => realNow() - 5);
+    await act(async () => {
+      vi.advanceTimersByTime(60_000);
+    });
+    spy.mockRestore();
+    await act(async () => {
+      vi.advanceTimersByTime(50);
+    });
+    expect(await screen.findByRole('heading', { level: 1, name: 'Bản xem trước đã hết hạn' })).toBeInTheDocument();
   });
 });
