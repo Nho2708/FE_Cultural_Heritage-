@@ -146,10 +146,11 @@ export function generate(tokens) {
   for (const [key, def] of entries(shadow)) root.push(`--dsv-shadow-${key}: ${def.value};`);
 
   root.push('', '/* Đường viền */');
-  for (const [key, def] of entries(border)) {
-    const value = def.value.replace(/\{color\.semantic\.[^.]+\.([^}]+)\}/g, 'var(--dsv-color-$1)');
-    root.push(`--dsv-border-${key}: ${value};`);
-  }
+  const borders = entries(border).map(([key, def]) => ({
+    name: `--dsv-border-${key}`,
+    value: def.value.replace(/\{color\.semantic\.[^.]+\.([^}]+)\}/g, 'var(--dsv-color-$1)'),
+  }));
+  for (const b of borders) root.push(`${b.name}: ${b.value};`);
 
   root.push('', '/* Chuyển động */');
   for (const [key, def] of entries(motion.duration)) root.push(`--dsv-duration-${key}: ${def.value};`);
@@ -160,12 +161,24 @@ export function generate(tokens) {
   root.push('', '/* z-index */');
   for (const [key, def] of entries(zIndex)) root.push(`--dsv-z-${key}: ${def.value};`);
 
-  const darkLines = semantic.filter((s) => s.darkDiffers).map((s) => `${s.name}: ${s.dark};`);
+  const darkSemantic = semantic.filter((s) => s.darkDiffers);
+  // Giá trị var() của một custom property được tính ngay tại phần tử khai báo nó (:root) rồi mới truyền xuống, nên token component
+  // và đường viền trỏ về token ngữ nghĩa mang màu sáng vào cả vùng dark (ô nhập nền trắng chữ sáng, mục menu đang chọn hồng nhạt)
+  // trừ khi vùng dark khai báo lại chúng. Khai báo lại đúng những token trỏ tới token ngữ nghĩa có bản dark.
+  const darkNames = new Set(darkSemantic.map((s) => s.name));
+  const refersToDark = (value) => [...String(value).matchAll(/var\((--dsv-color-[a-z0-9-]+)\)/g)].some((m) => darkNames.has(m[1]));
+  const darkDerived = [...component, ...borders].filter((t) => refersToDark(t.value));
+  const darkLines = [
+    ...darkSemantic.map((s) => `${s.name}: ${s.dark};`),
+    '',
+    '/* Token component và đường viền trỏ về token ngữ nghĩa có bản dark */',
+    ...darkDerived.map((t) => `${t.name}: ${t.value};`),
+  ];
   const sectionPad = layoutConstant['section-pad-y'];
 
   let tokensCss = HEADER(
     `${primitives.length} primitive · ${semantic.length} semantic · ${component.length} component · ` +
-      `${darkLines.length} ghi đè dark`,
+      `${darkSemantic.length} ghi đè dark (+${darkDerived.length} token dẫn xuất khai báo lại)`,
   );
   tokensCss += '\n' + block(':root', root);
   tokensCss +=
