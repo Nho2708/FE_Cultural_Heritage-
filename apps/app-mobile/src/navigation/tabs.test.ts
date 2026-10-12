@@ -25,9 +25,16 @@ describe('bottom tabs', () => {
     }
   });
 
-  it('has a title in every language for the visitor tabs', () => {
-    for (const language of ['en', 'ko', 'zh-Hans', 'ja'] as const) {
-      for (const tab of GUEST_TABS) expect(typeof lookup(resources[language].translation, tab.title)).toBe('string');
+  it('gives a visitor five tabs with Timeline before History', () => {
+    expect(GUEST_TABS.map((tab) => tab.name)).toEqual(['index', 'tim-kiem', 'ban-do', 'dong-thoi-gian', 'lich-su']);
+  });
+
+  it('has a title and a short label in every language for the visitor tabs', () => {
+    for (const language of ['vi', 'en', 'ko', 'zh-Hans', 'ja'] as const) {
+      for (const tab of GUEST_TABS) {
+        expect(typeof lookup(resources[language].translation, tab.title)).toBe('string');
+        if (tab.label) expect(typeof lookup(resources[language].translation, tab.label)).toBe('string');
+      }
     }
   });
 });

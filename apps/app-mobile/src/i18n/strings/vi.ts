@@ -38,7 +38,7 @@ export interface Strings {
     studentText: string;
     studentLanguageNote: string;
   };
-  tabs: { home: string; search: string; map: string; history: string };
+  tabs: { home: string; search: string; map: string; history: string; timeline: string };
   home: {
     intro: string;
     recommended: string;
@@ -53,6 +53,8 @@ export interface Strings {
     nearbyEmpty: string;
     nearbyDistance: string;
     total: string;
+    mapText: string;
+    timelineText: string;
   };
   search: {
     title: string;
@@ -92,7 +94,7 @@ export interface Strings {
     notFoundText: string;
     readMore: string;
   };
-  timeline: { title: string; empty: string; events: string };
+  timeline: { title: string; empty: string; events: string; pickerText: string; pickerPlaceholder: string };
   summary: {
     title: string;
     detailed: string;
@@ -190,7 +192,7 @@ export const vi: Strings = {
     studentText: 'Đăng nhập bằng mã học sinh của em để học bài, nhập mã bài học và làm bài kiểm tra.',
     studentLanguageNote: 'Chế độ Học sinh chỉ dùng tiếng Việt.',
   },
-  tabs: { home: 'Trang chủ', search: 'Tìm kiếm', map: 'Bản đồ', history: 'Lịch sử' },
+  tabs: { home: 'Trang chủ', search: 'Tìm kiếm', map: 'Bản đồ', history: 'Lịch sử', timeline: 'Thời gian' },
   home: {
     intro: 'Khám phá di sản văn hóa Việt Nam',
     recommended: 'Gợi ý cho bạn',
@@ -205,6 +207,8 @@ export const vi: Strings = {
     nearbyEmpty: 'Chưa tìm thấy di sản có tọa độ gần bạn.',
     nearbyDistance: 'cách {{distance}}',
     total: '{{count}} di sản đã xuất bản',
+    mapText: 'Xem vị trí các di sản trên bản đồ Việt Nam, gồm cả quần đảo Hoàng Sa, Trường Sa.',
+    timelineText: 'Giai đoạn và sự kiện của từng di sản, theo thứ tự năm.',
   },
   search: {
     title: 'Tìm kiếm di sản',
@@ -244,7 +248,13 @@ export const vi: Strings = {
     notFoundText: 'Di sản này không tồn tại hoặc chưa được xuất bản.',
     readMore: 'Đọc tiếp',
   },
-  timeline: { title: 'Dòng thời gian', empty: 'Di sản này chưa có dòng thời gian.', events: '{{count}} sự kiện' },
+  timeline: {
+    title: 'Dòng thời gian',
+    empty: 'Di sản này chưa có dòng thời gian.',
+    events: '{{count}} sự kiện',
+    pickerText: 'Mỗi di sản có dòng thời gian riêng. Chọn một di sản để xem các giai đoạn và sự kiện của nó.',
+    pickerPlaceholder: 'Tìm nhanh theo tên di sản',
+  },
   summary: {
     title: 'Tóm tắt di sản',
     detailed: 'Đọc',

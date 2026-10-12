@@ -7,7 +7,10 @@ type IconName = keyof typeof Ionicons.glyphMap;
 
 export interface TabSpec {
   name: string;
+  /** Khóa chữ của tiêu đề màn hình (thanh tiêu đề phía trên). */
   title: string;
+  /** Khóa chữ ngắn hơn cho nhãn trên thanh tab khi tiêu đề dài quá một ô tab; bỏ trống thì nhãn là tiêu đề. */
+  label?: string;
   icon: IconName;
   focusedIcon: IconName;
 }
@@ -21,10 +24,11 @@ export const STUDENT_TABS: readonly TabSpec[] = [
   { name: 'cua-em', title: 'hs.tabs.account', icon: 'person-outline', focusedIcon: 'person' },
 ];
 
-/** Chế độ Khách tham quan: Trang chủ, Tìm kiếm, Bản đồ, Lịch sử và cài đặt. */
+/** Chế độ Khách tham quan: Trang chủ, Tìm kiếm, Bản đồ, Dòng thời gian, Lịch sử và cài đặt. */
 export const GUEST_TABS: readonly TabSpec[] = [
   { name: 'index', title: 'tabs.home', icon: 'home-outline', focusedIcon: 'home' },
   { name: 'tim-kiem', title: 'tabs.search', icon: 'search-outline', focusedIcon: 'search' },
   { name: 'ban-do', title: 'tabs.map', icon: 'map-outline', focusedIcon: 'map' },
+  { name: 'dong-thoi-gian', title: 'timeline.title', label: 'tabs.timeline', icon: 'hourglass-outline', focusedIcon: 'hourglass' },
   { name: 'lich-su', title: 'tabs.history', icon: 'time-outline', focusedIcon: 'time' },
 ];

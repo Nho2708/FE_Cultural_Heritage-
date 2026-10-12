@@ -37,7 +37,7 @@ export const en: Strings = {
     studentText: 'Sign in with your student code to study lessons, enter a lesson code and take quizzes.',
     studentLanguageNote: 'Student mode is in Vietnamese only.',
   },
-  tabs: { home: 'Home', search: 'Search', map: 'Map', history: 'History' },
+  tabs: { home: 'Home', search: 'Search', map: 'Map', history: 'History', timeline: 'Timeline' },
   home: {
     intro: 'Discover the cultural heritage of Viet Nam',
     recommended: 'Recommended for you',
@@ -52,6 +52,8 @@ export const en: Strings = {
     nearbyEmpty: 'No heritage sites with coordinates found near you yet.',
     nearbyDistance: '{{distance}} away',
     total: '{{count}} published sites',
+    mapText: 'See where heritage sites are on the map of Viet Nam, including the Hoang Sa and Truong Sa archipelagos.',
+    timelineText: 'Periods and events of each site, in order of year.',
   },
   search: {
     title: 'Search heritage',
@@ -91,7 +93,13 @@ export const en: Strings = {
     notFoundText: 'This heritage site does not exist or is not published.',
     readMore: 'Read more',
   },
-  timeline: { title: 'Timeline', empty: 'This heritage site has no timeline yet.', events: '{{count}} events' },
+  timeline: {
+    title: 'Timeline',
+    empty: 'This heritage site has no timeline yet.',
+    events: '{{count}} events',
+    pickerText: 'Each site has its own timeline. Choose a site to see its periods and events.',
+    pickerPlaceholder: 'Quick search by heritage name',
+  },
   summary: {
     title: 'Heritage summary',
     detailed: 'Read',

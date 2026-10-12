@@ -11,6 +11,11 @@ describe('publicHref', () => {
     expect(publicHref('student', 'map')).toBe('/ban-do-di-san');
   });
 
+  it('opens the timeline picker as a tab for a visitor and as a stand-alone screen for a student', () => {
+    expect(publicHref('guest', 'timeline')).toBe('/(khach)/dong-thoi-gian');
+    expect(publicHref('student', 'timeline')).toBe('/dong-thoi-gian-di-san');
+  });
+
   it('treats a missing mode as a visitor', () => {
     expect(publicHref(null, 'search')).toBe('/(khach)/tim-kiem');
   });

@@ -37,7 +37,7 @@ export const ja: Strings = {
     studentText: '生徒コードでログインして、授業の学習、授業コードの入力、クイズの受験ができます。',
     studentLanguageNote: '生徒モードはベトナム語のみです。',
   },
-  tabs: { home: 'ホーム', search: '検索', map: '地図', history: '履歴' },
+  tabs: { home: 'ホーム', search: '検索', map: '地図', history: '履歴', timeline: '年表' },
   home: {
     intro: 'ベトナムの文化遺産を探索しよう',
     recommended: 'おすすめ',
@@ -52,6 +52,8 @@ export const ja: Strings = {
     nearbyEmpty: '近くに座標のある遺産が見つかりませんでした。',
     nearbyDistance: '{{distance}}',
     total: '公開中の遺産 {{count}} 件',
+    mapText: 'ホアンサ諸島・チュオンサ諸島を含むベトナムの地図で遺産の位置を確認できます。',
+    timelineText: '遺産ごとの時代と出来事を年の順に見られます。',
   },
   search: {
     title: '遺産を検索',
@@ -91,7 +93,7 @@ export const ja: Strings = {
     notFoundText: 'この遺産は存在しないか、公開されていません。',
     readMore: '続きを読む',
   },
-  timeline: { title: '年表', empty: 'この遺産にはまだ年表がありません。', events: '出来事 {{count}} 件' },
+  timeline: { title: '年表', empty: 'この遺産にはまだ年表がありません。', events: '出来事 {{count}} 件', pickerText: '遺産ごとに年表があります。遺産を選んで、時代と出来事を見てみましょう。', pickerPlaceholder: '遺産名で素早く検索' },
   summary: {
     title: '遺産の要約',
     detailed: '読む',

@@ -9,7 +9,7 @@ import { GUEST_TABS } from '../../src/navigation/tabs';
 import { useApp, useAuth } from '../../src/state/AppProvider';
 import { useTheme } from '../../src/theme/ThemeProvider';
 
-// Chế độ Khách tham quan: bốn tab (Trang chủ, Tìm kiếm, Bản đồ, Lịch sử và cài đặt). Không cần đăng nhập; vào nhầm khi đang ở chế độ Học sinh thì về điểm vào.
+// Chế độ Khách tham quan: năm tab (Trang chủ, Tìm kiếm, Bản đồ, Dòng thời gian, Lịch sử và cài đặt). Không cần đăng nhập; vào nhầm khi đang ở chế độ Học sinh thì về điểm vào.
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -39,7 +39,7 @@ export default function GuestLayout() {
       }}
     >
       {GUEST_TABS.map((tab) => (
-        <Tabs.Screen key={tab.name} name={tab.name} options={{ title: t(tab.title), tabBarIcon: icon(tab.icon, tab.focusedIcon) }} />
+        <Tabs.Screen key={tab.name} name={tab.name} options={{ title: t(tab.title), tabBarLabel: tab.label ? t(tab.label) : undefined, tabBarIcon: icon(tab.icon, tab.focusedIcon) }} />
       ))}
     </Tabs>
   );

@@ -46,6 +46,7 @@ function Navigation() {
         <Stack.Screen name="di-san/[slug]/dong-thoi-gian" options={{ title: t('timeline.title') }} />
         <Stack.Screen name="di-san/[slug]/3d" options={{ title: t('model.title') }} />
         <Stack.Screen name="tim-kiem-di-san" options={{ title: t('search.title') }} />
+        <Stack.Screen name="dong-thoi-gian-di-san" options={{ title: t('timeline.title') }} />
         <Stack.Screen name="ban-do-di-san" options={{ title: t('map.title') }} />
         <Stack.Screen name="bai-hoc/[ma]/index" options={{ title: mode === 'student' ? t('hs.lesson.title') : '' }} />
         <Stack.Screen name="kiem-tra/[quizId]" options={{ headerShown: false, gestureEnabled: false }} />

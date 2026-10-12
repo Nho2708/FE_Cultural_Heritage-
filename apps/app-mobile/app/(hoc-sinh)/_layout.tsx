@@ -41,7 +41,7 @@ export default function StudentLayout() {
       }}
     >
       {STUDENT_TABS.map((tab) => (
-        <Tabs.Screen key={tab.name} name={tab.name} options={{ title: t(tab.title), tabBarIcon: icon(tab.icon, tab.focusedIcon) }} />
+        <Tabs.Screen key={tab.name} name={tab.name} options={{ title: t(tab.title), tabBarLabel: tab.label ? t(tab.label) : undefined, tabBarIcon: icon(tab.icon, tab.focusedIcon) }} />
       ))}
     </Tabs>
   );

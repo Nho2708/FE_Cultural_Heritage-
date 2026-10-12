@@ -37,7 +37,7 @@ export const zhHans: Strings = {
     studentText: '使用学生代码登录，学习课程、输入课程代码并完成测验。',
     studentLanguageNote: '学生模式仅支持越南语。',
   },
-  tabs: { home: '首页', search: '搜索', map: '地图', history: '历史' },
+  tabs: { home: '首页', search: '搜索', map: '地图', history: '历史', timeline: '时间线' },
   home: {
     intro: '探索越南文化遗产',
     recommended: '为您推荐',
@@ -52,6 +52,8 @@ export const zhHans: Strings = {
     nearbyEmpty: '暂未找到附近带坐标的遗产。',
     nearbyDistance: '距离 {{distance}}',
     total: '已发布 {{count}} 处遗产',
+    mapText: '在越南地图上查看遗产的位置，包括黄沙群岛和长沙群岛。',
+    timelineText: '按年份顺序查看每处遗产的时期和事件。',
   },
   search: {
     title: '搜索遗产',
@@ -91,7 +93,7 @@ export const zhHans: Strings = {
     notFoundText: '该遗产不存在或尚未发布。',
     readMore: '继续阅读',
   },
-  timeline: { title: '时间线', empty: '该遗产暂无时间线。', events: '{{count}} 个事件' },
+  timeline: { title: '时间线', empty: '该遗产暂无时间线。', events: '{{count}} 个事件', pickerText: '每处遗产都有自己的时间线。选择一处遗产，查看它的时期和事件。', pickerPlaceholder: '按遗产名称快速搜索' },
   summary: {
     title: '遗产摘要',
     detailed: '阅读',

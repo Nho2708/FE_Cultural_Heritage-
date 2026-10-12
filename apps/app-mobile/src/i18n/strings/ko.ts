@@ -37,7 +37,7 @@ export const ko: Strings = {
     studentText: '학생 코드로 로그인하여 수업을 듣고, 수업 코드를 입력하고, 퀴즈를 풉니다.',
     studentLanguageNote: '학생 모드는 베트남어만 지원합니다.',
   },
-  tabs: { home: '홈', search: '검색', map: '지도', history: '기록' },
+  tabs: { home: '홈', search: '검색', map: '지도', history: '기록', timeline: '연표' },
   home: {
     intro: '베트남 문화유산을 만나보세요',
     recommended: '추천 유산',
@@ -52,6 +52,8 @@ export const ko: Strings = {
     nearbyEmpty: '주변에서 좌표가 있는 유산을 찾지 못했습니다.',
     nearbyDistance: '{{distance}} 거리',
     total: '공개된 유산 {{count}}곳',
+    mapText: '호앙사, 쯔엉사 군도를 포함해 베트남 지도에서 유산의 위치를 확인하세요.',
+    timelineText: '유산별 시대와 사건을 연도순으로 살펴보세요.',
   },
   search: {
     title: '유산 검색',
@@ -91,7 +93,7 @@ export const ko: Strings = {
     notFoundText: '이 유산은 존재하지 않거나 공개되지 않았습니다.',
     readMore: '더 읽기',
   },
-  timeline: { title: '연표', empty: '이 유산에는 아직 연표가 없습니다.', events: '사건 {{count}}건' },
+  timeline: { title: '연표', empty: '이 유산에는 아직 연표가 없습니다.', events: '사건 {{count}}건', pickerText: '유산마다 고유한 연표가 있습니다. 유산을 선택해 시대와 사건을 확인하세요.', pickerPlaceholder: '유산 이름으로 빠르게 검색' },
   summary: {
     title: '유산 요약',
     detailed: '읽기',
