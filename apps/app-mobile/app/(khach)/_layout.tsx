@@ -5,6 +5,7 @@ import type { ColorValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GuardRedirect } from '../../src/components/GuardRedirect';
 import { entryHref } from '../../src/navigation/entry';
+import { GUEST_TABS } from '../../src/navigation/tabs';
 import { useApp, useAuth } from '../../src/state/AppProvider';
 import { useTheme } from '../../src/theme/ThemeProvider';
 
@@ -37,10 +38,9 @@ export default function GuestLayout() {
         sceneStyle: { backgroundColor: theme.color.background },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: t('tabs.home'), tabBarIcon: icon('home-outline', 'home') }} />
-      <Tabs.Screen name="tim-kiem" options={{ title: t('tabs.search'), tabBarIcon: icon('search-outline', 'search') }} />
-      <Tabs.Screen name="ban-do" options={{ title: t('tabs.map'), tabBarIcon: icon('map-outline', 'map') }} />
-      <Tabs.Screen name="lich-su" options={{ title: t('tabs.history'), tabBarIcon: icon('time-outline', 'time') }} />
+      {GUEST_TABS.map((tab) => (
+        <Tabs.Screen key={tab.name} name={tab.name} options={{ title: t(tab.title), tabBarIcon: icon(tab.icon, tab.focusedIcon) }} />
+      ))}
     </Tabs>
   );
 }

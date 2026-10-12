@@ -8,6 +8,7 @@ import { WEB_BASE_URL } from '../config/env';
 import { Button, Chip, ErrorState, Txt } from '../components/ui';
 import { EmbedWebView } from '../embed/EmbedWebView';
 import { regionName, typeName } from '../guest/format';
+import { publicHref } from '../navigation/publicRoutes';
 import { useApp } from '../state/AppProvider';
 import { useTheme } from '../theme/ThemeProvider';
 
@@ -55,7 +56,7 @@ export function HeritageMapScreen({ select }: { select?: string }) {
         <View style={styles.fill}>
           <ErrorState message={t('map.unavailable')} retryLabel={t('common.retry')} onRetry={() => { setFailed(false); setAttempt((n) => n + 1); }} />
           <View style={styles.center}>
-            <Button label={t('map.listInstead')} variant="secondary" onPress={() => router.push(mode === 'student' ? '/(hoc-sinh)/hoc' : '/(khach)/tim-kiem')} />
+            <Button label={t('map.listInstead')} variant="secondary" onPress={() => router.push(publicHref(mode, 'search'))} />
           </View>
         </View>
       ) : (

@@ -2,7 +2,7 @@
 // Chỗ chèn giá trị viết `{{tên}}` theo i18next.
 
 export const studentVi = {
-  tabs: { learn: 'Trang học', code: 'Nhập mã', progress: 'Tiến độ', account: 'Của em' },
+  tabs: { learn: 'Trang học', code: 'Nhập mã', explore: 'Khám phá', progress: 'Tiến độ', account: 'Của em' },
   login: {
     title: 'Học sinh đăng nhập',
     subtitle: 'Em dùng mã học sinh và mật khẩu trên phiếu đăng nhập.',

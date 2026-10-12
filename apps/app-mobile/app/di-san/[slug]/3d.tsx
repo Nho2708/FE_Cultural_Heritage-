@@ -10,13 +10,21 @@ import { EmbedWebView } from '../../../src/embed/EmbedWebView';
 import { useHistory } from '../../../src/guest/HistoryProvider';
 import { useHeritageDetail, useModel } from '../../../src/guest/queries';
 import { useApp } from '../../../src/state/AppProvider';
-import { useTheme } from '../../../src/theme/ThemeProvider';
+import { DefaultThemeScope, useTheme } from '../../../src/theme/ThemeProvider';
 import { Photo } from '../../../src/components/Heritage';
 
 // Xem mô hình 3D (miễn phí, không cần đăng nhập): trang nhúng của web học tập dùng `<model-viewer>` mở trong WebView, nên một trình xem cho cả web và app.
 // Thiết bị không vẽ được 3D hoặc tải lỗi thì quay về bộ ảnh của di sản kèm thông báo. Ghi "đã xem 3D" vào lịch sử trên máy khi mô hình tải xong.
 
-export default function Model3D() {
+export default function Model3DPage() {
+  return (
+    <DefaultThemeScope>
+      <Model3D />
+    </DefaultThemeScope>
+  );
+}
+
+function Model3D() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const { t } = useTranslation();
   const { mode, language } = useApp();

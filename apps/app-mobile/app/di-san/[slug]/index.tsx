@@ -11,13 +11,23 @@ import { cardLine, externalUrl, levelName, provinceName, typeName } from '../../
 import { useHistory } from '../../../src/guest/HistoryProvider';
 import { useHeritageDetail } from '../../../src/guest/queries';
 import { localizeDateText } from '../../../src/i18n/dates';
+import { publicHref } from '../../../src/navigation/publicRoutes';
 import { useApp } from '../../../src/state/AppProvider';
-import { useTheme } from '../../../src/theme/ThemeProvider';
+import { DefaultThemeScope, useTheme } from '../../../src/theme/ThemeProvider';
 
 // Chi tiết di sản (khách và học sinh đều xem được): ảnh, mô tả, tóm tắt, nghe thuyết minh, xem 3D, dòng thời gian, bản đồ, hình ảnh và nguồn tham khảo.
 // Mở trang thì ghi "đã xem" vào lịch sử trên máy.
 
-export default function HeritageDetail() {
+/** Bộ giao diện mặc định cho cả khách và học sinh (kể cả khi học sinh mở từ thẻ di sản của bài học). */
+export default function HeritageDetailPage() {
+  return (
+    <DefaultThemeScope>
+      <HeritageDetail />
+    </DefaultThemeScope>
+  );
+}
+
+function HeritageDetail() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const { language, mode } = useApp();
   const { t } = useTranslation();
@@ -110,7 +120,7 @@ export default function HeritageDetail() {
             <Button
               label={t('detail.onMap')}
               variant="secondary"
-              onPress={() => router.push({ pathname: mode === 'guest' ? '/(khach)/ban-do' : '/ban-do-di-san', params: { chon: data.slug } })}
+              onPress={() => router.push(publicHref(mode, 'map', { chon: data.slug }))}
             />
           ) : null}
         </View>
