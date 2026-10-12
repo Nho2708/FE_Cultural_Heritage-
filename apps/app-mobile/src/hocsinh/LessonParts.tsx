@@ -1,8 +1,9 @@
 import { paragraphsOf } from '@dsvhvn/dung-chung/lesson-data';
 import type { StudentHeritageCard, StudentQuiz, StudentSection } from '@dsvhvn/dung-chung/api';
 import { useRouter } from 'expo-router';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import { Photo } from '../components/Heritage';
 import { Badge, Button, Card, EmptyState, Txt, styles as ui } from '../components/ui';
 import { useNarration } from '../speech/useNarration';
@@ -101,11 +102,19 @@ export function QuizList({ quizzes, large = false }: { quizzes: StudentQuiz[]; l
   );
 }
 
-/** Nút loa đọc to một đoạn bằng giọng tiếng Việt của điện thoại; cấp 1 dùng để nghe chuyện. Không có giọng thì ẩn nút. */
-export function ReadAloud({ text, label, big = false }: { text: string; label?: string; big?: boolean }) {
+/**
+ * Nút loa đọc to một đoạn bằng giọng tiếng Việt của điện thoại; cấp 1 dùng để nghe chuyện và nghe câu hỏi. Không có giọng thì ẩn nút.
+ * `auto` bật thì đọc ngay khi màn hình hiện ra (mỗi đoạn, mỗi câu một lần vì khối được dựng lại theo `key`); nút loa vẫn để dừng hoặc nghe lại.
+ * Có `onAutoChange` thì hiện công tắc "Tự đọc to" để em tắt, tắt thì dừng ngay.
+ */
+export function ReadAloud({ text, label, big = false, auto = false, onAutoChange }: { text: string; label?: string; big?: boolean; auto?: boolean; onAutoChange?: (on: boolean) => void }) {
   const { t } = useTranslation();
   const theme = useTheme();
   const narration = useNarration(text, 'vi-VN');
+  const { playWhenReady } = narration;
+  useEffect(() => {
+    if (auto) void playWhenReady();
+  }, [auto, playWhenReady]);
   if (narration.voiceState === 'unsupported' || narration.sentences.length === 0) return null;
   const speaking = narration.status === 'playing';
   const size = big ? 64 : 44;
@@ -124,6 +133,20 @@ export function ReadAloud({ text, label, big = false }: { text: string; label?: 
           {speaking ? t('hs.lesson.reading') : t('hs.lesson.tapSpeaker')}
         </Txt>
       </View>
+      {onAutoChange ? (
+        <View style={[ui.row, { gap: 10 }]}>
+          <Switch
+            value={auto}
+            onValueChange={(on) => {
+              onAutoChange(on);
+              if (!on) narration.stop();
+            }}
+            accessibilityLabel={t('hs.lesson.autoRead')}
+            trackColor={{ true: theme.color.primary, false: theme.color.border }}
+          />
+          <Txt variant="label">{t('hs.lesson.autoRead')}</Txt>
+        </View>
+      ) : null}
       {speaking ? (
         <Txt style={{ backgroundColor: theme.color.accent, color: theme.color.onAccent, borderRadius: 6, padding: 6 }}>{narration.sentences[narration.index] ?? ''}</Txt>
       ) : null}

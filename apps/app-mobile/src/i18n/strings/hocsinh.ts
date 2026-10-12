@@ -93,6 +93,8 @@ export const studentVi = {
     partOf: 'Đoạn {{index}} / {{total}}',
     listenStory: 'Nghe chuyện',
     readAloud: 'Đọc to đoạn này',
+    autoRead: 'Tự đọc to',
+    stepOf: 'Bước {{index}} / {{total}}',
     stopReading: 'Dừng đọc',
     reading: 'Đang đọc cho em nghe…',
     readAgain: 'Nghe lại',

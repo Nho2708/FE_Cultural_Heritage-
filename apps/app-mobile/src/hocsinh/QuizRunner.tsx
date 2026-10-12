@@ -9,6 +9,7 @@ import { Button, Card, Notice, Txt, styles as ui } from '../components/ui';
 import { KEYS, prefs } from '../storage/keyValue';
 import { useServices } from '../state/AppProvider';
 import { useTheme } from '../theme/ThemeProvider';
+import { useAutoRead } from './autoRead';
 import { ReadAloud } from './LessonParts';
 import { QuestionInput, type QuizLevel } from './QuestionInput';
 import { useQuizAttempt, type QuizAttemptSession, type SaveStatus } from './useQuizAttempt';
@@ -123,6 +124,7 @@ function Passage({ question }: { question: AttemptQuestion }) {
 function QuestionCard({ question, index, total, level, answer, onChange, readAloud, inlinePassage = true, disabled, aside }: { question: AttemptQuestion; index: number; total: number; level: QuizLevel; answer: QuestionSubmission | null; onChange: (next: QuestionSubmission) => void; readAloud: boolean; inlinePassage?: boolean; disabled: boolean; aside?: React.ReactNode }) {
   const { t } = useTranslation();
   const theme = useTheme();
+  const { autoRead, setAutoRead } = useAutoRead();
   const fill = question.questionType === 'FILL_BLANK';
   return (
     <Card>
@@ -140,7 +142,9 @@ function QuestionCard({ question, index, total, level, answer, onChange, readAlo
             {question.content}
           </Txt>
         ) : null}
-        {readAloud ? <ReadAloud key={question.questionId} text={fill ? question.content.replace(/_{3,}/gu, '…') : question.content} big /> : null}
+        {readAloud ? (
+          <ReadAloud key={question.questionId} text={fill ? question.content.replace(/_{3,}/gu, '…') : question.content} big auto={autoRead === true} onAutoChange={setAutoRead} />
+        ) : null}
         {aside}
         <QuestionInput question={question} answer={answer} onChange={onChange} level={level} disabled={disabled} />
       </View>
