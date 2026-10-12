@@ -23,6 +23,8 @@ function IntroBody({ intro, onClose, code }: { intro: StudentQuizIntro; onClose:
   const timed = intro.timeLimitMinutes !== null;
   const open = intro.action === 'START' || intro.action === 'CONTINUE';
   const name = intro.name ?? 'Bài kiểm tra';
+  // Cấp 1 gọi bài kiểm tra là bài chơi: nút và lời nhắc dùng "Bắt đầu chơi" (nội dung hộp thoại đổi theo cấp).
+  const startLabel = intro.level === 1 ? 'Bắt đầu chơi' : 'Bắt đầu';
 
   return (
     <div className="flex flex-col gap-4">
@@ -41,7 +43,7 @@ function IntroBody({ intro, onClose, code }: { intro: StudentQuizIntro; onClose:
       {intro.action === 'START' && (
         <p className="type-body-m text-on-surface">
           Bài kiểm tra “{name}” có {intro.questionCount} câu
-          {timed ? `, thời gian làm ${intro.timeLimitMinutes} phút` : ', không giới hạn thời gian'}. Em chỉ được làm một lần. Bấm “Bắt đầu” để làm bài.
+          {timed ? `, thời gian làm ${intro.timeLimitMinutes} phút` : ', không giới hạn thời gian'}. Em chỉ được làm một lần. Bấm “{startLabel}” để làm bài.
         </p>
       )}
       {intro.action === 'CONTINUE' && (
@@ -61,7 +63,7 @@ function IntroBody({ intro, onClose, code }: { intro: StudentQuizIntro; onClose:
               Để sau
             </Button>
             <Button size="lg" onClick={() => void navigate(takeQuizPath(code, intro.id), { state: { confirmed: true } })}>
-              {intro.action === 'CONTINUE' ? 'Làm tiếp' : 'Bắt đầu'}
+              {intro.action === 'CONTINUE' ? 'Làm tiếp' : startLabel}
             </Button>
           </>
         ) : intro.action === 'VIEW_RESULT' && intro.attemptId !== null ? (
