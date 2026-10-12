@@ -1,4 +1,5 @@
 import { LESSON_LIMITS, LESSON_SECTION_LABEL, countLessonWords } from '@dsvhvn/dung-chung';
+import { imageCreditLine } from '@dsvhvn/dung-chung/lesson-data';
 import type {
   LessonDetail,
   LessonDraft,
@@ -204,9 +205,9 @@ export function checkForm(state: LessonFormState, frame: LessonFrame): FormCheck
   return { missing, warnings };
 }
 
-/** Dòng ghi công của một hình: nguồn, tác giả, giấy phép. */
+/** Dòng ghi công của một hình (tác giả · giấy phép · nguồn), cùng cách ghép với bài học của học sinh: không lặp ghi công hai lần. */
 export function creditLine(image: { credit: string | null; author: string | null; license: string | null; source: string | null }): string {
-  return [image.credit, image.author, image.license, image.source].filter(Boolean).join(' · ');
+  return imageCreditLine(image);
 }
 
 /** Các loại phần giáo viên thêm được ở cấp này, theo thứ tự của khung. */

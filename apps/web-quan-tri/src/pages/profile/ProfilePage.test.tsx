@@ -1,7 +1,7 @@
 import { MESSAGES } from '@dsvhvn/dung-chung';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { sessionStore } from '../../lib/auth/session';
 import { envelope, mockApi, sessionOf, userOf } from '../../test/fixtures';
 import { renderApp, signInAs } from '../../test/renderApp';
@@ -91,6 +91,58 @@ describe('Hồ sơ cá nhân', () => {
       expect(calls.find((c) => c.path === '/me/avatar')?.body).toEqual({ file: { fileName: 'toi.jpg', size: 2048 } });
       expect(sessionStore.getSession()?.user.avatarUrl).toBe(withAvatar.avatarUrl);
       expect(await screen.findByRole('button', { name: 'Gỡ ảnh' })).toBeInTheDocument();
+    });
+
+    // jsdom không có URL.createObjectURL và không giải mã ảnh: giả hai thứ đó để kiểm bước thử giải mã trước khi xem trước.
+    // Trả lại jsdom nguyên trạng sau mỗi test (Image do vi.unstubAllGlobals của setup lo).
+    afterEach(() => {
+      delete (URL as { createObjectURL?: unknown }).createObjectURL;
+      delete (URL as { revokeObjectURL?: unknown }).revokeObjectURL;
+    });
+
+    function stubPreview(decodes: boolean) {
+      const revoke = vi.fn<(url: string) => void>();
+      Object.defineProperty(URL, 'createObjectURL', { configurable: true, value: () => 'blob:xem-truoc' });
+      Object.defineProperty(URL, 'revokeObjectURL', { configurable: true, value: revoke });
+      class FakeImage {
+        onload: (() => void) | null = null;
+        onerror: (() => void) | null = null;
+        naturalWidth = decodes ? 64 : 0;
+        set src(_url: string) {
+          queueMicrotask(() => (decodes ? this.onload?.() : this.onerror?.()));
+        }
+      }
+      vi.stubGlobal('Image', FakeImage);
+      return revoke;
+    }
+
+    it('tệp đổi đuôi thành .jpg nhưng không phải ảnh bị từ chối sau khi thử giải mã: không xem trước, không gọi API', async () => {
+      signInAs('TEACHER');
+      const calls = mockApi((call) => (call.path === '/me' && call.method === 'GET' ? envelope(200, { data: userOf('TEACHER') }) : undefined));
+      const revoke = stubPreview(false);
+      const user = userEvent.setup();
+      renderApp('/tai-khoan');
+
+      await user.upload(await screen.findByLabelText('Chọn tệp ảnh đại diện'), new File(['đây là chữ, không phải ảnh'], 'gia-anh.jpg', { type: 'image/jpeg' }));
+
+      expect(await screen.findByText('Tệp ảnh không hợp lệ: không đọc được, tệp không phải ảnh hoặc đã bị hỏng.')).toBeInTheDocument();
+      expect(screen.queryByAltText('Ảnh đại diện mới (xem trước)')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Tải ảnh lên' })).not.toBeInTheDocument();
+      expect(revoke).toHaveBeenCalledWith('blob:xem-truoc');
+      expect(calls.some((c) => c.path === '/me/avatar')).toBe(false);
+    });
+
+    it('ảnh giải mã được thì hiện xem trước và nút Tải ảnh lên', async () => {
+      signInAs('TEACHER');
+      mockApi((call) => (call.path === '/me' && call.method === 'GET' ? envelope(200, { data: userOf('TEACHER') }) : undefined));
+      stubPreview(true);
+      const user = userEvent.setup();
+      renderApp('/tai-khoan');
+
+      await user.upload(await screen.findByLabelText('Chọn tệp ảnh đại diện'), jpg());
+
+      expect(await screen.findByAltText('Ảnh đại diện mới (xem trước)')).toHaveAttribute('src', 'blob:xem-truoc');
+      expect(screen.getByRole('button', { name: 'Tải ảnh lên' })).toBeInTheDocument();
     });
 
     it('chọn rồi bấm Hủy thì không gọi API', async () => {

@@ -41,6 +41,19 @@ export function validateImageFile(file: PickedFile | null): string | null {
 }
 
 /**
+ * Trình duyệt có giải mã được ảnh ở địa chỉ này không. Tệp đổi đuôi thành .jpg nhưng không phải ảnh qua được kiểm tên và loại
+ * tệp, chỉ lộ ra khi vẽ: hỏi trước khi hiện xem trước để không hiện khung ảnh hỏng. Backend vẫn kiểm bằng nội dung tệp.
+ */
+export function canDecodeImage(url: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const image = new Image();
+    image.onload = () => resolve(image.naturalWidth > 0);
+    image.onerror = () => resolve(false);
+    image.src = url;
+  });
+}
+
+/**
  * Đường dẫn tệp trong kho dạng `/files/...` là đường dẫn tương đối so với máy chủ API, nên phải ghép với địa chỉ gốc của API
  * (bỏ phần `/api/v1`). Đường dẫn đủ địa chỉ (cấu hình `Storage:PublicBaseUrl` hoặc ảnh ngoài) giữ nguyên.
  */

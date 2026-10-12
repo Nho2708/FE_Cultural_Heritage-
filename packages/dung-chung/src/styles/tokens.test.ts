@@ -25,4 +25,24 @@ describe('token CSS sinh từ design/tokens.json', () => {
     expect(tokensCss).toContain('[data-theme="system"] {');
     expect(tokensCss).not.toMatch(/prefers-color-scheme: dark\)\s*\{\s*:root/);
   });
+
+  it('vùng dark khai báo lại token component và đường viền trỏ về token ngữ nghĩa có bản dark (ô nhập, menu đang chọn, bảng…)', () => {
+    const dark = tokensCss.slice(tokensCss.indexOf('[data-theme="dark"] {'), tokensCss.indexOf('@media (prefers-color-scheme: dark)'));
+    const system = tokensCss.slice(tokensCss.indexOf('[data-theme="system"] {'));
+    for (const line of [
+      '--dsv-input-bg: var(--dsv-color-surface);',
+      '--dsv-input-border: var(--dsv-color-border-strong);',
+      '--dsv-drawer-item-active-bg: var(--dsv-color-primary-container);',
+      '--dsv-carousel-arrow-bg: var(--dsv-color-surface);',
+      '--dsv-table-header-bg: var(--dsv-color-surface-container);',
+      '--dsv-modal-bg: var(--dsv-color-surface);',
+      '--dsv-border-default: 1px solid var(--dsv-color-border-strong);',
+    ]) {
+      expect(dark).toContain(line);
+      expect(system).toContain(line);
+    }
+    // Token trỏ về token ngữ nghĩa không đổi theo dark (chữ trên ảnh) hoặc về primitive thì không cần khai báo lại.
+    expect(dark).not.toContain('--dsv-card-title-fg');
+    expect(dark).not.toContain('--dsv-circle-badge-icon');
+  });
 });

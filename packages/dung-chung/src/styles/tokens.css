@@ -1,6 +1,6 @@
 /* TỆP SINH TỰ ĐỘNG — KHÔNG SỬA TAY.
  * Nguồn: design/tokens.json · Lệnh: npm run gen:tokens
- * 79 primitive · 67 semantic · 78 component · 61 ghi đè dark
+ * 79 primitive · 67 semantic · 78 component · 61 ghi đè dark (+67 token dẫn xuất khai báo lại)
  */
 
 :root {
@@ -435,6 +435,75 @@
   --dsv-color-ai-approved: var(--color-jade-300);
   --dsv-color-ai-on-container: var(--color-indigo-100);
   --dsv-color-ai-progress: var(--color-indigo-300);
+
+  /* Token component và đường viền trỏ về token ngữ nghĩa có bản dark */
+  --dsv-topbar-bg: var(--dsv-color-surface);
+  --dsv-topbar-fg: var(--dsv-color-on-surface);
+  --dsv-topbar-hover-bg: var(--dsv-color-surface-container);
+  --dsv-drawer-bg: var(--dsv-color-surface);
+  --dsv-drawer-item-hover-bg: var(--dsv-color-surface-container);
+  --dsv-drawer-item-active-bg: var(--dsv-color-primary-container);
+  --dsv-drawer-divider: var(--dsv-color-border);
+  --dsv-card-placeholder-bg: var(--dsv-color-image-placeholder);
+  --dsv-circle-kicker-fg: var(--dsv-color-on-surface-muted);
+  --dsv-circle-badge-bg: var(--dsv-color-surface);
+  --dsv-pill-bg: var(--dsv-color-primary);
+  --dsv-pill-bg-hover: var(--dsv-color-primary-hover);
+  --dsv-pill-bg-active: var(--dsv-color-primary-active);
+  --dsv-pill-fg: var(--dsv-color-on-primary);
+  --dsv-carousel-arrow-bg: var(--dsv-color-surface);
+  --dsv-section-heading-fg: var(--dsv-color-on-surface);
+  --dsv-section-subheading-fg: var(--dsv-color-on-surface-variant);
+  --dsv-input-bg: var(--dsv-color-surface);
+  --dsv-input-border: var(--dsv-color-border-strong);
+  --dsv-input-border-hover: var(--dsv-color-on-surface-variant);
+  --dsv-input-border-focus: var(--dsv-color-primary);
+  --dsv-input-border-error: var(--dsv-color-danger);
+  --dsv-input-placeholder-fg: var(--dsv-color-on-surface-disabled);
+  --dsv-input-disabled-bg: var(--dsv-color-surface-container);
+  --dsv-quiz-option-border: var(--dsv-color-border-strong);
+  --dsv-quiz-selected-border: var(--dsv-color-primary);
+  --dsv-quiz-correct-bg: var(--dsv-color-success-container);
+  --dsv-quiz-correct-fg: var(--dsv-color-on-success-container);
+  --dsv-quiz-wrong-bg: var(--dsv-color-danger-container);
+  --dsv-quiz-wrong-fg: var(--dsv-color-on-danger-container);
+  --dsv-progress-track: var(--dsv-color-surface-container-high);
+  --dsv-progress-fill: var(--dsv-color-tertiary);
+  --dsv-progress-fill-ai: var(--dsv-color-ai-progress);
+  --dsv-badge-gold-fg: var(--dsv-color-secondary);
+  --dsv-verified-fg: var(--dsv-color-success);
+  --dsv-unverified-fg: var(--dsv-color-warning-text);
+  --dsv-unverified-bg: var(--dsv-color-warning-container);
+  --dsv-citation-fg: var(--dsv-color-on-surface-variant);
+  --dsv-citation-border: var(--dsv-color-border);
+  --dsv-table-header-bg: var(--dsv-color-surface-container);
+  --dsv-table-row-hover-bg: var(--dsv-color-surface-container-low);
+  --dsv-table-row-selected-bg: var(--dsv-color-primary-soft);
+  --dsv-table-border: var(--dsv-color-surface-container-high);
+  --dsv-toast-bg: var(--dsv-color-inverse-surface);
+  --dsv-toast-fg: var(--dsv-color-inverse-on-surface);
+  --dsv-modal-bg: var(--dsv-color-surface);
+  --dsv-tab-active-fg: var(--dsv-color-primary);
+  --dsv-tab-active-indicator: var(--dsv-color-primary);
+  --dsv-tab-inactive-fg: var(--dsv-color-on-surface-variant);
+  --dsv-mappin-default: var(--dsv-color-primary);
+  --dsv-mappin-cluster: var(--dsv-color-secondary);
+  --dsv-mappin-selected: var(--dsv-color-primary-active);
+  --dsv-timeline-axis: var(--dsv-color-border);
+  --dsv-timeline-marker: var(--dsv-color-primary);
+  --dsv-leaderboard-rank-1: var(--dsv-color-secondary);
+  --dsv-leaderboard-rank-2: var(--dsv-color-on-surface-disabled);
+  --dsv-leaderboard-rank-3: var(--dsv-color-on-surface-muted);
+  --dsv-upload-dropzone-border: var(--dsv-color-border-strong);
+  --dsv-upload-dropzone-bg: var(--dsv-color-surface-container-low);
+  --dsv-ai-panel-bg: var(--dsv-color-ai-main-variant);
+  --dsv-ai-panel-border: var(--dsv-color-ai-main);
+  --dsv-ai-panel-fg: var(--dsv-color-ai-on-container);
+  --dsv-border-hairline: 1px solid var(--dsv-color-border);
+  --dsv-border-default: 1px solid var(--dsv-color-border-strong);
+  --dsv-border-emphasis: 2px solid var(--dsv-color-primary);
+  --dsv-border-accent-left: 3px solid var(--dsv-color-ai-main);
+  --dsv-border-dashed: 2px dashed var(--dsv-color-border-strong);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -500,5 +569,74 @@
     --dsv-color-ai-approved: var(--color-jade-300);
     --dsv-color-ai-on-container: var(--color-indigo-100);
     --dsv-color-ai-progress: var(--color-indigo-300);
+
+    /* Token component và đường viền trỏ về token ngữ nghĩa có bản dark */
+    --dsv-topbar-bg: var(--dsv-color-surface);
+    --dsv-topbar-fg: var(--dsv-color-on-surface);
+    --dsv-topbar-hover-bg: var(--dsv-color-surface-container);
+    --dsv-drawer-bg: var(--dsv-color-surface);
+    --dsv-drawer-item-hover-bg: var(--dsv-color-surface-container);
+    --dsv-drawer-item-active-bg: var(--dsv-color-primary-container);
+    --dsv-drawer-divider: var(--dsv-color-border);
+    --dsv-card-placeholder-bg: var(--dsv-color-image-placeholder);
+    --dsv-circle-kicker-fg: var(--dsv-color-on-surface-muted);
+    --dsv-circle-badge-bg: var(--dsv-color-surface);
+    --dsv-pill-bg: var(--dsv-color-primary);
+    --dsv-pill-bg-hover: var(--dsv-color-primary-hover);
+    --dsv-pill-bg-active: var(--dsv-color-primary-active);
+    --dsv-pill-fg: var(--dsv-color-on-primary);
+    --dsv-carousel-arrow-bg: var(--dsv-color-surface);
+    --dsv-section-heading-fg: var(--dsv-color-on-surface);
+    --dsv-section-subheading-fg: var(--dsv-color-on-surface-variant);
+    --dsv-input-bg: var(--dsv-color-surface);
+    --dsv-input-border: var(--dsv-color-border-strong);
+    --dsv-input-border-hover: var(--dsv-color-on-surface-variant);
+    --dsv-input-border-focus: var(--dsv-color-primary);
+    --dsv-input-border-error: var(--dsv-color-danger);
+    --dsv-input-placeholder-fg: var(--dsv-color-on-surface-disabled);
+    --dsv-input-disabled-bg: var(--dsv-color-surface-container);
+    --dsv-quiz-option-border: var(--dsv-color-border-strong);
+    --dsv-quiz-selected-border: var(--dsv-color-primary);
+    --dsv-quiz-correct-bg: var(--dsv-color-success-container);
+    --dsv-quiz-correct-fg: var(--dsv-color-on-success-container);
+    --dsv-quiz-wrong-bg: var(--dsv-color-danger-container);
+    --dsv-quiz-wrong-fg: var(--dsv-color-on-danger-container);
+    --dsv-progress-track: var(--dsv-color-surface-container-high);
+    --dsv-progress-fill: var(--dsv-color-tertiary);
+    --dsv-progress-fill-ai: var(--dsv-color-ai-progress);
+    --dsv-badge-gold-fg: var(--dsv-color-secondary);
+    --dsv-verified-fg: var(--dsv-color-success);
+    --dsv-unverified-fg: var(--dsv-color-warning-text);
+    --dsv-unverified-bg: var(--dsv-color-warning-container);
+    --dsv-citation-fg: var(--dsv-color-on-surface-variant);
+    --dsv-citation-border: var(--dsv-color-border);
+    --dsv-table-header-bg: var(--dsv-color-surface-container);
+    --dsv-table-row-hover-bg: var(--dsv-color-surface-container-low);
+    --dsv-table-row-selected-bg: var(--dsv-color-primary-soft);
+    --dsv-table-border: var(--dsv-color-surface-container-high);
+    --dsv-toast-bg: var(--dsv-color-inverse-surface);
+    --dsv-toast-fg: var(--dsv-color-inverse-on-surface);
+    --dsv-modal-bg: var(--dsv-color-surface);
+    --dsv-tab-active-fg: var(--dsv-color-primary);
+    --dsv-tab-active-indicator: var(--dsv-color-primary);
+    --dsv-tab-inactive-fg: var(--dsv-color-on-surface-variant);
+    --dsv-mappin-default: var(--dsv-color-primary);
+    --dsv-mappin-cluster: var(--dsv-color-secondary);
+    --dsv-mappin-selected: var(--dsv-color-primary-active);
+    --dsv-timeline-axis: var(--dsv-color-border);
+    --dsv-timeline-marker: var(--dsv-color-primary);
+    --dsv-leaderboard-rank-1: var(--dsv-color-secondary);
+    --dsv-leaderboard-rank-2: var(--dsv-color-on-surface-disabled);
+    --dsv-leaderboard-rank-3: var(--dsv-color-on-surface-muted);
+    --dsv-upload-dropzone-border: var(--dsv-color-border-strong);
+    --dsv-upload-dropzone-bg: var(--dsv-color-surface-container-low);
+    --dsv-ai-panel-bg: var(--dsv-color-ai-main-variant);
+    --dsv-ai-panel-border: var(--dsv-color-ai-main);
+    --dsv-ai-panel-fg: var(--dsv-color-ai-on-container);
+    --dsv-border-hairline: 1px solid var(--dsv-color-border);
+    --dsv-border-default: 1px solid var(--dsv-color-border-strong);
+    --dsv-border-emphasis: 2px solid var(--dsv-color-primary);
+    --dsv-border-accent-left: 3px solid var(--dsv-color-ai-main);
+    --dsv-border-dashed: 2px dashed var(--dsv-color-border-strong);
   }
 }

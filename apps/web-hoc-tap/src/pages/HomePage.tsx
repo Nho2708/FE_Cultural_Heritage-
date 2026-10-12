@@ -146,7 +146,7 @@ function ExploreEntries({ featured }: { featured: HeritageCard[] }) {
             className="group relative flex min-h-[220px] flex-col justify-end gap-2 overflow-hidden rounded-md bg-inverse-surface p-6"
           >
             <Thumbnail url={tile.image} className="transition-transform duration-(--dsv-duration-control) ease-out group-hover:scale-105" />
-            <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-(--dsv-card-scrim-top) to-(--dsv-card-scrim-strong)" />
+            <div aria-hidden="true" className="absolute inset-0 entry-tile-scrim" />
             <span className="relative flex w-fit rounded-full bg-surface p-2 text-primary">
               <Icon name={tile.icon} size={20} />
             </span>
