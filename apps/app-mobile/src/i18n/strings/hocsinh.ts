@@ -61,6 +61,8 @@ export const studentVi = {
     submit: 'Mở bài học',
     hint: 'Mã bài học do thầy cô cung cấp. Cùng mã này mở luôn bài kiểm tra của bài, em không phải nhập lần hai.',
     required: 'Em hãy nhập mã bài học.',
+    recent: 'Mã em đã mở gần đây trên máy này',
+    lastOpened: 'Mở lần cuối {{date}}',
   },
   lesson: {
     title: 'Bài học',

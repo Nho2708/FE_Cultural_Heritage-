@@ -5,11 +5,12 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Field } from '../../src/components/Field';
 import { Button, Notice, Screen, Txt } from '../../src/components/ui';
+import { RecentCodes } from '../../src/hocsinh/RecentCodes';
 import { serverErrorText } from '../../src/hocsinh/serverErrorText';
 import { useAuth, useServices } from '../../src/state/AppProvider';
 
 // Nhập mã bài học: em chỉ gõ mã (viết hoa, bỏ khoảng trắng và dấu gạch). Máy chủ kiểm mã, bài đã xuất bản và bài thuộc lớp của em; sai thì báo chung một câu và giới hạn
-// số lần nhập sai. Cùng mã này mở luôn bài kiểm tra của bài, em không nhập lần hai.
+// số lần nhập sai. Cùng mã này mở luôn bài kiểm tra của bài, em không nhập lần hai. Dưới ô nhập là các mã em đã mở gần đây trên máy này.
 
 export default function EnterCode() {
   const { t } = useTranslation();
@@ -57,6 +58,7 @@ export default function EnterCode() {
         onSubmitEditing={() => void submit()}
       />
       <Button label={t('hs.code.submit')} loading={loading} onPress={() => void submit()} full />
+      <RecentCodes />
     </Screen>
   );
 }
