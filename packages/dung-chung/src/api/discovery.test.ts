@@ -101,3 +101,26 @@ describe('khám phá di sản công khai', () => {
     expect(calls.map((c) => c.path)).toEqual(['/preview/heritages/ma-xem-truoc?lang=ko', '/preview/heritages/ma-xem-truoc/timeline']);
   });
 });
+
+describe('ngôn ngữ mặc định của bộ API khám phá (web quản trị chỉ tiếng Việt)', () => {
+  const vi = createDiscoveryApi(createApiClient({ baseUrl: 'http://api.test/api/v1', getAccessToken: () => 'access-dang-nhap' }), { lang: 'vi' });
+  const langOf = (path: string) => new URL(`http://x${path}`).searchParams.get('lang');
+
+  it('gửi kèm lang=vi ở mọi API có nội dung theo ngôn ngữ để máy chủ không chọn theo Accept-Language của trình duyệt', async () => {
+    const calls = mockApi(() => envelope(200, { data: { items: [], page: 1, pageSize: 12, totalItems: 0, totalPages: 0, pins: [], phases: [] } }));
+    await vi.search({ keyword: 'hoi an' }, { page: 1, pageSize: 12 });
+    await vi.map({});
+    await vi.detail('do-thi-co-hoi-an');
+    await vi.timeline('do-thi-co-hoi-an');
+    await vi.home();
+    expect(calls.map((c) => langOf(c.path))).toEqual(['vi', 'vi', 'vi', 'vi', 'vi']);
+  });
+
+  it('danh mục lọc không có nội dung theo ngôn ngữ nên không gửi lang; lời gọi chỉ rõ ngôn ngữ thì thắng mặc định', async () => {
+    const calls = mockApi(() => envelope(200, { data: {} }));
+    await vi.filters();
+    await vi.detail('do-thi-co-hoi-an', { lang: 'en' });
+    expect(calls[0]!.path).toBe('/public/filters');
+    expect(langOf(calls[1]!.path)).toBe('en');
+  });
+});

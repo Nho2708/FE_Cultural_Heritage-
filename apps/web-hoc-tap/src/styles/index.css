@@ -21,6 +21,14 @@
   --dsv-inline-gap: 16px;
 }
 
+/*
+ * Lớp phủ của hai thẻ lối vào ở trang chủ (Bản đồ di sản, Dòng thời gian): chữ trắng nằm trên ảnh nổi bật có thể rất sáng nên
+ * phủ đậm dần về đáy và đậm hơn lớp phủ của thẻ di sản thường, để tiêu đề và mô tả đọc được trên mọi ảnh.
+ */
+@utility entry-tile-scrim {
+  background-image: linear-gradient(to bottom, var(--dsv-card-scrim-top) 0%, var(--dsv-card-scrim-soft) 35%, rgb(0 0 0 / 0.82) 100%);
+}
+
 /* Cỡ chữ nội dung câu hỏi khi làm bài kiểm tra (cấp 1 từ 22px, cấp 2 và 3 từ 18px). */
 @utility type-question {
   font-family: var(--dsv-font-sans);

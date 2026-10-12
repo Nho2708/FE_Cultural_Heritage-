@@ -10,6 +10,21 @@ export function paragraphsOf(text: string | null | undefined): string[] {
     .filter((p) => p !== '');
 }
 
+/**
+ * Dòng ghi công của một hình. Máy chủ gửi `credit` đã ghép sẵn ("tác giả · giấy phép · nguồn") và tách thêm ba phần để màn hình
+ * nào cần thì hiện riêng; chỉ nối thêm phần nào chưa có trong dòng ghép sẵn, không nối cả hai (sẽ lặp ghi công hai lần).
+ */
+export function imageCreditLine(
+  image: { credit: string | null; author: string | null; license: string | null; source: string | null } | null | undefined,
+): string {
+  if (!image) return '';
+  const composed = image.credit?.trim() ?? '';
+  const missing = [image.author, image.license, image.source]
+    .map((part) => part?.trim() ?? '')
+    .filter((part) => part !== '' && !composed.includes(part));
+  return [composed, ...missing].filter((part) => part !== '').join(' · ');
+}
+
 export const sectionsOf = (lesson: StudentLesson, ...types: StudentSection['type'][]): StudentSection[] =>
   lesson.sections.filter((s) => types.includes(s.type)).sort((a, b) => a.sortOrder - b.sortOrder);
 
