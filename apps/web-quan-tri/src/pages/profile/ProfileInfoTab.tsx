@@ -2,6 +2,7 @@ import {
   IMAGE_UPLOAD,
   MESSAGES,
   ROLE_LABEL,
+  canDecodeImage,
   collectErrors,
   focusFirstInvalid,
   formatDate,
@@ -176,20 +177,41 @@ function AvatarEditor({ user }: { user: StaffProfile }) {
     [],
   );
 
-  const pick = (picked: File | null) => {
+  // Số thứ tự lần chọn: em chọn tệp khác trong lúc đang thử giải mã tệp trước thì kết quả của lần trước bị bỏ.
+  const pickSeq = useRef(0);
+
+  const pick = async (picked: File | null) => {
+    const seq = ++pickSeq.current;
     releasePreview();
+    setPreview(null);
+    setFile(null);
     const problem = picked ? validateImageFile(picked) : null;
     setError(problem);
-    previewRef.current = picked && !problem ? previewUrlOf(picked) : null;
-    setPreview(previewRef.current);
-    setFile(picked && !problem ? picked : null);
+    if (!picked || problem) return;
+
+    // Tệp đổi đuôi thành .jpg nhưng không phải ảnh qua được kiểm tên và loại tệp: thử giải mã trước khi hiện xem trước
+    // (không tạo được địa chỉ xem trước thì bỏ qua bước này, backend vẫn kiểm bằng nội dung tệp).
+    const url = previewUrlOf(picked);
+    const decodes = url ? await canDecodeImage(url) : true;
+    if (seq !== pickSeq.current) {
+      if (url) URL.revokeObjectURL(url);
+      return;
+    }
+    if (!decodes) {
+      if (url) URL.revokeObjectURL(url);
+      setError(MESSAGES.invalid('Tệp ảnh', 'không đọc được, tệp không phải ảnh hoặc đã bị hỏng'));
+      return;
+    }
+    previewRef.current = url;
+    setPreview(url);
+    setFile(picked);
   };
 
   const onChoose = (event: ChangeEvent<HTMLInputElement>) => {
     const picked = event.target.files?.[0] ?? null;
     // Cho phép chọn lại đúng tệp vừa bỏ.
     event.target.value = '';
-    if (picked) pick(picked);
+    if (picked) void pick(picked);
   };
 
   const fail = (err: unknown) => {
@@ -259,7 +281,7 @@ function AvatarEditor({ user }: { user: StaffProfile }) {
                 <Button size="sm" loading={busy === 'upload'} disabled={busy !== null} onClick={upload}>
                   Tải ảnh lên
                 </Button>
-                <Button size="sm" variant="ghost" disabled={busy !== null} onClick={() => pick(null)}>
+                <Button size="sm" variant="ghost" disabled={busy !== null} onClick={() => void pick(null)}>
                   Hủy
                 </Button>
               </div>
