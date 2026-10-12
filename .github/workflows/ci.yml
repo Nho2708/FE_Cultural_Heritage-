@@ -1,0 +1,91 @@
+name: CI
+
+# Kiểm tra mỗi lần đẩy nhánh làm việc hoặc mở yêu cầu hợp nhất vào main.
+on:
+  push:
+    branches: [main, 'feature/**', 'bugfix/**', 'release/**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Một lần chạy mới trên cùng nhánh sẽ hủy lần chạy cũ.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Hai web và gói dùng chung (npm workspaces ở thư mục gốc).
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - run: npm run check:tokens
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      # Chỉ báo lỗ hổng, không làm hỏng lần chạy.
+      - run: npm audit --omit=dev --audit-level=high
+        continue-on-error: true
+
+  # App mobile: có package-lock.json riêng, không thuộc workspaces.
+  mobile:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/app-mobile
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            apps/app-mobile/package-lock.json
+      # Mã dùng chung ở packages/dung-chung tìm phụ thuộc (vd. @babel/runtime) và oxlint
+      # từ node_modules ở gốc, nên cần cài cả gốc lẫn app mobile.
+      - name: Cài phụ thuộc ở gốc
+        working-directory: .
+        run: npm ci
+      - name: Cài phụ thuộc của app mobile
+        run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      # Không được để mã quảng cáo thật trong mã nguồn; chỉ nhà xuất bản thử của Google được phép.
+      - name: Kiểm không có mã quảng cáo thật
+        working-directory: .
+        run: |
+          kq=$(git grep -nE 'ca-app-pub-[0-9]{16}[~/][0-9]{10}' -- . ':!*.md' || true)
+          that=$(printf '%s\n' "$kq" | grep -v '3940256099942544' | grep -v '^$' || true)
+          if [ -n "$that" ]; then
+            echo "Có mã quảng cáo thật trong mã nguồn:"
+            echo "$that"
+            exit 1
+          fi
+          echo "Không có mã quảng cáo thật."
+
+  # Quét ký hiệu viết tắt nội bộ trong mã, commit message và tên nhánh.
+  ky-hieu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Quét ký hiệu
+        env:
+          BASE_REF: ${{ github.event_name == 'pull_request' && github.base_ref || 'main' }}
+        run: python .github/scripts/kiem-ky-hieu.py --base "origin/$BASE_REF"
