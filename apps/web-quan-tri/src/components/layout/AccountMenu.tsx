@@ -1,13 +1,14 @@
-import { MESSAGES, ROLE_LABEL, initials } from '@dsvhvn/dung-chung';
+import { MESSAGES, ROLE_LABEL } from '@dsvhvn/dung-chung';
 import { ConfirmDialog, Icon, usePopover, useToast } from '@dsvhvn/dung-chung/ui';
 import { useId, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { workArea } from '../../access/access';
 import { pathOf } from '../../access/screens';
 import { useAuth } from '../../lib/auth/context';
+import { UserAvatar } from '../UserAvatar';
 import { accountNav, type NavItem } from './navigation';
 
-// Nút Avatar (chữ viết tắt) mở menu tài khoản: tên, tên đăng nhập, vai trò, trường; "Hồ sơ", lối vào khu làm việc của
+// Nút Avatar (ảnh đại diện, chưa có thì chữ viết tắt) mở menu tài khoản: tên, tên đăng nhập, vai trò, trường; "Hồ sơ", lối vào khu làm việc của
 // vai trò; "Đăng xuất" hỏi lại bằng hộp xác nhận chung rồi về màn hình Đăng nhập (từ mọi màn hình). Đăng xuất chỉ
 // xóa access token trên trình duyệt.
 
@@ -41,12 +42,7 @@ export function AccountMenu() {
         onClick={toggle}
         className="flex size-12 items-center justify-center rounded-full transition-colors duration-(--dsv-duration-control) ease-header hover:bg-(--dsv-topbar-hover-bg)"
       >
-        <span
-          aria-hidden="true"
-          className="flex size-9 items-center justify-center rounded-full bg-surface-container-high type-control text-on-surface-variant"
-        >
-          {initials(user.fullName)}
-        </span>
+        <UserAvatar fullName={user.fullName} avatarUrl={user.avatarUrl} className="size-9 type-control" />
       </button>
 
       <div

@@ -10,7 +10,6 @@ export const LIMITS = {
   fullName: 255,
   usernameMin: 3,
   usernameMax: 50,
-  avatarUrl: 500,
   organizationName: 255,
   organizationAddress: 500,
   className: 100,
@@ -74,22 +73,6 @@ export function validateUsername(value: string): string | null {
 
 export function validateFullName(value: string): string | null {
   return validateRequiredText(value, 'họ tên', 'Họ tên', LIMITS.fullName);
-}
-
-/** Ảnh đại diện: để trống hoặc đường dẫn http/https, tối đa 500 ký tự. */
-export function validateAvatarUrl(value: string): string | null {
-  const v = value.trim();
-  if (v === '') return null;
-  let ok = v.length <= LIMITS.avatarUrl;
-  if (ok) {
-    try {
-      const url = new URL(v);
-      ok = url.protocol === 'http:' || url.protocol === 'https:';
-    } catch {
-      ok = false;
-    }
-  }
-  return ok ? null : MESSAGES.invalid('Ảnh đại diện', `phải là đường dẫn http hoặc https, tối đa ${LIMITS.avatarUrl} ký tự`);
 }
 
 /** Gom lỗi theo trường, bỏ trường không lỗi. */
