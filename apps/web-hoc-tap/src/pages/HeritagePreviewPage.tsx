@@ -56,14 +56,15 @@ export function HeritagePreviewPage() {
   const preview = query.data;
   const expiresAt = preview?.expiresAt;
 
-  // Hết hạn thì ẩn nội dung ngay, không đợi lần đọc sau: hẹn một lần đúng lúc hết hạn.
+  // Hết hạn thì ẩn nội dung ngay, không đợi lần đọc sau: hẹn đúng lúc hết hạn. Bộ hẹn giờ có thể chạy sớm vài mili giây so với
+  // đồng hồ, nên lúc đó chưa hết hạn thì hẹn lại theo thời gian còn lại (hiệu ứng chạy lại khi `now` đổi).
+  const expired = expiresAt !== undefined && now >= new Date(expiresAt).getTime();
   useEffect(() => {
-    if (!expiresAt) return;
-    const remaining = Math.max(new Date(expiresAt).getTime() - Date.now(), 0);
+    if (!expiresAt || expired) return;
+    const remaining = Math.max(new Date(expiresAt).getTime() - Date.now(), 1);
     const timer = window.setTimeout(() => setNow(Date.now()), Math.min(remaining, 2_000_000_000));
     return () => window.clearTimeout(timer);
-  }, [expiresAt]);
-  const expired = expiresAt !== undefined && now >= new Date(expiresAt).getTime();
+  }, [expiresAt, expired, now]);
 
   if (query.isError) {
     if (query.error instanceof NoOpenerError) {
