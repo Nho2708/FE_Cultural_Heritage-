@@ -9,6 +9,7 @@ import { Photo } from '../../../src/components/Heritage';
 import { SummaryPanel, type SummaryTab } from '../../../src/components/SummaryPanel';
 import { cardLine, externalUrl, levelName, provinceName, typeName } from '../../../src/guest/format';
 import { useHistory } from '../../../src/guest/HistoryProvider';
+import { DetailSuggestions } from '../../../src/guest/DetailSuggestions';
 import { useHeritageDetail } from '../../../src/guest/queries';
 import { localizeDateText } from '../../../src/i18n/dates';
 import { publicHref } from '../../../src/navigation/publicRoutes';
@@ -230,6 +231,8 @@ function HeritageDetail() {
             ) : null}
           </Section>
         ) : null}
+
+        {mode === 'guest' ? <DetailSuggestions slug={data.slug} /> : null}
       </View>
     </ScrollView>
   );

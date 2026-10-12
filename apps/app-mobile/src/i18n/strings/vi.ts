@@ -55,6 +55,18 @@ export interface Strings {
     total: string;
     mapText: string;
     timelineText: string;
+    nearbyOutside: string;
+    nearbyError: string;
+    nearbyLocating: string;
+  };
+  recommend: {
+    text: string;
+    textFeatured: string;
+    because: string;
+    reasonsLabel: string;
+    reasons: { SAME_TYPE: string; SAME_PROVINCE: string; SAME_REGION: string; SAME_LEVEL: string; OVERLAPPING_ERA: string; SIMILAR_TEXT: string };
+    fallbackNote: string;
+    loading: string;
   };
   search: {
     title: string;
@@ -209,6 +221,25 @@ export const vi: Strings = {
     total: '{{count}} di sản đã xuất bản',
     mapText: 'Xem vị trí các di sản trên bản đồ Việt Nam, gồm cả quần đảo Hoàng Sa, Trường Sa.',
     timelineText: 'Giai đoạn và sự kiện của từng di sản, theo thứ tự năm.',
+    nearbyOutside: 'Chưa dùng được "Gần bạn": bạn đang ở ngoài Việt Nam.',
+    nearbyError: 'Không xác định được vị trí của bạn. Hãy thử lại.',
+    nearbyLocating: 'Đang xác định vị trí của bạn…',
+  },
+  recommend: {
+    text: 'Di sản giống những gì bạn đã tìm, đã xem hoặc đã nghe gần đây.',
+    textFeatured: 'Bạn chưa xem di sản nào. Hãy xem thử vài di sản, mục này sẽ gợi ý theo sở thích của bạn. Trong lúc đó, đây là những di sản nổi bật.',
+    because: 'Vì bạn quan tâm đến {{name}}',
+    reasonsLabel: 'Điểm chung',
+    reasons: {
+      SAME_TYPE: 'Cùng loại hình',
+      SAME_PROVINCE: 'Cùng tỉnh, thành',
+      SAME_REGION: 'Cùng vùng',
+      SAME_LEVEL: 'Cùng cấp xếp hạng',
+      OVERLAPPING_ERA: 'Cùng thời kỳ',
+      SIMILAR_TEXT: 'Nội dung gần giống',
+    },
+    fallbackNote: 'Gợi ý được chọn theo loại hình và vùng của di sản bạn xem gần nhất.',
+    loading: 'Đang tìm gợi ý cho bạn…',
   },
   search: {
     title: 'Tìm kiếm di sản',

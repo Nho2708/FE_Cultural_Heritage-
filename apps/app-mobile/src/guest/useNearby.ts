@@ -1,4 +1,4 @@
-import type { HeritageCard } from '@dsvhvn/dung-chung/api';
+import { NEARBY_OUTSIDE_VIETNAM, type HeritageCard } from '@dsvhvn/dung-chung/api';
 import { useQuery } from '@tanstack/react-query';
 import * as Location from 'expo-location';
 import { useCallback, useMemo } from 'react';
@@ -42,5 +42,8 @@ export function useNearby() {
     void result.refetch();
   }, [setLocationEnabled, result]);
 
-  return { status, items, locate, isLoading: status === 'locating' };
+  /** Vị trí nằm ngoài khung tọa độ Việt Nam: máy chủ không tính khoảng cách và trả danh sách rỗng. */
+  const outsideVietnam = result.data?.unavailableReason === NEARBY_OUTSIDE_VIETNAM;
+
+  return { status, items, locate, outsideVietnam, isLoading: status === 'locating' };
 }
