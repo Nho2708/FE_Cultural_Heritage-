@@ -9,6 +9,7 @@ import { Button, Card, Divider, Notice, Screen, Section, Txt, styles as ui } fro
 import { API_BASE_URL, APP_CHANNEL, APP_VERSION } from '../../src/config/env';
 import { useHistory } from '../../src/guest/HistoryProvider';
 import type { HistoryEntry, HistoryKind } from '../../src/guest/historyCore';
+import { localeOf } from '../../src/i18n/dates';
 import { useApp } from '../../src/state/AppProvider';
 import { useTheme } from '../../src/theme/ThemeProvider';
 
@@ -68,7 +69,7 @@ export default function HistoryAndSettings() {
                       <View style={[ui.row, local.entry]}>
                         <Pressable accessibilityRole="button" accessibilityLabel={entry.label} onPress={() => openEntry(entry)} style={[ui.grow, { minHeight: theme.touchTarget, justifyContent: 'center' }]}>
                           <Txt numberOfLines={2}>{entry.label}</Txt>
-                          <Txt variant="caption">{new Date(entry.at).toLocaleDateString()}</Txt>
+                          <Txt variant="caption">{new Date(entry.at).toLocaleDateString(localeOf(language))}</Txt>
                         </Pressable>
                         <Button label="✕" accessibilityLabel={t('history.remove')} variant="ghost" onPress={() => history.remove(entry)} />
                       </View>
