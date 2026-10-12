@@ -84,6 +84,48 @@ describe('Trang bản đồ nhúng', () => {
     expect(messages()).toContainEqual({ type: 'pin-selected', version: 1, slug: 'quan-the-di-tich-co-do-hue' });
   });
 
+  it('ghim có dòng thời gian thì thẻ có nút mở dòng thời gian và gửi thông điệp cho app', async () => {
+    const messages = mockNativeBridge();
+    mockApi(publicApi());
+    const user = userEvent.setup();
+    renderApp('/nhung/ban-do');
+
+    await user.click(await screen.findByRole('button', { name: /Ghim Quần thể di tích Cố đô Huế/ }));
+    await user.click(await screen.findByRole('button', { name: 'Mở dòng thời gian' }));
+
+    expect(messages()).toContainEqual({ type: 'timeline-selected', version: 1, slug: 'quan-the-di-tich-co-do-hue' });
+  });
+
+  it('nhận lệnh đổi bộ lọc đủ tỉnh, cấp xếp hạng, thời kỳ và hỏi lại ghim theo bộ lọc mới', async () => {
+    mockNativeBridge();
+    const calls = mockApi(publicApi());
+    renderApp('/nhung/ban-do');
+    await screen.findByTestId('ban-do');
+
+    window.dispatchEvent(new MessageEvent('message', { data: JSON.stringify({ type: 'set-filter', version: 1, filter: { provinceId: 29, recognitionLevel: 'UNESCO', period: 'MODERN' } }) }));
+
+    await waitFor(() => {
+      const call = calls.filter((item) => item.path.startsWith('/public/heritages/map')).at(-1)!;
+      const query = new URL(`http://x${call.path}`).searchParams;
+      expect(query.get('provinceId')).toBe('29');
+      expect(query.get('recognitionLevel')).toBe('UNESCO');
+      expect(query.get('period')).toBe('MODERN');
+    });
+  });
+
+  it('bộ lọc đủ tỉnh, cấp xếp hạng và thời kỳ cũng đọc được từ địa chỉ', async () => {
+    mockNativeBridge();
+    const calls = mockApi(publicApi());
+    renderApp('/nhung/ban-do?tinh=29&cap=NATIONAL&thoi-ky=MODERN');
+    await screen.findByTestId('ban-do');
+
+    const call = calls.find((item) => item.path.startsWith('/public/heritages/map'))!;
+    const query = new URL(`http://x${call.path}`).searchParams;
+    expect(query.get('provinceId')).toBe('29');
+    expect(query.get('recognitionLevel')).toBe('NATIONAL');
+    expect(query.get('period')).toBe('MODERN');
+  });
+
   it('làm nổi ghim theo tham số chọn và nhận lệnh từ app', async () => {
     mockNativeBridge();
     mockApi(publicApi({ '/public/heritages/map': () => envelope(200, { data: mapOf() }) }));

@@ -14,7 +14,7 @@ jest.mock('react-native-safe-area-context', () => ({ useSafeAreaInsets: () => ({
 type Nearby = ReturnType<typeof useNearby>;
 
 function nearbyOf(overrides: Partial<Nearby>): Nearby {
-  return { status: 'off', items: [], locate: jest.fn(), outsideVietnam: false, isLoading: false, ...overrides };
+  return { status: 'off', items: [], position: null, locate: jest.fn(), outsideVietnam: false, isLoading: false, ...overrides };
 }
 
 async function render(nearby: Nearby) {
