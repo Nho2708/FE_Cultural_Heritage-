@@ -1,0 +1,147 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: trien-khai-web
+  cancel-in-progress: false
+
+jobs:
+  dong-goi:
+    name: Đóng gói hai web
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Kiểm biến cấp repo cho bản build
+        env:
+          DEMO_LEARNING_WEB_URL: ${{ vars.DEMO_LEARNING_WEB_URL }}
+          DEMO_ADMIN_WEB_URL: ${{ vars.DEMO_ADMIN_WEB_URL }}
+        run: |
+          # Thiếu địa chỉ thì bản build chạy lên sẽ báo lỗi cấu hình, nên dừng ngay ở đây.
+          if [ -z "$DEMO_LEARNING_WEB_URL" ] || [ -z "$DEMO_ADMIN_WEB_URL" ]; then
+            echo "::error::Chưa đặt biến repo DEMO_LEARNING_WEB_URL hoặc DEMO_ADMIN_WEB_URL (ví dụ http://localhost:8082 và http://localhost:8081)."
+            exit 1
+          fi
+
+      - run: npm ci
+
+      - name: Build hai web
+        env:
+          VITE_API_BASE_URL: /api/v1
+          VITE_LEARNING_WEB_URL: ${{ vars.DEMO_LEARNING_WEB_URL }}
+          VITE_ADMIN_WEB_URL: ${{ vars.DEMO_ADMIN_WEB_URL }}
+          VITE_ANDROID_APP_URL: ${{ vars.DEMO_ANDROID_APP_URL }}
+          VITE_VNPAY_SANDBOX_NOTE: 'true'
+        run: |
+          npm run build -w @dsvhvn/web-quan-tri
+          npm run build -w @dsvhvn/web-hoc-tap
+
+      - name: Thêm cấu hình IIS và tệp phiên bản vào từng gói
+        run: |
+          for web in web-quan-tri web-hoc-tap; do
+            cp scripts/trien-khai/web.config "apps/$web/dist/web.config"
+            {
+              echo "commit=$GITHUB_SHA"
+              echo "ref=$GITHUB_REF_NAME"
+              echo "lan-chay=$GITHUB_RUN_NUMBER"
+              echo "gio-dong-goi=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            } > "apps/$web/dist/phien-ban.txt"
+          done
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: web-quan-tri
+          path: apps/web-quan-tri/dist
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: web-hoc-tap
+          path: apps/web-hoc-tap/dist
+          if-no-files-found: error
+
+  trien-khai:
+    name: Triển khai lên máy demo
+    needs: dong-goi
+    runs-on: [self-hosted, windows, may-demo]
+    environment: ${{ startsWith(github.ref, 'refs/tags/v') && 'phat-hanh' || 'demo' }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: web-quan-tri
+          path: goi/web-quan-tri
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: web-hoc-tap
+          path: goi/web-hoc-tap
+
+      - name: Triển khai web quản trị
+        shell: pwsh
+        run: >
+          ./scripts/trien-khai/trien-khai-web.ps1
+          -ThuMucGoi "$env:GITHUB_WORKSPACE\goi\web-quan-tri"
+          -Dich 'C:\dsvhvn\web-quan-tri'
+          -KiemUrl 'http://localhost:8081/'
+
+      - name: Triển khai web học tập
+        shell: pwsh
+        run: >
+          ./scripts/trien-khai/trien-khai-web.ps1
+          -ThuMucGoi "$env:GITHUB_WORKSPACE\goi\web-hoc-tap"
+          -Dich 'C:\dsvhvn\web-hoc-tap'
+          -KiemUrl 'http://localhost:8082/'
+
+  phat-hanh:
+    name: Tạo bản phát hành
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: trien-khai
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: web-quan-tri
+          path: goi/web-quan-tri
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: web-hoc-tap
+          path: goi/web-hoc-tap
+
+      - name: Nén hai web
+        run: |
+          mkdir -p ra
+          (cd goi/web-quan-tri && zip -qr "$GITHUB_WORKSPACE/ra/dsvhvn-web-quan-tri-$GITHUB_REF_NAME.zip" .)
+          (cd goi/web-hoc-tap && zip -qr "$GITHUB_WORKSPACE/ra/dsvhvn-web-hoc-tap-$GITHUB_REF_NAME.zip" .)
+          ls -l ra
+
+      - name: Tạo hoặc cập nhật Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" ra/*.zip --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" ra/*.zip --generate-notes --verify-tag --title "$GITHUB_REF_NAME"
+          fi
