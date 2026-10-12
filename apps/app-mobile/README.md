@@ -22,8 +22,11 @@ Nên `apps/app-mobile` có `package.json`, `package-lock.json` và `node_modules
 cd apps/app-mobile
 npm install                       # cài riêng cho app
 cp .env.example .env              # sửa hai địa chỉ bên dưới thành IP của máy chạy backend và web học tập
-npx expo start                    # in mã QR
+npx expo start --port 8083        # in mã QR (hoặc npm start)
 ```
+
+Metro chạy ở cổng **8083**, không dùng cổng mặc định 8081: trên máy demo cổng 8080–8082 là ba site IIS (API, web quản trị, web học tập)
+và 8090 là Dịch vụ AI, nên chạy Metro ở 8081 sẽ đụng web quản trị của máy demo.
 
 | Biến | Ý nghĩa |
 |---|---|
@@ -38,22 +41,22 @@ Backend cần chạy với `--urls http://0.0.0.0:5080` (hoặc cổng khác) đ
 2. Lấy IP của máy tính: chạy `ipconfig`, lấy dòng `IPv4 Address` của card Wi-Fi (ví dụ `192.168.1.10`). Sửa `.env` của app:
    `EXPO_PUBLIC_API_BASE_URL=http://192.168.1.10:5080/api/v1` và `EXPO_PUBLIC_WEB_BASE_URL=http://192.168.1.10:5174`.
 3. Mở tường lửa Windows cho ba cổng (chạy PowerShell **với quyền Administrator**, một lần):
-   `netsh advfirewall firewall add rule name="DSVHVN dev" dir=in action=allow protocol=TCP localport=5080,5174,8081 profile=private`
+   `netsh advfirewall firewall add rule name="DSVHVN dev" dir=in action=allow protocol=TCP localport=5080,5174,8083 profile=private`
    và đặt mạng Wi-Fi đang dùng là **Private network** trong Settings → Network.
 4. Backend (thư mục `BE_Cultural_Heritage-`): `dotnet run --project src/DSVHVN.Api --launch-profile http --urls http://0.0.0.0:5080`.
    Kiểm từ điện thoại: mở trình duyệt điện thoại vào `http://192.168.1.10:5080/swagger` phải thấy trang Swagger.
 5. Web học tập (thư mục gốc FE, cho bản đồ và 3D): `npm run dev:hoc-tap -- --host`.
-6. App: `cd apps/app-mobile`, `npm install`, `npx expo start`, rồi quét mã QR (Android: trong Expo Go; iPhone: bằng Camera).
-   Mạng trường/quán cà phê thường chặn máy trong cùng Wi-Fi nói chuyện với nhau — khi đó dùng `npx expo start --tunnel` cho app, nhưng API vẫn phải gọi được (bước 4); cách chắc nhất là phát Wi-Fi từ điện thoại hoặc dùng Wi-Fi ở nhà.
+6. App: `cd apps/app-mobile`, `npm install`, `npx expo start --port 8083`, rồi quét mã QR (Android: trong Expo Go; iPhone: bằng Camera).
+   Mạng trường/quán cà phê thường chặn máy trong cùng Wi-Fi nói chuyện với nhau — khi đó dùng `npx expo start --port 8083 --tunnel` cho app, nhưng API vẫn phải gọi được (bước 4); cách chắc nhất là phát Wi-Fi từ điện thoại hoặc dùng Wi-Fi ở nhà.
 
 Lỗi thường gặp:
 - *"Project is incompatible with this version of Expo Go"*: cập nhật Expo Go trong cửa hàng ứng dụng (app dùng SDK 57).
-- Quét QR xong quay mãi rồi báo *"Could not connect to the development server"*: máy tính và điện thoại khác mạng, hoặc tường lửa chặn cổng 8081 (bước 3) — thử `--tunnel`.
-- App mở được nhưng báo lỗi mạng ở mọi màn hình: sai IP trong `.env`, backend chạy `localhost` thay vì `0.0.0.0`, hoặc tường lửa chặn 5080. Sửa `.env` thì phải tắt `npx expo start` và chạy lại.
+- Quét QR xong quay mãi rồi báo *"Could not connect to the development server"*: máy tính và điện thoại khác mạng, hoặc tường lửa chặn cổng 8083 (bước 3) — thử `--tunnel`.
+- App mở được nhưng báo lỗi mạng ở mọi màn hình: sai IP trong `.env`, backend chạy `localhost` thay vì `0.0.0.0`, hoặc tường lửa chặn 5080. Sửa `.env` thì phải tắt `npx expo start --port 8083` và chạy lại.
 
 ### Expo Go
 
-- **Android**: cài Expo Go từ Google Play, mở và quét mã QR của `npx expo start` (điện thoại và máy tính cùng Wi-Fi). Không có Wi-Fi chung thì dùng `npx expo start --tunnel`.
+- **Android**: cài Expo Go từ Google Play, mở và quét mã QR của `npx expo start --port 8083` (điện thoại và máy tính cùng Wi-Fi). Không có Wi-Fi chung thì dùng `npx expo start --port 8083 --tunnel`.
 - **iPhone**: cài Expo Go từ App Store, mở **Camera** của iPhone và quét mã QR rồi chọn mở bằng Expo Go. iPhone chạy được cả giọng đọc, vị trí, bản đồ và 3D (WebView),
   **không có quảng cáo** (Expo Go không có mô-đun quảng cáo).
 
@@ -70,7 +73,7 @@ khách xem hết quảng cáo thì app hỏi `GET /public/ads/unlock?slug=` mỗ
 - **Expo Go không có AdMob.** Ở đó app gửi thêm `X-Ads-Unavailable: true`; backend ở môi trường phát triển (`Ads:AllowNoAdsDeclaration` = true) mở thẳng tóm tắt và nghe, app hiện ghi chú "chạy trong Expo Go nên chưa có quảng cáo".
   Nếu backend không bật cờ này (môi trường thật) mà cổng bật, app hiện "cần bản dựng phát triển để xem quảng cáo" và không mở được.
 - **Bật AdMob** bằng bản dựng phát triển: `react-native-google-mobile-ads` đã khai trong `package.json` và `app.json` với **mã ứng dụng thử do Google công bố** (`ca-app-pub-3940256099942544~...`). Chạy
-  `eas build --profile development --platform android` (hoặc `ios`, cần tài khoản Apple Developer), cài bản dựng lên máy rồi `npx expo start --dev-client`. Đơn vị quảng cáo **không** nằm trong app: lấy từ
+  `eas build --profile development --platform android` (hoặc `ios`, cần tài khoản Apple Developer), cài bản dựng lên máy rồi `npx expo start --port 8083 --dev-client`. Đơn vị quảng cáo **không** nằm trong app: lấy từ
   `GET /public/ads/config`; ở môi trường phát triển backend trả **đơn vị thử của Google** (`.../5224354917` Android, `.../1712485313` iOS). Không dùng mã quảng cáo thật khi phát triển và không tự bấm quảng cáo thật (vi phạm chính sách của Google).
   Bản dựng dùng tài khoản AdMob của nhóm đặt mã ứng dụng lúc dựng bằng biến môi trường `ADMOB_ANDROID_APP_ID`, `ADMOB_IOS_APP_ID` ([`app.config.ts`](app.config.ts)); không đặt thì giữ mã thử.
   Muốn thử trọn luồng mở khóa với đơn vị thật thì khai điện thoại là **thiết bị thử** trong AdMob (Settings → Test devices) để Google chỉ trả quảng cáo thử, hoặc đặt
@@ -131,14 +134,14 @@ Cách này cho điện thoại gọi `localhost` như máy tính nên không c�
    Có nhiều thiết bị cùng nối thì mọi lệnh `adb` phải kèm `-s <số hiệu>`.
 2. Chuyển cổng từ điện thoại về máy tính (Metro, backend, web học tập), chạy lại sau mỗi lần nối lại:
    ```
-   adb -s <số hiệu> reverse tcp:8081 tcp:8081
+   adb -s <số hiệu> reverse tcp:8083 tcp:8083
    adb -s <số hiệu> reverse tcp:5080 tcp:5080
    adb -s <số hiệu> reverse tcp:5174 tcp:5174
    ```
 3. Chạy backend ở cổng 5080 và web học tập ở cổng 5174 (`VITE_API_BASE_URL=http://localhost:5080/api/v1`). Web học tập chạy bằng `npm run dev:hoc-tap -- --host 127.0.0.1`:
    để mặc định thì Vite có thể chỉ nghe trên `::1` (IPv6) và trang bản đồ, 3D mở qua `adb reverse` sẽ không tải được. Sau đó chạy Metro trong `apps/app-mobile` với biến môi trường của tiến trình:
-   `EXPO_PUBLIC_API_BASE_URL=http://localhost:5080/api/v1` và `EXPO_PUBLIC_WEB_BASE_URL=http://localhost:5174`, lệnh `npx expo start` (không thêm `--android`).
-4. Mở app trong Expo Go: `adb -s <số hiệu> shell am start -a android.intent.action.VIEW -d exp://127.0.0.1:8081 host.exp.exponent`.
+   `EXPO_PUBLIC_API_BASE_URL=http://localhost:5080/api/v1` và `EXPO_PUBLIC_WEB_BASE_URL=http://localhost:5174`, lệnh `npx expo start --port 8083` (không thêm `--android`).
+4. Mở app trong Expo Go: `adb -s <số hiệu> shell am start -a android.intent.action.VIEW -d exp://127.0.0.1:8083 host.exp.exponent`.
 5. Xong thì `adb -s <số hiệu> reverse --remove-all`.
 
 Lưu ý: Xiaomi/MIUI chặn cài ứng dụng qua adb nếu chưa bật "Cài đặt qua USB" (và đăng nhập tài khoản Xiaomi), nên Maestro, vốn cài trình điều khiển lên điện thoại, sẽ bị "Install canceled by user"; chỉ dùng Maestro trên máy ảo
@@ -148,7 +151,7 @@ Lệnh `adb shell input text` chỉ gõ được chữ không dấu.
 ## Kiểm thử trên máy ảo Android
 
 Chạy app thật trong Expo Go trên máy ảo, đi qua các hành trình chính bằng [Maestro](https://maestro.mobile.dev) rồi báo đạt hoặc không đạt từng luồng.
-Các luồng nằm ở [`e2e/`](e2e/) (YAML, mở app qua `exp://10.0.2.2:8081`); phần dùng chung ở `e2e/chung/`.
+Các luồng nằm ở [`e2e/`](e2e/) (YAML, mở app qua `exp://10.0.2.2:8083`); phần dùng chung ở `e2e/chung/`.
 
 | Luồng | Nội dung |
 |---|---|
@@ -157,7 +160,7 @@ Các luồng nằm ở [`e2e/`](e2e/) (YAML, mở app qua `exp://10.0.2.2:8081`)
 | `hoc-sinh-khoi-3` | cấp 1: đăng nhập mật khẩu tạm, đổi mật khẩu bắt buộc, nhập mã bài học, học từng bước, bài chơi bốn dạng câu, kết quả bằng sao |
 | `hoc-sinh-khoi-11` | cấp 3: bài dạng tài liệu, bài kiểm tra có giờ ba dạng câu, điểm và phân tích |
 
-**Chạy một lệnh** (PowerShell 7, từ thư mục gốc FE; cần cổng 5080, 5174, 8081 đang rảnh):
+**Chạy một lệnh** (PowerShell 7, từ thư mục gốc FE; cần cổng 5080, 5174, 8083 đang rảnh):
 
 ```powershell
 pwsh -File apps/app-mobile/scripts/chay-kiem-thu-may-ao.ps1                          # mọi luồng

@@ -85,7 +85,7 @@ function Ensure-ExpoGo {
     if ((& adb -s $Serial shell pm list packages host.exp.exponent) -match 'host.exp.exponent') { return }
     # Không dùng `expo start --android`: khi có điện thoại thật cắm adb, Expo CLI mở Expo Go trên điện thoại thay vì máy ảo.
     $apk = Get-ChildItem (Join-Path $env:USERPROFILE '.expo\android-apk-cache') -Filter 'Expo-Go-*.apk' -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-    if (-not $apk) { throw 'Máy ảo chưa có Expo Go và chưa có tệp APK trong %USERPROFILE%\.expo\android-apk-cache. Rút điện thoại thật, chạy `npx expo start --android` một lần để Expo CLI tải và cài, rồi chạy lại script.' }
+    if (-not $apk) { throw 'Máy ảo chưa có Expo Go và chưa có tệp APK trong %USERPROFILE%\.expo\android-apk-cache. Rút điện thoại thật, chạy `npx expo start --port 8083 --android` một lần để Expo CLI tải và cài, rồi chạy lại script.' }
     Step "Cài Expo Go ($($apk.Name)) vào máy ảo"
     & adb -s $Serial install -r $apk.FullName | Out-Null
 }
@@ -108,14 +108,14 @@ function Cleanup {
     if ($KeepRunning) { Write-Host "`nGiữ nguyên dịch vụ và cơ sở dữ liệu tạm $dbName (-KeepRunning)."; return }
     Step 'Dọn dẹp'
     foreach ($id in $started) { Stop-Tree $id }
-    foreach ($port in 5080, 5174, 8081) { Stop-Port $port }
+    foreach ($port in 5080, 5174, 8083) { Stop-Port $port }
     if ($startedEmulator) { & adb -s $Serial emu kill 2>$null | Out-Null }
     & sqlcmd -S '(localdb)\MSSQLLocalDB' -Q "IF DB_ID('$dbName') IS NOT NULL BEGIN ALTER DATABASE [$dbName] SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [$dbName]; END" 2>$null | Out-Null
     Write-Host "Đã tắt tiến trình đã bật và xoá cơ sở dữ liệu tạm $dbName."
 }
 
 $results = @()
-foreach ($port in 5080, 5174, 8081) {
+foreach ($port in 5080, 5174, 8083) {
     if (Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue) { throw "Cổng $port đang bị dùng: tắt dịch vụ đang chạy rồi chạy lại script." }
 }
 try {
@@ -158,8 +158,8 @@ try {
     $env:EXPO_PUBLIC_WEB_BASE_URL = 'http://10.0.2.2:5174'
     $env:EXPO_NO_TELEMETRY = '1'
     Ensure-ExpoGo
-    Start-Background 'cmd' '/c npx expo start' $appDir (Join-Path $work 'metro') | Out-Null
-    Wait-Until { (Get-Content "$work\metro.out" -Raw -ErrorAction SilentlyContinue) -match 'Waiting on http://localhost:8081' } 300 'Metro sẵn sàng (gói được dựng khi luồng đầu tiên mở app)'
+    Start-Background 'cmd' '/c npx expo start --port 8083' $appDir (Join-Path $work 'metro') | Out-Null
+    Wait-Until { (Get-Content "$work\metro.out" -Raw -ErrorAction SilentlyContinue) -match 'Waiting on http://localhost:8083' } 300 'Metro sẵn sàng (gói được dựng khi luồng đầu tiên mở app)'
 
     $e2e = Join-Path $appDir 'e2e'
     $envFor = @{

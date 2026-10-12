@@ -1,10 +1,10 @@
 # Mở app trong Expo Go trên máy ảo, với trạng thái sạch (chưa chọn ngôn ngữ, chưa chọn chế độ, chưa đăng nhập).
-# Cần Metro đang chạy ở cổng 8081 (máy tính là 10.0.2.2 trong máy ảo).
+# Cần Metro đang chạy ở cổng 8083 (máy tính là 10.0.2.2 trong máy ảo).
 appId: host.exp.exponent
 ---
 # Xoá dữ liệu Expo Go bằng lệnh adb (scripts/chay-kiem-thu-may-ao.ps1 làm việc này trước mỗi luồng); `clearState` của Maestro làm trình điều khiển rớt kết nối ở một số lần chạy.
 - stopApp: host.exp.exponent
-- openLink: exp://10.0.2.2:8081
+- openLink: exp://10.0.2.2:8083
 - extendedWaitUntil:
     visible: "(This is the developer menu.*|Choose a language|Chọn ngôn ngữ.*)"
     timeout: 120000
