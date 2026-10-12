@@ -191,5 +191,9 @@ export const en: Strings = {
     switchToStudent: 'Switch to Student mode',
     version: 'Version',
     apiAddress: 'Server address',
+    adsOptions: 'Review personalized ad choices',
+    adsNotNeeded: 'Google ad consent is not required where you are, so there are no choices to reopen.',
+    adsUnavailable: 'This build has no Google ads yet, so there are no choices to open.',
+    adsCheckFailed: 'Could not check ad choices. Check your connection and try again.',
   },
 };

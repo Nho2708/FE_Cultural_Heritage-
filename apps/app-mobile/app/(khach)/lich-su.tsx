@@ -3,6 +3,7 @@ import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Switch, View } from 'react-native';
+import { AdChoices } from '../../src/components/AdChoices';
 import { confirmAction } from '../../src/components/confirm';
 import { Button, Card, Divider, Notice, Screen, Section, Txt, styles as ui } from '../../src/components/ui';
 import { API_BASE_URL, APP_CHANNEL, APP_VERSION } from '../../src/config/env';
@@ -109,8 +110,7 @@ export default function HistoryAndSettings() {
           </View>
           <Divider />
           <View style={local.setting}>
-            <Txt variant="label">{t('settings.ads')}</Txt>
-            <Txt variant="caption">{t('settings.adsText')}</Txt>
+            <AdChoices />
           </View>
           <Divider />
           <View style={local.setting}>

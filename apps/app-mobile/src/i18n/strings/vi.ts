@@ -164,6 +164,10 @@ export interface Strings {
     switchToStudent: string;
     version: string;
     apiAddress: string;
+    adsOptions: string;
+    adsNotNeeded: string;
+    adsUnavailable: string;
+    adsCheckFailed: string;
   };
 }
 
@@ -358,5 +362,9 @@ export const vi: Strings = {
     switchToStudent: 'Chuyển sang chế độ Học sinh',
     version: 'Phiên bản',
     apiAddress: 'Địa chỉ máy chủ',
+    adsOptions: 'Mở lại lựa chọn quảng cáo cá nhân hóa',
+    adsNotNeeded: 'Khu vực của bạn không cần hộp đồng ý quảng cáo của Google, nên không có lựa chọn nào để mở lại.',
+    adsUnavailable: 'Bản này chưa có quảng cáo của Google nên chưa có lựa chọn nào để mở.',
+    adsCheckFailed: 'Không kiểm tra được lựa chọn quảng cáo. Bạn kiểm tra mạng rồi thử lại.',
   },
 };

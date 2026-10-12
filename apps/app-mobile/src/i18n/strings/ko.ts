@@ -185,5 +185,9 @@ export const ko: Strings = {
     switchToStudent: '학생 모드로 전환',
     version: '버전',
     apiAddress: '서버 주소',
+    adsOptions: '맞춤 광고 선택 다시 열기',
+    adsNotNeeded: '현재 지역에서는 Google 광고 동의 창이 필요하지 않아 다시 열 선택 항목이 없습니다.',
+    adsUnavailable: '이 빌드에는 Google 광고가 없어 열 선택 항목이 없습니다.',
+    adsCheckFailed: '광고 선택 항목을 확인할 수 없습니다. 네트워크를 확인하고 다시 시도해 주세요.',
   },
 };

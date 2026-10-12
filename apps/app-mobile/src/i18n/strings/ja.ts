@@ -185,5 +185,9 @@ export const ja: Strings = {
     switchToStudent: '生徒モードに切り替える',
     version: 'バージョン',
     apiAddress: 'サーバーのアドレス',
+    adsOptions: 'パーソナライズ広告の選択を開く',
+    adsNotNeeded: 'お住まいの地域では Google の広告に関する同意は不要なため、開き直す選択項目はありません。',
+    adsUnavailable: 'このビルドには Google 広告がないため、開く選択項目はありません。',
+    adsCheckFailed: '広告の選択を確認できませんでした。ネットワークを確認して、もう一度お試しください。',
   },
 };

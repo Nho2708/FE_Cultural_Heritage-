@@ -185,5 +185,9 @@ export const zhHans: Strings = {
     switchToStudent: '切换到学生模式',
     version: '版本',
     apiAddress: '服务器地址',
+    adsOptions: '重新打开个性化广告选项',
+    adsNotNeeded: '你所在的地区无需 Google 广告同意窗口，因此没有可重新打开的选项。',
+    adsUnavailable: '此版本没有 Google 广告，因此没有可打开的选项。',
+    adsCheckFailed: '无法检查广告选项。请检查网络后重试。',
   },
 };
