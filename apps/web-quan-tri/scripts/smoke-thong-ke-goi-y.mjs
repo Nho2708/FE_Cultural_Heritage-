@@ -297,7 +297,7 @@ async function loginStudent(page, student) {
   await page.waitForURL(/\/hoc/);
 }
 
-const L2 = data[2];
+const cap2 = data[2];
 const teacherPage = await newPage();
 try {
   await loginTeacher(teacherPage, teacherLogin);
@@ -363,7 +363,7 @@ try {
   check('Tạo bài ôn tập: bài nháp mới của lớp, chuyển sang Soạn bài học', /\/giao-vien\/bai-hoc\/\d+$/.test(pathOf(teacherPage)));
 
   // ---- Kết quả bài kiểm tra ----
-  await teacherPage.goto(`${ADMIN_WEB}/giao-vien/kiem-tra/${L2.quizA}/ket-qua`);
+  await teacherPage.goto(`${ADMIN_WEB}/giao-vien/kiem-tra/${cap2.quizA}/ket-qua`);
   await teacherPage.getByRole('heading', { level: 1, name: /Kiểm tra 15 phút: Hoàng thành/ }).waitFor();
   await teacherPage.getByText('Điểm trung bình').waitFor();
   check('Kết quả: Tổng quan — đã nộp 5 / 6, chưa làm 1 em', (await visible(teacherPage.getByText('5 / 6', { exact: true }))) && (await visible(teacherPage.getByText(/Chưa làm 1 em/))));
@@ -418,16 +418,16 @@ try {
   await loginTeacher(otherPage, otherLogin);
   await otherPage.goto(`${ADMIN_WEB}/giao-vien/lop/${cls[2].id}?tab=tien-do`);
   check('Giáo viên khác mở lớp không phải của mình: báo không tìm thấy lớp', await otherPage.getByText('Không tìm thấy lớp.').waitFor({ timeout: 15000 }).then(() => true, () => false));
-  await otherPage.goto(`${ADMIN_WEB}/giao-vien/kiem-tra/${L2.quizA}/ket-qua`);
+  await otherPage.goto(`${ADMIN_WEB}/giao-vien/kiem-tra/${cap2.quizA}/ket-qua`);
   check('Giáo viên khác mở kết quả bài không phải của mình: báo không tìm thấy bài kiểm tra', await otherPage.getByText('Không tìm thấy bài kiểm tra.').waitFor({ timeout: 15000 }).then(() => true, () => false));
-  await otherPage.goto(`${ADMIN_WEB}/giao-vien/lop/${otherClass.id}/hoc-sinh/${L2.students[0].id}`);
+  await otherPage.goto(`${ADMIN_WEB}/giao-vien/lop/${otherClass.id}/hoc-sinh/${cap2.students[0].id}`);
   check('Hồ sơ học sinh của lớp khác: báo không tìm thấy học sinh', await otherPage.getByText('Không tìm thấy học sinh.').waitFor({ timeout: 15000 }).then(() => true, () => false));
   await otherPage.close();
 
   // ---- Điện thoại ----
   const mobile = await newPage({ viewport: { width: 390, height: 844 } });
   await loginTeacher(mobile, teacherLogin);
-  await mobile.goto(`${ADMIN_WEB}/giao-vien/kiem-tra/${L2.quizA}/ket-qua`);
+  await mobile.goto(`${ADMIN_WEB}/giao-vien/kiem-tra/${cap2.quizA}/ket-qua`);
   await mobile.getByText('Điểm trung bình').waitFor();
   check('390px: Kết quả bài kiểm tra không tràn ngang', await noOverflow(mobile));
   await mobile.goto(`${ADMIN_WEB}/giao-vien/lop/${cls[2].id}?tab=thanh-thao`);
@@ -456,7 +456,7 @@ async function studentFlow(level, student, run) {
 }
 
 // Cấp 2: em 2 sai bài A → di sản nên ôn, bài học nên ôn; bài B chưa mở nên cần mã; bài C là bài mới.
-await studentFlow(2, L2.students[1], async (page) => {
+await studentFlow(2, cap2.students[1], async (page) => {
   const section = page.getByRole('region', { name: 'Gợi ý cho em' });
   await section.getByRole('list', { name: 'Gợi ý cho em' }).waitFor();
   check('Cấp 2: Gợi ý cho em có đủ các phần theo bài đã làm', (await section.getByText('Bài kiểm tra nên làm tiếp').count()) >= 1 && (await section.getByText('Di sản nên ôn').count()) >= 1 && (await section.getByText('Bài học mới nên học').count()) >= 1);
@@ -469,7 +469,7 @@ await studentFlow(2, L2.students[1], async (page) => {
   await page.waitForURL(/\/di-san\//);
   check('Cấp 2: thẻ di sản gợi ý mở chi tiết di sản', /\/di-san\/[^/]+$/.test(pathOf(page)));
   // Kết quả của một lượt: gợi ý theo lượt đang xem.
-  await page.goto(`${LEARNING_WEB}/ket-qua/${L2.attempts.s2a}`);
+  await page.goto(`${LEARNING_WEB}/ket-qua/${cap2.attempts.s2a}`);
   const resultSection = page.getByRole('region', { name: 'Gợi ý cho em' });
   await resultSection.getByRole('list', { name: 'Gợi ý cho em' }).waitFor();
   check('Cấp 2: Kết quả bài làm có khối Gợi ý cho em từ lượt đang xem', (await resultSection.getByText('Di sản nên ôn').count()) >= 1);
@@ -477,7 +477,7 @@ await studentFlow(2, L2.students[1], async (page) => {
 });
 
 // Em chưa có lượt nào: lời mời nhập mã và các bài mới.
-await studentFlow(2, L2.students[5], async (page) => {
+await studentFlow(2, cap2.students[5], async (page) => {
   const section = page.getByRole('region', { name: 'Gợi ý cho em' });
   await section.waitFor();
   check('Học sinh chưa làm gì: lời mời nhập mã bài học và các bài mới', (await section.getByText(/mã bài học/i).count()) >= 1 && (await section.getByText('Bài học mới nên học').count()) >= 1);
