@@ -1,4 +1,4 @@
-import { cn, formatNumber, optionLetter, splitBlanks } from '@dsvhvn/dung-chung';
+import { cn, formatNumber, hasAnswer, optionLetter, splitBlanks } from '@dsvhvn/dung-chung';
 import type { StudentQuestionReview } from '@dsvhvn/dung-chung/api';
 import { Badge, Icon } from '@dsvhvn/dung-chung/ui';
 import type { QuizLevel } from './QuestionInput';
@@ -181,6 +181,8 @@ function Body({ review, level }: { review: StudentQuestionReview; level: QuizLev
 export function QuestionReview({ review, index, total, level }: { review: StudentQuestionReview; index: number; total: number; level: QuizLevel }) {
   const { question: q } = review;
   const marks = level !== 1 && review.isCorrect !== null;
+  // Câu em bỏ trống: máy chủ chấm 0 điểm (isCorrect false) nhưng với em đó là "Bỏ trống", khớp ô "Bỏ trống" ở phần tổng kết, không phải "Sai".
+  const blank = marks && !hasAnswer(q, q.answer);
   const partial = review.partsTotal !== null && review.partsTotal > 1 && review.partsCorrect !== null;
   return (
     <article aria-label={`Câu ${index + 1} của phần xem lại`} className="rounded-lg border border-border bg-surface p-5">
@@ -190,8 +192,14 @@ export function QuestionReview({ review, index, total, level }: { review: Studen
         </span>
         <Badge>{q.typeName}</Badge>
         {marks && (
-          <Badge tone={review.isCorrect ? 'success' : 'danger'}>
-            {review.isCorrect ? 'Đúng' : partial && (review.partsCorrect ?? 0) > 0 ? `Đúng ${review.partsCorrect} / ${review.partsTotal} ý` : 'Sai'}
+          <Badge tone={blank ? 'neutral' : review.isCorrect ? 'success' : 'danger'}>
+            {blank
+              ? 'Bỏ trống'
+              : review.isCorrect
+                ? 'Đúng'
+                : partial && (review.partsCorrect ?? 0) > 0
+                  ? `Đúng ${review.partsCorrect} / ${review.partsTotal} ý`
+                  : 'Sai'}
           </Badge>
         )}
         {marks && review.pointEarned !== null && q.point !== null && (
