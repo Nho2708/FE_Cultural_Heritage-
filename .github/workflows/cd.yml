@@ -1,8 +1,13 @@
 name: CD
 
+# Triển khai hai web lên máy demo: CI trên main đạt thì cập nhật môi trường demo (commit hỏng CI không được triển khai,
+# kể cả khi chủ repo đẩy thẳng hoặc gộp vượt bảo vệ), gắn tag v* thì cập nhật bản phát hành (chủ repo duyệt) và tạo GitHub Release.
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
+  push:
     tags: ['v*']
   workflow_dispatch:
 
@@ -16,10 +21,21 @@ concurrency:
 jobs:
   dong-goi:
     name: Đóng gói hai web
+    # Sau CI: chỉ khi CI đạt trên commit của main trong chính repo này (không nhận lượt CI của Pull Request).
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event != 'pull_request' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      MA_COMMIT: ${{ github.event.workflow_run.head_sha || github.sha }}
     steps:
+      # Lấy đúng commit CI vừa kiểm (main có thể đã có commit mới hơn).
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - uses: actions/setup-node@v7
         with:
@@ -55,7 +71,7 @@ jobs:
           for web in web-quan-tri web-hoc-tap; do
             cp scripts/trien-khai/web.config "apps/$web/dist/web.config"
             {
-              echo "commit=$GITHUB_SHA"
+              echo "commit=$MA_COMMIT"
               echo "ref=$GITHUB_REF_NAME"
               echo "lan-chay=$GITHUB_RUN_NUMBER"
               echo "gio-dong-goi=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -82,6 +98,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - uses: actions/download-artifact@v8
         with:
