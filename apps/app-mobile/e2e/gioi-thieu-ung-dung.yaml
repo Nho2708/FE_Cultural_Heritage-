@@ -1,0 +1,73 @@
+# Giới thiệu ứng dụng (giao diện tiếng Anh): lần mở đầu đi qua bốn thẻ bằng Next rồi Get started (chỉ khi app còn mới: máy ảo xoá dữ liệu trước mỗi luồng;
+# điện thoại thật đã qua lần mở đầu nên bước này được bỏ qua), rồi xem lại từ History → View again: đi hết bốn thẻ, và lần nữa chỉ bấm Skip.
+appId: host.exp.exponent
+---
+- runFlow: chung/mo-app.yaml
+- runFlow:
+    when:
+      visible: "(Choose a language|Chọn ngôn ngữ|언어 선택|选择语言|言語を選択)"
+    commands:
+      - tapOn: "English"
+      - extendedWaitUntil:
+          visible: "Skip"
+          timeout: 15000
+      - assertVisible: "Discover heritage near you"
+      - assertVisible: "Next"
+      - takeScreenshot: gioi-thieu-lan-dau-01-ghim
+      - tapOn: "Next"
+      - assertVisible: "Listen in your own language"
+      - takeScreenshot: gioi-thieu-lan-dau-02-thuyet-minh
+      - tapOn: "Next"
+      - assertVisible: "See 3D models and the timeline"
+      - takeScreenshot: gioi-thieu-lan-dau-03-3d
+      - tapOn: "Next"
+      - assertVisible: "Students learn by level with a lesson code"
+      - assertNotVisible: "Next"
+      - takeScreenshot: gioi-thieu-lan-dau-04-hoc-sinh
+      - tapOn: "Get started"
+      - extendedWaitUntil:
+          visible: "How will you use the app.*"
+          timeout: 15000
+      - takeScreenshot: gioi-thieu-lan-dau-05-chon-che-do
+      - tapOn:
+          text: "Visitor"
+          index: 1
+- runFlow:
+    file: chung/vao-khach.yaml
+    env:
+      LANGUAGE_NAME: English
+# Xem lại từ Lịch sử và cài đặt: đi hết bốn thẻ rồi quay về đúng màn hình đó.
+- tapOn: "History"
+- scrollUntilVisible:
+    element: "View again"
+    timeout: 30000
+- takeScreenshot: gioi-thieu-xem-lai-01-muc-xem-lai
+- tapOn: "View again"
+- extendedWaitUntil:
+    visible: "Discover heritage near you"
+    timeout: 15000
+- tapOn: "Next"
+- assertVisible: "Listen in your own language"
+- tapOn: "Next"
+- assertVisible: "See 3D models and the timeline"
+- tapOn: "Next"
+- assertVisible: "Students learn by level with a lesson code"
+- tapOn: "Get started"
+- extendedWaitUntil:
+    visible: "View again"
+    timeout: 15000
+- assertNotVisible: "Discover heritage near you"
+# Xem lại lần nữa và bỏ qua ngay ở thẻ đầu.
+- scrollUntilVisible:
+    element: "View again"
+    timeout: 30000
+- tapOn: "View again"
+- extendedWaitUntil:
+    visible: "Skip"
+    timeout: 15000
+- tapOn: "Skip"
+- extendedWaitUntil:
+    visible: "View again"
+    timeout: 15000
+- assertNotVisible: "Discover heritage near you"
+- takeScreenshot: gioi-thieu-xem-lai-02-sau-khi-bo-qua
