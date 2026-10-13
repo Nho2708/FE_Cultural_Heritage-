@@ -1,0 +1,175 @@
+/* Chuyển động giới thiệu dùng chung của hai web: huy hiệu chuyển động (AnimatedLogo) và khối hiện lên khi cuộn tới
+ * (useRevealOnce). Nạp sau tokens.css. Kiểu gốc của mọi phần tử là trạng thái cuối, chuyển động chỉ nằm trong
+ * @keyframes với fill-mode both: tắt chuyển động (giảm chuyển động, trình duyệt cũ) thì vẫn thấy đủ huy hiệu và nội dung. */
+
+/* Góc quét của lớp chữ trên huy hiệu; giá trị gốc 360deg là hiện hết. */
+@property --dsv-logo-sweep {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 360deg;
+}
+
+.dsv-logo-motion {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  isolation: isolate;
+}
+
+.dsv-logo-motion > * {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Hai ảnh lớp chưa tải xong: giữ mọi chuyển động ở khung đầu. */
+.dsv-logo-motion[data-logo-motion='loading'] * {
+  animation-play-state: paused;
+}
+
+.dsv-logo-motion__navy {
+  fill: var(--color-brand-navy);
+  animation: dsv-logo-fade var(--dsv-duration-image) var(--dsv-ease-fade) both;
+}
+
+.dsv-logo-motion__gold {
+  fill: none;
+  stroke: var(--color-brand-gold);
+  stroke-width: 2;
+  animation: dsv-logo-draw 400ms var(--dsv-ease-fade) both;
+}
+
+.dsv-logo-motion > .dsv-logo-motion__disc {
+  inset: 6.7%;
+  width: auto;
+  height: auto;
+  border-radius: 50%;
+  background-color: var(--color-brand-cream);
+  animation: dsv-logo-disc var(--dsv-duration-slow) var(--dsv-ease-expo-out) 200ms both;
+}
+
+.dsv-logo-motion__tier {
+  animation: dsv-logo-rise 320ms var(--dsv-ease-expo-out) calc(500ms + var(--tier, 0) * var(--dsv-stagger-tier)) both;
+}
+
+/* Mái trên "đáp" nhẹ: vượt lên dưới 1% rồi về chỗ. */
+.dsv-logo-motion__tier--roof {
+  animation-name: dsv-logo-land;
+  animation-duration: 420ms;
+}
+
+.dsv-logo-motion__text {
+  mask-image: conic-gradient(from 240deg, #000 var(--dsv-logo-sweep), transparent calc(var(--dsv-logo-sweep) + 30deg));
+  animation: dsv-logo-text 600ms var(--dsv-ease-fade) 1500ms both;
+}
+
+@keyframes dsv-logo-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Vẽ bằng nét đứt dài đúng một vòng; xong thì bỏ nét đứt để chỗ nối ở đỉnh không còn vệt mảnh. */
+@keyframes dsv-logo-draw {
+  from {
+    stroke-dasharray: 0 1;
+  }
+  99.9% {
+    stroke-dasharray: 1 0;
+  }
+  to {
+    stroke-dasharray: none;
+  }
+}
+
+@keyframes dsv-logo-disc {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+
+@keyframes dsv-logo-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8%);
+  }
+}
+
+@keyframes dsv-logo-land {
+  0% {
+    opacity: 0;
+    transform: translateY(8%);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-0.8%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes dsv-logo-text {
+  from {
+    opacity: 0;
+    --dsv-logo-sweep: 0deg;
+  }
+}
+
+/* Đường kẻ vàng như mái ngói: kẻ từ trái sang phải một lần, cùng nhịp với đường kẻ trên mái của logo (1200–1700 ms). */
+.dsv-draw-x {
+  transform-origin: left center;
+  animation: dsv-draw-x var(--dsv-duration-slow) var(--dsv-ease-expo-out) 1200ms both;
+}
+
+@keyframes dsv-draw-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* Khối hiện lên khi cuộn tới: phần tử con lệch nhịp 60 ms, tối đa 6 phần tử mỗi nhóm. */
+[data-reveal='waiting'] [data-reveal-item] {
+  opacity: 0;
+}
+
+[data-reveal='shown'] [data-reveal-item] {
+  animation: dsv-reveal-in var(--dsv-duration-slow) var(--dsv-ease-expo-out) both;
+  animation-delay: calc(min(var(--reveal-index, 0), 5) * var(--dsv-stagger-ui));
+}
+
+/* Đường nối các bước: kẻ dần từ trên xuống khi khối hiện. */
+[data-reveal='waiting'] [data-reveal-line] {
+  transform: scaleY(0);
+}
+
+[data-reveal='shown'] [data-reveal-line] {
+  transform-origin: top;
+  animation: dsv-reveal-line 600ms var(--dsv-ease-expo-out) 120ms both;
+}
+
+@keyframes dsv-reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@keyframes dsv-reveal-line {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dsv-logo-motion *,
+  .dsv-draw-x,
+  [data-reveal] [data-reveal-item],
+  [data-reveal] [data-reveal-line] {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
