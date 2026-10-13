@@ -21,12 +21,12 @@ function icon(name: IconName, focusedName: IconName) {
 }
 
 export default function StudentLayout() {
-  const { chosenLanguage, mode } = useApp();
+  const { chosenLanguage, mode, introSeen } = useApp();
   const { session } = useAuth();
   const { t } = useTranslation();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
-  const entry = entryHref({ chosenLanguage, mode, hasSession: Boolean(session), mustChangePassword: Boolean(session?.user.mustChangePassword) });
+  const entry = entryHref({ chosenLanguage, mode, introSeen, hasSession: Boolean(session), mustChangePassword: Boolean(session?.user.mustChangePassword) });
   if (mode !== 'student' || !session || session.user.mustChangePassword) return <GuardRedirect href={entry} />;
   return (
     <Tabs
