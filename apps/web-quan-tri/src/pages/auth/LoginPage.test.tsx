@@ -108,4 +108,14 @@ describe('màn hình Đăng nhập', () => {
     await waitFor(() => expect(router.state.location.pathname).toBe('/dang-nhap'));
     expect(await screen.findByRole('alert')).toHaveTextContent(MESSAGES.sessionExpired);
   });
+
+  it('dòng dẫn trường chưa dùng sang trang Dành cho nhà trường của web học tập, mở ở tab mới', async () => {
+    mockApi();
+    renderApp('/dang-nhap');
+
+    const link = await screen.findByRole('link', { name: /Xem giới thiệu cho nhà trường/ });
+    expect(link).toHaveAttribute('href', 'http://hoc.test/nha-truong');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link.closest('p')).toHaveTextContent(/^Trường bạn chưa dùng Học di sản\?/);
+  });
 });
