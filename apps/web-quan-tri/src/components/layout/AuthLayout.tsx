@@ -1,3 +1,4 @@
+import { BrandLogo } from '@dsvhvn/dung-chung/ui';
 import type { ReactNode } from 'react';
 import type { AuthPhoto } from './authPhotos';
 
@@ -38,6 +39,7 @@ export function AuthLayout({ photo, title, subtitle, children }: AuthLayoutProps
 
       <div className="flex justify-center px-4 py-10 dsvmd:items-center dsvmd:px-10 dsvmd:py-16">
         <div className="w-full max-w-[400px]">
+          <BrandLogo variant="badge" size={80} className="mb-6" />
           <h1 className="type-h2 text-on-surface dsvmd:type-display-l">{title}</h1>
           {subtitle && <p className="mt-2 type-body-m text-on-surface-variant">{subtitle}</p>}
           <div className="mt-8">{children}</div>

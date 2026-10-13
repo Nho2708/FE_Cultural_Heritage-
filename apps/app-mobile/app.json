@@ -6,6 +6,7 @@
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
+    "icon": "./assets/images/icon.png",
     "plugins": [
       "expo-router",
       "expo-secure-store",
@@ -24,18 +25,32 @@
           "userTrackingPermission": "Học di sản dùng nhận dạng quảng cáo để hiện quảng cáo phù hợp mọi lứa tuổi."
         }
       ],
-      "expo-image"
+      "expo-image",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#292B38"
+        }
+      ]
     ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "vn.dsvhvn.hocdisan"
     },
     "android": {
-      "package": "vn.dsvhvn.hocdisan"
+      "package": "vn.dsvhvn.hocdisan",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#292B38"
+      }
     },
     "web": {
       "bundler": "metro",
-      "output": "single"
+      "output": "single",
+      "favicon": "./assets/images/favicon.png"
     },
     "experiments": {
       "typedRoutes": false

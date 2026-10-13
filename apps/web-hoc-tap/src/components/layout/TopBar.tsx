@@ -1,5 +1,5 @@
 import { cn } from '@dsvhvn/dung-chung';
-import { Icon, PillLink } from '@dsvhvn/dung-chung/ui';
+import { BrandLogo, Icon, PillLink } from '@dsvhvn/dung-chung/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router';
 import { pathOf } from '../../access/screens';
@@ -23,9 +23,12 @@ const NAV_LINK = 'rounded-xs px-2 py-2.5 type-control transition-colors duration
 export function Wordmark({ className }: { className?: string }) {
   const { t } = useI18n();
   return (
-    <Link to="/" className={cn('flex min-w-0 flex-col justify-center rounded-xs px-2 py-1', className)}>
-      <span className="type-h3 leading-5 whitespace-nowrap text-on-surface">{t.brandName}</span>
-      <span className="hidden truncate type-label text-on-surface-muted dsvsm:block">{t.brandTagline}</span>
+    <Link to="/" className={cn('flex min-w-0 items-center gap-2 rounded-xs px-2 py-1', className)}>
+      <BrandLogo variant="emblem" size={32} decorative />
+      <span className="flex min-w-0 flex-col justify-center">
+        <span className="type-h3 leading-5 whitespace-nowrap text-on-surface">{t.brandName}</span>
+        <span className="hidden truncate type-label text-on-surface-muted dsvsm:block">{t.brandTagline}</span>
+      </span>
     </Link>
   );
 }
