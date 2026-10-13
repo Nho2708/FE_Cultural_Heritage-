@@ -29,6 +29,13 @@ export function starsText(stars: number | null | undefined, max = 3): string {
   return '★'.repeat(filled) + '☆'.repeat(max - filled);
 }
 
+/** Các đoạn của thanh tiến trình bước ở cấp 1: các bước đã qua `done`, bước đang học `current`, các bước sau `todo`. Bước ngoài khoảng thì kẹp vào khoảng. */
+export function stepSegments(step: number, total: number): Array<'done' | 'current' | 'todo'> {
+  const count = Math.max(0, Math.floor(total));
+  const current = Math.min(Math.max(Math.floor(step), 0), Math.max(count - 1, 0));
+  return Array.from({ length: count }, (_, index) => (index < current ? 'done' : index === current ? 'current' : 'todo'));
+}
+
 /** Phần trăm làm tròn, rỗng khi không có số. */
 export function percentText(value: number | null | undefined): string {
   return typeof value === 'number' && Number.isFinite(value) ? `${Math.round(value)}%` : '';

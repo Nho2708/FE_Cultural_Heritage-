@@ -1,12 +1,15 @@
-# Mở app trong Expo Go trên máy ảo, với trạng thái sạch (chưa chọn ngôn ngữ, chưa chọn chế độ, chưa đăng nhập).
-# Cần Metro đang chạy ở cổng 8081 (máy tính là 10.0.2.2 trong máy ảo).
+# Mở app trong Expo Go. Địa chỉ Metro nhìn từ thiết bị lấy ở biến METRO_URL; không truyền thì là địa chỉ máy tính nhìn từ máy ảo (exp://10.0.2.2:8083);
+# điện thoại thật qua adb reverse truyền -e METRO_URL=exp://127.0.0.1:8083.
+# Máy ảo: dữ liệu Expo Go đã được xoá trước mỗi luồng (scripts/chay-kiem-thu-may-ao.ps1) nên app hiện màn chọn ngôn ngữ; `clearState` của Maestro làm trình điều khiển
+# rớt kết nối ở một số lần chạy nên không dùng. Điện thoại thật: dữ liệu còn nguyên nên app có thể mở thẳng chế độ đã chọn lần trước; luồng này chỉ chờ tới
+# màn hình đầu tiên bất kỳ, rồi vao-khach.yaml hoặc vao-hoc-sinh.yaml đưa app về trạng thái cần.
 appId: host.exp.exponent
 ---
-# Xoá dữ liệu Expo Go bằng lệnh adb (scripts/chay-kiem-thu-may-ao.ps1 làm việc này trước mỗi luồng); `clearState` của Maestro làm trình điều khiển rớt kết nối ở một số lần chạy.
+- evalScript: "${output.metroUrl = (typeof METRO_URL === 'undefined') ? 'exp://10.0.2.2:8083' : METRO_URL}"
 - stopApp: host.exp.exponent
-- openLink: exp://10.0.2.2:8081
+- openLink: ${output.metroUrl}
 - extendedWaitUntil:
-    visible: "(This is the developer menu.*|Choose a language|Chọn ngôn ngữ.*)"
+    visible: "(This is the developer menu.*|Choose a language|Chọn ngôn ngữ|언어 선택|选择语言|言語を選択|How will you use the app.*|Bạn dùng app như thế nào.*|Home|Trang chủ|홈|首页|ホーム|Học sinh đăng nhập|Của em|Đặt mật khẩu và bắt đầu học|Don.t allow|Deny|Không cho phép|Từ chối)"
     timeout: 120000
 - runFlow:
     when:
@@ -18,6 +21,20 @@ appId: host.exp.exponent
       visible: "Toggle performance monitor"
     commands:
       - pressKey: back
+# Điện thoại thật: lần trước khách đã bật "Gần bạn" mà quyền vị trí của Expo Go bị thu hồi thì trang chủ hỏi quyền ngay khi mở: từ chối để đi tiếp
+# (luồng khach-gan-ban-tu-choi.yaml kiểm riêng đường này; đã cấp quyền thì không có hộp nào).
+- runFlow:
+    when:
+      visible: "(Don.t allow|Deny|Không cho phép|Từ chối)"
+    commands:
+      - tapOn: "(Don.t allow|Deny|Không cho phép|Từ chối)"
 - extendedWaitUntil:
-    visible: "(Choose a language|Chọn ngôn ngữ.*)"
+    visible: "(Choose a language|Chọn ngôn ngữ|언어 선택|选择语言|言語を選択|How will you use the app.*|Bạn dùng app như thế nào.*|Home|Trang chủ|홈|首页|ホーム|Học sinh đăng nhập|Của em|Đặt mật khẩu và bắt đầu học)"
     timeout: 60000
+# Khu học mở với phiên cũ đã hết hạn thì vài giây sau app tự về màn đăng nhập: chờ màn hình yên rồi mới đi tiếp.
+- runFlow:
+    when:
+      visible: "Của em"
+    commands:
+      - waitForAnimationToEnd:
+          timeout: 4000

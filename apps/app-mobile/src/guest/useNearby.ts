@@ -1,4 +1,4 @@
-import type { HeritageCard } from '@dsvhvn/dung-chung/api';
+import { NEARBY_OUTSIDE_VIETNAM, type HeritageCard } from '@dsvhvn/dung-chung/api';
 import { useQuery } from '@tanstack/react-query';
 import * as Location from 'expo-location';
 import { useCallback, useMemo } from 'react';
@@ -28,7 +28,10 @@ export function useNearby() {
     retry: false,
     gcTime: 60_000,
     staleTime: 5 * 60_000,
-    queryFn: async ({ signal }) => services.guestApi.nearby(await currentPosition(), { signal, lang: language }),
+    queryFn: async ({ signal }) => {
+      const position = await currentPosition();
+      return { ...(await services.guestApi.nearby(position, { signal, lang: language })), position };
+    },
   });
 
   const error: unknown = result.error;
@@ -42,5 +45,11 @@ export function useNearby() {
     void result.refetch();
   }, [setLocationEnabled, result]);
 
-  return { status, items, locate, isLoading: status === 'locating' };
+  /** Vị trí nằm ngoài khung tọa độ Việt Nam: máy chủ không tính khoảng cách và trả danh sách rỗng. */
+  const outsideVietnam = result.data?.unavailableReason === NEARBY_OUTSIDE_VIETNAM;
+
+  /** Vị trí vừa lấy (để bản đồ vẽ chấm "Gần bạn"); chỉ nằm trong bộ nhớ, không lưu. */
+  const position = result.data?.position ?? null;
+
+  return { status, items, position, locate, outsideVietnam, isLoading: status === 'locating' };
 }

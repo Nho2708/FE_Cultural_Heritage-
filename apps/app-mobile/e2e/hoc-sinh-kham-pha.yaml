@@ -1,0 +1,81 @@
+# Học sinh (khối 8, đã đổi mật khẩu) dùng tab Khám phá: phần công khai bằng tiếng Việt, giao diện mặc định, không có lịch sử, gợi ý theo lịch sử hay "Gần bạn";
+# từ đó mở bản đồ, chọn di sản xem dòng thời gian, tìm kiếm và xem chi tiết (không có khối gợi ý). Biến: STUDENT_CODE, STUDENT_PASSWORD.
+appId: host.exp.exponent
+---
+- runFlow: chung/mo-app.yaml
+- runFlow: chung/vao-hoc-sinh.yaml
+- runFlow: chung/dang-nhap-hoc-sinh.yaml
+- extendedWaitUntil:
+    visible: "Khám phá"
+    timeout: 30000
+- tapOn: "Khám phá"
+- extendedWaitUntil:
+    visible: "Khám phá di sản văn hóa Việt Nam"
+    timeout: 60000
+- assertVisible: "Bản đồ di sản"
+- assertVisible: "Dòng thời gian"
+- assertNotVisible: "Gợi ý cho bạn"
+- assertNotVisible: "Di sản nổi bật hôm nay"
+- assertNotVisible: "Gần bạn"
+- assertNotVisible: "Xem tất cả"
+- takeScreenshot: kham-pha-01-trang-kham-pha
+- scrollUntilVisible:
+    element: "Di sản nổi bật"
+    timeout: 30000
+- takeScreenshot: kham-pha-02-di-san-noi-bat
+# Bản đồ mở riêng, không có nút Gần bạn.
+- scrollUntilVisible:
+    element: "Bản đồ di sản"
+    direction: UP
+    timeout: 30000
+- tapOn: "Bản đồ di sản"
+- extendedWaitUntil:
+    notVisible: "Đang tải bản đồ…"
+    timeout: 60000
+- assertNotVisible: "Không tải được bản đồ.*"
+- assertVisible: "Vật thể"
+- assertNotVisible: "Gần bạn"
+- takeScreenshot: kham-pha-03-ban-do
+- back
+# Chọn di sản xem dòng thời gian.
+- tapOn: "Dòng thời gian"
+- extendedWaitUntil:
+    visible: "Mỗi di sản có dòng thời gian riêng.*"
+    timeout: 30000
+- scrollUntilVisible:
+    element: "Thành nhà Hồ"
+    timeout: 60000
+- tapOn: "Thành nhà Hồ"
+- extendedWaitUntil:
+    notVisible: "Đang tải…"
+    timeout: 30000
+- assertVisible: "Thành nhà Hồ"
+- takeScreenshot: kham-pha-04-dong-thoi-gian
+- back
+- back
+# Tìm kiếm và chi tiết: không có khối gợi ý của khách.
+- tapOn: "Tìm theo tên, tỉnh, thời kỳ…"
+- inputText: "thang long"
+- pressKey: Enter
+- scrollUntilVisible:
+    element: ".*Hoàng thành Thăng Long.*"
+    timeout: 60000
+- tapOn: ".*Hoàng thành Thăng Long.*"
+- extendedWaitUntil:
+    visible: "Tóm tắt"
+    timeout: 30000
+- takeScreenshot: kham-pha-05-chi-tiet
+- scrollUntilVisible:
+    element: "Địa chỉ"
+    timeout: 30000
+- scroll
+- scroll
+- assertNotVisible: "Gợi ý cho bạn"
+- assertNotVisible: "Đang tìm gợi ý cho bạn…"
+- takeScreenshot: kham-pha-06-cuoi-chi-tiet
+- back
+- back
+- tapOn: "Trang học"
+- extendedWaitUntil:
+    visible: "Nhập mã bài học"
+    timeout: 30000

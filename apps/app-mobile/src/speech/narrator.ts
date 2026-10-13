@@ -48,6 +48,9 @@ type Listener = () => void;
 
 export class Narrator {
   private token = 0;
+  private loading: Promise<void> | null = null;
+  private touched = false;
+  private disposed = false;
   private voice: Voice | undefined;
   private listeners = new Set<Listener>();
   private state: NarrationState = { status: 'idle', index: -1, speed: 1, voiceState: 'unknown' };
@@ -65,8 +68,13 @@ export class Narrator {
     return () => this.listeners.delete(listener);
   };
 
-  /** Nạp danh sách giọng để biết thiết bị có giọng cho ngôn ngữ này không. */
-  async init(): Promise<void> {
+  /** Nạp danh sách giọng để biết thiết bị có giọng cho ngôn ngữ này không. Gọi nhiều lần chỉ nạp một lần. */
+  init(): Promise<void> {
+    this.loading ??= this.loadVoices();
+    return this.loading;
+  }
+
+  private async loadVoices(): Promise<void> {
     let voices: Voice[] | null;
     try {
       voices = await this.engine.voices();
@@ -80,7 +88,19 @@ export class Narrator {
   }
 
   play(): void {
+    this.touched = true;
     this.speakFrom(0, this.state.speed);
+  }
+
+  /**
+   * Tự đọc khi vào màn: đợi biết thiết bị có giọng của ngôn ngữ này rồi mới đọc (không có giọng hoặc không hỗ trợ thì không đọc, màn hình vẫn hiện chữ). Nếu người dùng đã tự bấm
+   * đọc hay dừng trong lúc chờ thì thôi, không đè lên lựa chọn của họ.
+   */
+  async playWhenReady(): Promise<void> {
+    await this.init();
+    if (this.disposed || this.touched) return;
+    if (this.state.voiceState === 'unsupported' || this.state.voiceState === 'missing') return;
+    this.play();
   }
 
   pause(): void {
@@ -96,6 +116,7 @@ export class Narrator {
   }
 
   stop(): void {
+    this.touched = true;
     this.token += 1;
     this.engine.stop();
     this.set({ status: 'idle', index: -1 });
@@ -109,6 +130,7 @@ export class Narrator {
   }
 
   dispose(): void {
+    this.disposed = true;
     this.token += 1;
     this.engine.stop();
     this.listeners.clear();

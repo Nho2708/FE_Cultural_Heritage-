@@ -91,7 +91,7 @@ export function QuizList({ code, quizzes, variant }: QuizListProps) {
     )}
     <ul className={variant === 'row' ? 'divide-y divide-border rounded-md border border-border bg-surface' : 'flex flex-col gap-3'}>
       {quizzes.map((quiz) => {
-        const action = quizActionLabel(quiz);
+        const action = quizActionLabel(quiz, variant === 'large');
         const when = quizWhen(quiz);
         const link = QuizDialog && canOpenQuiz(quiz) && action && (
           <Button onClick={() => setOpenId(quiz.id)} size={variant === 'large' ? 'lg' : 'md'} variant={quiz.state === 'SUBMITTED' ? 'secondary' : 'primary'} aria-label={`${action}: ${quiz.name ?? 'bài kiểm tra'}`}>

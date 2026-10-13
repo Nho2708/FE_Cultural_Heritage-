@@ -5,10 +5,11 @@ import type { ColorValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GuardRedirect } from '../../src/components/GuardRedirect';
 import { entryHref } from '../../src/navigation/entry';
+import { GUEST_TABS } from '../../src/navigation/tabs';
 import { useApp, useAuth } from '../../src/state/AppProvider';
 import { useTheme } from '../../src/theme/ThemeProvider';
 
-// Chế độ Khách tham quan: bốn tab (Trang chủ, Tìm kiếm, Bản đồ, Lịch sử và cài đặt). Không cần đăng nhập; vào nhầm khi đang ở chế độ Học sinh thì về điểm vào.
+// Chế độ Khách tham quan: năm tab (Trang chủ, Tìm kiếm, Bản đồ, Dòng thời gian, Lịch sử và cài đặt). Không cần đăng nhập; vào nhầm khi đang ở chế độ Học sinh thì về điểm vào.
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -37,10 +38,9 @@ export default function GuestLayout() {
         sceneStyle: { backgroundColor: theme.color.background },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: t('tabs.home'), tabBarIcon: icon('home-outline', 'home') }} />
-      <Tabs.Screen name="tim-kiem" options={{ title: t('tabs.search'), tabBarIcon: icon('search-outline', 'search') }} />
-      <Tabs.Screen name="ban-do" options={{ title: t('tabs.map'), tabBarIcon: icon('map-outline', 'map') }} />
-      <Tabs.Screen name="lich-su" options={{ title: t('tabs.history'), tabBarIcon: icon('time-outline', 'time') }} />
+      {GUEST_TABS.map((tab) => (
+        <Tabs.Screen key={tab.name} name={tab.name} options={{ title: t(tab.title), tabBarLabel: tab.label ? t(tab.label) : undefined, tabBarIcon: icon(tab.icon, tab.focusedIcon) }} />
+      ))}
     </Tabs>
   );
 }

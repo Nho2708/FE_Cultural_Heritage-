@@ -11,6 +11,13 @@ export function useTheme(): LearningTheme {
   return useContext(ThemeContext);
 }
 
+const DEFAULT_THEME = themeForLevel(null);
+
+/** Màn hình công khai (khám phá, chi tiết di sản, bản đồ) luôn dùng bộ giao diện mặc định, kể cả khi học sinh mở từ khu học: bộ theo cấp chỉ dành cho khu học. */
+export function DefaultThemeScope({ children }: { children: ReactNode }) {
+  return <ThemeContext.Provider value={DEFAULT_THEME}>{children}</ThemeContext.Provider>;
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const { mode } = useApp();
   const { session } = useAuth();

@@ -1,0 +1,40 @@
+# Đưa app về chế độ Khách tham quan với ngôn ngữ LANGUAGE_NAME (tên hiện trên màn chọn ngôn ngữ: "Tiếng Việt", "English", "한국어", "简体中文", "日本語"),
+# từ bất kỳ trạng thái nào sau mo-app.yaml: lần mở đầu (chọn ngôn ngữ rồi chế độ), đang ở chế độ Học sinh (thoát về khách), hoặc đã ở chế độ Khách với ngôn ngữ
+# khác (đổi trong Cài đặt). Kết thúc ở tab Trang chủ của khách. Ảnh chụp màn chọn chế độ chỉ có ở lần mở đầu.
+appId: host.exp.exponent
+---
+# Lần mở đầu: chọn ngôn ngữ rồi chế độ Khách tham quan.
+- runFlow:
+    when:
+      visible: "(Choose a language|Chọn ngôn ngữ|언어 선택|选择语言|言語を選択)"
+    commands:
+      - tapOn: ${LANGUAGE_NAME}
+      - extendedWaitUntil:
+          visible: "(How will you use the app.*|Bạn dùng app như thế nào.*|앱을 어떻게 사용하시겠어요.*|您想如何使用此应用.*|アプリの使い方を選んでください)"
+          timeout: 10000
+      - takeScreenshot: chon-che-do
+      - tapOn:
+          text: "(Visitor|Khách tham quan|방문객|游客|観光客)"
+          index: 1
+# Đang ở chế độ Học sinh: về chế độ Khách.
+- runFlow: thoat-hoc-sinh.yaml
+# Giờ đã ở chế độ Khách (ngôn ngữ nào cũng được). Lần trước khách đã bật "Gần bạn" mà quyền vị trí của Expo Go bị thu hồi thì trang chủ hỏi quyền ngay:
+# từ chối để đi tiếp (luồng khach-gan-ban-tu-choi.yaml kiểm riêng đường này). Rồi đặt đúng ngôn ngữ trong Cài đặt và về Trang chủ.
+- extendedWaitUntil:
+    visible: "(Home|Trang chủ|홈|首页|ホーム|Don.t allow|Deny|Không cho phép|Từ chối)"
+    timeout: 30000
+- runFlow:
+    when:
+      visible: "(Don.t allow|Deny|Không cho phép|Từ chối)"
+    commands:
+      - tapOn: "(Don.t allow|Deny|Không cho phép|Từ chối)"
+- extendedWaitUntil:
+    visible: "(Home|Trang chủ|홈|首页|ホーム)"
+    timeout: 30000
+- tapOn: "(History|Lịch sử|기록|历史|履歴)"
+- scrollUntilVisible:
+    element: "(Choose a language|Chọn ngôn ngữ|언어 선택|选择语言|言語を選択)"
+    timeout: 30000
+- tapOn: "(Choose a language|Chọn ngôn ngữ|언어 선택|选择语言|言語を選択)"
+- tapOn: ${LANGUAGE_NAME}
+- tapOn: "(Home|Trang chủ|홈|首页|ホーム)"

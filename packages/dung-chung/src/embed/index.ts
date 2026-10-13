@@ -1,5 +1,5 @@
-import type { DiscoveryFilter, LanguageCode } from '../api/discovery';
-import type { HeritageType } from '../api/heritage';
+import type { DiscoveryFilter, HeritagePeriod, LanguageCode } from '../api/discovery';
+import type { HeritageType, RecognitionLevel } from '../api/heritage';
 import { parseLanguage } from '../i18n/languages';
 
 // Hợp đồng giữa app mobile và hai trang nhúng của web học tập (bản đồ, trình xem 3D). App mở trang nhúng trong WebView và hai bên nói chuyện
@@ -20,8 +20,34 @@ export const EMBED_PARAM = {
   keyword: 'tu-khoa',
   region: 'vung',
   type: 'loai',
+  province: 'tinh',
+  level: 'cap',
+  period: 'thoi-ky',
   select: 'chon',
 } as const;
+
+const REGIONS = ['Bắc', 'Trung', 'Nam'] as const;
+const TYPES: readonly HeritageType[] = ['TANGIBLE', 'INTANGIBLE', 'NATURAL', 'MIXED', 'DOCUMENTARY'];
+const LEVELS: readonly RecognitionLevel[] = ['UNESCO', 'NATIONAL_SPECIAL', 'NATIONAL', 'PROVINCIAL', 'NONE'];
+const PERIODS: readonly HeritagePeriod[] = ['PREHISTORIC', 'NORTHERN_RULE', 'INDEPENDENT_FEUDAL', 'MODERN', 'CONTEMPORARY'];
+
+function oneOf<T extends string>(value: unknown, allowed: readonly T[]): T | undefined {
+  return allowed.find((item) => item === value);
+}
+
+function positiveInt(value: unknown): number | undefined {
+  const number = typeof value === 'string' ? Number(value) : value;
+  return typeof number === 'number' && Number.isInteger(number) && number > 0 ? number : undefined;
+}
+
+/** Các trường bộ lọc mà trang bản đồ nhúng hiểu (cùng bộ với trang Bản đồ của web). */
+export type EmbedMapFilter = Pick<DiscoveryFilter, 'keyword' | 'region' | 'heritageType' | 'provinceId' | 'recognitionLevel' | 'period'>;
+
+/** Vị trí của khách để vẽ chấm "Gần bạn" trên bản đồ. Chỉ nằm trong bộ nhớ của trang nhúng, không lưu và không đi vào địa chỉ. */
+export interface EmbedPosition {
+  latitude: number;
+  longitude: number;
+}
 
 export type ModelErrorReason = 'webgl' | 'load';
 
@@ -30,6 +56,8 @@ export type EmbedMessage =
   | { type: 'ready'; version: 1 }
   /** Khách chạm một ghim rồi bấm mở chi tiết: app đi tới trang chi tiết di sản. */
   | { type: 'pin-selected'; version: 1; slug: string }
+  /** Khách chạm một ghim rồi bấm mở dòng thời gian: app đi tới dòng thời gian của di sản. */
+  | { type: 'timeline-selected'; version: 1; slug: string }
   /** Tiến trình tải mô hình, 0 đến 1. */
   | { type: 'model-progress'; version: 1; fraction: number }
   | { type: 'model-loaded'; version: 1 }
@@ -38,8 +66,10 @@ export type EmbedMessage =
 
 /** App → trang nhúng. */
 export type EmbedCommand =
-  | { type: 'set-filter'; version: 1; filter: Pick<DiscoveryFilter, 'keyword' | 'region' | 'heritageType'> }
-  | { type: 'focus'; version: 1; slug: string };
+  | { type: 'set-filter'; version: 1; filter: EmbedMapFilter }
+  | { type: 'focus'; version: 1; slug: string }
+  /** Vị trí của khách ("Gần bạn"): bản đồ vẽ một chấm tại đó và đưa khung nhìn tới. `null` thì bỏ chấm. */
+  | { type: 'set-position'; version: 1; position: EmbedPosition | null };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
@@ -61,6 +91,8 @@ export function parseEmbedMessage(raw: unknown): EmbedMessage | null {
       return { type: 'ready', version: 1 };
     case 'pin-selected':
       return typeof value.slug === 'string' && value.slug !== '' && value.slug.length <= 200 ? { type: 'pin-selected', version: 1, slug: value.slug } : null;
+    case 'timeline-selected':
+      return typeof value.slug === 'string' && value.slug !== '' && value.slug.length <= 200 ? { type: 'timeline-selected', version: 1, slug: value.slug } : null;
     case 'model-progress':
       return typeof value.fraction === 'number' && Number.isFinite(value.fraction)
         ? { type: 'model-progress', version: 1, fraction: Math.min(1, Math.max(0, value.fraction)) }
@@ -91,7 +123,7 @@ export function parseEmbedCommand(raw: unknown): EmbedCommand | null {
   if (!isRecord(value) || value.version !== EMBED_PROTOCOL_VERSION) return null;
   if (value.type === 'focus' && typeof value.slug === 'string' && value.slug !== '') return { type: 'focus', version: 1, slug: value.slug };
   if (value.type === 'set-filter' && isRecord(value.filter)) {
-    const { keyword, region, heritageType } = value.filter;
+    const { keyword, region, heritageType, provinceId, recognitionLevel, period } = value.filter;
     return {
       type: 'set-filter',
       version: 1,
@@ -99,8 +131,20 @@ export function parseEmbedCommand(raw: unknown): EmbedCommand | null {
         keyword: typeof keyword === 'string' ? keyword : undefined,
         region: typeof region === 'string' ? region : undefined,
         heritageType: typeof heritageType === 'string' ? (heritageType as HeritageType) : undefined,
+        provinceId: positiveInt(provinceId),
+        recognitionLevel: oneOf(recognitionLevel, LEVELS),
+        period: oneOf(period, PERIODS),
       },
     };
+  }
+  if (value.type === 'set-position') {
+    if (value.position === null) return { type: 'set-position', version: 1, position: null };
+    if (isRecord(value.position)) {
+      const { latitude, longitude } = value.position;
+      if (typeof latitude === 'number' && typeof longitude === 'number' && Number.isFinite(latitude) && Number.isFinite(longitude) && Math.abs(latitude) <= 90 && Math.abs(longitude) <= 180) {
+        return { type: 'set-position', version: 1, position: { latitude, longitude } };
+      }
+    }
   }
   return null;
 }
@@ -112,6 +156,9 @@ export function embedMapUrl(baseUrl: string, filter: DiscoveryFilter, language: 
   if (filter.keyword) params.set(EMBED_PARAM.keyword, filter.keyword);
   if (filter.region) params.set(EMBED_PARAM.region, filter.region);
   if (filter.heritageType) params.set(EMBED_PARAM.type, filter.heritageType);
+  if (filter.provinceId) params.set(EMBED_PARAM.province, String(filter.provinceId));
+  if (filter.recognitionLevel) params.set(EMBED_PARAM.level, filter.recognitionLevel);
+  if (filter.period) params.set(EMBED_PARAM.period, filter.period);
   if (select) params.set(EMBED_PARAM.select, select);
   return `${baseUrl.replace(/\/+$/, '')}${EMBED_PATHS.map}?${params.toString()}`;
 }
@@ -127,10 +174,16 @@ export function readEmbedMapParams(params: URLSearchParams): { filter: Discovery
   const filter: DiscoveryFilter = {};
   const keyword = params.get(EMBED_PARAM.keyword)?.trim();
   if (keyword) filter.keyword = keyword;
-  const region = params.get(EMBED_PARAM.region);
-  if (region === 'Bắc' || region === 'Trung' || region === 'Nam') filter.region = region;
-  const type = params.get(EMBED_PARAM.type);
-  if (type === 'TANGIBLE' || type === 'INTANGIBLE' || type === 'NATURAL' || type === 'MIXED' || type === 'DOCUMENTARY') filter.heritageType = type;
+  const region = oneOf(params.get(EMBED_PARAM.region), REGIONS);
+  if (region) filter.region = region;
+  const type = oneOf(params.get(EMBED_PARAM.type), TYPES);
+  if (type) filter.heritageType = type;
+  const province = positiveInt(params.get(EMBED_PARAM.province));
+  if (province) filter.provinceId = province;
+  const level = oneOf(params.get(EMBED_PARAM.level), LEVELS);
+  if (level) filter.recognitionLevel = level;
+  const period = oneOf(params.get(EMBED_PARAM.period), PERIODS);
+  if (period) filter.period = period;
   return { filter, language: parseLanguage(params.get(EMBED_PARAM.language)) ?? 'vi', select: params.get(EMBED_PARAM.select) };
 }
 

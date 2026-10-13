@@ -38,8 +38,9 @@ export const canTakeQuiz = (quiz: StudentQuiz) => quiz.state === 'OPEN' || quiz.
 /** Bài kiểm tra có nút mở hộp thoại: làm được ngay, hoặc đã nộp (xem kết quả). */
 export const canOpenQuiz = (quiz: StudentQuiz) => canTakeQuiz(quiz) || quiz.state === 'SUBMITTED';
 
-export function quizActionLabel(quiz: StudentQuiz): string | null {
-  if (quiz.state === 'OPEN') return 'Làm bài';
+/** Nhãn nút của bài kiểm tra; bài chơi cấp 1 (`playful`) mời "Bắt đầu chơi" thay cho "Làm bài". */
+export function quizActionLabel(quiz: StudentQuiz, playful = false): string | null {
+  if (quiz.state === 'OPEN') return playful ? 'Bắt đầu chơi' : 'Làm bài';
   if (quiz.state === 'IN_PROGRESS') return 'Làm tiếp';
   if (quiz.state === 'SUBMITTED') return 'Xem kết quả';
   return null;

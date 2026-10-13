@@ -1,7 +1,8 @@
 import type { AttemptQuestion } from '@dsvhvn/dung-chung/api';
 import { createI18n } from '../i18n';
 import { studentVi } from '../i18n/strings/hocsinh';
-import { clockText, percentText, remainingText, starsText } from './format';
+import { parseAutoRead } from './autoRead';
+import { clockText, percentText, remainingText, starsText, stepSegments } from './format';
 import { answerLines, type ReviewWords } from './reviewText';
 
 const WORDS: ReviewWords = { yes: 'Đúng', no: 'Sai', empty: '(chưa trả lời)', imageN: (letter) => `Hình ${letter}` };
@@ -51,6 +52,22 @@ describe('chữ hiển thị của khu học', () => {
     expect(starsText(null)).toBe('☆☆☆');
     expect(percentText(77.5)).toBe('78%');
     expect(percentText(null)).toBe('');
+  });
+
+  it('thanh tiến trình bước ở cấp 1: bước đã qua, bước đang học, bước còn lại', () => {
+    expect(stepSegments(0, 4)).toEqual(['current', 'todo', 'todo', 'todo']);
+    expect(stepSegments(2, 4)).toEqual(['done', 'done', 'current', 'todo']);
+    expect(stepSegments(3, 4)).toEqual(['done', 'done', 'done', 'current']);
+    expect(stepSegments(9, 3)).toEqual(['done', 'done', 'current']);
+    expect(stepSegments(-1, 2)).toEqual(['current', 'todo']);
+    expect(stepSegments(0, 0)).toEqual([]);
+  });
+
+  it('tự đọc to mặc định bật, chỉ giá trị "0" đã lưu mới tắt', () => {
+    expect(parseAutoRead(null)).toBe(true);
+    expect(parseAutoRead('1')).toBe(true);
+    expect(parseAutoRead('lạ')).toBe(true);
+    expect(parseAutoRead('0')).toBe(false);
   });
 
   it('khu học chỉ tiếng Việt: ngôn ngữ khác lùi về tiếng Việt, phần công khai theo ngôn ngữ', async () => {

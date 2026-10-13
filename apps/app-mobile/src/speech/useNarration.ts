@@ -24,6 +24,8 @@ export interface Narration extends NarrationState {
   pause: () => void;
   resume: () => void;
   stop: () => void;
+  /** Tự đọc khi vào màn, sau khi biết thiết bị có giọng phù hợp. */
+  playWhenReady: () => Promise<void>;
   setSpeed: (speed: NarrationState['speed']) => void;
 }
 
@@ -45,6 +47,7 @@ export function useNarration(text: string, speechTag: string, engine: SpeechEngi
       pause: () => narrator.pause(),
       resume: () => narrator.resume(),
       stop: () => narrator.stop(),
+      playWhenReady: () => narrator.playWhenReady(),
       setSpeed: (speed: NarrationState['speed']) => narrator.setSpeed(speed),
     }),
     [narrator],

@@ -2,6 +2,16 @@
 
 export type RewardedOutcome = 'earned' | 'closed' | 'failed' | 'unavailable';
 
+export type PrivacyOptionsState = 'required' | 'not-required' | 'unavailable' | 'failed';
+
+export async function privacyOptionsState(): Promise<PrivacyOptionsState> {
+  return 'unavailable';
+}
+
+export async function showPrivacyOptions(): Promise<boolean> {
+  return false;
+}
+
 export function adsAvailable(): boolean {
   return false;
 }

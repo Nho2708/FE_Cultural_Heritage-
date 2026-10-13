@@ -1,5 +1,5 @@
 import type { StudentLesson } from '@dsvhvn/dung-chung/api';
-import { milestonesOf, sectionsOf } from '@dsvhvn/dung-chung/lesson-data';
+import { canTakeQuiz, milestonesOf, sectionsOf } from '@dsvhvn/dung-chung/lesson-data';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,7 +7,9 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Photo } from '../components/Heritage';
 import { Button, Card, Chip, Divider, EmptyState, Notice, Section, Txt, styles as ui } from '../components/ui';
 import { useTheme } from '../theme/ThemeProvider';
+import { useAutoRead } from './autoRead';
 import { Figure, HeritageLinks, Paragraphs, QuizList, ReadAloud } from './LessonParts';
+import { stepSegments } from './format';
 
 // Ba bố cục bài học khác nhau thật sự theo cấp (cùng dữ liệu, khác luồng): cấp 1 kể chuyện từng bước với nút lớn và đọc to; cấp 2 ba bước chuyển qua lại tự do
 // bằng chip (Đọc bài, Dòng thời gian của bài, Bài kiểm tra); cấp 3 là trang tài liệu có đề mục, tư liệu gốc, câu hỏi gợi suy nghĩ và bài kiểm tra dạng dòng.
@@ -24,6 +26,7 @@ export function LevelOneLesson({ lesson, initial, onPositionChange }: { lesson: 
   const theme = useTheme();
   const router = useRouter();
   const steps = lesson.layout.steps;
+  const playStep = steps.findIndex((s) => s.key === 'PLAY');
   const story = sectionsOf(lesson, 'STORY');
   const gallery = [
     ...story.filter((s) => s.imageUrl).map((s) => ({ url: s.imageUrl, caption: s.title, image: s.image })),
@@ -36,6 +39,7 @@ export function LevelOneLesson({ lesson, initial, onPositionChange }: { lesson: 
     const step = clamp(saved.step, steps.length - 1);
     return { step, part: step === 0 ? clamp(saved.part, parts.length - 1) : 0 };
   });
+  const { autoRead, setAutoRead } = useAutoRead();
   const stepKey = steps[position.step]?.key ?? 'LISTEN_STORY';
   const part = parts[position.part] ?? parts[0]!;
   const go = (next: LessonPosition) => {
@@ -55,26 +59,26 @@ export function LevelOneLesson({ lesson, initial, onPositionChange }: { lesson: 
         {lesson.title}
       </Txt>
 
-      <View accessibilityLabel={t('hs.lesson.steps')} style={styles.stepRow}>
-        {steps.map((step, index) => {
-          const done = index < position.step;
-          const current = index === position.step;
-          return (
-            <View key={step.key} style={styles.stepItem} accessibilityState={{ selected: current }}>
-              <View
-                style={[
-                  styles.stepDot,
-                  { borderColor: done || current ? theme.color.primary : theme.color.border, backgroundColor: current ? theme.color.primary : done ? theme.color.primaryContainer : theme.color.surface },
-                ]}
-              >
-                <Text style={{ color: current ? theme.color.onPrimary : theme.color.onSurfaceVariant, fontSize: 22, fontWeight: '700' }}>{done ? '✓' : index + 1}</Text>
-              </View>
-              <Txt variant="caption" style={{ textAlign: 'center' }} color={current ? theme.color.primary : undefined}>
-                {step.label}
-              </Txt>
-            </View>
-          );
-        })}
+      <View
+        accessibilityRole="progressbar"
+        accessibilityLabel={t('hs.lesson.steps')}
+        accessibilityValue={{ min: 1, max: steps.length, now: position.step + 1, text: t('hs.lesson.stepOf', { index: position.step + 1, total: steps.length }) }}
+        style={{ gap: 8 }}
+      >
+        <View style={styles.progressBar}>
+          {stepSegments(position.step, steps.length).map((state, index) => (
+            <View
+              key={steps[index]?.key ?? index}
+              style={[styles.progressSegment, { backgroundColor: state === 'todo' ? theme.color.border : theme.color.primary, opacity: state === 'done' ? 0.55 : 1 }]}
+            />
+          ))}
+        </View>
+        <View style={ui.row}>
+          <Txt variant="label" color={theme.color.primary} style={ui.grow}>
+            {steps[position.step]?.label}
+          </Txt>
+          <Txt variant="caption">{t('hs.lesson.stepOf', { index: position.step + 1, total: steps.length })}</Txt>
+        </View>
       </View>
 
       {stepKey === 'LISTEN_STORY' ? (
@@ -85,7 +89,7 @@ export function LevelOneLesson({ lesson, initial, onPositionChange }: { lesson: 
             <Txt variant="question" style={{ fontWeight: '500' }}>
               {part.text}
             </Txt>
-            <ReadAloud key={`${position.step}-${position.part}`} text={part.text} big />
+            <ReadAloud key={`${position.step}-${position.part}`} text={part.text} big auto={autoRead === true} onAutoChange={setAutoRead} />
             {lesson.heritages[0] ? (
               <Button label={t('hs.lesson.heritageOpen')} variant="ghost" onPress={() => router.push({ pathname: '/di-san/[slug]', params: { slug: lesson.heritages[0]!.slug } })} />
             ) : null}
@@ -126,6 +130,9 @@ export function LevelOneLesson({ lesson, initial, onPositionChange }: { lesson: 
               <Txt color={theme.color.onPrimaryContainer}>{t('hs.lesson.congratsText')}</Txt>
             </View>
           </View>
+          {playStep >= 0 && lesson.quizzes.some(canTakeQuiz) ? (
+            <Button label={t('hs.lesson.playForStars')} onPress={() => go({ step: playStep, part: 0 })} full style={big} />
+          ) : null}
           {lesson.keyPoints.length > 0 ? (
             <Card>
               <View style={{ padding: 16, gap: 8 }}>
@@ -370,8 +377,7 @@ export function LevelThreeLesson({ lesson }: { lesson: StudentLesson }) {
 }
 
 const styles = StyleSheet.create({
-  stepRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 6 },
-  stepItem: { flex: 1, alignItems: 'center', gap: 4 },
-  stepDot: { width: 48, height: 48, borderRadius: 24, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
+  progressBar: { flexDirection: 'row', gap: 6 },
+  progressSegment: { flex: 1, height: 14, borderRadius: 7 },
   number: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
 });
