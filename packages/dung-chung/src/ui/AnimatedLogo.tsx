@@ -17,11 +17,11 @@ import { usePrefersReducedMotion } from './motion';
 
 /** Năm dải ngang của cổng lầu, từ dưới lên: [mép trên, mép dưới] theo phần trăm cạnh huy hiệu. */
 const TIERS: ReadonlyArray<readonly [number, number]> = [
-  [67, 100], // bậc thềm và thân dưới
-  [58.5, 67], // mái dưới
-  [51, 58.5], // thân giữa và lan can
-  [43, 51], // mái giữa
-  [0, 43], // mái trên
+  [65.5, 100], // bậc thềm và thân dưới
+  [57.1, 65.5], // mái dưới
+  [49.6, 57.1], // thân giữa và lan can
+  [41.6, 49.6], // mái giữa
+  [0, 41.6], // mái trên
 ];
 
 /** Các dải chồng lên nhau 0,6% để mép cắt không để lộ đường kẻ mảnh. */
