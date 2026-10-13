@@ -96,6 +96,12 @@ export default function HistoryAndSettings() {
           </View>
           <Divider />
           <View style={local.setting}>
+            <Txt variant="label">{t('intro.title')}</Txt>
+            <Txt variant="caption">{t('intro.replayText')}</Txt>
+            <Button label={t('intro.replay')} variant="secondary" onPress={() => router.push('/gioi-thieu')} />
+          </View>
+          <Divider />
+          <View style={local.setting}>
             <View style={ui.row}>
               <View style={ui.grow}>
                 <Txt variant="label">{t('settings.location')}</Txt>

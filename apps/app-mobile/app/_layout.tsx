@@ -1,22 +1,22 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { HistoryProvider } from '../src/guest/HistoryProvider';
+import { BrandSplash, SPLASH_BACKGROUND } from '../src/motion/BrandSplash';
 import { AppProvider, useApp } from '../src/state/AppProvider';
 import { ThemeProvider, useTheme } from '../src/theme/ThemeProvider';
 
-// Gốc của app: bộ nhớ đệm truy vấn, vùng an toàn, trạng thái toàn app (nạp từ máy), bộ giao diện theo cấp học. Trong lúc nạp hiện màn hình chờ.
+// Gốc của app: bộ nhớ đệm truy vấn, vùng an toàn, trạng thái toàn app (nạp từ máy), bộ giao diện theo cấp học. Trong lúc nạp hiện màn hình chờ
+// (huy hiệu trên nền xanh than, nối liền với màn hình chờ gốc); nạp xong thì màn hình chờ mờ dần 300 ms phía trên app.
 
-function Splash() {
-  return (
-    <View style={styles.splash}>
-      <ActivityIndicator size="large" color="#A4231F" />
-    </View>
-  );
+/** Báo cho gốc biết app đã nạp xong (nằm trong AppProvider nên chỉ được dựng sau khi trạng thái đã nạp). */
+function ReadySignal({ onReady }: { onReady: () => void }) {
+  useEffect(onReady, [onReady]);
+  return null;
 }
 
 function Navigation() {
@@ -37,6 +37,7 @@ function Navigation() {
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="chon-ngon-ngu" options={{ headerShown: false }} />
+        <Stack.Screen name="gioi-thieu" options={{ headerShown: false }} />
         <Stack.Screen name="chon-che-do" options={{ headerShown: false }} />
         <Stack.Screen name="(khach)" options={{ headerShown: false }} />
         <Stack.Screen name="(hoc-sinh)" options={{ headerShown: false }} />
@@ -61,21 +62,29 @@ export default function RootLayout() {
   const [queryClient] = useState(
     () => new QueryClient({ defaultOptions: { queries: { staleTime: 30_000, retry: 1, refetchOnWindowFocus: false } } }),
   );
+  const [ready, setReady] = useState(false);
+  const [splashVisible, setSplashVisible] = useState(true);
+  const markReady = useCallback(() => setReady(true), []);
+  const hideSplash = useCallback(() => setSplashVisible(false), []);
   return (
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
-        <AppProvider fallback={<Splash />}>
-          <ThemeProvider>
-            <HistoryProvider>
-              <Navigation />
-            </HistoryProvider>
-          </ThemeProvider>
-        </AppProvider>
+        <View style={styles.root}>
+          <AppProvider fallback={null}>
+            <ThemeProvider>
+              <HistoryProvider>
+                <Navigation />
+              </HistoryProvider>
+            </ThemeProvider>
+            <ReadySignal onReady={markReady} />
+          </AppProvider>
+          {splashVisible ? <BrandSplash ready={ready} onDone={hideSplash} /> : null}
+        </View>
       </QueryClientProvider>
     </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  splash: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF' },
+  root: { flex: 1, backgroundColor: SPLASH_BACKGROUND },
 });

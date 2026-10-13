@@ -90,8 +90,9 @@ Bản APK dùng API `http://` (không `https://`) cần cho phép cleartext (plu
 
 ```
 app/                         Expo Router (đường dẫn viết bằng tiếng Việt, không dấu)
-  index.tsx                  điểm vào: chọn ngôn ngữ → chọn chế độ → vào chế độ đã chọn
+  index.tsx                  điểm vào: chọn ngôn ngữ → giới thiệu ứng dụng (một lần) → chọn chế độ → vào chế độ đã chọn
   chon-ngon-ngu.tsx          chọn một trong năm ngôn ngữ
+  gioi-thieu.tsx             bốn thẻ giới thiệu ứng dụng (lần đầu, hoặc xem lại từ Lịch sử và cài đặt / Của em)
   chon-che-do.tsx            Khách tham quan hoặc Học sinh
   (khach)/                   bốn tab: Trang chủ, Tìm kiếm, Bản đồ, Lịch sử và cài đặt
   di-san/[slug]/             chi tiết, dòng thời gian, xem 3D (dùng chung cho khách và học sinh)
@@ -112,6 +113,8 @@ src/
   embed/         WebView mở trang nhúng, chỉ đúng origin của web học tập
   hocsinh/       bài học ba cấp, làm bài tám dạng câu, phiên làm bài (lưu từng câu, tự nộp)
   ads/           cổng quảng cáo có thưởng (AdMob ở bản dựng phát triển)
+  intro/         bốn thẻ giới thiệu ứng dụng và hình minh họa vẽ bằng khối View theo màu logo
+  motion/        chuyển động dùng chung: màn hình chờ trong app, hiện dần lệch nhịp, đọc cài đặt giảm chuyển động
 ```
 
 ## Lệnh
@@ -155,6 +158,7 @@ Các luồng nằm ở [`e2e/`](e2e/) (YAML, mở app qua `exp://10.0.2.2:8083`)
 
 | Luồng | Nội dung |
 |---|---|
+| `gioi-thieu-ung-dung` | bốn thẻ giới thiệu: lần mở đầu (Next, Next, Next, Get started rồi chọn chế độ; chỉ chạy khi app còn mới) và xem lại từ Lịch sử và cài đặt (đi hết bốn thẻ, rồi chỉ bấm Skip) |
 | `khach-tham-quan` | chọn tiếng Anh và chế độ Khách, trang chủ, tìm "thang long", chi tiết, tóm tắt, nghe, xem 3D, bản đồ, lịch sử (xoá từng mục và xoá hết) |
 | `khach-dong-thoi-gian` | hai thẻ Bản đồ, Dòng thời gian trên trang chủ; màn chọn di sản (tìm nhanh, từ khóa ngắn); dòng thời gian một di sản; tab Dòng thời gian |
 | `khach-ban-do` | bản đồ: chip loại, vùng; bảng Thêm bộ lọc (tỉnh, cấp xếp hạng, thời kỳ); nút Gần bạn trên bản đồ; nút mở dòng thời gian trong thẻ ghim |
@@ -186,6 +190,7 @@ chạy từng luồng Maestro (xoá dữ liệu Expo Go trước mỗi luồng, 
 
 Chạy tay từng phần khi sửa lỗi: bật máy ảo, `adb shell pm clear host.exp.exponent`, giữ Metro đang chạy, rồi
 `maestro --device emulator-5554 test -e STUDENT_CODE=... apps/app-mobile/e2e/<luồng>.yaml`. Lệnh `maestro` cần biến `JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8` để đọc đúng chữ có dấu.
+Lần mở đầu có thêm bốn thẻ giới thiệu ngay sau chọn ngôn ngữ: `e2e/chung/bo-qua-gioi-thieu.yaml` bấm "Bỏ qua" và được `vao-khach.yaml`, `vao-hoc-sinh.yaml` gọi.
 Luồng học sinh dùng tài khoản một lần (đăng nhập lần đầu đổi mật khẩu, bài kiểm tra chỉ làm một lần) nên mỗi lần chạy phải nạp dữ liệu mới.
 Địa chỉ Metro nhìn từ thiết bị đi vào luồng bằng biến `METRO_URL` (mặc định `exp://10.0.2.2:8083` của máy ảo; điện thoại thật qua adb reverse truyền `-e METRO_URL=exp://127.0.0.1:8083`).
 
