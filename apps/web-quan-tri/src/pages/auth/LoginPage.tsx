@@ -12,7 +12,8 @@ import { useAuth } from '../../lib/auth/context';
 // trên tạo. Ô mật khẩu chỉ kiểm bắt buộc nhập — quy tắc mật khẩu áp cho mật khẩu mới, không áp khi đăng nhập.
 // Sai thông tin (không nói sai ô nào, tài khoản học sinh cũng nhận câu này) và tài khoản không đăng nhập được (tạm khóa,
 // bị khóa, ngừng sử dụng, trường đã ngừng) hiện In line. Dưới biểu mẫu luôn có dòng cố định chỉ học sinh sang web học
-// tập, không phụ thuộc thứ đã nhập. Thành công: trang mặc định theo vai trò hoặc trang bị chặn trước đó.
+// tập, không phụ thuộc thứ đã nhập, và dòng dẫn trường chưa dùng sang trang Dành cho nhà trường của web học tập.
+// Thành công: trang mặc định theo vai trò hoặc trang bị chặn trước đó.
 
 type Field = 'emailOrUsername' | 'password';
 
@@ -93,6 +94,12 @@ export function LoginPage() {
         </Button>
         <p className="text-center type-body-s text-on-surface-variant">
           Chưa có tài khoản? Quản trị trường của bạn sẽ tạo tài khoản và gửi email đặt mật khẩu.
+        </p>
+        <p className="text-center type-body-s text-on-surface-variant">
+          Trường bạn chưa dùng Học di sản?{' '}
+          <LearningWebLink path="/nha-truong" className="text-link underline underline-offset-4">
+            Xem giới thiệu cho nhà trường
+          </LearningWebLink>
         </p>
         <p className="rounded-sm bg-surface-container-low px-4 py-3 text-center type-body-s text-on-surface-variant">
           Học sinh đăng nhập ở trang Học di sản hoặc ứng dụng trên điện thoại.{' '}
