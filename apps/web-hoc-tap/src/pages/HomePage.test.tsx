@@ -53,7 +53,8 @@ describe('Trang chủ', () => {
     mockApi(withDetail(), publicApi());
     renderApp('/');
     await screen.findByRole('heading', { level: 2, name: 'Di sản nổi bật' });
-    const sources = [...document.querySelectorAll('img')].map((img) => img.getAttribute('src'));
+    // Chỉ ảnh di sản trong nội dung trang; biểu trưng ở thanh trên là ảnh của ứng dụng, không phải ảnh Wikimedia Commons.
+    const sources = [...document.querySelectorAll('img:not(header img)')].map((img) => img.getAttribute('src'));
     expect(sources.length).toBeGreaterThan(0);
     expect(sources.every((src) => src?.includes('/commons/thumb/'))).toBe(true);
   });

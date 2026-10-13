@@ -1,5 +1,5 @@
 import { cn } from '@dsvhvn/dung-chung';
-import { Icon, LoadingState } from '@dsvhvn/dung-chung/ui';
+import { BrandLogo, Icon, LoadingState } from '@dsvhvn/dung-chung/ui';
 import { Suspense, type ReactNode } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import { screenForPath } from '../../access/access';
@@ -45,10 +45,13 @@ export function AreaLayout({ title, context, items, root, theme = 'light', banne
     >
       <SkipLink />
       <aside className="sticky top-0 hidden h-dvh flex-col gap-6 border-r border-border bg-surface-container-low px-3 py-4 dsvmd:flex">
-        <Link to="/" className="flex flex-col rounded-sm px-3 py-1">
-          <span className="type-h3 text-on-surface">DSVHVN</span>
-          <span className="type-label text-on-surface-muted">{title}</span>
-          {context && <span className="mt-1 type-body-s text-on-surface-variant">{context}</span>}
+        <Link to="/" className="flex items-start gap-3 rounded-sm px-3 py-1">
+          <BrandLogo variant="emblem" size={32} decorative className="mt-0.5" />
+          <span className="flex min-w-0 flex-col">
+            <span className="type-h3 text-on-surface">DSVHVN</span>
+            <span className="type-label text-on-surface-muted">{title}</span>
+            {context && <span className="mt-1 type-body-s text-on-surface-variant">{context}</span>}
+          </span>
         </Link>
         <nav aria-label={title} className="flex flex-col gap-1">
           {items.map((item) => (
@@ -66,7 +69,8 @@ export function AreaLayout({ title, context, items, root, theme = 'light', banne
 
       <div className="flex min-w-0 flex-col">
         <header className="flex h-(--dsv-topbar-height) items-center gap-3 border-b border-border bg-surface px-4 dsvmd:px-6">
-          <Link to="/" className="type-h3 text-on-surface dsvmd:hidden">
+          <Link to="/" className="flex items-center gap-2 type-h3 text-on-surface dsvmd:hidden">
+            <BrandLogo variant="emblem" size={32} decorative />
             DSVHVN
           </Link>
           <nav aria-label="Vị trí hiện tại" className="min-w-0 flex-1">

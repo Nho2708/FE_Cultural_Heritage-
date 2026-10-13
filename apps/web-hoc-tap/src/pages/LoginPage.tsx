@@ -8,7 +8,7 @@ import {
   validateStudentCodeInput,
 } from '@dsvhvn/dung-chung';
 import { ApiError, ERROR_CODES } from '@dsvhvn/dung-chung/api';
-import { Button, InlineMessage, PasswordField, TextField, useToast } from '@dsvhvn/dung-chung/ui';
+import { BrandLogo, Button, InlineMessage, PasswordField, TextField, useToast } from '@dsvhvn/dung-chung/ui';
 import { useRef, useState, type FormEvent } from 'react';
 import { useLocation } from 'react-router';
 import { isLessonPath } from '../access/access';
@@ -80,6 +80,7 @@ export function LoginPage() {
     <section className="dsv-content dsv-section">
       <title>Học sinh đăng nhập · Học di sản</title>
       <div className="mx-auto flex w-full max-w-[440px] flex-col gap-(--dsv-block-gap)">
+        <BrandLogo variant="badge" size={96} className="self-center" />
         <div className="flex items-center gap-(--dsv-inline-gap)">
           <Illustration state="chao" className="size-20" />
           <div>

@@ -1,4 +1,5 @@
 export * from './Badge';
+export * from './BrandLogo';
 export * from './Button';
 export * from './ConfirmDialog';
 export * from './DataState';
