@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Image, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Card, Screen, Txt } from '../src/components/ui';
+import { Reveal } from '../src/motion/Reveal';
 import { useApp } from '../src/state/AppProvider';
 import type { AppMode } from '../src/state/services';
 import { useTheme } from '../src/theme/ThemeProvider';
@@ -37,23 +38,28 @@ export default function ChooseMode() {
         </Txt>
         <Txt muted>{t('mode.subtitle')}</Txt>
       </View>
-      <Card>
-        <View style={[styles.card, { gap: theme.spacing.inline }]}>
-          <Txt variant="title">{t('mode.guestTitle')}</Txt>
-          <Txt>{t('mode.guestText')}</Txt>
-          <Button label={t('mode.guestTitle')} onPress={() => pick('guest')} full />
-        </View>
-      </Card>
-      <Card>
-        <View style={[styles.card, { gap: theme.spacing.inline }]}>
-          <Txt variant="title">{t('mode.studentTitle')}</Txt>
-          <Txt>{t('mode.studentText')}</Txt>
-          <Txt variant="caption" muted>
-            {t('mode.studentLanguageNote')}
-          </Txt>
-          <Button label={t('mode.studentTitle')} variant="secondary" onPress={() => pick('student')} full />
-        </View>
-      </Card>
+      {/* Hai thẻ vào lệch nhịp 60 ms (bật giảm chuyển động thì hiện ngay). */}
+      <Reveal index={0}>
+        <Card>
+          <View style={[styles.card, { gap: theme.spacing.inline }]}>
+            <Txt variant="title">{t('mode.guestTitle')}</Txt>
+            <Txt>{t('mode.guestText')}</Txt>
+            <Button label={t('mode.guestTitle')} onPress={() => pick('guest')} full />
+          </View>
+        </Card>
+      </Reveal>
+      <Reveal index={1}>
+        <Card>
+          <View style={[styles.card, { gap: theme.spacing.inline }]}>
+            <Txt variant="title">{t('mode.studentTitle')}</Txt>
+            <Txt>{t('mode.studentText')}</Txt>
+            <Txt variant="caption" muted>
+              {t('mode.studentLanguageNote')}
+            </Txt>
+            <Button label={t('mode.studentTitle')} variant="secondary" onPress={() => pick('student')} full />
+          </View>
+        </Card>
+      </Reveal>
     </Screen>
   );
 }
