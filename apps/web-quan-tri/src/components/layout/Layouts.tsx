@@ -1,4 +1,4 @@
-import { Icon } from '@dsvhvn/dung-chung/ui';
+import { BrandLogo, Icon } from '@dsvhvn/dung-chung/ui';
 import { cn } from '@dsvhvn/dung-chung';
 import { useEffect, type ReactNode } from 'react';
 import { Link, Outlet, ScrollRestoration, useLocation } from 'react-router';
@@ -38,9 +38,12 @@ export function SkipLink() {
 /** Chữ nhận diện: "DSVHVN" kèm tên ứng dụng. */
 export function Wordmark({ to = '/', subtitle = APP_NAME, className }: { to?: string; subtitle?: string; className?: string }) {
   return (
-    <Link to={to} className={cn('flex min-w-0 flex-col justify-center rounded-xs px-2 py-1', className)}>
-      <span className="type-h3 leading-5 text-on-surface">DSVHVN</span>
-      <span className="truncate type-label text-on-surface-muted">{subtitle}</span>
+    <Link to={to} className={cn('flex min-w-0 items-center gap-2 rounded-xs px-2 py-1', className)}>
+      <BrandLogo variant="emblem" size={32} decorative />
+      <span className="flex min-w-0 flex-col justify-center">
+        <span className="type-h3 leading-5 text-on-surface">DSVHVN</span>
+        <span className="truncate type-label text-on-surface-muted">{subtitle}</span>
+      </span>
     </Link>
   );
 }

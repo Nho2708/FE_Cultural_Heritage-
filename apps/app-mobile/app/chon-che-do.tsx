@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Card, Screen, Txt } from '../src/components/ui';
 import { useApp } from '../src/state/AppProvider';
@@ -24,6 +24,13 @@ export default function ChooseMode() {
 
   return (
     <Screen style={{ paddingTop: insets.top + 24 }}>
+      {/* Huy hiệu thương hiệu: tên "Vietnam Heritage" không dịch theo ngôn ngữ. */}
+      <Image
+        source={require('../assets/images/huy-hieu.png')}
+        accessibilityLabel="Vietnam Heritage"
+        style={styles.logo}
+        resizeMode="contain"
+      />
       <View style={{ gap: 8 }}>
         <Txt variant="heading" accessibilityRole="header">
           {t('mode.title')}
@@ -53,4 +60,5 @@ export default function ChooseMode() {
 
 const styles = StyleSheet.create({
   card: { padding: 16 },
+  logo: { width: 112, height: 112, alignSelf: 'center' },
 });
