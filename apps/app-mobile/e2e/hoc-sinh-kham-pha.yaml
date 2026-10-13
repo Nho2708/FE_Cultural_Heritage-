@@ -65,9 +65,11 @@ appId: host.exp.exponent
     visible: "Tóm tắt"
     timeout: 30000
 - takeScreenshot: kham-pha-05-chi-tiet
+# Trang chi tiết di sản dài (mô tả, tư liệu, gợi ý cho học sinh): cuộn nhanh hơn và chờ lâu hơn mặc định, như ở luồng khối 3.
 - scrollUntilVisible:
     element: "Địa chỉ"
-    timeout: 30000
+    speed: 70
+    timeout: 60000
 - scroll
 - scroll
 - assertNotVisible: "Gợi ý cho bạn"
