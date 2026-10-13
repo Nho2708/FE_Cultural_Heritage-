@@ -2,6 +2,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Image, StyleSheet } from 'react-native';
+import { APP_CHANNEL } from '../config/env';
 import { DURATION, EASING } from './tokens';
 import { useReducedMotion } from './useReducedMotion';
 
@@ -15,10 +16,13 @@ const EMBLEM = require('../../assets/images/splash-icon.png');
 
 // Giữ màn hình chờ gốc cho tới khi màn hình chờ trong app đã vẽ xong khung đầu, để không nháy nền trống giữa hai màn.
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
-try {
-  SplashScreen.setOptions({ duration: 300, fade: true });
-} catch {
-  // Expo Go và web không có tuỳ chọn này.
+// Expo Go dùng màn hình chờ riêng của nó và báo cảnh báo khi app đặt tuỳ chọn này, nên chỉ đặt ở bản dựng thật.
+if (APP_CHANNEL !== 'expo-go') {
+  try {
+    SplashScreen.setOptions({ duration: 300, fade: true });
+  } catch {
+    // Web không có tuỳ chọn này.
+  }
 }
 
 function hideNativeSplash() {
