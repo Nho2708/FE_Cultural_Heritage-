@@ -15,7 +15,7 @@
 # qua màn chọn ngôn ngữ, đổi chế độ, đăng xuất); điện thoại gọi máy tính qua `adb reverse` nên backend, web học tập và Metro đều là `localhost` trên điện thoại.
 [CmdletBinding()]
 param(
-    [string[]] $Flows = @('khach-tham-quan', 'khach-dong-thoi-gian', 'khach-ban-do', 'khach-goi-y', 'khach-cai-dat', 'khach-ngon-ngu', 'hoc-sinh-dang-nhap-sai', 'hoc-sinh-kham-pha', 'hoc-sinh-ma-gan-day', 'hoc-sinh-khoi-3', 'hoc-sinh-khoi-11'),
+    [string[]] $Flows = @('gioi-thieu-ung-dung', 'khach-tham-quan', 'khach-dong-thoi-gian', 'khach-ban-do', 'khach-goi-y', 'khach-cai-dat', 'khach-ngon-ngu', 'hoc-sinh-dang-nhap-sai', 'hoc-sinh-kham-pha', 'hoc-sinh-ma-gan-day', 'hoc-sinh-khoi-3', 'hoc-sinh-khoi-11'),
     [string] $AvdName = 'dsvhvn_pixel',
     # Số hiệu thiết bị adb. Máy ảo mặc định emulator-5554; điện thoại thật bỏ trống thì script tự lấy thiết bị thật duy nhất đang nối.
     [string] $Serial = '',
@@ -202,6 +202,7 @@ try {
     $e2e = Join-Path $appDir 'e2e'
     $newPassword = 'EmHocDiSan2026'
     $envFor = @{
+        'gioi-thieu-ung-dung'    = @()
         'khach-tham-quan'        = @()
         'khach-dong-thoi-gian'   = @()
         'khach-ban-do'           = @()

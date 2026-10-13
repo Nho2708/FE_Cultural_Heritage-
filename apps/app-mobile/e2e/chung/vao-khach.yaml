@@ -1,14 +1,15 @@
 # Đưa app về chế độ Khách tham quan với ngôn ngữ LANGUAGE_NAME (tên hiện trên màn chọn ngôn ngữ: "Tiếng Việt", "English", "한국어", "简体中文", "日本語"),
 # từ bất kỳ trạng thái nào sau mo-app.yaml: lần mở đầu (chọn ngôn ngữ rồi chế độ), đang ở chế độ Học sinh (thoát về khách), hoặc đã ở chế độ Khách với ngôn ngữ
-# khác (đổi trong Cài đặt). Kết thúc ở tab Trang chủ của khách. Ảnh chụp màn chọn chế độ chỉ có ở lần mở đầu.
+# khác (đổi trong Cài đặt). Kết thúc ở tab Trang chủ của khách. Ảnh chụp màn chọn chế độ chỉ có ở lần mở đầu (sau các thẻ giới thiệu, cũng chỉ ở lần mở đầu).
 appId: host.exp.exponent
 ---
-# Lần mở đầu: chọn ngôn ngữ rồi chế độ Khách tham quan.
+# Lần mở đầu: chọn ngôn ngữ, bỏ qua các thẻ giới thiệu, rồi chọn chế độ Khách tham quan.
 - runFlow:
     when:
       visible: "(Choose a language|Chọn ngôn ngữ|언어 선택|选择语言|言語を選択)"
     commands:
       - tapOn: ${LANGUAGE_NAME}
+      - runFlow: bo-qua-gioi-thieu.yaml
       - extendedWaitUntil:
           visible: "(How will you use the app.*|Bạn dùng app như thế nào.*|앱을 어떻게 사용하시겠어요.*|您想如何使用此应用.*|アプリの使い方を選んでください)"
           timeout: 10000

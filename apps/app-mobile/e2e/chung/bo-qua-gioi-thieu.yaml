@@ -1,0 +1,10 @@
+# Lần mở đầu, ngay sau khi chọn ngôn ngữ: chờ các thẻ giới thiệu ứng dụng hiện rồi bấm "Bỏ qua" (nút có ở mọi thẻ). Kết thúc ở màn chọn chế độ.
+appId: host.exp.exponent
+---
+- extendedWaitUntil:
+    visible: "(Skip|Bỏ qua|건너뛰기|跳过|スキップ)"
+    timeout: 15000
+- tapOn: "(Skip|Bỏ qua|건너뛰기|跳过|スキップ)"
+- extendedWaitUntil:
+    visible: "(How will you use the app.*|Bạn dùng app như thế nào.*|앱을 어떻게 사용하시겠어요.*|您想如何使用此应用.*|アプリの使い方を選んでください)"
+    timeout: 15000
