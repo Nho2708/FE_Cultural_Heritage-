@@ -7,6 +7,8 @@ appId: host.exp.exponent
 - runFlow:
     when:
       visible: "(Choose a language|Chọn ngôn ngữ|언어 선택|选择语言|言語を選択)"
+      # Màn chọn ngôn ngữ không có thanh tab; nút cùng tên trong Lịch sử và cài đặt thì có.
+      notVisible: "(Home|Trang chủ|홈|首页|ホーム)"
     commands:
       - tapOn: ${LANGUAGE_NAME}
       - runFlow: bo-qua-gioi-thieu.yaml
