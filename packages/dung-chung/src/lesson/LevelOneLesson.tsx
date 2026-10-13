@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useAutoRead, useAutoSpeak } from './autoRead';
 import { AutoReadSwitch } from './AutoReadSwitch';
 import { Illustration } from './Illustration';
-import { sectionsOf } from './lessonData';
+import { canTakeQuiz, sectionsOf } from './lessonData';
 import { useLessonLinks } from './lessonLinks';
 import { HeritageLinks, LessonFigure, QuizList } from './LessonParts';
 import { SpeakButton } from './SpeakButton';
@@ -63,6 +63,7 @@ export function LevelOneLesson({ lesson, initialPosition, onPositionChange }: Le
   }, [onPositionChange, position]);
 
   const stepKey = steps[position.step]?.key ?? 'LISTEN_STORY';
+  const playStep = steps.findIndex((s) => s.key === 'PLAY');
   const part = parts[position.part] ?? parts[0]!;
   const go = (next: { step: number; part: number }) => {
     speech.stop();
@@ -216,6 +217,12 @@ export function LevelOneLesson({ lesson, initialPosition, onPositionChange }: Le
                 <p className="mt-2 type-body-m">Em làm bài chơi hoặc bài kiểm tra của bài để nhận sao nhé.</p>
               </div>
             </div>
+            {playStep >= 0 && lesson.quizzes.some(canTakeQuiz) && (
+              <Button size="lg" className="self-start rounded-full" onClick={() => go({ step: playStep, part: 0 })}>
+                <Icon name="play" size={22} />
+                Chơi để nhận sao
+              </Button>
+            )}
             {lesson.keyPoints.length > 0 && (
               <div className="rounded-lg border-2 border-border bg-surface p-(--dsv-inline-gap)">
                 <div className="flex items-center gap-3">

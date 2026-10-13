@@ -153,10 +153,15 @@ describe('bố cục bài học theo cấp', () => {
     await view.press('Tiếp nhé');
     expect(view.has('Bài chơi của em')).toBe(true);
     expect(view.has('Đố vui')).toBe(true);
+    expect(view.has('Bắt đầu chơi')).toBe(true);
     await view.press('Tiếp nhé');
     expect(view.has('Em học xong rồi! Giỏi quá!')).toBe(true);
     expect(view.has('Ý chính một')).toBe(true);
     expect(positions.at(-1)).toEqual({ step: 3, part: 0 });
+    // Màn nhận sao có lối quay về bài chơi khi còn bài làm được.
+    await view.press('Chơi để nhận sao');
+    expect(view.has('Bài chơi của em')).toBe(true);
+    expect(positions.at(-1)).toEqual({ step: 2, part: 0 });
   });
 
   it('cấp 1 mở lại đúng bước đang dừng', async () => {

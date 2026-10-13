@@ -1,5 +1,5 @@
 import type { StudentLesson } from '@dsvhvn/dung-chung/api';
-import { milestonesOf, sectionsOf } from '@dsvhvn/dung-chung/lesson-data';
+import { canTakeQuiz, milestonesOf, sectionsOf } from '@dsvhvn/dung-chung/lesson-data';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,6 +26,7 @@ export function LevelOneLesson({ lesson, initial, onPositionChange }: { lesson: 
   const theme = useTheme();
   const router = useRouter();
   const steps = lesson.layout.steps;
+  const playStep = steps.findIndex((s) => s.key === 'PLAY');
   const story = sectionsOf(lesson, 'STORY');
   const gallery = [
     ...story.filter((s) => s.imageUrl).map((s) => ({ url: s.imageUrl, caption: s.title, image: s.image })),
@@ -129,6 +130,9 @@ export function LevelOneLesson({ lesson, initial, onPositionChange }: { lesson: 
               <Txt color={theme.color.onPrimaryContainer}>{t('hs.lesson.congratsText')}</Txt>
             </View>
           </View>
+          {playStep >= 0 && lesson.quizzes.some(canTakeQuiz) ? (
+            <Button label={t('hs.lesson.playForStars')} onPress={() => go({ step: playStep, part: 0 })} full style={big} />
+          ) : null}
           {lesson.keyPoints.length > 0 ? (
             <Card>
               <View style={{ padding: 16, gap: 8 }}>

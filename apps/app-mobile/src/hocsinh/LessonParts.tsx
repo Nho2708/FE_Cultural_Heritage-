@@ -78,7 +78,7 @@ export function QuizList({ quizzes, large = false }: { quizzes: StudentQuiz[]; l
       {quizzes.map((quiz) => {
         const open = quiz.state === 'OPEN' || quiz.state === 'IN_PROGRESS';
         const done = quiz.state === 'SUBMITTED';
-        const action = open ? (quiz.state === 'IN_PROGRESS' ? t('hs.lesson.continue') : t('hs.lesson.start')) : done ? t('hs.lesson.viewResult') : null;
+        const action = open ? (quiz.state === 'IN_PROGRESS' ? t('hs.lesson.continue') : large ? t('hs.lesson.startPlay') : t('hs.lesson.start')) : done ? t('hs.lesson.viewResult') : null;
         return (
           <Card key={quiz.id}>
             <View style={{ padding: large ? 16 : 12, gap: 8 }}>
