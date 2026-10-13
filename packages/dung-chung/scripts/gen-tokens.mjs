@@ -155,6 +155,7 @@ export function generate(tokens) {
   root.push('', '/* Chuyển động */');
   for (const [key, def] of entries(motion.duration)) root.push(`--dsv-duration-${key}: ${def.value};`);
   for (const [key, def] of entries(motion.easing)) root.push(`--dsv-ease-${key}: ${def.value};`);
+  for (const [key, def] of entries(motion.stagger)) root.push(`--dsv-stagger-${key}: ${def.value};`);
   root.push(`--dsv-card-hover-scale: ${motion.cardHoverScale.value};`);
   root.push(`--dsv-text-fade-in-start: ${motion.textFadeInStart.value};`);
 

@@ -22,5 +22,11 @@ export const API_BASE_URL = read('VITE_API_BASE_URL', DEV_DEFAULTS.api);
  */
 export const ANDROID_APP_URL: string | null = import.meta.env.VITE_ANDROID_APP_URL?.trim() || null;
 
+/**
+ * Địa chỉ gốc của video giới thiệu (thư mục trên kho lưu tệp, không có dấu / ở cuối). Tùy chọn: chưa có video thì để
+ * trống, trang Giới thiệu và Dành cho nhà trường ẩn khung video và vẫn đủ nội dung bằng chữ.
+ */
+export const INTRO_VIDEO_BASE_URL: string | null = import.meta.env.VITE_INTRO_VIDEO_BASE_URL?.trim().replace(/\/+$/, '') || null;
+
 /** Web quản trị: nơi thầy cô đăng nhập. */
 export const ADMIN_WEB_URL = read('VITE_ADMIN_WEB_URL', DEV_DEFAULTS.adminWeb);

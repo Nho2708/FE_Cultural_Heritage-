@@ -48,10 +48,21 @@ export function Wordmark({ to = '/', subtitle = APP_NAME, className }: { to?: st
   );
 }
 
-/** Liên kết sang web học tập (tab mới): trang khám phá di sản công khai. */
-export function LearningWebLink({ className, children = 'Mở trang khám phá di sản' }: { className?: string; children?: ReactNode }) {
+/**
+ * Liên kết sang web học tập (tab mới): mặc định là trang khám phá di sản công khai; `path` (bắt đầu bằng /) để mở một
+ * trang khác của web học tập, ví dụ trang Dành cho nhà trường.
+ */
+export function LearningWebLink({
+  className,
+  path = '',
+  children = 'Mở trang khám phá di sản',
+}: {
+  className?: string;
+  path?: string;
+  children?: ReactNode;
+}) {
   return (
-    <a href={LEARNING_WEB_URL} target="_blank" rel="noopener noreferrer" className={className}>
+    <a href={`${LEARNING_WEB_URL}${path}`} target="_blank" rel="noopener noreferrer" className={className}>
       {children}
       <span className="sr-only"> (mở trong tab mới)</span>
     </a>

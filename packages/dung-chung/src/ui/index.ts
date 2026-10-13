@@ -1,3 +1,4 @@
+export * from './AnimatedLogo';
 export * from './Badge';
 export * from './BrandLogo';
 export * from './Button';
@@ -8,6 +9,7 @@ export * from './Icon';
 export * from './InlineMessage';
 export * from './Input';
 export * from './Modal';
+export * from './motion';
 export * from './Pagination';
 export * from './SearchForm';
 export * from './Tabs';
