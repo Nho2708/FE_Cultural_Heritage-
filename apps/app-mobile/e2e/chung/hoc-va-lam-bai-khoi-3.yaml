@@ -15,7 +15,7 @@ appId: host.exp.exponent
           timeout: 60000
       - tapOn: "Tiếp nhé"
 - takeScreenshot: khoi3-06-bai-choi
-- tapOn: "Làm bài"
+- tapOn: "Bắt đầu chơi"
 - takeScreenshot: khoi3-07-gioi-thieu-bai
 - tapOn: "Bắt đầu"
 # Câu 1: đúng/sai kèm hình
