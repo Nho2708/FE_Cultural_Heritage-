@@ -18,10 +18,13 @@ export interface AppState {
   /** Ngôn ngữ đang áp cho giao diện và nội dung: tiếng Việt ở chế độ Học sinh. */
   language: LanguageCode;
   mode: AppMode | null;
+  /** Đã xem hoặc bỏ qua các thẻ giới thiệu lần đầu (chỉ hiện một lần, trước khi chọn chế độ). */
+  introSeen: boolean;
   locationEnabled: boolean;
   services: Services;
   chooseLanguage: (code: LanguageCode) => void;
   chooseMode: (mode: AppMode) => void;
+  markIntroSeen: () => void;
   setLocationEnabled: (enabled: boolean) => void;
   /** Đăng xuất học sinh (xóa token trên máy này). */
   signOut: () => void;
@@ -48,6 +51,7 @@ export function useAuth(): AuthSnapshot<StudentProfile> {
 interface Loaded {
   chosenLanguage: LanguageCode | null;
   mode: AppMode | null;
+  introSeen: boolean;
   locationEnabled: boolean;
   services: Services;
 }
@@ -59,14 +63,14 @@ export function AppProvider({ children, fallback }: { children: ReactNode; fallb
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      const [storedLanguage, mode, location] = await Promise.all([prefs.get(KEYS.language), readStoredMode(), prefs.get(KEYS.location)]);
+      const [storedLanguage, mode, location, intro] = await Promise.all([prefs.get(KEYS.language), readStoredMode(), prefs.get(KEYS.location), prefs.get(KEYS.introSeen)]);
       modeRef.current = mode;
       const services = await createServices(() => modeRef.current);
       const chosenLanguage = parseLanguage(storedLanguage) ?? null;
       // Đặt ngôn ngữ trước khi vẽ màn hình đầu tiên để không nháy bằng tiếng Việt.
       await i18n.changeLanguage(mode === 'student' ? 'vi' : (chosenLanguage ?? deviceLanguage()));
       if (cancelled) return;
-      setLoaded({ chosenLanguage, mode, locationEnabled: location === '1', services });
+      setLoaded({ chosenLanguage, mode, introSeen: intro === '1', locationEnabled: location === '1', services });
     })();
     return () => {
       cancelled = true;
@@ -92,6 +96,7 @@ function deviceLanguage(): LanguageCode {
 function Ready({ initial, modeRef, children }: { initial: Loaded; modeRef: { current: AppMode | null }; children: ReactNode }) {
   const [chosenLanguage, setChosenLanguage] = useState(initial.chosenLanguage);
   const [mode, setMode] = useState(initial.mode);
+  const [introSeen, setIntroSeen] = useState(initial.introSeen);
   const [locationAllowed, setLocation] = useState(initial.locationEnabled);
   const { services } = initial;
   const queryClient = useQueryClient();
@@ -134,6 +139,11 @@ function Ready({ initial, modeRef, children }: { initial: Loaded; modeRef: { cur
     [modeRef, services],
   );
 
+  const markIntroSeen = useCallback(() => {
+    setIntroSeen(true);
+    void prefs.set(KEYS.introSeen, '1');
+  }, []);
+
   const setLocationEnabled = useCallback((enabled: boolean) => {
     setLocation(enabled);
     void prefs.set(KEYS.location, enabled ? '1' : '0');
@@ -142,8 +152,8 @@ function Ready({ initial, modeRef, children }: { initial: Loaded; modeRef: { cur
   const signOut = useCallback(() => services.sessionStore.clear(), [services]);
 
   const value = useMemo<AppState>(
-    () => ({ chosenLanguage, language, mode, locationEnabled: locationAllowed, services, chooseLanguage, chooseMode, setLocationEnabled, signOut }),
-    [chosenLanguage, language, mode, locationAllowed, services, chooseLanguage, chooseMode, setLocationEnabled, signOut],
+    () => ({ chosenLanguage, language, mode, introSeen, locationEnabled: locationAllowed, services, chooseLanguage, chooseMode, markIntroSeen, setLocationEnabled, signOut }),
+    [chosenLanguage, language, mode, introSeen, locationAllowed, services, chooseLanguage, chooseMode, markIntroSeen, setLocationEnabled, signOut],
   );
 
   return (

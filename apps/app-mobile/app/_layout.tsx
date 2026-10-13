@@ -37,6 +37,7 @@ function Navigation() {
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="chon-ngon-ngu" options={{ headerShown: false }} />
+        <Stack.Screen name="gioi-thieu" options={{ headerShown: false }} />
         <Stack.Screen name="chon-che-do" options={{ headerShown: false }} />
         <Stack.Screen name="(khach)" options={{ headerShown: false }} />
         <Stack.Screen name="(hoc-sinh)" options={{ headerShown: false }} />

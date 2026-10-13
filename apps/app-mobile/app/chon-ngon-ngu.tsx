@@ -12,7 +12,7 @@ import { useTheme } from '../src/theme/ThemeProvider';
 // nên có ghi chú. Đổi lại được trong Cài đặt của chế độ Khách.
 
 export default function ChooseLanguage() {
-  const { language, chooseLanguage, chosenLanguage, mode } = useApp();
+  const { language, chooseLanguage, chosenLanguage } = useApp();
   const { t } = useTranslation();
   const theme = useTheme();
   const router = useRouter();
@@ -20,9 +20,9 @@ export default function ChooseLanguage() {
 
   const pick = (code: LanguageCode) => {
     chooseLanguage(code);
-    // Vào từ Cài đặt thì quay lại; lần mở đầu thì sang bước chọn chế độ.
+    // Vào từ Cài đặt thì quay lại; lần mở đầu thì để điểm vào chọn bước kế (thẻ giới thiệu rồi chọn chế độ).
     if (router.canGoBack()) router.back();
-    else router.replace(mode ? '/' : '/chon-che-do');
+    else router.replace('/');
   };
 
   return (

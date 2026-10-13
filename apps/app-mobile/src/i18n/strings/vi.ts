@@ -38,6 +38,19 @@ export interface Strings {
     studentText: string;
     studentLanguageNote: string;
   };
+  intro: {
+    title: string;
+    replay: string;
+    replayText: string;
+    skip: string;
+    next: string;
+    start: string;
+    step: string;
+    discover: { title: string; text: string };
+    narration: { title: string; text: string };
+    model: { title: string; text: string };
+    learn: { title: string; text: string };
+  };
   tabs: { home: string; search: string; map: string; history: string; timeline: string };
   home: {
     intro: string;
@@ -207,6 +220,19 @@ export const vi: Strings = {
     studentTitle: 'Học sinh',
     studentText: 'Đăng nhập bằng mã học sinh của em để học bài, nhập mã bài học và làm bài kiểm tra.',
     studentLanguageNote: 'Chế độ Học sinh chỉ dùng tiếng Việt.',
+  },
+  intro: {
+    title: 'Giới thiệu ứng dụng',
+    replay: 'Xem lại',
+    replayText: 'Xem lại bốn thẻ giới thiệu ngắn về ứng dụng.',
+    skip: 'Bỏ qua',
+    next: 'Tiếp',
+    start: 'Bắt đầu',
+    step: 'Bước {{current}} trên {{total}}',
+    discover: { title: 'Khám phá di sản gần bạn', text: 'Mở bản đồ, tìm di sản quanh nơi bạn đứng và đọc tóm tắt từng nơi.' },
+    narration: { title: 'Nghe thuyết minh bằng tiếng của bạn', text: 'Chọn một trong năm ngôn ngữ, rồi nghe thuyết minh về từng di sản.' },
+    model: { title: 'Xem 3D và dòng thời gian', text: 'Xoay mô hình 3D của di sản và đi theo dòng thời gian lịch sử.' },
+    learn: { title: 'Học sinh học theo cấp bằng mã bài học', text: 'Học sinh đăng nhập, nhập mã bài học thầy cô cho và học đúng với cấp của mình.' },
   },
   tabs: { home: 'Trang chủ', search: 'Tìm kiếm', map: 'Bản đồ', history: 'Lịch sử', timeline: 'Thời gian' },
   home: {

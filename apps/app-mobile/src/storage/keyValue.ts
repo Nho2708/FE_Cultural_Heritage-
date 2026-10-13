@@ -66,6 +66,7 @@ export const secure: KeyValueStore =
 export const KEYS = {
   language: 'dsvhvn.app.ngon-ngu',
   mode: 'dsvhvn.app.che-do',
+  introSeen: 'dsvhvn.app.gioi-thieu',
   location: 'dsvhvn.app.vi-tri',
   history: 'dsvhvn.app.lich-su',
   deviceId: 'dsvhvn.app.ma-thiet-bi',
