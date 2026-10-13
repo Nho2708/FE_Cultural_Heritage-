@@ -109,6 +109,19 @@ describe('Trang chủ', () => {
     expect(screen.queryByRole('link', { name: /Tải tệp cài đặt cho Android/ })).not.toBeInTheDocument();
   });
 
+  it('ảnh đầu trang có lối "Xem giới thiệu" sang trang Giới thiệu; khối app nói đủ hai chế độ Khách tham quan và Học sinh', async () => {
+    mockApi(withDetail(), publicApi());
+    renderApp('/');
+
+    expect(await screen.findByRole('link', { name: 'Xem giới thiệu' })).toHaveAttribute('href', '/gioi-thieu');
+    expect(document.querySelector('video')).toBeNull();
+    const app = screen.getByRole('region', { name: 'Một app, hai chế độ: tham quan và học tập' });
+    expect(within(app).getByText('Khách tham quan')).toBeInTheDocument();
+    expect(within(app).getByText(/Bản đồ di sản và "Gần bạn", dòng thời gian, mô hình 3D, nghe thuyết minh bằng 5 ngôn ngữ/)).toBeInTheDocument();
+    expect(within(app).getByText('Học sinh')).toBeInTheDocument();
+    expect(within(app).queryByText(/vẫn xem trên web/)).not.toBeInTheDocument();
+  });
+
   it('máy chủ lỗi thì báo lỗi kèm nút thử lại, phần còn lại của trang vẫn dùng được', async () => {
     let fail = true;
     mockApi(

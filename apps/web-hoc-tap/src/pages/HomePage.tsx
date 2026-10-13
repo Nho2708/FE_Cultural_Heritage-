@@ -1,6 +1,6 @@
 import { cn } from '@dsvhvn/dung-chung';
 import type { CountItem, DiscoveryHome, HeritageCard, HeritageType } from '@dsvhvn/dung-chung/api';
-import { ButtonLink, Icon, type IconName } from '@dsvhvn/dung-chung/ui';
+import { ButtonLink, Icon, useRevealOnce, type IconName } from '@dsvhvn/dung-chung/ui';
 import { Link, useNavigate } from 'react-router';
 import { pathOf } from '../access/screens';
 import { ListNotes } from '../components/ListNotes';
@@ -18,10 +18,12 @@ import { Thumbnail } from '../discovery/Thumbnail';
 import { useI18n } from '../i18n/context';
 import { formatCount, listFlags } from '../i18n/format';
 import { HERITAGE_TYPE_NAME, REGION_LONG_NAME, type RegionValue } from '@dsvhvn/dung-chung/i18n';
+import { revealItem } from '../intro/reveal';
 import { useAuth } from '../lib/auth/context';
 
 // Trang chủ khám phá (công khai): ảnh lớn đầu trang, ô tìm kiếm, lối vào bản đồ và dòng thời gian, di sản nổi bật (tối
-// đa 8, do máy chủ chọn), khám phá theo vùng và loại, giới thiệu app mobile. Không có ô nhập mã bài học: mã chỉ nhập
+// đa 8, do máy chủ chọn), khám phá theo vùng và loại, giới thiệu app mobile (hai chế độ Khách tham quan và Học sinh). Lối
+// "Xem giới thiệu" ở ảnh đầu trang dẫn sang trang Giới thiệu, không phát video nền. Không có ô nhập mã bài học: mã chỉ nhập
 // sau khi học sinh đăng nhập. Chữ giao diện và tên, mô tả di sản theo ngôn ngữ khách đã chọn.
 
 const TYPE_ICON: Record<HeritageType, IconName> = {
@@ -86,6 +88,13 @@ function Hero({ home }: { home: DiscoveryHome | undefined }) {
             className="on-image inline-flex h-12 items-center rounded-sm border-[1.5px] border-on-image px-6 type-control text-on-image transition-colors hover:bg-white/15"
           >
             {t.home.viewAll}
+          </Link>
+          <Link
+            to={pathOf('about')}
+            className="on-image inline-flex h-12 items-center gap-2 rounded-sm px-3 type-control text-on-image underline underline-offset-4 transition-colors hover:bg-white/15"
+          >
+            <Icon name="info" size={20} />
+            {t.home.watchIntro}
           </Link>
         </div>
         {lead && credit && (
@@ -289,16 +298,36 @@ function PhoneIllustration() {
 
 function AppIntro() {
   const { t } = useI18n();
+  const { ref, state } = useRevealOnce<HTMLDivElement>();
+  const modes = [
+    { key: 'visitor', icon: 'map-pin', title: t.home.appVisitorTitle, text: t.home.appVisitorText },
+    { key: 'student', icon: 'book-open', title: t.home.appStudentTitle, text: t.home.appStudentText },
+  ] as const;
   return (
     <section aria-labelledby="app-di-dong" className="bg-background py-16">
       <div className="dsv-content">
-        <div className="flex items-center gap-16 rounded-md bg-primary-container px-6 py-10 text-on-primary-container dsvmd:px-16 dsvmd:py-14">
+        <div
+          ref={ref}
+          data-reveal={state}
+          className="flex items-center gap-16 rounded-md bg-primary-container px-6 py-10 text-on-primary-container dsvmd:px-16 dsvmd:py-14"
+        >
           <div className="flex min-w-0 flex-1 flex-col items-start gap-4">
             <p className="type-label-kicker">{t.home.appKicker}</p>
             <h2 id="app-di-dong" className="type-display-l">
               {t.home.appTitle}
             </h2>
             <p className="max-w-[640px] type-body-l">{t.home.appText}</p>
+            <ul className="grid w-full max-w-[760px] gap-4 dsvsm:grid-cols-2">
+              {modes.map((mode, index) => (
+                <li key={mode.key} {...revealItem(index)} className="flex flex-col gap-2 rounded-md bg-surface p-5 text-on-surface">
+                  <span className="flex items-center gap-2 type-h4">
+                    <Icon name={mode.icon} size={20} className="text-primary" />
+                    {mode.title}
+                  </span>
+                  <span className="type-body-s text-on-surface-variant">{mode.text}</span>
+                </li>
+              ))}
+            </ul>
             {ANDROID_APP_URL ? (
               <div className="flex flex-wrap items-center gap-4">
                 <a
@@ -314,7 +343,9 @@ function AppIntro() {
               <p className="type-body-s">{t.home.appSoon}</p>
             )}
           </div>
-          <PhoneIllustration />
+          <div {...revealItem(2)} className="hidden shrink-0 dsvlg:block">
+            <PhoneIllustration />
+          </div>
         </div>
       </div>
     </section>
