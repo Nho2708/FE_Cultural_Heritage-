@@ -1,12 +1,15 @@
-# Đưa app tới màn hình đăng nhập học sinh (giao diện tiếng Việt) từ bất kỳ trạng thái nào sau mo-app.yaml: lần mở đầu (chọn Tiếng Việt rồi Học sinh),
+# Đưa app tới màn hình đăng nhập học sinh (giao diện tiếng Việt) từ bất kỳ trạng thái nào sau mo-app.yaml: lần mở đầu (chọn Tiếng Việt, bỏ qua các thẻ giới thiệu, rồi chọn Học sinh),
 # đang ở chế độ Khách (Cài đặt → chuyển sang chế độ Học sinh), đã đăng nhập (đăng xuất), hoặc màn đổi mật khẩu bắt buộc còn dở (đặt NEW_PASSWORD rồi đăng xuất).
 appId: host.exp.exponent
 ---
 - runFlow:
     when:
       visible: "(Choose a language|Chọn ngôn ngữ|언어 선택|选择语言|言語を選択)"
+      # Màn chọn ngôn ngữ không có thanh tab; nút cùng tên trong Lịch sử và cài đặt thì có.
+      notVisible: "(Home|Trang chủ|홈|首页|ホーム)"
     commands:
       - tapOn: "Tiếng Việt"
+      - runFlow: bo-qua-gioi-thieu.yaml
       - assertVisible: "Bạn dùng app như thế nào.*"
       - tapOn:
           text: "Học sinh"

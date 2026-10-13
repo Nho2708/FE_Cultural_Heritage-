@@ -20,12 +20,12 @@ function icon(name: IconName, focusedName: IconName) {
 }
 
 export default function GuestLayout() {
-  const { chosenLanguage, mode } = useApp();
+  const { chosenLanguage, mode, introSeen } = useApp();
   const { session } = useAuth();
   const { t } = useTranslation();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
-  if (mode !== 'guest') return <GuardRedirect href={entryHref({ chosenLanguage, mode, hasSession: Boolean(session), mustChangePassword: Boolean(session?.user.mustChangePassword) })} />;
+  if (mode !== 'guest') return <GuardRedirect href={entryHref({ chosenLanguage, mode, introSeen, hasSession: Boolean(session), mustChangePassword: Boolean(session?.user.mustChangePassword) })} />;
   return (
     <Tabs
       screenOptions={{
