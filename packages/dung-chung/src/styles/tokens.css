@@ -1,6 +1,6 @@
 /* TỆP SINH TỰ ĐỘNG — KHÔNG SỬA TAY.
  * Nguồn: design/tokens.json · Lệnh: npm run gen:tokens
- * 79 primitive · 67 semantic · 78 component · 61 ghi đè dark (+67 token dẫn xuất khai báo lại)
+ * 83 primitive · 67 semantic · 78 component · 61 ghi đè dark (+67 token dẫn xuất khai báo lại)
  */
 
 :root {
@@ -67,6 +67,10 @@
   --color-ruby-700: #8F1E18;
   --color-ruby-800: #6B1612;
   --color-ruby-900: #470E0C;
+  --color-brand-navy: #292B38;
+  --color-brand-cream: #DFCFB6;
+  --color-brand-vermilion: #D9573A;
+  --color-brand-gold: #C18D48;
   --color-white: #FFFFFF;
   --color-true-black: #000000;
   --color-black-alpha-0: rgba(0,0,0,0);
@@ -346,11 +350,16 @@
   --dsv-duration-control: 350ms;
   --dsv-duration-slow: 500ms;
   --dsv-duration-zoom: 1000ms;
+  --dsv-duration-unlock: 600ms;
+  --dsv-duration-logo-short: 1200ms;
+  --dsv-duration-logo: 2400ms;
   --dsv-ease-expo-out: cubic-bezier(0.19, 1, 0.22, 1);
   --dsv-ease-header: cubic-bezier(0.24, 1, 0.32, 1);
   --dsv-ease-header-bg: cubic-bezier(0.39, 0.575, 0.565, 1);
   --dsv-ease-drawer: cubic-bezier(0.4, 0, 1, 1);
   --dsv-ease-fade: cubic-bezier(0, 0, 0.25, 1);
+  --dsv-stagger-ui: 60ms;
+  --dsv-stagger-tier: 120ms;
   --dsv-card-hover-scale: 1.1;
   --dsv-text-fade-in-start: 200ms;
 
