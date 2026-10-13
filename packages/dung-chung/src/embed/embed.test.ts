@@ -7,6 +7,7 @@ describe('hợp đồng thông điệp với trang nhúng', () => {
     expect(parseEmbedMessage({ type: 'pin-selected', version: 1, slug: 'hoang-thanh' })).toEqual({ type: 'pin-selected', version: 1, slug: 'hoang-thanh' });
     expect(parseEmbedMessage({ type: 'model-error', version: 1, reason: 'webgl' })).toEqual({ type: 'model-error', version: 1, reason: 'webgl' });
     expect(parseEmbedMessage({ type: 'model-loaded', version: 1 })).toEqual({ type: 'model-loaded', version: 1 });
+    expect(parseEmbedMessage({ type: 'timeline-selected', version: 1, slug: 'hoang-thanh' })).toEqual({ type: 'timeline-selected', version: 1, slug: 'hoang-thanh' });
   });
 
   it('cắt tiến trình vào khoảng 0 đến 1', () => {
@@ -15,7 +16,7 @@ describe('hợp đồng thông điệp với trang nhúng', () => {
   });
 
   it('bỏ thông điệp lạ, sai phiên bản hoặc thiếu trường', () => {
-    for (const raw of [null, 'không phải JSON', '[]', { type: 'ready' }, { type: 'ready', version: 2 }, { type: 'pin-selected', version: 1 }, { type: 'pin-selected', version: 1, slug: '' }, { type: 'model-error', version: 1, reason: 'khác' }, { type: 'lạ', version: 1 }, { type: 'model-progress', version: 1, fraction: Number.NaN }]) {
+    for (const raw of [null, 'không phải JSON', '[]', { type: 'ready' }, { type: 'ready', version: 2 }, { type: 'pin-selected', version: 1 }, { type: 'pin-selected', version: 1, slug: '' }, { type: 'timeline-selected', version: 1, slug: '' }, { type: 'timeline-selected', version: 1 }, { type: 'model-error', version: 1, reason: 'khác' }, { type: 'lạ', version: 1 }, { type: 'model-progress', version: 1, fraction: Number.NaN }]) {
       expect(parseEmbedMessage(raw)).toBeNull();
     }
   });
@@ -31,6 +32,28 @@ describe('hợp đồng thông điệp với trang nhúng', () => {
     expect(parseEmbedCommand({ type: 'focus', version: 3, slug: 'x' })).toBeNull();
   });
 
+  it('lệnh đổi bộ lọc mang cả tỉnh, cấp xếp hạng và thời kỳ, bỏ giá trị lạ', () => {
+    expect(parseEmbedCommand({ type: 'set-filter', version: 1, filter: { provinceId: 29, recognitionLevel: 'UNESCO', period: 'MODERN' } })).toEqual({
+      type: 'set-filter',
+      version: 1,
+      filter: { provinceId: 29, recognitionLevel: 'UNESCO', period: 'MODERN' },
+    });
+    const odd = parseEmbedCommand({ type: 'set-filter', version: 1, filter: { provinceId: -3, recognitionLevel: 'KHAC', period: 'XA' } });
+    expect(odd).toEqual({ type: 'set-filter', version: 1, filter: {} });
+  });
+
+  it('lệnh vị trí: nhận tọa độ hợp lệ, cho phép bỏ chấm, bỏ tọa độ hỏng', () => {
+    expect(parseEmbedCommand({ type: 'set-position', version: 1, position: { latitude: 21.03, longitude: 105.85 } })).toEqual({
+      type: 'set-position',
+      version: 1,
+      position: { latitude: 21.03, longitude: 105.85 },
+    });
+    expect(parseEmbedCommand({ type: 'set-position', version: 1, position: null })).toEqual({ type: 'set-position', version: 1, position: null });
+    for (const position of [{ latitude: 'a', longitude: 1 }, { latitude: 120, longitude: 1 }, { latitude: 1, longitude: 200 }, { latitude: Number.NaN, longitude: 1 }, 'x', undefined]) {
+      expect(parseEmbedCommand({ type: 'set-position', version: 1, position })).toBeNull();
+    }
+  });
+
   it('dựng và đọc lại địa chỉ trang bản đồ nhúng', () => {
     const url = embedMapUrl('http://web.test:5174/', { keyword: 'chùa', region: 'Bắc', heritageType: 'TANGIBLE' }, 'ko', 'chua-mot-cot');
     expect(url.startsWith('http://web.test:5174/nhung/ban-do?')).toBe(true);
@@ -38,8 +61,17 @@ describe('hợp đồng thông điệp với trang nhúng', () => {
     expect(parsed).toEqual({ filter: { keyword: 'chùa', region: 'Bắc', heritageType: 'TANGIBLE' }, language: 'ko', select: 'chua-mot-cot' });
   });
 
+  it('địa chỉ trang bản đồ mang cả tỉnh, cấp xếp hạng và thời kỳ', () => {
+    const url = embedMapUrl('http://web.test:5174', { provinceId: 29, recognitionLevel: 'NATIONAL', period: 'INDEPENDENT_FEUDAL' }, 'vi');
+    const params = new URL(url).searchParams;
+    expect(params.get('tinh')).toBe('29');
+    expect(params.get('cap')).toBe('NATIONAL');
+    expect(params.get('thoi-ky')).toBe('INDEPENDENT_FEUDAL');
+    expect(readEmbedMapParams(params).filter).toEqual({ provinceId: 29, recognitionLevel: 'NATIONAL', period: 'INDEPENDENT_FEUDAL' });
+  });
+
   it('tham số lạ trên địa chỉ bị bỏ, ngôn ngữ lạ về tiếng Việt', () => {
-    const parsed = readEmbedMapParams(new URLSearchParams('lang=fr&vung=Tây&loai=KHAC&tu-khoa=%20%20'));
+    const parsed = readEmbedMapParams(new URLSearchParams('lang=fr&vung=Tây&loai=KHAC&tu-khoa=%20%20&tinh=abc&cap=X&thoi-ky=Y'));
     expect(parsed).toEqual({ filter: {}, language: 'vi', select: null });
   });
 

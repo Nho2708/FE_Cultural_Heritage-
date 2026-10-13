@@ -255,6 +255,47 @@ describe('Làm bài kiểm tra — cấp 1 (từng câu, nút lớn)', () => {
   });
 });
 
+describe('Làm bài kiểm tra — cấp 1 tự đọc câu hỏi', () => {
+  function stubSpeech() {
+    const spoken: string[] = [];
+    vi.stubGlobal('speechSynthesis', { cancel: () => undefined, speak: (u: { text: string }) => spoken.push(u.text) });
+    vi.stubGlobal(
+      'SpeechSynthesisUtterance',
+      class {
+        text: string;
+        constructor(text: string) {
+          this.text = text;
+        }
+      },
+    );
+    return spoken;
+  }
+
+  it('câu hỏi tự đọc to khi em vào câu, sang câu khác thì đọc câu đó, tắt được và nhớ lựa chọn', async () => {
+    window.localStorage.clear();
+    const spoken = stubSpeech();
+    quizServer(1, { attempt: attemptOf(1, questions(2)) });
+    const user = userEvent.setup();
+    renderApp(PATH, OPEN.state);
+
+    expect(await screen.findByRole('heading', { level: 2, name: 'Câu hỏi số 1?' })).toBeInTheDocument();
+    await waitFor(() => expect(spoken).toHaveLength(1));
+    expect(spoken[0]).toMatch(/^Câu hỏi số 1\?/);
+
+    await user.click(screen.getByRole('radio', { name: 'Vua Gia Long' }));
+    await user.click(screen.getByRole('button', { name: 'Tiếp nhé' }));
+    await waitFor(() => expect(spoken).toHaveLength(2));
+    expect(spoken[1]).toMatch(/^Câu hỏi số 2\?/);
+
+    await user.click(screen.getByRole('switch', { name: 'Tự đọc to' }));
+    expect(window.localStorage.getItem('dsvhvn.hoc-tap.tu-doc')).toBe('0');
+    await user.click(screen.getByRole('button', { name: 'Câu trước' }));
+    expect(await screen.findByRole('heading', { level: 2, name: 'Câu hỏi số 1?' })).toBeInTheDocument();
+    expect(spoken).toHaveLength(2);
+    window.localStorage.clear();
+  });
+});
+
 describe('Làm bài kiểm tra — cấp 3 (gọn, đồng hồ, tư liệu ghim)', () => {
   it('bảng số câu nằm ngang, đánh dấu xem lại, tư liệu của nhóm câu hiện bên trái', async () => {
     const passage = 'Huống chi thành Đại La, kinh đô cũ của Cao Vương.';

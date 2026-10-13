@@ -22,8 +22,11 @@ Nên `apps/app-mobile` có `package.json`, `package-lock.json` và `node_modules
 cd apps/app-mobile
 npm install                       # cài riêng cho app
 cp .env.example .env              # sửa hai địa chỉ bên dưới thành IP của máy chạy backend và web học tập
-npx expo start                    # in mã QR
+npx expo start --port 8083        # in mã QR (hoặc npm start)
 ```
+
+Metro chạy ở cổng **8083**, không dùng cổng mặc định 8081: trên máy demo cổng 8080–8082 là ba site IIS (API, web quản trị, web học tập)
+và 8090 là Dịch vụ AI, nên chạy Metro ở 8081 sẽ đụng web quản trị của máy demo.
 
 | Biến | Ý nghĩa |
 |---|---|
@@ -38,22 +41,22 @@ Backend cần chạy với `--urls http://0.0.0.0:5080` (hoặc cổng khác) đ
 2. Lấy IP của máy tính: chạy `ipconfig`, lấy dòng `IPv4 Address` của card Wi-Fi (ví dụ `192.168.1.10`). Sửa `.env` của app:
    `EXPO_PUBLIC_API_BASE_URL=http://192.168.1.10:5080/api/v1` và `EXPO_PUBLIC_WEB_BASE_URL=http://192.168.1.10:5174`.
 3. Mở tường lửa Windows cho ba cổng (chạy PowerShell **với quyền Administrator**, một lần):
-   `netsh advfirewall firewall add rule name="DSVHVN dev" dir=in action=allow protocol=TCP localport=5080,5174,8081 profile=private`
+   `netsh advfirewall firewall add rule name="DSVHVN dev" dir=in action=allow protocol=TCP localport=5080,5174,8083 profile=private`
    và đặt mạng Wi-Fi đang dùng là **Private network** trong Settings → Network.
 4. Backend (thư mục `BE_Cultural_Heritage-`): `dotnet run --project src/DSVHVN.Api --launch-profile http --urls http://0.0.0.0:5080`.
    Kiểm từ điện thoại: mở trình duyệt điện thoại vào `http://192.168.1.10:5080/swagger` phải thấy trang Swagger.
 5. Web học tập (thư mục gốc FE, cho bản đồ và 3D): `npm run dev:hoc-tap -- --host`.
-6. App: `cd apps/app-mobile`, `npm install`, `npx expo start`, rồi quét mã QR (Android: trong Expo Go; iPhone: bằng Camera).
-   Mạng trường/quán cà phê thường chặn máy trong cùng Wi-Fi nói chuyện với nhau — khi đó dùng `npx expo start --tunnel` cho app, nhưng API vẫn phải gọi được (bước 4); cách chắc nhất là phát Wi-Fi từ điện thoại hoặc dùng Wi-Fi ở nhà.
+6. App: `cd apps/app-mobile`, `npm install`, `npx expo start --port 8083`, rồi quét mã QR (Android: trong Expo Go; iPhone: bằng Camera).
+   Mạng trường/quán cà phê thường chặn máy trong cùng Wi-Fi nói chuyện với nhau — khi đó dùng `npx expo start --port 8083 --tunnel` cho app, nhưng API vẫn phải gọi được (bước 4); cách chắc nhất là phát Wi-Fi từ điện thoại hoặc dùng Wi-Fi ở nhà.
 
 Lỗi thường gặp:
 - *"Project is incompatible with this version of Expo Go"*: cập nhật Expo Go trong cửa hàng ứng dụng (app dùng SDK 57).
-- Quét QR xong quay mãi rồi báo *"Could not connect to the development server"*: máy tính và điện thoại khác mạng, hoặc tường lửa chặn cổng 8081 (bước 3) — thử `--tunnel`.
-- App mở được nhưng báo lỗi mạng ở mọi màn hình: sai IP trong `.env`, backend chạy `localhost` thay vì `0.0.0.0`, hoặc tường lửa chặn 5080. Sửa `.env` thì phải tắt `npx expo start` và chạy lại.
+- Quét QR xong quay mãi rồi báo *"Could not connect to the development server"*: máy tính và điện thoại khác mạng, hoặc tường lửa chặn cổng 8083 (bước 3) — thử `--tunnel`.
+- App mở được nhưng báo lỗi mạng ở mọi màn hình: sai IP trong `.env`, backend chạy `localhost` thay vì `0.0.0.0`, hoặc tường lửa chặn 5080. Sửa `.env` thì phải tắt `npx expo start --port 8083` và chạy lại.
 
 ### Expo Go
 
-- **Android**: cài Expo Go từ Google Play, mở và quét mã QR của `npx expo start` (điện thoại và máy tính cùng Wi-Fi). Không có Wi-Fi chung thì dùng `npx expo start --tunnel`.
+- **Android**: cài Expo Go từ Google Play, mở và quét mã QR của `npx expo start --port 8083` (điện thoại và máy tính cùng Wi-Fi). Không có Wi-Fi chung thì dùng `npx expo start --port 8083 --tunnel`.
 - **iPhone**: cài Expo Go từ App Store, mở **Camera** của iPhone và quét mã QR rồi chọn mở bằng Expo Go. iPhone chạy được cả giọng đọc, vị trí, bản đồ và 3D (WebView),
   **không có quảng cáo** (Expo Go không có mô-đun quảng cáo).
 
@@ -70,7 +73,7 @@ khách xem hết quảng cáo thì app hỏi `GET /public/ads/unlock?slug=` mỗ
 - **Expo Go không có AdMob.** Ở đó app gửi thêm `X-Ads-Unavailable: true`; backend ở môi trường phát triển (`Ads:AllowNoAdsDeclaration` = true) mở thẳng tóm tắt và nghe, app hiện ghi chú "chạy trong Expo Go nên chưa có quảng cáo".
   Nếu backend không bật cờ này (môi trường thật) mà cổng bật, app hiện "cần bản dựng phát triển để xem quảng cáo" và không mở được.
 - **Bật AdMob** bằng bản dựng phát triển: `react-native-google-mobile-ads` đã khai trong `package.json` và `app.json` với **mã ứng dụng thử do Google công bố** (`ca-app-pub-3940256099942544~...`). Chạy
-  `eas build --profile development --platform android` (hoặc `ios`, cần tài khoản Apple Developer), cài bản dựng lên máy rồi `npx expo start --dev-client`. Đơn vị quảng cáo **không** nằm trong app: lấy từ
+  `eas build --profile development --platform android` (hoặc `ios`, cần tài khoản Apple Developer), cài bản dựng lên máy rồi `npx expo start --port 8083 --dev-client`. Đơn vị quảng cáo **không** nằm trong app: lấy từ
   `GET /public/ads/config`; ở môi trường phát triển backend trả **đơn vị thử của Google** (`.../5224354917` Android, `.../1712485313` iOS). Không dùng mã quảng cáo thật khi phát triển và không tự bấm quảng cáo thật (vi phạm chính sách của Google).
   Bản dựng dùng tài khoản AdMob của nhóm đặt mã ứng dụng lúc dựng bằng biến môi trường `ADMOB_ANDROID_APP_ID`, `ADMOB_IOS_APP_ID` ([`app.config.ts`](app.config.ts)); không đặt thì giữ mã thử.
   Muốn thử trọn luồng mở khóa với đơn vị thật thì khai điện thoại là **thiết bị thử** trong AdMob (Settings → Test devices) để Google chỉ trả quảng cáo thử, hoặc đặt
@@ -131,14 +134,14 @@ Cách này cho điện thoại gọi `localhost` như máy tính nên không c�
    Có nhiều thiết bị cùng nối thì mọi lệnh `adb` phải kèm `-s <số hiệu>`.
 2. Chuyển cổng từ điện thoại về máy tính (Metro, backend, web học tập), chạy lại sau mỗi lần nối lại:
    ```
-   adb -s <số hiệu> reverse tcp:8081 tcp:8081
+   adb -s <số hiệu> reverse tcp:8083 tcp:8083
    adb -s <số hiệu> reverse tcp:5080 tcp:5080
    adb -s <số hiệu> reverse tcp:5174 tcp:5174
    ```
 3. Chạy backend ở cổng 5080 và web học tập ở cổng 5174 (`VITE_API_BASE_URL=http://localhost:5080/api/v1`). Web học tập chạy bằng `npm run dev:hoc-tap -- --host 127.0.0.1`:
    để mặc định thì Vite có thể chỉ nghe trên `::1` (IPv6) và trang bản đồ, 3D mở qua `adb reverse` sẽ không tải được. Sau đó chạy Metro trong `apps/app-mobile` với biến môi trường của tiến trình:
-   `EXPO_PUBLIC_API_BASE_URL=http://localhost:5080/api/v1` và `EXPO_PUBLIC_WEB_BASE_URL=http://localhost:5174`, lệnh `npx expo start` (không thêm `--android`).
-4. Mở app trong Expo Go: `adb -s <số hiệu> shell am start -a android.intent.action.VIEW -d exp://127.0.0.1:8081 host.exp.exponent`.
+   `EXPO_PUBLIC_API_BASE_URL=http://localhost:5080/api/v1` và `EXPO_PUBLIC_WEB_BASE_URL=http://localhost:5174`, lệnh `npx expo start --port 8083` (không thêm `--android`).
+4. Mở app trong Expo Go: `adb -s <số hiệu> shell am start -a android.intent.action.VIEW -d exp://127.0.0.1:8083 host.exp.exponent`.
 5. Xong thì `adb -s <số hiệu> reverse --remove-all`.
 
 Lưu ý: Xiaomi/MIUI chặn cài ứng dụng qua adb nếu chưa bật "Cài đặt qua USB" (và đăng nhập tài khoản Xiaomi), nên Maestro, vốn cài trình điều khiển lên điện thoại, sẽ bị "Install canceled by user"; chỉ dùng Maestro trên máy ảo
@@ -148,21 +151,30 @@ Lệnh `adb shell input text` chỉ gõ được chữ không dấu.
 ## Kiểm thử trên máy ảo Android
 
 Chạy app thật trong Expo Go trên máy ảo, đi qua các hành trình chính bằng [Maestro](https://maestro.mobile.dev) rồi báo đạt hoặc không đạt từng luồng.
-Các luồng nằm ở [`e2e/`](e2e/) (YAML, mở app qua `exp://10.0.2.2:8081`); phần dùng chung ở `e2e/chung/`.
+Các luồng nằm ở [`e2e/`](e2e/) (YAML, mở app qua `exp://10.0.2.2:8083`); phần dùng chung ở `e2e/chung/`.
 
 | Luồng | Nội dung |
 |---|---|
 | `khach-tham-quan` | chọn tiếng Anh và chế độ Khách, trang chủ, tìm "thang long", chi tiết, tóm tắt, nghe, xem 3D, bản đồ, lịch sử (xoá từng mục và xoá hết) |
+| `khach-dong-thoi-gian` | hai thẻ Bản đồ, Dòng thời gian trên trang chủ; màn chọn di sản (tìm nhanh, từ khóa ngắn); dòng thời gian một di sản; tab Dòng thời gian |
+| `khach-ban-do` | bản đồ: chip loại, vùng; bảng Thêm bộ lọc (tỉnh, cấp xếp hạng, thời kỳ); nút Gần bạn trên bản đồ; nút mở dòng thời gian trong thẻ ghim |
+| `khach-goi-y` | Gợi ý cho bạn ở trang chủ và cuối trang chi tiết; màn Xem tất cả với tab Gợi ý và Gần bạn (xin quyền khi bấm; điện thoại đã cấp quyền thì thấy khoảng cách) |
+| `khach-cai-dat` | Cài đặt: mục Quảng cáo trong Expo Go (không có nút mở lại lựa chọn, app giải thích), phiên bản và kênh, địa chỉ máy chủ |
+| `khach-ngon-ngu` | đổi ngôn ngữ trong Cài đặt: Hàn, Nhật, Trung giản thể rồi Việt; chụp trang chủ, tìm kiếm, bản đồ, dòng thời gian, lịch sử từng ngôn ngữ |
 | `hoc-sinh-dang-nhap-sai` | bỏ trống và nhập sai mật khẩu |
+| `hoc-sinh-kham-pha` | học sinh khối 8: tab Khám phá (không có lịch sử, gợi ý, Gần bạn), bản đồ và dòng thời gian mở riêng, tìm kiếm, chi tiết không có khối gợi ý |
+| `hoc-sinh-ma-gan-day` | học sinh khối 3: bài cấp 1 có thanh tiến độ theo bước, công tắc Tự đọc to tắt bật; mã vừa mở hiện ở "Mã em đã mở gần đây", chạm để mở lại |
 | `hoc-sinh-khoi-3` | cấp 1: đăng nhập mật khẩu tạm, đổi mật khẩu bắt buộc, nhập mã bài học, học từng bước, bài chơi bốn dạng câu, kết quả bằng sao |
 | `hoc-sinh-khoi-11` | cấp 3: bài dạng tài liệu, bài kiểm tra có giờ ba dạng câu, điểm và phân tích |
+| `khach-gan-ban-tu-choi` | (không chạy mặc định) khách từ chối quyền vị trí: app báo và vẫn cho thử lại; cần Expo Go chưa có quyền vị trí (máy ảo mới hoặc đã `pm revoke`, cấp lại sau) |
 
-**Chạy một lệnh** (PowerShell 7, từ thư mục gốc FE; cần cổng 5080, 5174, 8081 đang rảnh):
+**Chạy một lệnh** (PowerShell 7, từ thư mục gốc FE; cần cổng 5080, 5174, 8083 đang rảnh):
 
 ```powershell
-pwsh -File apps/app-mobile/scripts/chay-kiem-thu-may-ao.ps1                          # mọi luồng
+pwsh -File apps/app-mobile/scripts/chay-kiem-thu-may-ao.ps1                          # mọi luồng trên máy ảo
 pwsh -File apps/app-mobile/scripts/chay-kiem-thu-may-ao.ps1 -Flows khach-tham-quan   # một luồng
 pwsh -File apps/app-mobile/scripts/chay-kiem-thu-may-ao.ps1 -KeepRunning             # giữ máy ảo, dịch vụ và cơ sở dữ liệu tạm để xem lại
+pwsh -File apps/app-mobile/scripts/chay-kiem-thu-may-ao.ps1 -RealDevice              # điện thoại thật đang nối adb (xem bên dưới)
 ```
 
 Script làm lần lượt: bật máy ảo `dsvhvn_pixel` (tự tạo AVD pixel_7 nếu chưa có; dùng `-gpu host` vì GPU phần mềm làm WebGL của trình xem 3D sập), chạy backend trên **cơ sở dữ liệu tạm**
@@ -175,6 +187,23 @@ chạy từng luồng Maestro (xoá dữ liệu Expo Go trước mỗi luồng, 
 Chạy tay từng phần khi sửa lỗi: bật máy ảo, `adb shell pm clear host.exp.exponent`, giữ Metro đang chạy, rồi
 `maestro --device emulator-5554 test -e STUDENT_CODE=... apps/app-mobile/e2e/<luồng>.yaml`. Lệnh `maestro` cần biến `JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8` để đọc đúng chữ có dấu.
 Luồng học sinh dùng tài khoản một lần (đăng nhập lần đầu đổi mật khẩu, bài kiểm tra chỉ làm một lần) nên mỗi lần chạy phải nạp dữ liệu mới.
+Địa chỉ Metro nhìn từ thiết bị đi vào luồng bằng biến `METRO_URL` (mặc định `exp://10.0.2.2:8083` của máy ảo; điện thoại thật qua adb reverse truyền `-e METRO_URL=exp://127.0.0.1:8083`).
+
+### Chạy các luồng trên điện thoại thật (`-RealDevice`)
+
+Cùng script, thêm `-RealDevice` (và `-Serial <số hiệu>` nếu nối nhiều máy). Script không bật máy ảo, không đổi cài đặt nào của điện thoại và **không xoá dữ liệu Expo Go**:
+điện thoại gọi máy tính qua `adb reverse` (backend, web học tập, Metro đều là `localhost` trên điện thoại), các luồng tự đưa app về trạng thái cần từ bất kỳ trạng thái nào
+(`e2e/chung/vao-khach.yaml`: về chế độ Khách với ngôn ngữ cho trước; `vao-hoc-sinh.yaml`: về màn đăng nhập học sinh, kể cả khi đang đăng nhập hay đang dở màn đổi mật khẩu bắt buộc).
+Xong thì script đóng Expo Go và bỏ các cổng đã chuyển. Đã chạy xanh cả 11 luồng trên Xiaomi Redmi Note 10 Pro (Android 13, MIUI) qua gỡ lỗi không dây.
+
+Lưu ý riêng khi dùng điện thoại:
+- Maestro cài lại trình điều khiển của nó mỗi lần chạy; MIUI hiện hộp "Cài đặt qua USB" và tự từ chối sau 10 giây. Bật "Cài đặt qua USB" trong Tùy chọn nhà phát triển và
+  bấm "Cài đặt" khi hộp hiện (tích "Nhớ lựa chọn của tôi" nếu muốn khỏi hỏi lại), nếu không Maestro báo `INSTALL_FAILED_USER_RESTRICTED`.
+- Nút bánh răng nổi của Expo Go kéo được và nhận cả vuốt; nó che góc phải trên và làm luồng chạm nhầm. Tắt nó trong menu nhà phát triển của Expo Go (lắc máy → "Tools button") trong lúc chạy, xong bật lại.
+- Màn hình điện thoại cao hơn máy ảo nên nhiều phần nằm dưới mép: luồng dùng `scrollUntilVisible` thay cho `assertVisible` với phần ở cuối trang, và không dùng `hideKeyboard`
+  sau phím Enter (bàn phím đã đóng thì Maestro gửi phím Back và thanh tab nhảy về Trang chủ). Hàng chip cuộn ngang vuốt bằng `swipe` bắt đầu cách mép màn hình (MIUI coi vuốt từ mép là Quay lại).
+- Luồng `khach-goi-y` và `khach-ban-do` dùng quyền vị trí đã cấp cho Expo Go (không hỏi lại); đường từ chối quyền ở `khach-gan-ban-tu-choi.yaml`, chạy tay sau khi `pm revoke` và cấp lại sau.
+- Tài khoản học sinh "mới" dùng một lần: chạy lại `hoc-sinh-khoi-3` hay `hoc-sinh-khoi-11` thì tạo học sinh mới bằng tài khoản giáo viên trong tệp dữ liệu thử hoặc chạy lại script.
 
 **Lưu ý khi chạy với máy ảo hoặc điện thoại:**
 - Máy tính là `10.0.2.2` trong máy ảo. Web học tập phải chạy với `VITE_API_BASE_URL=http://10.0.2.2:5080/api/v1` (trang bản đồ và 3D trong WebView gọi API từ chính địa chỉ này), `npm run dev:hoc-tap -- --host`

@@ -1,5 +1,6 @@
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { Platform } from 'react-native';
+import { privacyOptionsStateOf, type PrivacyOptionsState } from './consent';
 import { parseTestDeviceIds } from './testDevices';
 
 // Quảng cáo có thưởng của Google (AdMob) qua `react-native-google-mobile-ads`. Mô-đun này là mã gốc nên KHÔNG có trong Expo Go: ở đó `require` thất bại và app
@@ -11,7 +12,11 @@ interface AdsModule {
   RewardedAd: { createForAdRequest: (unitId: string, options: Record<string, unknown>) => RewardedAdInstance };
   RewardedAdEventType: { LOADED: string; EARNED_REWARD: string };
   AdEventType: { CLOSED: string; ERROR: string };
-  AdsConsent?: { gatherConsent: () => Promise<unknown> };
+  AdsConsent?: {
+    gatherConsent: () => Promise<unknown>;
+    requestInfoUpdate: () => Promise<{ privacyOptionsRequirementStatus?: string }>;
+    showPrivacyOptionsForm: () => Promise<unknown>;
+  };
   MaxAdContentRating: { G: string };
 }
 
@@ -45,6 +50,31 @@ function adsModule(): AdsModule | null {
 /** Bản dựng này có mô-đun quảng cáo (bản dựng phát triển qua EAS); Expo Go thì không. */
 export function adsAvailable(): boolean {
   return adsModule() !== null;
+}
+
+export type { PrivacyOptionsState } from './consent';
+
+/** Hỏi Google xem vùng của khách có yêu cầu tùy chọn quyền riêng tư (hộp đồng ý quảng cáo) không. Không hiện hộp nào. */
+export async function privacyOptionsState(): Promise<PrivacyOptionsState> {
+  const consent = adsModule()?.AdsConsent;
+  if (!consent) return 'unavailable';
+  try {
+    return privacyOptionsStateOf((await consent.requestInfoUpdate()).privacyOptionsRequirementStatus);
+  } catch {
+    return 'failed';
+  }
+}
+
+/** Mở lại biểu mẫu tùy chọn quyền riêng tư của Google để khách đổi lựa chọn quảng cáo cá nhân hóa. Trả false khi không mở được. */
+export async function showPrivacyOptions(): Promise<boolean> {
+  const consent = adsModule()?.AdsConsent;
+  if (!consent) return false;
+  try {
+    await consent.showPrivacyOptionsForm();
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export type RewardedOutcome = 'earned' | 'closed' | 'failed' | 'unavailable';

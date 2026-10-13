@@ -1,5 +1,5 @@
 import type { DiscoveryFilter, HeritagePin } from '@dsvhvn/dung-chung/api';
-import { readEmbedMapParams, type EmbedCommand } from '@dsvhvn/dung-chung/embed';
+import { readEmbedMapParams, type EmbedCommand, type EmbedPosition } from '@dsvhvn/dung-chung/embed';
 import { HERITAGE_TYPE_NAME, provinceName } from '@dsvhvn/dung-chung/i18n';
 import { Button } from '@dsvhvn/dung-chung/ui';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
@@ -12,7 +12,8 @@ import { postToHost, useHostCommands } from './hostMessages';
 
 // Trang bản đồ nhúng cho app mobile (và dùng được trực tiếp trên web): cùng bản đồ Leaflet + OpenStreetMap, cùng Hoàng Sa, Trường Sa với trang Bản đồ,
 // nhưng không có thanh điều hướng. Bộ lọc, ngôn ngữ và ghim cần làm nổi nằm trên địa chỉ; app đổi bộ lọc hoặc làm nổi một ghim bằng lệnh `postMessage`.
-// Chạm ghim mở thẻ di sản; bấm "Xem chi tiết" thì gửi thông điệp để app đi tới trang chi tiết di sản.
+// Chạm ghim mở thẻ di sản; bấm "Xem chi tiết" hoặc "Mở dòng thời gian" thì gửi thông điệp để app đi tới trang chi tiết hoặc dòng thời gian của di sản.
+// App cũng gửi lệnh đổi bộ lọc (tỉnh, vùng, loại, cấp xếp hạng, thời kỳ) và vị trí của khách để bản đồ vẽ chấm "Gần bạn"; vị trí chỉ nằm trong bộ nhớ của trang.
 
 const HeritageMap = lazy(() => import('../discovery/HeritageMap'));
 
@@ -28,9 +29,14 @@ function EmbedPinCard({ pin }: { pin: HeritagePin }) {
         <h2 className="type-h3">{pin.name}</h2>
         {meta && <p className="type-body-s text-on-surface-variant">{meta}</p>}
         {pin.isMachineTranslated && <p className="type-label text-on-surface-variant">{t.language.machineLabel}</p>}
-        <Button className="mt-1 self-start" onClick={() => postToHost({ type: 'pin-selected', version: 1, slug: pin.slug })}>
-          {t.map.viewDetail}
-        </Button>
+        <div className="mt-1 flex flex-wrap gap-3">
+          <Button onClick={() => postToHost({ type: 'pin-selected', version: 1, slug: pin.slug })}>{t.map.viewDetail}</Button>
+          {pin.hasTimeline && (
+            <Button variant="secondary" onClick={() => postToHost({ type: 'timeline-selected', version: 1, slug: pin.slug })}>
+              {t.map.openTimeline}
+            </Button>
+          )}
+        </div>
       </div>
     </article>
   );
@@ -42,6 +48,7 @@ export function EmbedMapPage() {
   const { language, t } = useI18n();
   const [filter, setFilter] = useState<DiscoveryFilter>(initial.filter);
   const [selected, setSelected] = useState<string | null>(initial.select);
+  const [position, setPosition] = useState<EmbedPosition | null>(null);
   const result = useMapPins(filter);
   const data = result.data;
 
@@ -52,7 +59,8 @@ export function EmbedMapPage() {
 
   const onCommand = useCallback((command: EmbedCommand) => {
     if (command.type === 'focus') setSelected(command.slug);
-    else setFilter({ keyword: command.filter.keyword, region: command.filter.region, heritageType: command.filter.heritageType });
+    else if (command.type === 'set-position') setPosition(command.position);
+    else setFilter({ ...command.filter });
   }, []);
   useHostCommands(onCommand);
 
@@ -77,6 +85,8 @@ export function EmbedMapPage() {
           fitKey={String(result.dataUpdatedAt)}
           fitToPins={hasActiveFilter(filter)}
           renderPopup={(pin) => <EmbedPinCard pin={pin} />}
+          userPosition={position}
+          userLabel={t.guest.nearby.title}
         />
       </Suspense>
     </div>

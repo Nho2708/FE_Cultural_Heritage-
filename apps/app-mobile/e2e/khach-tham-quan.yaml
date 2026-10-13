@@ -3,12 +3,11 @@
 appId: host.exp.exponent
 ---
 - runFlow: chung/mo-app.yaml
-- tapOn: "English"
-- assertVisible: "How will you use the app?"
-- takeScreenshot: khach-01-chon-che-do
-- tapOn:
-    text: "Visitor"
-    index: 1
+- runFlow:
+    file: chung/vao-khach.yaml
+    env:
+      LANGUAGE_NAME: English
+- takeScreenshot: khach-01-vao-che-do-khach
 - extendedWaitUntil:
     visible: "Discover the cultural heritage of Viet Nam"
     timeout: 60000
@@ -30,11 +29,17 @@ appId: host.exp.exponent
 - assertVisible: ".*Khu Trung tâm Hoàng thành.*"
 - tapOn: "Summary"
 - extendedWaitUntil:
-    visible: "This build runs in Expo Go.*"
+    notVisible: "Loading…"
+    timeout: 30000
+# Bảng tóm tắt nằm dưới các nút; trên màn hình cao (điện thoại thật) phải cuộn mới thấy ghi chú Expo Go.
+- scrollUntilVisible:
+    element: "This build runs in Expo Go.*"
     timeout: 30000
 - takeScreenshot: khach-05-tom-tat
 - tapOn: "Listen"
-- scroll
+- scrollUntilVisible:
+    element: "▶ Listen"
+    timeout: 20000
 - tapOn: "▶ Listen"
 - extendedWaitUntil:
     visible: "(Pause|Stop|Your phone has no.*|This device cannot read aloud.*)"

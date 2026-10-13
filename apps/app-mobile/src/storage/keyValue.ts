@@ -71,5 +71,7 @@ export const KEYS = {
   deviceId: 'dsvhvn.app.ma-thiet-bi',
   session: 'dsvhvn.app.phien',
   lessonPosition: 'dsvhvn.app.vi-tri-bai',
+  recentLessons: 'dsvhvn.app.ma-gan-day',
+  autoRead: 'dsvhvn.app.tu-doc',
   quizFlags: 'dsvhvn.app.danh-dau-cau',
 } as const;

@@ -3,6 +3,7 @@
 appId: host.exp.exponent
 ---
 - takeScreenshot: khoi3-05-bai-hoc
+# Bước Xem hình có nhiều ảnh lớn (điện thoại thật cuộn qua vài màn hình mới tới nút): cuộn nhanh và chờ lâu hơn mặc định.
 - repeat:
     while:
       notVisible: "Bài chơi của em"
@@ -10,6 +11,8 @@ appId: host.exp.exponent
     commands:
       - scrollUntilVisible:
           element: "Tiếp nhé"
+          speed: 70
+          timeout: 60000
       - tapOn: "Tiếp nhé"
 - takeScreenshot: khoi3-06-bai-choi
 - tapOn: "Làm bài"
@@ -53,9 +56,15 @@ appId: host.exp.exponent
 - scrollUntilVisible:
     element: "Tiếp nhé"
 - tapOn: "Tiếp nhé"
-# Câu 4: sắp xếp bốn sự kiện theo thời gian
+# Câu 4: sắp xếp bốn sự kiện theo thời gian (mỗi mục cuộn tới rồi mới chạm, vì danh sách có thể dài hơn một màn hình).
+- scrollUntilVisible:
+    element: "Năm 1010: dời đô"
 - tapOn: "Năm 1010: dời đô"
+- scrollUntilVisible:
+    element: "Năm 1070: lập Văn Miếu"
 - tapOn: "Năm 1070: lập Văn Miếu"
+- scrollUntilVisible:
+    element: "Năm 1428: Lê Lợi lên ngôi"
 - tapOn: "Năm 1428: Lê Lợi lên ngôi"
 - scrollUntilVisible:
     element: "Năm 2010: UNESCO ghi danh"

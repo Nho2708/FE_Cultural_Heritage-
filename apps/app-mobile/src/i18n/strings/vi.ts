@@ -38,7 +38,7 @@ export interface Strings {
     studentText: string;
     studentLanguageNote: string;
   };
-  tabs: { home: string; search: string; map: string; history: string };
+  tabs: { home: string; search: string; map: string; history: string; timeline: string };
   home: {
     intro: string;
     recommended: string;
@@ -53,6 +53,20 @@ export interface Strings {
     nearbyEmpty: string;
     nearbyDistance: string;
     total: string;
+    mapText: string;
+    timelineText: string;
+    nearbyOutside: string;
+    nearbyError: string;
+    nearbyLocating: string;
+  };
+  recommend: {
+    text: string;
+    textFeatured: string;
+    because: string;
+    reasonsLabel: string;
+    reasons: { SAME_TYPE: string; SAME_PROVINCE: string; SAME_REGION: string; SAME_LEVEL: string; OVERLAPPING_ERA: string; SIMILAR_TEXT: string };
+    fallbackNote: string;
+    loading: string;
   };
   search: {
     title: string;
@@ -92,7 +106,7 @@ export interface Strings {
     notFoundText: string;
     readMore: string;
   };
-  timeline: { title: string; empty: string; events: string };
+  timeline: { title: string; empty: string; events: string; pickerText: string; pickerPlaceholder: string };
   summary: {
     title: string;
     detailed: string;
@@ -150,6 +164,10 @@ export interface Strings {
     switchToStudent: string;
     version: string;
     apiAddress: string;
+    adsOptions: string;
+    adsNotNeeded: string;
+    adsUnavailable: string;
+    adsCheckFailed: string;
   };
 }
 
@@ -190,7 +208,7 @@ export const vi: Strings = {
     studentText: 'Đăng nhập bằng mã học sinh của em để học bài, nhập mã bài học và làm bài kiểm tra.',
     studentLanguageNote: 'Chế độ Học sinh chỉ dùng tiếng Việt.',
   },
-  tabs: { home: 'Trang chủ', search: 'Tìm kiếm', map: 'Bản đồ', history: 'Lịch sử' },
+  tabs: { home: 'Trang chủ', search: 'Tìm kiếm', map: 'Bản đồ', history: 'Lịch sử', timeline: 'Thời gian' },
   home: {
     intro: 'Khám phá di sản văn hóa Việt Nam',
     recommended: 'Gợi ý cho bạn',
@@ -205,6 +223,27 @@ export const vi: Strings = {
     nearbyEmpty: 'Chưa tìm thấy di sản có tọa độ gần bạn.',
     nearbyDistance: 'cách {{distance}}',
     total: '{{count}} di sản đã xuất bản',
+    mapText: 'Xem vị trí các di sản trên bản đồ Việt Nam, gồm cả quần đảo Hoàng Sa, Trường Sa.',
+    timelineText: 'Giai đoạn và sự kiện của từng di sản, theo thứ tự năm.',
+    nearbyOutside: 'Chưa dùng được "Gần bạn": bạn đang ở ngoài Việt Nam.',
+    nearbyError: 'Không xác định được vị trí của bạn. Hãy thử lại.',
+    nearbyLocating: 'Đang xác định vị trí của bạn…',
+  },
+  recommend: {
+    text: 'Di sản giống những gì bạn đã tìm, đã xem hoặc đã nghe gần đây.',
+    textFeatured: 'Bạn chưa xem di sản nào. Hãy xem thử vài di sản, mục này sẽ gợi ý theo sở thích của bạn. Trong lúc đó, đây là những di sản nổi bật.',
+    because: 'Vì bạn quan tâm đến {{name}}',
+    reasonsLabel: 'Điểm chung',
+    reasons: {
+      SAME_TYPE: 'Cùng loại hình',
+      SAME_PROVINCE: 'Cùng tỉnh, thành',
+      SAME_REGION: 'Cùng vùng',
+      SAME_LEVEL: 'Cùng cấp xếp hạng',
+      OVERLAPPING_ERA: 'Cùng thời kỳ',
+      SIMILAR_TEXT: 'Nội dung gần giống',
+    },
+    fallbackNote: 'Gợi ý được chọn theo loại hình và vùng của di sản bạn xem gần nhất.',
+    loading: 'Đang tìm gợi ý cho bạn…',
   },
   search: {
     title: 'Tìm kiếm di sản',
@@ -244,7 +283,13 @@ export const vi: Strings = {
     notFoundText: 'Di sản này không tồn tại hoặc chưa được xuất bản.',
     readMore: 'Đọc tiếp',
   },
-  timeline: { title: 'Dòng thời gian', empty: 'Di sản này chưa có dòng thời gian.', events: '{{count}} sự kiện' },
+  timeline: {
+    title: 'Dòng thời gian',
+    empty: 'Di sản này chưa có dòng thời gian.',
+    events: '{{count}} sự kiện',
+    pickerText: 'Mỗi di sản có dòng thời gian riêng. Chọn một di sản để xem các giai đoạn và sự kiện của nó.',
+    pickerPlaceholder: 'Tìm nhanh theo tên di sản',
+  },
   summary: {
     title: 'Tóm tắt di sản',
     detailed: 'Đọc',
@@ -317,5 +362,9 @@ export const vi: Strings = {
     switchToStudent: 'Chuyển sang chế độ Học sinh',
     version: 'Phiên bản',
     apiAddress: 'Địa chỉ máy chủ',
+    adsOptions: 'Mở lại lựa chọn quảng cáo cá nhân hóa',
+    adsNotNeeded: 'Khu vực của bạn không cần hộp đồng ý quảng cáo của Google, nên không có lựa chọn nào để mở lại.',
+    adsUnavailable: 'Bản này chưa có quảng cáo của Google nên chưa có lựa chọn nào để mở.',
+    adsCheckFailed: 'Không kiểm tra được lựa chọn quảng cáo. Bạn kiểm tra mạng rồi thử lại.',
   },
 };

@@ -1,0 +1,129 @@
+# Bản đồ của khách (giao diện tiếng Anh): bộ lọc loại, vùng, bảng "Thêm bộ lọc" (tỉnh, cấp xếp hạng, thời kỳ) đổi không tải lại trang, nút "Gần bạn" trên bản đồ,
+# và nút mở dòng thời gian trong thẻ ghim của trang nhúng (mở từ "Xem trên bản đồ" ở chi tiết di sản để ghim được làm nổi sẵn).
+appId: host.exp.exponent
+---
+- runFlow: chung/mo-app.yaml
+- runFlow:
+    file: chung/vao-khach.yaml
+    env:
+      LANGUAGE_NAME: English
+- tapOn: "Map"
+- extendedWaitUntil:
+    notVisible: "Loading map…"
+    timeout: 60000
+- assertNotVisible: "The map could not be loaded.*"
+- assertVisible: "Tangible"
+- assertVisible: "Near you"
+- takeScreenshot: ban-do-01-ban-do
+# Chip loại và vùng. Hàng chip cuộn ngang ở ngay dưới thanh tiêu đề: vuốt hàng này (không vuốt giữa màn hình, đó là bản đồ) để thấy các chip vùng và "Thêm bộ lọc".
+# Không bắt đầu vuốt sát mép màn hình (MIUI coi vuốt từ mép là cử chỉ Quay lại) và không ở góc phải trên (nút bánh răng kéo được của Expo Go).
+- tapOn: "Tangible"
+- swipe:
+    start: "80%,15%"
+    end: "5%,15%"
+    duration: 400
+- swipe:
+    start: "80%,15%"
+    end: "5%,15%"
+    duration: 400
+- tapOn: "North"
+- takeScreenshot: ban-do-02-loc-loai-vung
+# Bảng Thêm bộ lọc: cấp xếp hạng, thời kỳ, tỉnh (chọn trong danh sách).
+- tapOn: "More filters"
+- assertVisible: "Province, city"
+- assertVisible: "Ranking"
+- assertVisible: "Period"
+- tapOn: "World Heritage (UNESCO)"
+- assertVisible: "More filters (1)"
+- scrollUntilVisible:
+    element: "Independent feudal era"
+    timeout: 20000
+- tapOn: "Independent feudal era"
+- assertVisible: "More filters (2)"
+- scrollUntilVisible:
+    element: "All provinces"
+    direction: UP
+    timeout: 20000
+- tapOn: "All provinces"
+- assertVisible: "Choose a province or city"
+- scrollUntilVisible:
+    element: "Thanh Hoa Province"
+    timeout: 30000
+- tapOn: "Thanh Hoa Province"
+- assertNotVisible: "Choose a province or city"
+- assertVisible: "More filters (3)"
+- assertVisible: "Thanh Hoa Province"
+- takeScreenshot: ban-do-03-them-bo-loc
+- tapOn: "More filters (3)"
+- assertNotVisible: "Province, city"
+# Bỏ hết bộ lọc: vuốt hàng chip về đầu rồi chạm "All".
+- swipe:
+    start: "20%,15%"
+    end: "80%,15%"
+    duration: 400
+- swipe:
+    start: "20%,15%"
+    end: "80%,15%"
+    duration: 400
+- tapOn:
+    text: "All"
+    index: 0
+- swipe:
+    start: "80%,15%"
+    end: "5%,15%"
+    duration: 400
+- swipe:
+    start: "80%,15%"
+    end: "5%,15%"
+    duration: 400
+- assertVisible: "More filters"
+- assertNotVisible: "More filters (3)"
+- swipe:
+    start: "20%,15%"
+    end: "80%,15%"
+    duration: 400
+- swipe:
+    start: "20%,15%"
+    end: "80%,15%"
+    duration: 400
+# Gần bạn trên bản đồ: bấm mới xin quyền và định vị; có vị trí thì bảng liệt kê di sản gần nhất kèm khoảng cách (tên tỉnh · khoảng cách).
+# Chạm theo mã của nút vì chấm vị trí trong trang nhúng cũng mang tên "Near you".
+- tapOn:
+    id: "nut-gan-ban-tren-ban-do"
+- runFlow:
+    when:
+      visible: "(While using the app|Only this time|Khi dùng ứng dụng|Chỉ lần này)"
+    commands:
+      - tapOn: "(While using the app|Khi dùng ứng dụng)"
+- extendedWaitUntil:
+    visible: "(.* (km|m)|No heritage sites with coordinates.*|Could not determine your location.*|Near you is not available.*|Location is not allowed.*)"
+    timeout: 90000
+- takeScreenshot: ban-do-04-gan-ban
+- tapOn: "Close"
+- assertNotVisible: "Close"
+# Thẻ ghim trong trang nhúng có nút mở dòng thời gian: mở bản đồ từ chi tiết di sản để ghim được làm nổi và thẻ mở sẵn.
+- tapOn: "Search"
+- tapOn: "Search by name, province, period…"
+- inputText: "thang long"
+- pressKey: Enter
+- scrollUntilVisible:
+    element: ".*Hoàng thành Thăng Long.*"
+    timeout: 60000
+- tapOn: ".*Hoàng thành Thăng Long.*"
+- extendedWaitUntil:
+    visible: "Show on map"
+    timeout: 30000
+- tapOn: "Show on map"
+- extendedWaitUntil:
+    notVisible: "Loading map…"
+    timeout: 60000
+- extendedWaitUntil:
+    visible: "Open timeline"
+    timeout: 30000
+- takeScreenshot: ban-do-05-the-ghim
+- tapOn: "Open timeline"
+- extendedWaitUntil:
+    visible: ".*Hoàng thành Thăng Long.*"
+    timeout: 30000
+- assertNotVisible: "Open timeline"
+- takeScreenshot: ban-do-06-dong-thoi-gian-tu-ban-do

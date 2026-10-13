@@ -1,7 +1,7 @@
 import { CLOCK_WARNING_SECONDS, cn, formatClock, hasAnswer } from '@dsvhvn/dung-chung';
 import type { AttemptQuestion, QuestionSubmission, StudentAttempt } from '@dsvhvn/dung-chung/api';
 import { Button, Icon, InlineMessage, Modal } from '@dsvhvn/dung-chung/ui';
-import { SpeakButton } from '@dsvhvn/dung-chung/lesson';
+import { AutoReadSwitch, SpeakButton, useAutoRead, useAutoSpeak, useSpeech } from '@dsvhvn/dung-chung/lesson';
 import type { ReactNode } from 'react';
 import { speechOf } from './speech';
 import { QuestionInput, type QuizLevel } from './QuestionInput';
@@ -40,6 +40,10 @@ export function PassageBox({ question }: { question: Pick<AttemptQuestion, 'pass
 
 export function QuestionCard({ question, index, total, level, answer, onChange, readAloud, inlinePassage = true, disabled, aside }: QuestionCardProps) {
   const sentence = question.questionType === 'FILL_BLANK';
+  // Cấp 1: câu hỏi tự đọc to khi em vào câu (tắt được); nút loa vẫn để nghe lại.
+  const speech = useSpeech();
+  const [autoRead, setAutoRead] = useAutoRead();
+  useAutoSpeak(speech.speak, speechOf(question), readAloud && autoRead && speech.supported);
   return (
     <article
       aria-label={`Câu ${index + 1}`}
@@ -53,6 +57,15 @@ export function QuestionCard({ question, index, total, level, answer, onChange, 
         {question.point !== null && level !== 1 && <span className="type-body-s text-on-surface-variant">· {question.point} điểm</span>}
         <span className="ml-auto flex items-center gap-2">
           {aside}
+          {readAloud && speech.supported && (
+            <AutoReadSwitch
+              on={autoRead}
+              onChange={(on) => {
+                setAutoRead(on);
+                if (!on) speech.stop();
+              }}
+            />
+          )}
           {readAloud && <SpeakButton text={speechOf(question)} label="Nghe đọc câu hỏi" />}
         </span>
       </header>

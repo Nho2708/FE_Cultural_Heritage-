@@ -1,0 +1,81 @@
+# Gợi ý cho khách (giao diện tiếng Anh): khối "Gợi ý cho bạn" trên trang chủ và cuối trang chi tiết di sản, màn "Xem tất cả" với hai tab Gợi ý cho bạn và Gần bạn;
+# tab Gần bạn chỉ hỏi quyền vị trí khi khách bấm "Cho phép vị trí". Điện thoại đã cấp quyền thì thấy danh sách kèm khoảng cách (hoặc lời báo khi không định vị được,
+# ở ngoài Việt Nam); máy ảo không có vị trí thì thấy lời báo. Đường từ chối quyền ở khach-gan-ban-tu-choi.yaml.
+appId: host.exp.exponent
+---
+- runFlow: chung/mo-app.yaml
+- runFlow:
+    file: chung/vao-khach.yaml
+    env:
+      LANGUAGE_NAME: English
+- extendedWaitUntil:
+    visible: "Discover the cultural heritage of Viet Nam"
+    timeout: 60000
+# Trang chủ: khối gợi ý (chưa có lịch sử thì là di sản nổi bật) có nút Xem tất cả; khối Gần bạn có nút xin quyền (hoặc danh sách nếu đã cho phép trước đó).
+- scrollUntilVisible:
+    element: "(Recommended for you|Featured heritage today)"
+    timeout: 30000
+- assertVisible: "See all"
+- scrollUntilVisible:
+    element: "Near you"
+    timeout: 30000
+- scrollUntilVisible:
+    element: "(Allow location|.* away|Finding your location…|No heritage sites with coordinates.*|Could not determine your location.*|Near you is not available.*|Location is not allowed.*)"
+    timeout: 60000
+- takeScreenshot: goi-y-01-trang-chu
+# Chi tiết di sản: khối gợi ý ở cuối trang, trừ chính di sản đang xem.
+- tapOn: "Search"
+- tapOn: "Search by name, province, period…"
+- inputText: "thang long"
+- pressKey: Enter
+- scrollUntilVisible:
+    element: ".*Hoàng thành Thăng Long.*"
+    timeout: 60000
+- tapOn: ".*Hoàng thành Thăng Long.*"
+- extendedWaitUntil:
+    visible: "Summary"
+    timeout: 30000
+# Trang chi tiết dài (mô tả, hình, nguồn tham khảo): cuộn nhanh và chờ lâu hơn.
+- scrollUntilVisible:
+    element: "Recommended for you"
+    speed: 90
+    timeout: 150000
+- extendedWaitUntil:
+    visible: "(Heritage sites similar to what you recently.*|You have not viewed any site yet.*)"
+    timeout: 30000
+- assertVisible: "See all"
+- takeScreenshot: goi-y-02-chi-tiet
+- tapOn: "See all"
+- extendedWaitUntil:
+    visible: "(Heritage sites similar to what you recently.*|You have not viewed any site yet.*)"
+    timeout: 30000
+- assertVisible: "Near you"
+- takeScreenshot: goi-y-03-xem-tat-ca
+# Tab Gần bạn: xin quyền khi bấm, không hỏi sớm hơn.
+- tapOn: "Near you"
+- runFlow:
+    when:
+      visible: "Allow location"
+    commands:
+      - assertVisible: "Allow location to see heritage sites near you.*"
+      - takeScreenshot: goi-y-04-hoi-vi-tri
+      - tapOn: "Allow location"
+      # Hộp cấp quyền của hệ điều hành (nếu Expo Go chưa có quyền).
+      - runFlow:
+          when:
+            visible: "(While using the app|Only this time|Khi dùng ứng dụng|Chỉ lần này)"
+          commands:
+            - tapOn: "(While using the app|Khi dùng ứng dụng)"
+- extendedWaitUntil:
+    visible: "(.* away|No heritage sites with coordinates.*|Could not determine your location.*|Near you is not available.*|Location is not allowed.*)"
+    timeout: 90000
+- takeScreenshot: goi-y-05-gan-ban
+- runFlow:
+    when:
+      visible: ".* away"
+    commands:
+      - scrollUntilVisible:
+          element: "Show on map"
+          timeout: 30000
+- back
+- assertVisible: ".*Hoàng thành Thăng Long.*"

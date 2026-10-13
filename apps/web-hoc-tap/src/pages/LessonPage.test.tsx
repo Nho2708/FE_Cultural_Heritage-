@@ -53,7 +53,7 @@ describe('Bài học — cấp 1 (kể chuyện từng bước)', () => {
     await user.click(screen.getByRole('button', { name: 'Tiếp nhé' }));
     expect(screen.getByRole('heading', { name: 'Bài chơi của em' })).toBeInTheDocument();
     expect(screen.getByText('Chơi cùng bạn Na')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^Làm bài/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Bắt đầu chơi/ })).toBeInTheDocument();
     expect(readPosition(student.id, 'BH7F3K2Q').step).toBe(2);
 
     unmount();
@@ -65,6 +65,10 @@ describe('Bài học — cấp 1 (kể chuyện từng bước)', () => {
     expect(screen.getByRole('heading', { name: 'Em học xong rồi! Giỏi quá!' })).toBeInTheDocument();
     expect(screen.getByText('Ngọ Môn là cổng chính.')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Về trang học' })).toHaveAttribute('href', '/hoc');
+
+    // Màn nhận sao có lối quay về bài chơi khi còn bài làm được.
+    await user.click(screen.getByRole('button', { name: 'Chơi để nhận sao' }));
+    expect(screen.getByRole('heading', { name: 'Bài chơi của em' })).toBeInTheDocument();
   });
 });
 

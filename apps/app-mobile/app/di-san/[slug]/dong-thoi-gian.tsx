@@ -6,11 +6,19 @@ import { Photo } from '../../../src/components/Heritage';
 import { useTimeline } from '../../../src/guest/queries';
 import { localizeDateText } from '../../../src/i18n/dates';
 import { useApp } from '../../../src/state/AppProvider';
-import { useTheme } from '../../../src/theme/ThemeProvider';
+import { DefaultThemeScope, useTheme } from '../../../src/theme/ThemeProvider';
 
 // Dòng thời gian của một di sản: các giai đoạn, mỗi giai đoạn có các sự kiện kèm ngày tháng (chữ "TCN" và "nay" đổi theo ngôn ngữ đang chọn).
 
-export default function TimelineScreen() {
+export default function TimelinePage() {
+  return (
+    <DefaultThemeScope>
+      <TimelineScreen />
+    </DefaultThemeScope>
+  );
+}
+
+function TimelineScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const { language } = useApp();
   const { t } = useTranslation();

@@ -85,6 +85,22 @@ export function useModel(slug: string | undefined) {
 }
 
 /**
+ * Danh sách gợi ý đầy đủ (kèm lý do và di sản giống nhất) cho trang chi tiết và màn hình "Xem tất cả". Luôn hỏi lại máy chủ khi mở: mỗi lượt xem thêm làm đổi gợi ý.
+ * `scope` đổi thì hỏi lại (trang chi tiết truyền mã di sản, chỉ bật `enabled` sau khi chi tiết đã tải xong để lượt xem đã được ghi). Khóa cùng tiền tố với gợi ý ở trang chủ nên xóa lịch sử là làm mới cả hai.
+ */
+export function useRecommendationList({ scope, enabled = true }: { scope: string; enabled?: boolean }) {
+  const { language, services, mode } = useApp();
+  return useQuery({
+    queryKey: ['guest', 'recommend', 'list', language, scope],
+    enabled: enabled && mode === 'guest',
+    retry: false,
+    staleTime: 0,
+    gcTime: 60_000,
+    queryFn: ({ signal }) => services.guestApi.recommendations(services.deviceId, { signal, lang: language }),
+  });
+}
+
+/**
  * "Gợi ý cho bạn": máy chủ chọn di sản giống những gì khách đã quan tâm (theo lịch sử của thiết bị); chưa có lịch sử hoặc máy chủ lỗi thì dùng di sản nổi bật của trang chủ.
  * `refreshKey` đổi khi lịch sử đổi để gợi ý được tính lại.
  */

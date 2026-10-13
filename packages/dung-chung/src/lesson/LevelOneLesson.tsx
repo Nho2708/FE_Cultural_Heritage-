@@ -2,15 +2,17 @@ import { cn } from '../cn';
 import type { StudentLesson } from '../api';
 import { Button, ButtonLink, Icon, InlineMessage, TextLink, type IconName } from '../ui';
 import { useEffect, useState } from 'react';
+import { useAutoRead, useAutoSpeak } from './autoRead';
+import { AutoReadSwitch } from './AutoReadSwitch';
 import { Illustration } from './Illustration';
-import { sectionsOf } from './lessonData';
+import { canTakeQuiz, sectionsOf } from './lessonData';
 import { useLessonLinks } from './lessonLinks';
 import { HeritageLinks, LessonFigure, QuizList } from './LessonParts';
 import { SpeakButton } from './SpeakButton';
 import { useSpeech } from './useSpeech';
 
 // Bài học — bố cục cấp 1 (khối 1-5): kể chuyện từng bước, mỗi bước một hình lớn và một đoạn ngắn, chữ to, nút lớn, nút loa đọc to
-// bằng giọng đọc của trình duyệt. Luồng đi lần lượt: Nghe chuyện → Xem hình → Chơi → Nhận sao; em ra giữa chừng thì lần sau mở lại
+// bằng giọng đọc của trình duyệt; câu chuyện tự đọc to khi em vào mỗi đoạn (em tắt được). Luồng đi lần lượt: Nghe chuyện → Xem hình → Chơi → Nhận sao; em ra giữa chừng thì lần sau mở lại
 // đúng bước đang dừng (nhớ trên máy này). Không có bảng, không có chữ dài.
 
 const STEP_ICON: Record<string, IconName> = {
@@ -54,12 +56,14 @@ export function LevelOneLesson({ lesson, initialPosition, onPositionChange }: Le
     return { step, part: step === 0 ? clamp(saved.part, parts.length - 1) : 0 };
   });
   const speech = useSpeech();
+  const [autoRead, setAutoRead] = useAutoRead();
 
   useEffect(() => {
     onPositionChange?.(position);
   }, [onPositionChange, position]);
 
   const stepKey = steps[position.step]?.key ?? 'LISTEN_STORY';
+  const playStep = steps.findIndex((s) => s.key === 'PLAY');
   const part = parts[position.part] ?? parts[0]!;
   const go = (next: { step: number; part: number }) => {
     speech.stop();
@@ -70,6 +74,8 @@ export function LevelOneLesson({ lesson, initialPosition, onPositionChange }: Le
     if (stepKey === 'LISTEN_STORY' && position.part < parts.length - 1) go({ step: position.step, part: position.part + 1 });
     else go({ step: Math.min(position.step + 1, steps.length - 1), part: 0 });
   };
+  // Câu chuyện tự đọc to khi em vào mỗi đoạn (tắt được; xem trước của giáo viên thì không tự đọc). Nút loa vẫn để nghe lại hoặc dừng.
+  useAutoSpeak(speech.speak, part.text, autoRead && speech.supported && stepKey === 'LISTEN_STORY' && !links.preview);
   const firstHeritage = lesson.heritages[0];
   const firstHeritageTo = firstHeritage ? links.heritage(firstHeritage.slug) : null;
 
@@ -149,6 +155,16 @@ export function LevelOneLesson({ lesson, initialPosition, onPositionChange }: Le
                   )}
                 </div>
               )}
+              {speech.supported && !links.preview && (
+                <AutoReadSwitch
+                  on={autoRead}
+                  onChange={(on) => {
+                    setAutoRead(on);
+                    if (!on) speech.stop();
+                  }}
+                  className="w-fit"
+                />
+              )}
               {firstHeritageTo && <TextLink to={firstHeritageTo}>Xem về di sản này</TextLink>}
             </div>
           </article>
@@ -201,6 +217,12 @@ export function LevelOneLesson({ lesson, initialPosition, onPositionChange }: Le
                 <p className="mt-2 type-body-m">Em làm bài chơi hoặc bài kiểm tra của bài để nhận sao nhé.</p>
               </div>
             </div>
+            {playStep >= 0 && lesson.quizzes.some(canTakeQuiz) && (
+              <Button size="lg" className="self-start rounded-full" onClick={() => go({ step: playStep, part: 0 })}>
+                <Icon name="play" size={22} />
+                Chơi để nhận sao
+              </Button>
+            )}
             {lesson.keyPoints.length > 0 && (
               <div className="rounded-lg border-2 border-border bg-surface p-(--dsv-inline-gap)">
                 <div className="flex items-center gap-3">

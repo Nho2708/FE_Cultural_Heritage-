@@ -2,7 +2,7 @@
 // Chỗ chèn giá trị viết `{{tên}}` theo i18next.
 
 export const studentVi = {
-  tabs: { learn: 'Trang học', code: 'Nhập mã', progress: 'Tiến độ', account: 'Của em' },
+  tabs: { learn: 'Trang học', code: 'Nhập mã', explore: 'Khám phá', progress: 'Tiến độ', account: 'Của em' },
   login: {
     title: 'Học sinh đăng nhập',
     subtitle: 'Em dùng mã học sinh và mật khẩu trên phiếu đăng nhập.',
@@ -61,6 +61,8 @@ export const studentVi = {
     submit: 'Mở bài học',
     hint: 'Mã bài học do thầy cô cung cấp. Cùng mã này mở luôn bài kiểm tra của bài, em không phải nhập lần hai.',
     required: 'Em hãy nhập mã bài học.',
+    recent: 'Mã em đã mở gần đây trên máy này',
+    lastOpened: 'Mở lần cuối {{date}}',
   },
   lesson: {
     title: 'Bài học',
@@ -73,6 +75,7 @@ export const studentVi = {
     quizzesNote: 'Mỗi em chỉ làm mỗi bài kiểm tra một lần.',
     noQuizzes: 'Bài này chưa có bài kiểm tra.',
     start: 'Làm bài',
+    startPlay: 'Bắt đầu chơi',
     continue: 'Làm tiếp',
     viewResult: 'Xem kết quả',
     notAvailable: 'Chưa làm được',
@@ -91,6 +94,8 @@ export const studentVi = {
     partOf: 'Đoạn {{index}} / {{total}}',
     listenStory: 'Nghe chuyện',
     readAloud: 'Đọc to đoạn này',
+    autoRead: 'Tự đọc to',
+    stepOf: 'Bước {{index}} / {{total}}',
     stopReading: 'Dừng đọc',
     reading: 'Đang đọc cho em nghe…',
     readAgain: 'Nghe lại',
@@ -102,6 +107,7 @@ export const studentVi = {
     noPlay: 'Chưa có bài chơi nào. Em bấm "Tiếp nhé" để đi tiếp!',
     congrats: 'Em học xong rồi! Giỏi quá!',
     congratsText: 'Em làm bài chơi hoặc bài kiểm tra của bài để nhận sao nhé.',
+    playForStars: 'Chơi để nhận sao',
     remember: 'Em nhớ nhé',
     resume: 'Em ra ngoài giữa chừng cũng không sao. Lần sau vào lại trên máy này, bài sẽ mở đúng bước em đang dừng.',
     replay: 'Xem lại từ đầu',

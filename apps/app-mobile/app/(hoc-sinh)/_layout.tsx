@@ -5,10 +5,11 @@ import type { ColorValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GuardRedirect } from '../../src/components/GuardRedirect';
 import { entryHref } from '../../src/navigation/entry';
+import { STUDENT_TABS } from '../../src/navigation/tabs';
 import { useApp, useAuth } from '../../src/state/AppProvider';
 import { useTheme } from '../../src/theme/ThemeProvider';
 
-// Chế độ Học sinh: bốn tab (Trang học, Nhập mã, Tiến độ, Của em), bố cục và màu theo cấp học của lớp. Chưa đăng nhập hoặc phiên đã hết thì về màn hình Đăng nhập;
+// Chế độ Học sinh: năm tab (Trang học, Nhập mã, Khám phá, Tiến độ, Của em), bố cục và màu theo cấp học của lớp. Chưa đăng nhập hoặc phiên đã hết thì về màn hình Đăng nhập;
 // còn bị buộc đổi mật khẩu thì về màn hình Đổi mật khẩu (không đi tiếp được).
 
 type IconName = keyof typeof Ionicons.glyphMap;
@@ -39,10 +40,9 @@ export default function StudentLayout() {
         sceneStyle: { backgroundColor: theme.color.background },
       }}
     >
-      <Tabs.Screen name="hoc" options={{ title: t('hs.tabs.learn'), tabBarIcon: icon('school-outline', 'school') }} />
-      <Tabs.Screen name="nhap-ma" options={{ title: t('hs.tabs.code'), tabBarIcon: icon('key-outline', 'key') }} />
-      <Tabs.Screen name="tien-do" options={{ title: t('hs.tabs.progress'), tabBarIcon: icon('star-outline', 'star') }} />
-      <Tabs.Screen name="cua-em" options={{ title: t('hs.tabs.account'), tabBarIcon: icon('person-outline', 'person') }} />
+      {STUDENT_TABS.map((tab) => (
+        <Tabs.Screen key={tab.name} name={tab.name} options={{ title: t(tab.title), tabBarLabel: tab.label ? t(tab.label) : undefined, tabBarIcon: icon(tab.icon, tab.focusedIcon) }} />
+      ))}
     </Tabs>
   );
 }

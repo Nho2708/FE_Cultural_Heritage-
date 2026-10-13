@@ -1,0 +1,26 @@
+# Cài đặt của khách (giao diện tiếng Anh): mục Quảng cáo trong Expo Go (không có mô-đun quảng cáo nên không có nút mở lại lựa chọn, app giải thích bằng lời),
+# công tắc vị trí, dòng phiên bản và kênh, địa chỉ máy chủ.
+appId: host.exp.exponent
+---
+- runFlow: chung/mo-app.yaml
+- runFlow:
+    file: chung/vao-khach.yaml
+    env:
+      LANGUAGE_NAME: English
+- tapOn: "History"
+- scrollUntilVisible:
+    element: "Ads"
+    timeout: 30000
+- assertVisible: "The Google ad consent form only appears for visitors in Europe and the UK.*"
+- extendedWaitUntil:
+    visible: "This build has no Google ads yet, so there are no choices to open."
+    timeout: 15000
+- assertNotVisible: "Review personalized ad choices"
+- assertNotVisible: "Could not check ad choices.*"
+- takeScreenshot: cai-dat-01-quang-cao
+- scrollUntilVisible:
+    element: "Server address: .*"
+    timeout: 30000
+- assertVisible: "Version: .* \\(expo-go\\)"
+- assertVisible: "Switch to Student mode"
+- takeScreenshot: cai-dat-02-phien-ban

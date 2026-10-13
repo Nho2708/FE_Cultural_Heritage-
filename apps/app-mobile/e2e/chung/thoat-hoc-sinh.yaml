@@ -1,0 +1,41 @@
+# Từ chế độ Học sinh (màn đăng nhập, khu học đã đăng nhập, hoặc màn đổi mật khẩu bắt buộc còn dở từ lần chạy trước) về chế độ Khách tham quan.
+# Đang ở chế độ Khách hoặc màn chọn ngôn ngữ thì không làm gì. Biến NEW_PASSWORD chỉ dùng khi gặp màn đổi mật khẩu bắt buộc.
+appId: host.exp.exponent
+---
+# Màn đổi mật khẩu bắt buộc: đặt mật khẩu để vào khu học rồi thoát như bình thường.
+- runFlow:
+    when:
+      visible: "Đặt mật khẩu và bắt đầu học"
+    commands:
+      - tapOn:
+          text: "Mật khẩu mới"
+          index: 1
+      - inputText: ${NEW_PASSWORD}
+      - hideKeyboard
+      - tapOn:
+          text: "Nhập lại mật khẩu mới"
+          index: 1
+      - inputText: ${NEW_PASSWORD}
+      - hideKeyboard
+      - tapOn: "Đặt mật khẩu và bắt đầu học"
+      - extendedWaitUntil:
+          visible: "Của em"
+          timeout: 30000
+# Khu học đã đăng nhập: Của em → chuyển sang chế độ Khách tham quan (cũng là đăng xuất).
+- runFlow:
+    when:
+      visible: "Của em"
+    commands:
+      - tapOn: "Của em"
+      - runFlow:
+          when:
+            visible: "Chuyển sang chế độ Khách tham quan"
+          commands:
+            - tapOn: "Chuyển sang chế độ Khách tham quan"
+            - tapOn: "Đồng ý"
+# Màn đăng nhập học sinh.
+- runFlow:
+    when:
+      visible: "Tôi là khách tham quan"
+    commands:
+      - tapOn: "Tôi là khách tham quan"

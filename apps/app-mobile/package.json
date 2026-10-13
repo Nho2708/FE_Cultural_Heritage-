@@ -5,9 +5,9 @@
   "description": "App mobile DSVHVN (tên hiển thị \"Học di sản\"): một app, hai chế độ (Khách tham quan, Học sinh), React Native + Expo. Không thuộc npm workspaces của thư mục gốc vì Expo SDK 57 cố định React 19.2.3 còn hai web dùng React 19.3; app cài phụ thuộc riêng và đọc mã dùng chung từ packages/dung-chung qua bí danh đường dẫn.",
   "main": "expo-router/entry",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "start": "expo start --port 8083",
+    "android": "expo start --port 8083 --android",
+    "ios": "expo start --port 8083 --ios",
     "typecheck": "tsc -p tsconfig.json",
     "test": "jest",
     "lint": "oxlint -c .oxlintrc.json --deny-warnings src app",

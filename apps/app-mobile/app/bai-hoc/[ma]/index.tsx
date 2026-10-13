@@ -5,8 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import { Button, Loading, Txt, styles as ui } from '../../../src/components/ui';
 import { useLessonByCode } from '../../../src/hocsinh/queries';
+import { rememberLesson } from '../../../src/hocsinh/recentLessons';
 import { serverErrorText } from '../../../src/hocsinh/serverErrorText';
 import { LevelOneLesson, LevelThreeLesson, LevelTwoLesson, type LessonPosition } from '../../../src/hocsinh/LevelLessons';
+import { useAuth } from '../../../src/state/AppProvider';
 import { KEYS, prefs } from '../../../src/storage/keyValue';
 import { useTheme } from '../../../src/theme/ThemeProvider';
 
@@ -22,6 +24,9 @@ export default function LessonScreen() {
   const theme = useTheme();
   const router = useRouter();
   const lesson = useLessonByCode(ma);
+  const userId = useAuth().session?.user.id;
+  const openedCode = lesson.data?.accessCode;
+  const openedTitle = lesson.data?.title;
   const level = lesson.data?.schoolLevel ?? theme.level ?? 2;
   // Vị trí đã nhớ của cấp 1: nạp xong mới dựng bố cục để mở đúng bước đang dừng.
   const [saved, setSaved] = useState<LessonPosition | null | undefined>(undefined);
@@ -43,6 +48,11 @@ export default function LessonScreen() {
       cancelled = true;
     };
   }, [ma, level]);
+
+  // Bài mở được thì nhớ mã trên máy để lần sau mở lại từ màn hình Nhập mã (mỗi học sinh một danh sách).
+  useEffect(() => {
+    if (openedCode && userId !== undefined) void rememberLesson(prefs, userId, { code: openedCode, title: openedTitle ?? t('hs.lesson.title') });
+  }, [openedCode, openedTitle, userId, t]);
 
   if (lesson.isLoading || (level === 1 && saved === undefined && lesson.data)) return <Loading label={t('hs.common.loading')} />;
   if (lesson.isError || !lesson.data) {

@@ -1,0 +1,41 @@
+# Khách từ chối quyền vị trí ở mục "Gần bạn" của trang chủ (giao diện tiếng Anh): app báo nhẹ nhàng và nút cho phép vẫn còn để thử lại.
+# Chạy khi Expo Go CHƯA được cấp quyền vị trí (máy ảo mới, hoặc điện thoại đã `adb shell pm revoke host.exp.exponent android.permission.ACCESS_FINE_LOCATION`
+# và ACCESS_COARSE_LOCATION, nhớ cấp lại sau); đã cấp rồi thì hệ điều hành không hỏi và luồng này không kiểm được gì. Không nằm trong danh sách luồng mặc định của script.
+# Nếu lần trước khách đã bật "Gần bạn" thì trang chủ hỏi quyền ngay khi hiện (không cần bấm nút): luồng chấp nhận cả hai đường.
+appId: host.exp.exponent
+---
+- runFlow: chung/mo-app.yaml
+- runFlow:
+    file: chung/vao-khach.yaml
+    env:
+      LANGUAGE_NAME: English
+- extendedWaitUntil:
+    visible: "(Discover the cultural heritage of Viet Nam|Don.t allow|Deny|Không cho phép|Từ chối)"
+    timeout: 60000
+- runFlow:
+    when:
+      notVisible: "(Don.t allow|Deny|Không cho phép|Từ chối)"
+    commands:
+      - scrollUntilVisible:
+          element: "Near you"
+          timeout: 30000
+      - runFlow:
+          when:
+            visible: "Allow location"
+          commands:
+            - tapOn: "Allow location"
+# Hệ điều hành đã bị từ chối hai lần trước đó thì không hỏi nữa mà trả lời "không" ngay: khi đó chỉ còn lời báo của app.
+- extendedWaitUntil:
+    visible: "(Don.t allow|Deny|Không cho phép|Từ chối|Location is not allowed.*)"
+    timeout: 15000
+- runFlow:
+    when:
+      visible: "(Don.t allow|Deny|Không cho phép|Từ chối)"
+    commands:
+      - takeScreenshot: gan-ban-tu-choi-01-hop-quyen
+      - tapOn: "(Don.t allow|Deny|Không cho phép|Từ chối)"
+- scrollUntilVisible:
+    element: "Location is not allowed. You can turn it on in your phone settings."
+    timeout: 30000
+- assertVisible: "Allow location"
+- takeScreenshot: gan-ban-tu-choi-02-bi-tu-choi

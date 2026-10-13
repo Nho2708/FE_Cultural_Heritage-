@@ -1,0 +1,99 @@
+# Đổi ngôn ngữ của khách trong Cài đặt: tiếng Hàn, tiếng Nhật, tiếng Trung giản thể rồi về tiếng Việt; mỗi ngôn ngữ chụp trang chủ, bản đồ, dòng thời gian,
+# lịch sử và cài đặt để soát chữ tràn, chữ chưa dịch. Chữ trên thanh tab và tiêu đề phải đổi theo.
+appId: host.exp.exponent
+---
+- runFlow: chung/mo-app.yaml
+- runFlow:
+    file: chung/vao-khach.yaml
+    env:
+      LANGUAGE_NAME: 한국어
+- extendedWaitUntil:
+    visible: "베트남 문화유산을 만나보세요"
+    timeout: 60000
+- assertVisible: "유산 지도"
+- assertVisible: "연표"
+- takeScreenshot: ngon-ngu-01-ko-trang-chu
+- tapOn: "검색"
+- assertVisible: "이름, 성·시, 시대로 검색…"
+# Nút mở bảng lọc thêm của trang Tìm kiếm có dấu "+" phía trước.
+- tapOn: ".*필터 더보기"
+- assertVisible: "성·시"
+- assertVisible: "등급"
+- assertVisible: "시대"
+- takeScreenshot: ngon-ngu-02-ko-tim-kiem
+- tapOn: "지도"
+- extendedWaitUntil:
+    notVisible: "지도를 불러오는 중…"
+    timeout: 60000
+- assertVisible: "내 주변"
+- takeScreenshot: ngon-ngu-03-ko-ban-do
+- tapOn:
+    text: "연표"
+    index: 0
+- extendedWaitUntil:
+    visible: "유산마다 연표가 있습니다.*|.*연표.*"
+    timeout: 30000
+- takeScreenshot: ngon-ngu-04-ko-dong-thoi-gian
+# Về Trang chủ rồi mới vào tab Lịch sử: trên màn chọn di sản, nhãn loại "Tư liệu" tiếng Hàn cũng là "기록".
+- tapOn: "홈"
+- tapOn: "기록"
+# Tab Lịch sử giữ vị trí cuộn của lần trước (vao-khach.yaml đã cuộn tới nút chọn ngôn ngữ): cuộn lên đầu.
+- scrollUntilVisible:
+    element: "내 기록"
+    direction: UP
+    timeout: 30000
+- assertVisible: "설정"
+- takeScreenshot: ngon-ngu-05-ko-cai-dat
+# Tiếng Nhật.
+- runFlow:
+    file: chung/vao-khach.yaml
+    env:
+      LANGUAGE_NAME: 日本語
+- extendedWaitUntil:
+    visible: "ベトナムの文化遺産を探索しよう"
+    timeout: 60000
+- takeScreenshot: ngon-ngu-06-ja-trang-chu
+- tapOn:
+    text: "年表"
+    index: 0
+- extendedWaitUntil:
+    visible: ".*年表.*"
+    timeout: 30000
+- takeScreenshot: ngon-ngu-07-ja-dong-thoi-gian
+- tapOn: "履歴"
+- scrollUntilVisible:
+    element: "あなたの履歴"
+    direction: UP
+    timeout: 30000
+- takeScreenshot: ngon-ngu-08-ja-cai-dat
+# Tiếng Trung giản thể.
+- runFlow:
+    file: chung/vao-khach.yaml
+    env:
+      LANGUAGE_NAME: 简体中文
+- extendedWaitUntil:
+    visible: "探索越南文化遗产"
+    timeout: 60000
+- takeScreenshot: ngon-ngu-09-zh-trang-chu
+- tapOn: "历史"
+- scrollUntilVisible:
+    element: "您的历史"
+    direction: UP
+    timeout: 30000
+- takeScreenshot: ngon-ngu-10-zh-cai-dat
+# Về tiếng Việt: nhãn tab Dòng thời gian là "Thời gian" cho vừa ô tab.
+- runFlow:
+    file: chung/vao-khach.yaml
+    env:
+      LANGUAGE_NAME: Tiếng Việt
+- extendedWaitUntil:
+    visible: "Khám phá di sản văn hóa Việt Nam"
+    timeout: 60000
+- assertVisible: "Thời gian"
+- assertVisible: "Bản đồ di sản"
+- takeScreenshot: ngon-ngu-11-vi-trang-chu
+- tapOn: "Thời gian"
+- extendedWaitUntil:
+    visible: "Mỗi di sản có dòng thời gian riêng.*"
+    timeout: 30000
+- takeScreenshot: ngon-ngu-12-vi-dong-thoi-gian

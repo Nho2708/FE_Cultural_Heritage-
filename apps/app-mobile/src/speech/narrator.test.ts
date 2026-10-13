@@ -95,6 +95,50 @@ describe('nghe thuyết minh bằng giọng của thiết bị', () => {
     expect(spoken).toHaveLength(0);
   });
 
+  it('tự đọc khi vào màn: đợi nạp giọng rồi mới đọc, một lần', async () => {
+    const { engine, spoken } = fakeEngine([{ lang: 'vi-VN', id: 'v1' }]);
+    const narrator = new Narrator(engine, SENTENCES, 'vi-VN');
+    const ready = narrator.playWhenReady();
+    expect(spoken).toHaveLength(0);
+    await ready;
+    expect(spoken).toHaveLength(1);
+    expect(spoken[0]).toMatchObject({ text: 'Câu một.', options: { voice: 'v1' } });
+  });
+
+  it('tự đọc không chạy khi thiết bị không hỗ trợ hoặc không có giọng của ngôn ngữ', async () => {
+    const none = fakeEngine(null);
+    await new Narrator(none.engine, SENTENCES, 'vi-VN').playWhenReady();
+    expect(none.spoken).toHaveLength(0);
+
+    const wrong = fakeEngine([{ lang: 'en-US', id: 'e1' }]);
+    await new Narrator(wrong.engine, SENTENCES, 'vi-VN').playWhenReady();
+    expect(wrong.spoken).toHaveLength(0);
+  });
+
+  it('tự đọc không đè lên việc em đã tự bấm dừng hoặc đọc, và không chạy sau khi rời màn', async () => {
+    const stopped = fakeEngine([{ lang: 'vi-VN', id: 'v1' }]);
+    const first = new Narrator(stopped.engine, SENTENCES, 'vi-VN');
+    const pending = first.playWhenReady();
+    first.stop();
+    await pending;
+    expect(stopped.spoken).toHaveLength(0);
+
+    const left = fakeEngine([{ lang: 'vi-VN', id: 'v1' }]);
+    const second = new Narrator(left.engine, SENTENCES, 'vi-VN');
+    const later = second.playWhenReady();
+    second.dispose();
+    await later;
+    expect(left.spoken).toHaveLength(0);
+  });
+
+  it('nạp giọng chỉ một lần dù gọi nhiều lần', async () => {
+    let calls = 0;
+    const engine: SpeechEngine = { speak: () => undefined, stop: () => undefined, voices: async () => (calls += 1, [{ lang: 'vi-VN', id: 'v1' }]) };
+    const narrator = new Narrator(engine, SENTENCES, 'vi-VN');
+    await Promise.all([narrator.init(), narrator.init(), narrator.playWhenReady()]);
+    expect(calls).toBe(1);
+  });
+
   it('lỗi của giọng đọc đưa về trạng thái nghỉ', async () => {
     const { engine, spoken } = fakeEngine([{ lang: 'vi-VN', id: 'v1' }]);
     const narrator = new Narrator(engine, SENTENCES, 'vi-VN');
