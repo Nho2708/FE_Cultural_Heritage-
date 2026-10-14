@@ -20,6 +20,7 @@ Tên tệp 720p khớp với khung video của web học tập (`apps/web-hoc-ta
 - Logo: hai lớp ảnh (`public/logo/lop-cong.png`, `lop-chu.png`) tách từ logo của nhóm (`doc/design/logo/` ngoài kho), cùng nhịp với huy hiệu chuyển động trên web.
 - Màn hình sản phẩm là **ảnh chụp thật** của bản demo (web học tập, web quản trị), chụp bằng Playwright theo kịch bản. Dữ liệu trường, lớp, học sinh là dữ liệu mẫu của CSDL demo.
 - Nhạc nền do nhóm tự tạo bằng code (`scripts/tao-nhac.py`, thang ngũ cung gảy như đàn tranh), không dùng nhạc của người khác.
+- Lời đọc tiếng Việt của video nhà trường là giọng tổng hợp, tạo trên máy bằng [Piper](https://github.com/rhasspy/piper) với giọng `vi_VN-vais1000-medium` (dữ liệu VAIS-1000, CC BY 4.0; ghi công ở thẻ kết). Câu đọc ở `loiDoc` của `kich-ban/nha-truong.json`, từ tiếng Anh viết theo cách đọc. Nhạc nền tự hạ xuống khi có lời. Muốn dùng giọng người thật: thu từng câu, lưu đè `public/giong/nha-truong/<id cảnh>.wav`, chạy `python scripts/tao-giong-doc.py --chi-do` rồi dựng lại.
 - Phông Be Vietnam Pro, Playfair Display, Noto Sans KR/SC/JP (giấy phép SIL OFL) nạp qua `@remotion/google-fonts`.
 - Giấy phép Remotion: bản miễn phí dùng được cho cá nhân, tổ chức phi lợi nhuận và công ty đến 3 người (`node_modules/remotion/LICENSE.md`); nhóm sinh viên làm đồ án thuộc diện này.
 
@@ -34,6 +35,7 @@ node scripts/quay-du-khach.mjs            # ảnh màn hình cho khách, 5 ngôn
 node scripts/quay-nha-truong.mjs          # ảnh web quản trị và web học tập; tài khoản đọc từ scripts/tai-khoan.local.json (không đưa vào git)
 python scripts/thu-nho-anh.py             # cắt khung "Gợi ý cho bạn", thu ảnh khách về rộng 600 px
 python scripts/tao-nhac.py                # nhạc nền
+python scripts/tao-giong-doc.py          # lời đọc video nhà trường (cần: pip install piper-tts; tự tải giọng vào .cache/piper)
 node scripts/liet-ke-tai-nguyen.mjs       # danh sách ảnh có sẵn, toạ độ cuộn và vùng phóng
 node scripts/tao-phu-de.mjs               # phụ đề .vtt
 node scripts/dung-video.mjs               # dựng tất cả (khoảng 15 phút trên máy 12 nhân); hoặc chỉ một số: node scripts/dung-video.mjs du-khach-60s-en
@@ -43,6 +45,18 @@ npx remotion studio src/index.ts          # xem và chỉnh trong trình duyệt
 ## Giới hạn hiện tại
 
 - CSDL demo chưa có bản dịch thật cho nội dung di sản (tên và mô tả ở tiếng Anh, Hàn, Trung, Nhật đang là chữ giữ chỗ dạng "[en] …"). Bản video tiếng Anh, Hàn, Trung, Nhật dùng ảnh chụp đúng ngôn ngữ cho các màn hình giao diện (chọn ngôn ngữ, Trang chủ, mở khóa tóm tắt, 3D, nguồn) và ảnh tiếng Việt cho các màn hình nặng nội dung (Gần bạn, bản đồ, chi tiết, dòng thời gian, lịch sử); thẻ kết ghi rõ điều này. Có bản dịch thật thì chụp lại và bỏ danh sách `NOI_DUNG_VI` trong `src/DuKhach.tsx`.
-- Video nhà trường chưa có lời đọc (kế hoạch: trưởng nhóm đọc tiếng Việt theo đúng câu trong kịch bản); video xem hiểu được khi tắt tiếng nhờ chữ trên hình.
+- Lời đọc video nhà trường là giọng máy; nghe chưa tự nhiên bằng người đọc. Video vẫn xem hiểu được khi tắt tiếng nhờ chữ trên hình.
 - Phiếu đăng nhập trong video nhà trường là màn hình thật nhưng mật khẩu tạm là dữ liệu mẫu (script chặn yêu cầu đặt lại mật khẩu ở trình duyệt để không đổi dữ liệu demo).
-- Chưa có bản WebM và vòng lặp 8 giây "app trong tay"; chưa đặt video lên kho lưu tệp nên web học tập chưa hiện khung video (cần đặt `VITE_INTRO_VIDEO_BASE_URL`).
+- Chưa có vòng lặp 8 giây "app trong tay".
+
+## Đưa video lên web
+
+Video 720p đặt trên Cloudinary (kho lưu tệp mà backend đã dùng), thư mục `gioi-thieu`:
+
+```powershell
+$env:CLOUDINARY_CLOUD_NAME = '...'; $env:CLOUDINARY_API_KEY = '...'; $env:CLOUDINARY_API_SECRET = '...'   # lấy từ User Secrets backend (Storage:Cloudinary:*), không ghi vào tệp
+node scripts/tai-len-cloudinary.mjs        # mọi tệp ra/video/*.720.mp4; ghi đè bản cũ cùng tên
+```
+
+Web học tập đọc địa chỉ gốc từ `VITE_INTRO_VIDEO_BASE_URL` (CD lấy từ biến repo `DEMO_INTRO_VIDEO_BASE_URL`,
+hiện là `https://res.cloudinary.com/mo8vwbyg/video/upload/gioi-thieu`). Web xin đuôi `.webm` trước: Cloudinary tự chuyển từ bản MP4 nên không cần dựng WebM riêng.

@@ -1,44 +1,159 @@
 {
   "ten": "Video giới thiệu cho nhà trường",
-  "ghiChu": "Chữ trên hình tiếng Việt; phụ đề tiếng Việt và tiếng Anh sinh từ tệp này. Video xem được khi tắt tiếng; lời đọc tiếng Việt thu sau (trưởng nhóm đọc theo đúng câu dưới đây).",
+  "ghiChu": "Chữ trên hình tiếng Việt; phụ đề tiếng Việt và tiếng Anh sinh từ tệp này. Lời đọc tiếng Việt (loiDoc) tạo bằng giọng tổng hợp; thay bằng giọng người thật thì làm theo ghiChuLoiDoc.",
   "canh": [
-    { "id": "logo", "tu": 0, "den": 3 },
-    { "id": "cau-hoi", "tu": 3, "den": 10 },
-    { "id": "vai-tro", "tu": 10, "den": 18 },
-    { "id": "lop-hoc", "tu": 18, "den": 28 },
-    { "id": "soan-bai", "tu": 28, "den": 42 },
-    { "id": "kiem-tra", "tu": 42, "den": 52 },
-    { "id": "ba-cap", "tu": 52, "den": 66 },
-    { "id": "ket-qua", "tu": 66, "den": 76 },
-    { "id": "hai-noi", "tu": 76, "den": 83 },
-    { "id": "ket", "tu": 83, "den": 90 }
+    {
+      "id": "logo",
+      "tu": 0,
+      "den": 3
+    },
+    {
+      "id": "cau-hoi",
+      "tu": 3,
+      "den": 10
+    },
+    {
+      "id": "vai-tro",
+      "tu": 10,
+      "den": 18
+    },
+    {
+      "id": "lop-hoc",
+      "tu": 18,
+      "den": 28
+    },
+    {
+      "id": "soan-bai",
+      "tu": 28,
+      "den": 42
+    },
+    {
+      "id": "kiem-tra",
+      "tu": 42,
+      "den": 52
+    },
+    {
+      "id": "ba-cap",
+      "tu": 52,
+      "den": 66
+    },
+    {
+      "id": "ket-qua",
+      "tu": 66,
+      "den": 76
+    },
+    {
+      "id": "hai-noi",
+      "tu": 76,
+      "den": 83
+    },
+    {
+      "id": "ket",
+      "tu": 83,
+      "den": 90
+    }
   ],
   "chu": {
     "vi": {
-      "cau-hoi": ["Dạy di sản sao cho học sinh nhớ lâu?", "Mà không mất cả buổi tối soạn bài."],
-      "vai-tro": ["Vietnam Heritage cho nhà trường", "Quản trị trường tạo tài khoản giáo viên; giáo viên tạo lớp và tài khoản cho học sinh."],
-      "lop-hoc": ["Lớp học và phiếu đăng nhập", "Thêm học sinh là có ngay tài khoản: mã học sinh và mật khẩu tạm, in phiếu phát cho cả lớp."],
-      "soan-bai": ["AI soạn nháp, thầy cô quyết định", "Chọn di sản từ kho dữ liệu biên soạn theo nguồn Cục Di sản văn hóa. AI soạn bản nháp đúng cấp của lớp; thầy cô đọc lại, sửa và quyết định xuất bản."],
-      "kiem-tra": ["Câu hỏi và bài kiểm tra", "Tám dạng câu hỏi theo cấp. Câu AI sinh phải được duyệt mới dùng. Xuất bản xong, bài học có một mã để học sinh mở."],
-      "ba-cap": ["Ba cấp, ba cách học", "Cùng một di sản, học sinh cấp 1, 2, 3 học theo cách riêng: bố cục, dạng câu hỏi và cách xem kết quả đều khác nhau."],
-      "ket-qua": ["Kết quả về ngay", "Điểm từng em, mức thành thạo của lớp và gợi ý nội dung cần ôn."],
-      "hai-noi": ["Học trên web và điện thoại", "Học sinh học trên web hoặc app điện thoại, không có quảng cáo."],
-      "ket": ["Vietnam Heritage", "Bắt đầu với gói Miễn phí. Gửi liên hệ ở trang Dành cho nhà trường để được tạo tài khoản cho trường."],
-      "ghi-cong": "Dữ liệu di sản: Cục Di sản văn hóa (dsvh.gov.vn) · Nhạc: nhóm dự án tự soạn · Trường, lớp, học sinh trong video là dữ liệu mẫu",
-      "nhan-cap": ["Cấp 1", "Cấp 2", "Cấp 3"],
-      "vai": ["Quản trị trường", "Giáo viên", "Lớp học", "Học sinh"]
+      "cau-hoi": [
+        "Dạy di sản sao cho học sinh nhớ lâu?",
+        "Mà không mất cả buổi tối soạn bài."
+      ],
+      "vai-tro": [
+        "Vietnam Heritage cho nhà trường",
+        "Quản trị trường tạo tài khoản giáo viên; giáo viên tạo lớp và tài khoản cho học sinh."
+      ],
+      "lop-hoc": [
+        "Lớp học và phiếu đăng nhập",
+        "Thêm học sinh là có ngay tài khoản: mã học sinh và mật khẩu tạm, in phiếu phát cho cả lớp."
+      ],
+      "soan-bai": [
+        "AI soạn nháp, thầy cô quyết định",
+        "Chọn di sản từ kho dữ liệu biên soạn theo nguồn Cục Di sản văn hóa. AI soạn bản nháp đúng cấp của lớp; thầy cô đọc lại, sửa và quyết định xuất bản."
+      ],
+      "kiem-tra": [
+        "Câu hỏi và bài kiểm tra",
+        "Tám dạng câu hỏi theo cấp. Câu AI sinh phải được duyệt mới dùng. Xuất bản xong, bài học có một mã để học sinh mở."
+      ],
+      "ba-cap": [
+        "Ba cấp, ba cách học",
+        "Cùng một di sản, học sinh cấp 1, 2, 3 học theo cách riêng: bố cục, dạng câu hỏi và cách xem kết quả đều khác nhau."
+      ],
+      "ket-qua": [
+        "Kết quả về ngay",
+        "Điểm từng em, mức thành thạo của lớp và gợi ý nội dung cần ôn."
+      ],
+      "hai-noi": [
+        "Học trên web và điện thoại",
+        "Học sinh học trên web hoặc app điện thoại, không có quảng cáo."
+      ],
+      "ket": [
+        "Vietnam Heritage",
+        "Bắt đầu với gói Miễn phí. Gửi liên hệ ở trang Dành cho nhà trường để được tạo tài khoản cho trường."
+      ],
+      "ghi-cong": "Dữ liệu di sản: Cục Di sản văn hóa (dsvh.gov.vn) · Nhạc: nhóm dự án tự soạn · Giọng đọc tổng hợp: Piper, giọng vais1000 (dữ liệu VAIS-1000, CC BY 4.0) · Trường, lớp, học sinh trong video là dữ liệu mẫu",
+      "nhan-cap": [
+        "Cấp 1",
+        "Cấp 2",
+        "Cấp 3"
+      ],
+      "vai": [
+        "Quản trị trường",
+        "Giáo viên",
+        "Lớp học",
+        "Học sinh"
+      ]
     },
     "en": {
-      "cau-hoi": ["How do you teach heritage that sticks?", "Without spending every evening preparing."],
-      "vai-tro": ["Vietnam Heritage for schools", "The school admin creates teacher accounts; teachers create classes and student accounts."],
-      "lop-hoc": ["Classes and sign-in sheets", "Adding a student creates their account: a student code and a temporary password, printed on a sign-in sheet."],
-      "soan-bai": ["AI drafts, teachers decide", "Pick a heritage site from a library built on official data. AI drafts the lesson for the class level; you review, edit and decide when to publish."],
-      "kiem-tra": ["Questions and quizzes", "Eight question types by level. AI questions are used only after approval. Once published, the lesson gets one code."],
-      "ba-cap": ["Three levels, three ways to learn", "Same heritage site, three ways to learn: layout, question types and results differ for primary, lower and upper secondary."],
-      "ket-qua": ["Results right away", "Each student's score, class mastery and what to review."],
-      "hai-noi": ["On the web and on the phone", "Students learn on the web or the phone app, with no ads."],
-      "ket": ["Vietnam Heritage", "Start with the free plan. Send us a message from the For Schools page to set up your school."],
-      "ghi-cong": "Heritage data: Department of Cultural Heritage (dsvh.gov.vn) · Music: original by the project team · Schools, classes and students shown are sample data"
+      "cau-hoi": [
+        "How do you teach heritage that sticks?",
+        "Without spending every evening preparing."
+      ],
+      "vai-tro": [
+        "Vietnam Heritage for schools",
+        "The school admin creates teacher accounts; teachers create classes and student accounts."
+      ],
+      "lop-hoc": [
+        "Classes and sign-in sheets",
+        "Adding a student creates their account: a student code and a temporary password, printed on a sign-in sheet."
+      ],
+      "soan-bai": [
+        "AI drafts, teachers decide",
+        "Pick a heritage site from a library built on official data. AI drafts the lesson for the class level; you review, edit and decide when to publish."
+      ],
+      "kiem-tra": [
+        "Questions and quizzes",
+        "Eight question types by level. AI questions are used only after approval. Once published, the lesson gets one code."
+      ],
+      "ba-cap": [
+        "Three levels, three ways to learn",
+        "Same heritage site, three ways to learn: layout, question types and results differ for primary, lower and upper secondary."
+      ],
+      "ket-qua": [
+        "Results right away",
+        "Each student's score, class mastery and what to review."
+      ],
+      "hai-noi": [
+        "On the web and on the phone",
+        "Students learn on the web or the phone app, with no ads."
+      ],
+      "ket": [
+        "Vietnam Heritage",
+        "Start with the free plan. Send us a message from the For Schools page to set up your school."
+      ],
+      "ghi-cong": "Heritage data: Department of Cultural Heritage (dsvh.gov.vn) · Music: original by the project team · Synthetic voice: Piper, vais1000 voice (VAIS-1000 data, CC BY 4.0) · Schools, classes and students shown are sample data"
     }
+  },
+  "ghiChuLoiDoc": "loiDoc là câu để tạo giọng đọc (scripts/tao-giong-doc.py); từ tiếng Anh viết theo cách đọc. Muốn thay bằng giọng người thật: thu từng câu, lưu đè public/giong/nha-truong/<id cảnh>.wav rồi chạy lại scripts/tao-giong-doc.py --chi-do.",
+  "loiDoc": {
+    "cau-hoi": "Làm sao dạy di sản để học sinh hiểu và nhớ lâu, mà không mất cả buổi tối soạn bài?",
+    "vai-tro": "Với Việt Nam Hé ri tịch, quản trị trường tạo tài khoản giáo viên; giáo viên tạo lớp và tài khoản cho học sinh.",
+    "lop-hoc": "Thêm học sinh là có ngay tài khoản: mã học sinh và mật khẩu tạm, in phiếu phát cho cả lớp.",
+    "soan-bai": "Chọn di sản từ kho dữ liệu biên soạn theo nguồn Cục Di sản văn hóa. Ây ai soạn bản nháp đúng cấp của lớp; thầy cô đọc lại, sửa và quyết định xuất bản.",
+    "kiem-tra": "Tám dạng câu hỏi theo cấp. Câu do Ây ai sinh phải được duyệt mới dùng. Xuất bản xong, bài học có một mã để học sinh mở.",
+    "ba-cap": "Cùng một di sản, học sinh cấp một, cấp hai, cấp ba học theo cách riêng: bố cục, dạng câu hỏi và cách xem kết quả đều khác nhau.",
+    "ket-qua": "Kết quả về ngay: điểm từng em, mức thành thạo của lớp, và gợi ý nội dung cần ôn.",
+    "hai-noi": "Học sinh học trên uếp hoặc ứng dụng điện thoại, không có quảng cáo.",
+    "ket": "Bắt đầu với gói Miễn phí. Gửi liên hệ ở trang Dành cho nhà trường để được tạo tài khoản cho trường."
   }
 }
