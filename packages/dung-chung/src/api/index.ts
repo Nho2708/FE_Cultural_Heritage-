@@ -2,6 +2,7 @@ export * from './client';
 export * from './discovery';
 export * from './guest';
 export * from './ads';
+export * from './schoolInquiry';
 export * from './studentApi';
 export { studentCodeOf } from './types';
 export type * from './types';

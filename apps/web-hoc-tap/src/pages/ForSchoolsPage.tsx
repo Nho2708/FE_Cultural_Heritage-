@@ -4,6 +4,7 @@ import { ADMIN_WEB_URL } from '../config/env';
 import { useI18n } from '../i18n/context';
 import { HeroAnchor, HeroLink, IntroHero, RevealList, SectionTitle } from '../intro/IntroParts';
 import { IntroVideo } from '../intro/IntroVideo';
+import { SchoolContactForm } from '../intro/SchoolContactForm';
 import { revealItem } from '../intro/reveal';
 
 // Trang Dành cho nhà trường (công khai, chỉ tiếng Việt): cho ban giám hiệu, quản trị trường và giáo viên của trường chưa
@@ -201,6 +202,8 @@ export function ForSchoolsPage() {
             </div>
           </div>
         </section>
+
+        <SchoolContactForm />
       </div>
     </>
   );
