@@ -19,6 +19,7 @@ export * from './validation/classroom';
 export * from './validation/fields';
 export * from './validation/heritage';
 export * from './validation/password';
+export * from './validation/schoolInquiry';
 export * from './validation/studentCode';
 export * from './statistics';
 export * from './overview';
