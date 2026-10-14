@@ -17,7 +17,7 @@ interface AuthLayoutProps {
 export function AuthLayout({ photo, title, subtitle, children }: AuthLayoutProps) {
   return (
     <div className="dsvmd:grid dsvmd:min-h-[calc(100dvh-var(--dsv-topbar-height))] dsvmd:grid-cols-2">
-      <title>{`${title} · DSVHVN`}</title>
+      <title>{`${title} · Vietnam Heritage`}</title>
       <figure className="relative hidden overflow-hidden bg-(--dsv-card-placeholder-bg) dsvmd:block">
         {/* Chỉ tải ảnh từ 841px: dưới mốc này khung ảnh bị ẩn, <source> theo media query tránh tải thừa trên điện thoại. */}
         <picture>
