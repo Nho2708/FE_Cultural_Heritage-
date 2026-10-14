@@ -10,6 +10,7 @@ Video xuất ra, ảnh chụp màn hình và nhạc đều sinh lại được b
 | Video cho khách du lịch, bản dọc 45 giây, 9:16 | `du-khach-45s-doc-<…>` | `du-khach-45s-doc.<ngôn ngữ>.1080.mp4`, `.720.mp4` |
 | Video cho nhà trường, 90 giây, 16:9 | `nha-truong-90s` | `nha-truong-90s.vi.1080.mp4`, `.720.mp4` |
 | Phụ đề WebVTT | — | `ra/phu-de/*.vtt` (bản ngang chép sang `apps/web-hoc-tap/public/video/`) |
+| Ảnh bìa không chữ (1280×720, 720×1280) | khung huy hiệu của `logo-16x9`, `logo-9x16` | `anh-bia.<cỡ>.jpeg` |
 
 Tên tệp 720p khớp với khung video của web học tập (`apps/web-hoc-tap/src/intro/IntroVideo.tsx`: `<tên>.<ngôn ngữ>.720.mp4`, phụ đề `/video/<tên>.<ngôn ngữ>.vtt`).
 
@@ -44,4 +45,4 @@ npx remotion studio src/index.ts          # xem và chỉnh trong trình duyệt
 - CSDL demo chưa có bản dịch thật cho nội dung di sản (tên và mô tả ở tiếng Anh, Hàn, Trung, Nhật đang là chữ giữ chỗ dạng "[en] …"). Bản video tiếng Anh, Hàn, Trung, Nhật dùng ảnh chụp đúng ngôn ngữ cho các màn hình giao diện (chọn ngôn ngữ, Trang chủ, mở khóa tóm tắt, 3D, nguồn) và ảnh tiếng Việt cho các màn hình nặng nội dung (Gần bạn, bản đồ, chi tiết, dòng thời gian, lịch sử); thẻ kết ghi rõ điều này. Có bản dịch thật thì chụp lại và bỏ danh sách `NOI_DUNG_VI` trong `src/DuKhach.tsx`.
 - Video nhà trường chưa có lời đọc (kế hoạch: trưởng nhóm đọc tiếng Việt theo đúng câu trong kịch bản); video xem hiểu được khi tắt tiếng nhờ chữ trên hình.
 - Phiếu đăng nhập trong video nhà trường là màn hình thật nhưng mật khẩu tạm là dữ liệu mẫu (script chặn yêu cầu đặt lại mật khẩu ở trình duyệt để không đổi dữ liệu demo).
-- Chưa có bản WebM, ảnh bìa và vòng lặp 8 giây "app trong tay"; chưa đặt video lên kho lưu tệp nên web học tập chưa hiện khung video (cần đặt `VITE_INTRO_VIDEO_BASE_URL`).
+- Chưa có bản WebM và vòng lặp 8 giây "app trong tay"; chưa đặt video lên kho lưu tệp nên web học tập chưa hiện khung video (cần đặt `VITE_INTRO_VIDEO_BASE_URL`).
