@@ -57,7 +57,7 @@ export function ProjectorView({ target, onClose }: { target: CodeTarget; onClose
       <div className="flex flex-1 flex-col items-center justify-center gap-8 px-6 text-center">
         <p className="flex items-center gap-3 text-[clamp(1.25rem,3vw,2.25rem)]">
           <Icon name="keyboard" size={40} />
-          Mở Học di sản → Nhập mã
+          Mở Vietnam Heritage → Nhập mã
         </p>
         <p className="text-[clamp(3rem,13vw,10rem)] leading-none font-medium" data-testid="ma-chieu-bang">
           <CodeDisplay code={spacedLessonCode(target.accessCode)} className="whitespace-pre-wrap" />

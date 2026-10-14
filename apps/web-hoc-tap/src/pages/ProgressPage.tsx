@@ -267,7 +267,7 @@ function LevelTwoThreeProgress({ progress, rows, level }: { progress: StudentPro
 
   return (
     <section data-bo-cuc={`cap-${level}`} className="dsv-content dsv-section">
-      <title>Tiến độ của em · Học di sản</title>
+      <title>Tiến độ của em · Vietnam Heritage</title>
       <h1 className="type-h1 text-on-surface">Tiến độ của em</h1>
       <p className="mt-2 type-body-m text-on-surface-variant">{subtitle}</p>
       <div className="mt-6">
@@ -300,7 +300,7 @@ function LevelOneProgress({ progress, rows }: { progress: StudentProgress; rows:
 
   return (
     <section data-bo-cuc="cap-1" className="dsv-content dsv-section">
-      <title>Sao của em · Học di sản</title>
+      <title>Sao của em · Vietnam Heritage</title>
       <div className="mx-auto flex max-w-[960px] flex-col gap-(--dsv-block-gap)">
         <div>
           <h1 className="type-h1 text-on-surface">Sao của em</h1>
@@ -414,7 +414,7 @@ export function ProgressPage() {
   if (progress.isPending || history.isPending) {
     return (
       <section className="dsv-content dsv-section">
-        <title>Tiến độ của em · Học di sản</title>
+        <title>Tiến độ của em · Vietnam Heritage</title>
         <LoadingState rows={4} />
       </section>
     );
@@ -422,7 +422,7 @@ export function ProgressPage() {
   if (progress.isError || history.isError) {
     return (
       <section className="dsv-content dsv-section">
-        <title>Tiến độ của em · Học di sản</title>
+        <title>Tiến độ của em · Vietnam Heritage</title>
         <ErrorState
           error={progress.error ?? history.error}
           onRetry={() => {

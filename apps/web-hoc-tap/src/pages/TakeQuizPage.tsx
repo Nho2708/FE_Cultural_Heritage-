@@ -18,7 +18,7 @@ import { useQuizIntro } from '../quiz/useQuizIntro';
 function Frame({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mx-auto flex min-h-dvh max-w-[640px] flex-col justify-center gap-5 px-4 py-10">
-      <title>{`${title} · Học di sản`}</title>
+      <title>{`${title} · Vietnam Heritage`}</title>
       {children}
     </section>
   );

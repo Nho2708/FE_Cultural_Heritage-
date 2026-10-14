@@ -13,7 +13,7 @@ bài học cho lớp; học sinh của lớp đăng nhập, gõ mã và thấy b
 | — | Tạo bài học: chọn lớp và di sản | Hộp thoại hai bước: chọn lớp (cấp hiện kèm), rồi chọn 1-10 di sản **đã xuất bản** (tìm theo tên, lọc tỉnh và loại, phân trang) và đặt tiêu đề. Mở từ Chi tiết lớp thì lớp chọn sẵn và khóa, bỏ bước 1. Tạo xong mở Soạn bài học |
 | `/giao-vien/bai-hoc/:baiHoc` | Soạn bài học | Thông tin bài (lớp khóa, tiêu đề, di sản); khối **Nội dung bài theo cấp** có bảng AI, tóm tắt, các phần theo khung của cấp, ý chính; cột phải: Mã bài học, điều kiện xuất bản, bài kiểm tra của bài. Nút: Nhân bản sang lớp khác · Lưu trữ · Lưu nháp (Lưu thay đổi) · Xuất bản (Xuất bản lại) |
 | — | Mã bài học | Hộp thoại: mã lớn, đường dẫn tới web học tập, Sao chép mã, Sao chép đường dẫn, **Chiếu lên bảng** |
-| — | Chiếu lên bảng | Toàn màn hình nền tối: "Mở Học di sản → Nhập mã" và mã chia nhóm `BH 7F3 K2Q` chữ rất lớn, Esc để thoát. Học sinh **gõ tay**, không quét mã QR |
+| — | Chiếu lên bảng | Toàn màn hình nền tối: "Mở Vietnam Heritage → Nhập mã" và mã chia nhóm `BH 7F3 K2Q` chữ rất lớn, Esc để thoát. Học sinh **gõ tay**, không quét mã QR |
 | — | Nhân bản bài học sang lớp khác | Chọn lớp đích khác của thầy cô (khối và cấp hiện kèm); lớp khác cấp thì cảnh báo xem lại hoặc nhờ AI soạn lại; tạo bài Nháp chưa có mã |
 | `/giao-vien/lop/:lop?tab=bai-hoc` | Chi tiết lớp, tab Bài học | Bài học của riêng lớp và nút "Tạo bài học" với lớp khóa sẵn |
 

@@ -17,7 +17,7 @@ const TOC = [
 export function LevelThree({ user, classroom }: { user: StudentProfile; classroom: StudentClassDetail }) {
   return (
     <section className="dsv-content dsv-section" data-bo-cuc="cap-3">
-      <title>Trang học của em · Học di sản</title>
+      <title>Trang học của em · Vietnam Heritage</title>
       <div className="grid gap-(--dsv-block-gap) lg:grid-cols-[240px_1fr]">
         <nav aria-label="Mục lục" className="h-fit rounded-md border border-border bg-surface p-2 lg:sticky lg:top-20">
           <p className="flex items-center gap-2 px-3 py-2 type-label text-on-surface-variant">

@@ -34,7 +34,7 @@ Ba khu làm việc và màn hình của chúng tách chunk riêng, chỉ tải s
 
 | Route | Màn hình | Ai mở | Ghi chú |
 |---|---|---|---|
-| `/dang-nhap` | Đăng nhập | Khách | Một ô "Email hoặc tên đăng nhập"; không có "Đăng ký". Sai thông tin (kể cả tài khoản học sinh) và tài khoản bị chặn báo In line. Dòng cố định "Học sinh đăng nhập ở trang Học di sản hoặc ứng dụng trên điện thoại" kèm đường dẫn. Thành công → trang bị chặn trước đó nếu vai trò mở được, còn lại trang mặc định theo vai trò |
+| `/dang-nhap` | Đăng nhập | Khách | Một ô "Email hoặc tên đăng nhập"; không có "Đăng ký". Sai thông tin (kể cả tài khoản học sinh) và tài khoản bị chặn báo In line. Dòng cố định "Học sinh đăng nhập ở trang Vietnam Heritage hoặc ứng dụng trên điện thoại" kèm đường dẫn. Thành công → trang bị chặn trước đó nếu vai trò mở được, còn lại trang mặc định theo vai trò |
 | `/quen-mat-khau` | Quên mật khẩu | Khách | Luôn cùng một câu của máy chủ; nút đổi thành "Gửi lại liên kết" |
 | `/dat-mat-khau?token=…` | Đặt mật khẩu | Khách | Kiểm liên kết trước, hiện tên đăng nhập và hạn; mật khẩu mới + nhập lại; dùng chung cho tài khoản mới (48 giờ) và quên mật khẩu (30 phút). Hỏng → báo lỗi + "Gửi lại liên kết". Xong → Đăng nhập, tên đăng nhập điền sẵn |
 | `/tai-khoan` | Hồ sơ cá nhân | 3 vai trò | `?tab=thong-tin` (mặc định) · `doi-mat-khau`. Sửa họ tên, số điện thoại, ảnh (đường dẫn); email, tên đăng nhập, vai trò, trường chỉ đọc. Đổi mật khẩu: mật khẩu mới phải khác mật khẩu cũ, nhận access token mới |

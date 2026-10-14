@@ -1,6 +1,6 @@
 # Web học tập — khung tối thiểu
 
-Ứng dụng React thứ hai (tên hiển thị "Học di sản"), tách khỏi web quản trị: khám phá di sản công khai cho khách và học
+Ứng dụng React thứ hai (tên hiển thị "Vietnam Heritage"), tách khỏi web quản trị: khám phá di sản công khai cho khách và học
 sinh, khu học của học sinh đăng nhập bằng **mã học sinh + mật khẩu**. Giao diện đổi theo **cấp học** của học sinh (suy từ
 khối lớp) bằng bộ token; một bố cục, một bộ component, một bộ câu chữ cho cả ba cấp. Bản này có: năm màn hình khám phá công khai (xem [kham-pha-di-san.md](kham-pha-di-san.md)), học sinh đăng nhập, đổi mật khẩu lần đầu, trang học của em (ba bản bố cục theo cấp) và bốn bộ giao diện. Các
 màn hình khác đã có route và guard, hiện "Đang xây dựng".

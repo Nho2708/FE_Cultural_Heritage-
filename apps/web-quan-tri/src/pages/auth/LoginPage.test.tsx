@@ -116,6 +116,6 @@ describe('màn hình Đăng nhập', () => {
     const link = await screen.findByRole('link', { name: /Xem giới thiệu cho nhà trường/ });
     expect(link).toHaveAttribute('href', 'http://hoc.test/nha-truong');
     expect(link).toHaveAttribute('target', '_blank');
-    expect(link.closest('p')).toHaveTextContent(/^Trường bạn chưa dùng Học di sản\?/);
+    expect(link.closest('p')).toHaveTextContent(/^Trường bạn chưa dùng Vietnam Heritage\?/);
   });
 });

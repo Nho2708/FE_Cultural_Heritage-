@@ -1,9 +1,9 @@
 import type { Strings } from './vi';
 
 export const ko: Strings = {
-  brandName: 'Học di sản',
+  brandName: 'Vietnam Heritage',
   brandTagline: '베트남 문화유산',
-  documentTitle: (page) => `${page} · Học di sản`,
+  documentTitle: (page) => `${page} · Vietnam Heritage`,
 
   common: {
     close: '닫기',
@@ -54,14 +54,14 @@ export const ko: Strings = {
     android: 'Android 앱 받기',
     about: '학교와 교사가 베트남 유산에 관한 수업과 시험을 만드는 플랫폼입니다. 누구나 유산을 탐색할 수 있습니다.',
     source: '유산 콘텐츠는 베트남 문화유산국(dsvh.gov.vn) 자료를 참고했습니다. 사진은 Wikimedia Commons에서 가져왔으며 사진마다 저작자를 표시합니다.',
-    aboutColumn: 'Học di sản 소개',
+    aboutColumn: 'Vietnam Heritage 소개',
     intro: '소개',
     forSchools: '학교용 안내',
-    copyright: '© 2026 Học di sản',
+    copyright: '© 2026 Vietnam Heritage',
   },
 
   home: {
-    title: 'Học di sản · DSVHVN',
+    title: 'Vietnam Heritage · DSVHVN',
     kicker: '베트남 문화유산',
     heroTitle: '베트남의 문화유산을 만나 보세요',
     heroText: (total) =>
@@ -88,7 +88,7 @@ export const ko: Strings = {
     circleCount: (n) => `유산 ${n}곳`,
     appKicker: '모바일 앱',
     appTitle: '하나의 앱, 두 가지 모드: 관광과 학습',
-    appText: 'Học di sản 휴대폰 앱에는 두 가지 모드가 있으며, 처음 열 때 하나를 고릅니다.',
+    appText: 'Vietnam Heritage 휴대폰 앱에는 두 가지 모드가 있으며, 처음 열 때 하나를 고릅니다.',
     appVisitorTitle: '관광객',
     appVisitorText: '유산 지도와 "내 주변", 연표, 3D 모델, 5개 언어 음성 해설. 계정이 필요 없습니다.',
     appStudentTitle: '학생',
@@ -244,7 +244,7 @@ export const ko: Strings = {
     problem: {
       closed: '광고를 끝까지 보지 않아 요약이 아직 열리지 않았습니다. 광고를 끝까지 다시 시청해 주세요.',
       noFill: '지금은 표시할 광고가 없습니다. 잠시 후 다시 시도해 주세요.',
-      unsupported: '이 브라우저나 기기에서는 보상형 광고를 표시할 수 없습니다. 휴대전화에서 시도하거나 Học di sản 앱을 이용해 주세요.',
+      unsupported: '이 브라우저나 기기에서는 보상형 광고를 표시할 수 없습니다. 휴대전화에서 시도하거나 Vietnam Heritage 앱을 이용해 주세요.',
       blocked: '광고를 불러오지 못했습니다. 광고 차단 프로그램을 사용 중이라면 이 페이지에서 끄고 다시 시도해 주세요.',
       timeout: '광고를 불러오는 데 시간이 너무 오래 걸립니다. 잠시 후 다시 시도해 주세요.',
       rejected: '요약을 열지 못했습니다. 광고를 끝까지 보거나 잠시 후 다시 시도해 주세요.',
@@ -381,10 +381,10 @@ export const ko: Strings = {
     title: '소개',
     kicker: '소개',
     heroTitle: '나의 언어로 만나는 베트남 유산',
-    heroText: 'Học di sản은 베트남의 문화유산과 자연유산을 탐색하는 무료 웹사이트이자 앱입니다. 베트남어, 영어, 한국어, 중국어, 일본어로 이용할 수 있고 계정이 필요 없습니다.',
+    heroText: 'Vietnam Heritage는 베트남의 문화유산과 자연유산을 탐색하는 무료 웹사이트이자 앱입니다. 베트남어, 영어, 한국어, 중국어, 일본어로 이용할 수 있고 계정이 필요 없습니다.',
     start: '탐색 시작하기',
     openMap: '유산 지도 열기',
-    featuresTitle: 'Học di sản으로 할 수 있는 일',
+    featuresTitle: 'Vietnam Heritage로 할 수 있는 일',
     nearbyTitle: '지도에서 내 주변 유산 찾기',
     nearbyText: '모든 유산이 호앙사, 쯔엉사 군도를 포함한 베트남 지도 위에 핀으로 표시됩니다. "내 주변"을 켜면 가까운 유산을 볼 수 있습니다. 위치는 거리 계산에만 쓰이며 저장되지 않습니다.',
     nearbyLink: '유산 지도 열기',
@@ -396,15 +396,15 @@ export const ko: Strings = {
     modelText: '3D 모델을 돌려 유산을 모든 방향에서 살펴보고, 연표를 따라 시대와 사건을 차례로 둘러보세요.',
     modelLink: '연표 보기',
     sourceTitle: '정보 출처',
-    sourceText: '정보는 베트남 문화유산국(dsvh.gov.vn)의 자료를 바탕으로 요약했으며 유산마다 출처를 표시합니다. Học di sản은 문화유산국의 공식 사이트가 아닙니다. 사진은 Wikimedia Commons에서 가져왔으며 사진마다 저작자를 표시합니다.',
+    sourceText: '정보는 베트남 문화유산국(dsvh.gov.vn)의 자료를 바탕으로 요약했으며 유산마다 출처를 표시합니다. Vietnam Heritage는 문화유산국의 공식 사이트가 아닙니다. 사진은 Wikimedia Commons에서 가져왔으며 사진마다 저작자를 표시합니다.',
     appTitle: '휴대폰으로 가지고 다니세요',
-    appText: 'Android용 Học di sản 앱을 설치하고 관광객 모드를 고르면 여행 중에 지도, "내 주변", 3D 모델, 음성 해설을 쓸 수 있습니다.',
+    appText: 'Android용 Vietnam Heritage 앱을 설치하고 관광객 모드를 고르면 여행 중에 지도, "내 주변", 3D 모델, 음성 해설을 쓸 수 있습니다.',
     appWeb: '설치하지 않아도 됩니다. 위의 기능은 모두 브라우저에서 바로 쓸 수 있습니다.',
     schoolsTitle: '학교용 안내',
     schoolsText: '교사는 반을 위한 유산 수업과 시험을 만들고, 학생은 수업 코드로 초등·중학교·고등학교 수준에 맞춰 공부합니다.',
     schoolsLink: '학교용 페이지 보기',
     videoTitle: '소개 영상',
-    videoLabel: 'Học di sản 소개 영상',
+    videoLabel: 'Vietnam Heritage 소개 영상',
     videoNoSupport: '이 브라우저에서는 영상을 재생할 수 없습니다.',
   },
 

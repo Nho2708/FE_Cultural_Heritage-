@@ -10,7 +10,7 @@ Repo gồm **hai ứng dụng web** và **một gói dùng chung**, quản lý b
 | Workspace | Thư mục | Tên hiển thị | Cổng dev | Dành cho |
 |---|---|---|---|---|
 | `@dsvhvn/web-quan-tri` | `apps/web-quan-tri` | Trang quản trị | 5173 | Giáo viên (`/giao-vien`), quản trị trường (`/truong`), quản trị hệ thống (`/quan-tri`) — một ứng dụng, menu theo vai trò |
-| `@dsvhvn/web-hoc-tap` | `apps/web-hoc-tap` | Học di sản | 5174 | Khách (khám phá di sản công khai) và học sinh (khu học), giao diện theo cấp học 1 / 2 / 3 |
+| `@dsvhvn/web-hoc-tap` | `apps/web-hoc-tap` | Vietnam Heritage | 5174 | Khách (khám phá di sản công khai) và học sinh (khu học), giao diện theo cấp học 1 / 2 / 3 |
 | `@dsvhvn/dung-chung` | `packages/dung-chung` | — | — | Design token và bộ giao diện theo cấp, component giao diện web, lớp gọi API, kiểu dữ liệu, phiên đăng nhập, kiểm tra hợp lệ, câu thông báo |
 
 **App mobile** (React Native + Expo, một app hai chế độ: Khách tham quan và Học sinh) nằm ở [`apps/app-mobile`](apps/app-mobile) nhưng **không thuộc npm workspaces**: Expo SDK 57 cố định React 19.2.3
