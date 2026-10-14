@@ -47,7 +47,7 @@ export function EnterCodePage() {
 
   return (
     <section className="dsv-content dsv-section" data-bo-man-hinh="nhap-ma">
-      <title>Nhập mã bài học · Học di sản</title>
+      <title>Nhập mã bài học · Vietnam Heritage</title>
       <div className="mx-auto flex max-w-[560px] flex-col gap-(--dsv-block-gap)">
         <header>
           <h1 className="type-h1 text-on-surface">Nhập mã bài học</h1>

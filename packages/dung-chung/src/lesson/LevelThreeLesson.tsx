@@ -52,7 +52,7 @@ export function LevelThreeLesson({ lesson }: { lesson: StudentLesson }) {
 
   return (
     <section className="dsv-content dsv-section" data-bo-cuc="cap-3" aria-labelledby="tieu-de-bai">
-      {!links.preview && <title>{`${lesson.title ?? 'Bài học'} · Học di sản`}</title>}
+      {!links.preview && <title>{`${lesson.title ?? 'Bài học'} · Vietnam Heritage`}</title>}
       <div className="grid gap-(--dsv-block-gap) lg:grid-cols-[240px_minmax(0,1fr)]">
         <div className="h-fit lg:sticky lg:top-20">
           <nav aria-label="Mục lục" className="rounded-md border border-border bg-surface p-2">

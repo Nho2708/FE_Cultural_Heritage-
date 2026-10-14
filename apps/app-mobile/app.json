@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Học di sản",
+    "name": "Vietnam Heritage",
     "slug": "hoc-di-san",
     "scheme": "hocdisan",
     "version": "0.1.0",
@@ -14,7 +14,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Học di sản dùng vị trí của bạn để gợi ý di sản gần bạn. Vị trí chỉ để tính khoảng cách trên máy này và không được lưu."
+          "locationWhenInUsePermission": "Vietnam Heritage dùng vị trí của bạn để gợi ý di sản gần bạn. Vị trí chỉ để tính khoảng cách trên máy này và không được lưu."
         }
       ],
       [
@@ -22,7 +22,7 @@
         {
           "androidAppId": "ca-app-pub-3940256099942544~3347511713",
           "iosAppId": "ca-app-pub-3940256099942544~1458002511",
-          "userTrackingPermission": "Học di sản dùng nhận dạng quảng cáo để hiện quảng cáo phù hợp mọi lứa tuổi."
+          "userTrackingPermission": "Vietnam Heritage dùng nhận dạng quảng cáo để hiện quảng cáo phù hợp mọi lứa tuổi."
         }
       ],
       "expo-image",

@@ -16,7 +16,7 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
 
   return (
     <section className="dsv-content dsv-section" data-bo-cuc="cap-1">
-      <title>Trang học của em · Học di sản</title>
+      <title>Trang học của em · Vietnam Heritage</title>
       <div className="mx-auto flex max-w-[860px] flex-col gap-(--dsv-block-gap)">
         <div className="flex items-center gap-(--dsv-inline-gap) rounded-lg bg-primary-container p-(--dsv-inline-gap) text-on-primary-container">
           <Illustration state="chao" className="size-24 bg-surface" />

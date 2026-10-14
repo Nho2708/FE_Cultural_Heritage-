@@ -9,7 +9,7 @@ export function PendingScreen({ screen }: { screen: Screen }) {
   const { user } = useAuth();
   return (
     <section className="dsv-content dsv-section">
-      <title>{`${screen.name} · Học di sản`}</title>
+      <title>{`${screen.name} · Vietnam Heritage`}</title>
       <div className="max-w-[760px] py-10">
         <p className="type-label-kicker text-on-surface-muted">ĐANG XÂY DỰNG</p>
         <h1 className="mt-2 type-h1 text-on-surface">{screen.name}</h1>
