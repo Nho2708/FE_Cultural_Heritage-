@@ -15,15 +15,46 @@ const LABEL: Record<IllustrationState, string> = {
 };
 
 function Mascot({ state }: { state: IllustrationState }) {
-  const mouth = state === 'dong-vien' ? 'M40 70 Q60 60 80 70' : 'M40 64 Q60 84 80 64';
   return (
-    <>
-      <circle cx="60" cy="58" r="40" fill="var(--dsv-color-secondary-container)" stroke="currentColor" strokeWidth="4" />
-      <circle cx="46" cy="50" r="5" fill="currentColor" />
-      <circle cx="74" cy="50" r="5" fill="currentColor" />
-      <path d={mouth} fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-      {state === 'chuc-mung' && <path d="M18 18l8 8M102 18l-8 8M60 4v10" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />}
-    </>
+    <g className="dsv-mascot">
+      {/* Ears */}
+      <circle cx="34" cy="32" r="14" fill="#FBBF24" stroke="currentColor" strokeWidth="3.5" />
+      <circle cx="34" cy="32" r="7" fill="#FDE68A" />
+      <circle cx="86" cy="32" r="14" fill="#FBBF24" stroke="currentColor" strokeWidth="3.5" />
+      <circle cx="86" cy="32" r="7" fill="#FDE68A" />
+
+      {/* Main Face */}
+      <circle cx="60" cy="62" r="38" fill="var(--dsv-color-secondary-container, #FDE047)" stroke="currentColor" strokeWidth="3.5" />
+
+      {/* Twinkly Happy Eyes */}
+      <ellipse cx="45" cy="54" rx="5" ry="6.5" fill="currentColor" />
+      <circle cx="43.5" cy="51.5" r="2" fill="#FFFFFF" />
+      <ellipse cx="75" cy="54" rx="5" ry="6.5" fill="currentColor" />
+      <circle cx="73.5" cy="51.5" r="2" fill="#FFFFFF" />
+
+      {/* Rosy Cheeks */}
+      <ellipse cx="34" cy="66" rx="6.5" ry="4" fill="#FB7185" opacity="0.65" />
+      <ellipse cx="86" cy="66" rx="6.5" ry="4" fill="#FB7185" opacity="0.65" />
+
+      {/* Cute Nose */}
+      <ellipse cx="60" cy="61" rx="4" ry="3" fill="#D97706" />
+
+      {/* Cheerful Mouth */}
+      {state === 'dong-vien' ? (
+        <path d="M48 73 Q60 67 72 73" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
+      ) : (
+        <path d="M46 67 Q60 85 74 67 Z" fill="#EF4444" stroke="currentColor" strokeWidth="3" strokeLinejoin="round" />
+      )}
+
+      {/* Sparkles / Stars for Greeting & Celebration */}
+      {(state === 'chao' || state === 'chuc-mung') && (
+        <>
+          <path d="M16 16 L22 22 M104 16 L98 22 M60 8 L60 16" stroke="#F59E0B" strokeWidth="3.5" strokeLinecap="round" />
+          <circle cx="18" cy="42" r="3" fill="#F59E0B" />
+          <circle cx="102" cy="42" r="3" fill="#F59E0B" />
+        </>
+      )}
+    </g>
   );
 }
 

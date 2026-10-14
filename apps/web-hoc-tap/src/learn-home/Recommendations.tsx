@@ -30,31 +30,31 @@ function Action({ item, className }: { item: Suggestion; className?: string }) {
 function CardOne({ item }: { item: Suggestion }) {
   const short = GROUPS[item.group].short;
   return (
-    <li className="relative flex w-44 shrink-0 flex-col overflow-hidden rounded-lg border-2 border-border bg-surface sm:w-48">
-      <div className="relative aspect-[4/3] bg-(--dsv-card-placeholder-bg)">
+    <li className="dsv-rec-card relative flex w-48 shrink-0 flex-col overflow-hidden sm:w-52">
+      <div className="relative aspect-[4/3] bg-(--dsv-card-placeholder-bg) overflow-hidden" style={{ borderTopLeftRadius: '23px', borderTopRightRadius: '23px' }}>
         {item.hasImage ? (
           <Thumbnail url={item.imageUrl} width={400} />
         ) : (
-          <span className="absolute inset-0 flex items-center justify-center text-on-surface-muted" aria-hidden="true">
-            <Icon name={item.group === 'newLesson' ? 'sparkles' : item.group === 'quiz' ? 'play' : 'book-open'} size={40} />
+          <span className="absolute inset-0 flex items-center justify-center text-on-surface-muted bg-amber-50/50" aria-hidden="true">
+            <Icon name={item.group === 'newLesson' ? 'sparkles' : item.group === 'quiz' ? 'play' : 'book-open'} size={40} className="text-amber-500" />
           </span>
         )}
       </div>
-      <div className="flex flex-1 flex-col gap-2 p-3">
-        <p className="type-label text-primary">{short}</p>
-        <h3 className="type-h4 text-on-surface">
+      <div className="flex flex-1 flex-col gap-2 p-3.5">
+        <span className="w-fit rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-900 border border-amber-300" style={{ borderRadius: '9999px' }}>{short}</span>
+        <h3 className="type-h4 font-bold text-on-surface line-clamp-2">
           {item.action ? (
-            <Link to={item.action.to} className="after:absolute after:inset-0 after:content-['']">
+            <Link to={item.action.to} className="after:absolute after:inset-0 after:content-[''] hover:text-primary">
               {item.title}
             </Link>
           ) : (
             item.title
           )}
         </h3>
-        {item.group === 'newLesson' && item.detail && <p className="type-body-s text-on-surface-variant">{item.detail}</p>}
+        {item.group === 'newLesson' && item.detail && <p className="type-body-s text-on-surface-variant font-medium">{item.detail}</p>}
         {item.badge && <Badge tone="warning">{item.badge}</Badge>}
-        <div className="relative z-10 mt-auto">
-          <SpeakButton text={`${short}. ${item.speech}`} label={`Nghe: ${item.title}`} />
+        <div className="relative z-10 mt-auto pt-1">
+          <SpeakButton text={`${short}. ${item.speech}`} label={`Nghe: ${item.title}`} size="sm" className="dsv-speak-btn" />
         </div>
       </div>
     </li>
