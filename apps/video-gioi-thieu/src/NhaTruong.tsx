@@ -5,6 +5,7 @@ import { FPS, MAU, PHONG_CHU, PHONG_TIEU_DE, expoOut, mo, phong } from './brand'
 import { Canh, DienThoai, KhoiChu, LatMai, Nen, TrinhDuyet, chonAnh, useVao, type ManMayTinh } from './khung';
 import { HuyHieu, LogoChuyenDong } from './Logo';
 import { coNhac } from './vi-tri';
+import giongDoc from './giong-doc.json';
 import vungPhong from './vung-nha-truong.json';
 
 type ChuCanh = [string, string];
@@ -12,6 +13,17 @@ const CHU = kichBan.chu.vi as unknown as Record<string, ChuCanh | string | strin
 const VUNG = vungPhong as unknown as Record<string, [number, number, number, number]>;
 const kep = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
 const P = phong('vi');
+
+/** Các đoạn lời đọc có tệp âm thanh (scripts/tao-giong-doc.py): id cảnh, khung bắt đầu, khung kết thúc. */
+const LOI_DOC = Object.entries(giongDoc as Record<string, { batDau: number; dai: number }>)
+  .map(([id, { batDau, dai }]) => ({ id, tep: `giong/nha-truong/${id}.wav`, tu: Math.round(batDau * FPS), den: Math.round((batDau + dai) * FPS) }))
+  .filter((doan) => coNhac(doan.tep));
+
+/** Nhạc nền hạ xuống khoảng 30% khi đang có lời đọc (lên xuống trong 300 ms). */
+function mucNhac(f: number) {
+  const ha = LOI_DOC.reduce((lon, doan) => Math.max(lon, interpolate(f, [doan.tu - 9, doan.tu, doan.den, doan.den + 9], [0, 1, 1, 0], kep)), 0);
+  return 1 - 0.7 * ha;
+}
 
 const a = (...ten: string[]) => chonAnh(...ten.map((t) => `man-hinh/nha-truong/${t}.png`));
 /** Một ảnh máy tính, phóng tới vùng đã đo lúc chụp (nếu có). */
@@ -40,7 +52,12 @@ export function NhaTruong() {
         );
       })}
       <LatMai tu={ds.find((c) => c.id === 'ket')!.tu * FPS - 8} />
-      {coNhac(nhac) ? <Html5Audio src={staticFile(nhac)} volume={(f) => interpolate(f, [0, 15, tong - 45, tong], [0, 0.85, 0.85, 0], kep)} /> : null}
+      {coNhac(nhac) ? <Html5Audio src={staticFile(nhac)} volume={(f) => interpolate(f, [0, 15, tong - 45, tong], [0, 0.85, 0.85, 0], kep) * mucNhac(f)} /> : null}
+      {LOI_DOC.map((doan) => (
+        <Sequence key={doan.id} from={doan.tu} durationInFrames={doan.den - doan.tu + 6} name={`loi-${doan.id}`}>
+          <Html5Audio src={staticFile(doan.tep)} />
+        </Sequence>
+      ))}
     </Nen>
   );
 }
