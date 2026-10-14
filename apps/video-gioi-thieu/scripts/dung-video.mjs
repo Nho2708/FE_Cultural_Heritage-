@@ -16,7 +16,7 @@ const viec = [
   { id: 'logo-9x16', ten: 'logo-2s4.9x16', ban720: false },
   ...Object.entries(NGON_NGU).map(([ma, ngonNgu]) => ({ id: `du-khach-60s-${ma}`, ten: `du-khach-60s.${ngonNgu}`, ban720: true })),
   ...Object.entries(NGON_NGU).map(([ma, ngonNgu]) => ({ id: `du-khach-45s-doc-${ma}`, ten: `du-khach-45s-doc.${ngonNgu}`, ban720: true, doc: true })),
-  { id: 'nha-truong-90s', ten: 'nha-truong-90s.vi', ban720: true, crf: 24 }, // ảnh màn hình máy tính nhiều chi tiết: nén mạnh hơn để bản 1080p dưới 18 MB
+  { id: 'nha-truong-90s', ten: 'nha-truong-90s.vi', ban720: true, crf: 26 }, // ảnh màn hình máy tính nhiều chi tiết: nén mạnh hơn để bản 1080p dưới 18 MB
 ];
 const chon = process.argv.slice(2);
 const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';

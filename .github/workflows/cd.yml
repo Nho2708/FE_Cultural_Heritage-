@@ -66,6 +66,8 @@ jobs:
           VITE_LEARNING_WEB_URL: ${{ vars.DEMO_LEARNING_WEB_URL }}
           VITE_ADMIN_WEB_URL: ${{ vars.DEMO_ADMIN_WEB_URL }}
           VITE_ANDROID_APP_URL: ${{ vars.DEMO_ANDROID_APP_URL }}
+          # Thư mục video giới thiệu trên Cloudinary (apps/video-gioi-thieu/scripts/tai-len-cloudinary.mjs); bỏ trống thì không hiện khung video.
+          VITE_INTRO_VIDEO_BASE_URL: ${{ vars.DEMO_INTRO_VIDEO_BASE_URL }}
           VITE_VNPAY_SANDBOX_NOTE: 'true'
         run: |
           npm run build -w @dsvhvn/web-quan-tri
