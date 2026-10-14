@@ -448,7 +448,6 @@
   /* Token component và đường viền trỏ về token ngữ nghĩa có bản dark */
   --dsv-topbar-bg: var(--dsv-color-surface);
   --dsv-topbar-fg: var(--dsv-color-on-surface);
-  --dsv-topbar-icon: var(--dsv-color-on-surface);
   --dsv-topbar-hover-bg: var(--dsv-color-surface-container);
   --dsv-drawer-bg: var(--dsv-color-surface);
   --dsv-drawer-item-hover-bg: var(--dsv-color-surface-container);
@@ -583,7 +582,6 @@
     /* Token component và đường viền trỏ về token ngữ nghĩa có bản dark */
     --dsv-topbar-bg: var(--dsv-color-surface);
     --dsv-topbar-fg: var(--dsv-color-on-surface);
-    --dsv-topbar-icon: var(--dsv-color-on-surface);
     --dsv-topbar-hover-bg: var(--dsv-color-surface-container);
     --dsv-drawer-bg: var(--dsv-color-surface);
     --dsv-drawer-item-hover-bg: var(--dsv-color-surface-container);
