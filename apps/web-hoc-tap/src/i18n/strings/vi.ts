@@ -2,12 +2,12 @@ import type { GuestActivityType, LanguageCode, SimilarityFactor } from '@dsvhvn/
 
 // Chữ giao diện của phần công khai (khám phá di sản) bằng tiếng Việt: bản gốc để dịch sang bốn ngôn ngữ còn lại (en.ts, ko.ts,
 // zh-Hans.ts, ja.ts phải có đúng các khóa của tệp này, kiểm bằng kiểu `Strings`). Khu học của học sinh và web quản trị chỉ có
-// tiếng Việt và không đi qua tệp này. Tên riêng (Học di sản, UNESCO, OpenStreetMap) giữ nguyên ở mọi ngôn ngữ.
+// tiếng Việt và không đi qua tệp này. Tên riêng (Vietnam Heritage, UNESCO, OpenStreetMap) giữ nguyên ở mọi ngôn ngữ.
 
 export const vi = {
-  brandName: 'Học di sản',
+  brandName: 'Vietnam Heritage',
   brandTagline: 'Di sản văn hóa Việt Nam',
-  documentTitle: (page: string) => `${page} · Học di sản`,
+  documentTitle: (page: string) => `${page} · Vietnam Heritage`,
 
   common: {
     close: 'Đóng',
@@ -58,14 +58,14 @@ export const vi = {
     android: 'Tải app cho Android',
     about: 'Nền tảng để trường học và giáo viên tạo bài học, bài kiểm tra về di sản Việt Nam; ai cũng có thể khám phá di sản.',
     source: 'Nội dung di sản tham khảo từ Cục Di sản văn hóa (dsvh.gov.vn). Ảnh từ Wikimedia Commons, ghi công theo từng ảnh.',
-    aboutColumn: 'Về Học di sản',
+    aboutColumn: 'Về Vietnam Heritage',
     intro: 'Giới thiệu',
     forSchools: 'Dành cho nhà trường',
-    copyright: '© 2026 Học di sản',
+    copyright: '© 2026 Vietnam Heritage',
   },
 
   home: {
-    title: 'Học di sản · DSVHVN',
+    title: 'Vietnam Heritage · DSVHVN',
     kicker: 'DI SẢN VĂN HÓA VIỆT NAM',
     heroTitle: 'Khám phá di sản Việt Nam',
     heroText: (total: string | null) =>
@@ -92,7 +92,7 @@ export const vi = {
     circleCount: (n: string) => `${n} DI SẢN`,
     appKicker: 'ỨNG DỤNG DI ĐỘNG',
     appTitle: 'Một app, hai chế độ: tham quan và học tập',
-    appText: 'App Học di sản trên điện thoại có hai chế độ, chọn ngay lần đầu mở app.',
+    appText: 'App Vietnam Heritage trên điện thoại có hai chế độ, chọn ngay lần đầu mở app.',
     appVisitorTitle: 'Khách tham quan',
     appVisitorText: 'Bản đồ di sản và "Gần bạn", dòng thời gian, mô hình 3D, nghe thuyết minh bằng 5 ngôn ngữ. Không cần tài khoản.',
     appStudentTitle: 'Học sinh',
@@ -249,7 +249,7 @@ export const vi = {
     problem: {
       closed: 'Bạn chưa xem hết quảng cáo nên chưa mở được tóm tắt. Hãy xem lại và xem đến hết.',
       noFill: 'Hiện chưa có quảng cáo để hiện. Bạn hãy thử lại sau ít phút.',
-      unsupported: 'Trình duyệt hoặc thiết bị này chưa hiện được quảng cáo có thưởng. Bạn hãy thử trên điện thoại hoặc dùng app Học di sản.',
+      unsupported: 'Trình duyệt hoặc thiết bị này chưa hiện được quảng cáo có thưởng. Bạn hãy thử trên điện thoại hoặc dùng app Vietnam Heritage.',
       blocked: 'Không tải được quảng cáo. Nếu bạn đang dùng trình chặn quảng cáo, hãy tắt nó cho trang này rồi thử lại.',
       timeout: 'Quảng cáo tải quá lâu. Bạn hãy thử lại sau ít phút.',
       rejected: 'Chưa mở được tóm tắt. Bạn hãy xem hết quảng cáo hoặc thử lại sau ít phút.',
@@ -386,10 +386,10 @@ export const vi = {
     title: 'Giới thiệu',
     kicker: 'GIỚI THIỆU',
     heroTitle: 'Di sản Việt Nam, kể bằng ngôn ngữ của bạn',
-    heroText: 'Học di sản là trang web và app miễn phí để khám phá di sản văn hóa và thiên nhiên Việt Nam. Đọc được bằng tiếng Việt, Anh, Hàn, Trung hoặc Nhật, không cần tài khoản.',
+    heroText: 'Vietnam Heritage là trang web và app miễn phí để khám phá di sản văn hóa và thiên nhiên Việt Nam. Đọc được bằng tiếng Việt, Anh, Hàn, Trung hoặc Nhật, không cần tài khoản.',
     start: 'Bắt đầu khám phá',
     openMap: 'Mở bản đồ di sản',
-    featuresTitle: 'Bạn làm được gì với Học di sản',
+    featuresTitle: 'Bạn làm được gì với Vietnam Heritage',
     nearbyTitle: 'Tìm di sản gần bạn trên bản đồ',
     nearbyText: 'Mỗi di sản là một ghim trên bản đồ Việt Nam, gồm cả quần đảo Hoàng Sa, Trường Sa. Bật "Gần bạn" để xem các di sản quanh mình; vị trí chỉ dùng để tính khoảng cách và không được lưu.',
     nearbyLink: 'Mở bản đồ di sản',
@@ -401,15 +401,15 @@ export const vi = {
     modelText: 'Xoay mô hình 3D để ngắm di sản từ mọi phía, rồi đi dọc dòng thời gian qua từng giai đoạn và sự kiện của di sản.',
     modelLink: 'Xem dòng thời gian',
     sourceTitle: 'Nguồn thông tin',
-    sourceText: 'Thông tin dựa trên dữ liệu của Cục Di sản văn hóa (dsvh.gov.vn), được tóm lược và ghi nguồn ở từng di sản. Học di sản không phải trang chính thức của Cục. Ảnh từ Wikimedia Commons, ghi công theo từng ảnh.',
+    sourceText: 'Thông tin dựa trên dữ liệu của Cục Di sản văn hóa (dsvh.gov.vn), được tóm lược và ghi nguồn ở từng di sản. Vietnam Heritage không phải trang chính thức của Cục. Ảnh từ Wikimedia Commons, ghi công theo từng ảnh.',
     appTitle: 'Mang theo trên điện thoại',
-    appText: 'Cài app Học di sản cho Android và chọn chế độ Khách tham quan để dùng bản đồ, "Gần bạn", mô hình 3D và nghe thuyết minh khi đi tham quan.',
+    appText: 'Cài app Vietnam Heritage cho Android và chọn chế độ Khách tham quan để dùng bản đồ, "Gần bạn", mô hình 3D và nghe thuyết minh khi đi tham quan.',
     appWeb: 'Không cần cài đặt: mọi tính năng trên đều dùng được ngay trên trình duyệt.',
     schoolsTitle: 'Dành cho nhà trường',
     schoolsText: 'Giáo viên soạn bài học và bài kiểm tra về di sản cho lớp mình; học sinh học theo cấp 1, 2, 3 bằng mã bài học.',
     schoolsLink: 'Xem trang dành cho nhà trường',
     videoTitle: 'Video giới thiệu',
-    videoLabel: 'Video giới thiệu Học di sản',
+    videoLabel: 'Video giới thiệu Vietnam Heritage',
     videoNoSupport: 'Trình duyệt này không phát được video.',
   },
 

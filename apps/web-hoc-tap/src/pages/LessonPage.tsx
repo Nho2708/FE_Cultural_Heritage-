@@ -19,7 +19,7 @@ import { StartQuizDialog } from '../quiz/QuizIntro';
 function CodeProblem({ message }: { message: string }) {
   return (
     <section className="dsv-content dsv-section">
-      <title>Không mở được bài học · Học di sản</title>
+      <title>Không mở được bài học · Vietnam Heritage</title>
       <div className="mx-auto max-w-[560px] py-10">
         <h1 className="type-h1 text-on-surface">Chưa mở được bài học</h1>
         <p role="alert" className="mt-3 type-body-m text-on-surface-variant">
@@ -82,7 +82,7 @@ export function LessonPage() {
   if (!lesson || userId === undefined) {
     return (
       <section className="dsv-content dsv-section">
-        <title>Bài học · Học di sản</title>
+        <title>Bài học · Vietnam Heritage</title>
         <LoadingState rows={3} />
       </section>
     );

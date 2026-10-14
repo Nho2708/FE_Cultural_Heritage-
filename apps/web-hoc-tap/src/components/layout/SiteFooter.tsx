@@ -5,7 +5,7 @@ import { ANDROID_APP_URL } from '../../config/env';
 import { useAuth } from '../../lib/auth/context';
 import { useI18n } from '../../i18n/context';
 
-// Chân trang của web học tập: liên kết khám phá, liên kết học sinh, liên kết về Học di sản (Giới thiệu, Dành cho nhà
+// Chân trang của web học tập: liên kết khám phá, liên kết học sinh, liên kết về Vietnam Heritage (Giới thiệu, Dành cho nhà
 // trường), dòng ghi nguồn nội dung di sản và ghi công ảnh.
 // Chỉ đặt liên kết tới trang đã có; "Tải app cho Android" chỉ hiện khi đã cấu hình địa chỉ tệp cài đặt.
 

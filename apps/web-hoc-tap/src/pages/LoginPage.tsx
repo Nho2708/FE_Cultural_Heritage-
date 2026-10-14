@@ -78,7 +78,7 @@ export function LoginPage() {
 
   return (
     <section className="dsv-content dsv-section">
-      <title>Học sinh đăng nhập · Học di sản</title>
+      <title>Học sinh đăng nhập · Vietnam Heritage</title>
       <div className="mx-auto flex w-full max-w-[440px] flex-col gap-(--dsv-block-gap)">
         <BrandLogo variant="badge" size={96} className="self-center" />
         <div className="flex items-center gap-(--dsv-inline-gap)">

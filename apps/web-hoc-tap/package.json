@@ -2,7 +2,7 @@
   "name": "@dsvhvn/web-hoc-tap",
   "private": true,
   "version": "0.1.0",
-  "description": "Web học tập DSVHVN (tên hiển thị \"Học di sản\"): khám phá di sản công khai và khu học của học sinh (đăng nhập bằng mã học sinh), giao diện theo cấp học 1/2/3 bằng bộ token.",
+  "description": "Web học tập DSVHVN (tên hiển thị \"Vietnam Heritage\"): khám phá di sản công khai và khu học của học sinh (đăng nhập bằng mã học sinh), giao diện theo cấp học 1/2/3 bằng bộ token.",
   "type": "module",
   "scripts": {
     "dev": "vite",

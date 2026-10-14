@@ -1,7 +1,7 @@
 import type { Strings } from './vi';
 
 export const en: Strings = {
-  appName: 'Học di sản',
+  appName: 'Vietnam Heritage',
   common: {
     back: 'Back',
     close: 'Close',

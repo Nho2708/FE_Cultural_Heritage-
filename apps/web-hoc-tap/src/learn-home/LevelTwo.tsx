@@ -13,7 +13,7 @@ import { LearningSections } from './LearningSections';
 export function LevelTwo({ user, classroom }: { user: StudentProfile; classroom: StudentClassDetail }) {
   return (
     <section className="dsv-content dsv-section" data-bo-cuc="cap-2">
-      <title>Trang học của em · Học di sản</title>
+      <title>Trang học của em · Vietnam Heritage</title>
       <h1 className="type-h1 text-on-surface">Trang học của em</h1>
       <div className="mt-6 flex items-center gap-(--dsv-inline-gap) rounded-md bg-primary-container p-(--dsv-inline-gap) text-on-primary-container">
         <Illustration state="chao" className="size-20 bg-surface" />
