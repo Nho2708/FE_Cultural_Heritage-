@@ -206,7 +206,7 @@ function BaCap() {
           return (
             <div key={ten} style={{ opacity: t, transform: `translateY(${(1 - t) * 60}px)` }}>
               <div style={{ fontFamily: PHONG_CHU, fontWeight: 700, fontSize: 34, color: k === 0 ? MAU.son : k === 1 ? MAU.vang : MAU.kem, marginBottom: 14 }}>{nhan[k]}</div>
-              <TrinhDuyet rong={540} man={[{ anh: a(ten, `${ten}-trang-chu`), tu: 0 }]} ten={nhan[k]} style={{ fontFamily: PHONG_CHU }} />
+              <TrinhDuyet rong={540} man={[{ anh: a(ten, `${ten}-trang-chu`), tu: 0, vung: VUNG[ten], nhip: [70, 380] }]} ten={nhan[k]} style={{ fontFamily: PHONG_CHU }} />
             </div>
           );
         })}
