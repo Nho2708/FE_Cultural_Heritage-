@@ -1,4 +1,4 @@
-import { BrandLogo, Icon } from '@dsvhvn/dung-chung/ui';
+import { BrandLogo, Icon, ThemeToggle } from '@dsvhvn/dung-chung/ui';
 import { cn } from '@dsvhvn/dung-chung';
 import { useEffect, type ReactNode } from 'react';
 import { Link, Outlet, ScrollRestoration, useLocation } from 'react-router';
@@ -79,6 +79,7 @@ export function BasicFrame({ children }: { children: ReactNode }) {
       <SkipLink />
       <header className="flex h-(--dsv-topbar-height) items-center gap-3 border-b border-border bg-surface px-2 dsvmd:px-4">
         <Wordmark className="mr-auto" />
+        <ThemeToggle />
         <LearningWebLink className="flex h-11 items-center gap-2 rounded-sm px-3 type-control text-on-surface-variant hover:bg-surface-container hover:text-on-surface">
           <Icon name="map-pin" size={20} />
           <span className="hidden dsvsm:inline">Mở trang khám phá di sản</span>

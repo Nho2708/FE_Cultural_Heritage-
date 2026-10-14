@@ -1,5 +1,5 @@
 import { cn } from '@dsvhvn/dung-chung';
-import { BrandLogo, Icon, LoadingState } from '@dsvhvn/dung-chung/ui';
+import { BrandLogo, Icon, LoadingState, ThemeToggle } from '@dsvhvn/dung-chung/ui';
 import { Suspense, type ReactNode } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import { screenForPath } from '../../access/access';
@@ -7,9 +7,8 @@ import { AccountMenu } from './AccountMenu';
 import { LearningWebLink, SkipLink } from './Layouts';
 import type { NavItem } from './navigation';
 
-// Khung chung của /giao-vien, /truong, /quan-tri: thanh bên trái cố định 240px + breadcrumb + menu tài khoản.
-// Chân thanh bên có "Mở trang khám phá di sản" (web học tập, tab mới). Dưới 841px thanh bên chuyển thành hàng cuộn
-// ngang. /quan-tri bật dark mode theo hệ điều hành (data-theme="system"); hai khu còn lại giữ nền sáng.
+// Khung chung của /giao-vien, /truong, /quan-tri: thanh bên trái cố định 240px + breadcrumb + menu tài khoản + nút đổi theme.
+// Chân thanh bên có "Mở trang khám phá di sản" (web học tập, tab mới). Dưới 841px thanh bên chuyển thành hàng cuộn ngang.
 // `banner` là thanh báo trên cùng của khu, ví dụ khi trường không có gói hiệu lực.
 
 interface AreaLayoutProps {
@@ -20,13 +19,13 @@ interface AreaLayoutProps {
   items: NavItem[];
   /** Đường dẫn gốc của khu vực, dùng để NavLink gốc chỉ sáng khi đúng trang đó. */
   root: string;
-  theme?: 'light' | 'system';
+  theme?: 'light' | 'system' | 'dark';
   banner?: ReactNode;
   /** Nội dung đặt sẵn (ví dụ trang 403 ở cổng khu); không có thì dùng Outlet của route con. */
   children?: ReactNode;
 }
 
-export function AreaLayout({ title, context, items, root, theme = 'light', banner, children }: AreaLayoutProps) {
+export function AreaLayout({ title, context, items, root, theme, banner, children }: AreaLayoutProps) {
   const { pathname } = useLocation();
   const current = screenForPath(pathname);
 
@@ -40,7 +39,7 @@ export function AreaLayout({ title, context, items, root, theme = 'light', banne
 
   return (
     <div
-      data-theme={theme === 'system' ? 'system' : undefined}
+      data-theme={theme}
       className="min-h-dvh bg-background text-on-background dsvmd:grid dsvmd:grid-cols-[var(--dsv-sidebar-admin-width)_1fr]"
     >
       <SkipLink />
@@ -88,6 +87,7 @@ export function AreaLayout({ title, context, items, root, theme = 'light', banne
               )}
             </ol>
           </nav>
+          <ThemeToggle />
           <AccountMenu />
         </header>
         <nav aria-label={`${title} (thu gọn)`} className="flex gap-1 overflow-x-auto border-b border-border px-2 py-2 dsvmd:hidden">
