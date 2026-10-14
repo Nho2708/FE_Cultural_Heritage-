@@ -98,6 +98,21 @@ describe('replay entries', () => {
     expect(mockPush).toHaveBeenCalledWith('/gioi-thieu');
   });
 
+  it('lets a visitor open the intro video from History and settings, with its own label apart from the replay', async () => {
+    mockMode = 'guest';
+    const screen = await render(<GuestHistoryAndSettings />, 'en');
+    expect(screen.buttons('Watch intro video')).toHaveLength(1);
+    await screen.press('Watch intro video');
+    expect(mockPush).toHaveBeenCalledWith('/video-gioi-thieu');
+    expect(mockPush).not.toHaveBeenCalledWith('/gioi-thieu');
+  });
+
+  it('does not offer the intro video to students', async () => {
+    mockMode = 'student';
+    const screen = await render(<StudentAccount />);
+    expect(screen.buttons('Xem video giới thiệu')).toHaveLength(0);
+  });
+
   it('lets a student open the introduction again from the account tab, in Vietnamese', async () => {
     mockMode = 'student';
     const screen = await render(<StudentAccount />);

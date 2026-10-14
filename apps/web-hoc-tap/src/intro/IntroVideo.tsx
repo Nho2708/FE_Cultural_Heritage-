@@ -9,7 +9,7 @@ import { useI18n } from '../i18n/context';
 
 export type IntroVideoName = 'du-khach-60s' | 'nha-truong-90s';
 
-export interface IntroVideoProps {
+export interface IntroVideoPlayerProps {
   name: IntroVideoName;
   /** Bản dựng của video (video khách có 5 bản theo ngôn ngữ; video nhà trường chỉ có tiếng Việt). */
   edition: LanguageCode;
@@ -17,13 +17,15 @@ export interface IntroVideoProps {
   captions: readonly [LanguageCode, ...LanguageCode[]];
   /** Phụ đề bật sẵn; null là tắt. */
   defaultCaption: LanguageCode | null;
-  title: string;
   label: string;
   noSupport: string;
-  headingId: string;
+  /** Kho lưu tệp trả ảnh từ khung hình đầu của video khi đổi đuôi thành .jpg; bật thì dùng làm ảnh bìa. */
+  withPoster?: boolean;
+  className?: string;
 }
 
-export function IntroVideo({ name, edition, captions, defaultCaption, title, label, noSupport, headingId }: IntroVideoProps) {
+/** Chỉ riêng thẻ video (không có tiêu đề hay khung trang): dùng chung cho trang Giới thiệu, Dành cho nhà trường và trang nhúng của app. */
+export function IntroVideoPlayer({ name, edition, captions, defaultCaption, label, noSupport, withPoster = false, className }: IntroVideoPlayerProps) {
   const { t } = useI18n();
   if (!INTRO_VIDEO_BASE_URL) return null;
   const file = `${INTRO_VIDEO_BASE_URL}/${name}.${edition}.720`;
@@ -35,26 +37,39 @@ export function IntroVideo({ name, edition, captions, defaultCaption, title, lab
     default: code === defaultCaption,
   });
   return (
+    <video
+      controls
+      preload="none"
+      playsInline
+      aria-label={label}
+      poster={withPoster ? `${file}.jpg` : undefined}
+      className={className ?? 'aspect-video w-full max-w-[960px] rounded-md bg-(--color-brand-navy)'}
+    >
+      <source src={`${file}.webm`} type="video/webm" />
+      <source src={`${file}.mp4`} type="video/mp4" />
+      <track kind="captions" {...track(first)} />
+      {others.map((code) => (
+        <track key={code} kind="captions" {...track(code)} />
+      ))}
+      {noSupport}
+    </video>
+  );
+}
+
+export interface IntroVideoProps extends Omit<IntroVideoPlayerProps, 'withPoster' | 'className'> {
+  title: string;
+  headingId: string;
+}
+
+export function IntroVideo({ title, headingId, ...player }: IntroVideoProps) {
+  if (!INTRO_VIDEO_BASE_URL) return null;
+  return (
     <section aria-labelledby={headingId} className="bg-surface py-12 dsvmd:py-16">
       <div className="dsv-content flex flex-col gap-6">
         <h2 id={headingId} className="type-h2 text-on-background">
           {title}
         </h2>
-        <video
-          controls
-          preload="none"
-          playsInline
-          aria-label={label}
-          className="aspect-video w-full max-w-[960px] rounded-md bg-(--color-brand-navy)"
-        >
-          <source src={`${file}.webm`} type="video/webm" />
-          <source src={`${file}.mp4`} type="video/mp4" />
-          <track kind="captions" {...track(first)} />
-          {others.map((code) => (
-            <track key={code} kind="captions" {...track(code)} />
-          ))}
-          {noSupport}
-        </video>
+        <IntroVideoPlayer {...player} />
       </div>
     </section>
   );
