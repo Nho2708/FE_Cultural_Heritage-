@@ -1,0 +1,7 @@
+node_modules/
+ra/
+out/
+.cache/
+public/nhac/
+public/man-hinh/
+scripts/tai-khoan.local.json

@@ -1,0 +1,312 @@
+{
+  "ten": "Video giới thiệu cho khách du lịch",
+  "ghiChu": "Chữ trên hình và phụ đề lấy từ tệp này. Bản Hàn, Trung, Nhật là bản dịch máy, nhờ người biết tiếng đọc lại trước khi đăng rộng rãi.",
+  "ngang": [
+    {
+      "id": "logo",
+      "tu": 0,
+      "den": 3
+    },
+    {
+      "id": "mo-dau",
+      "tu": 3,
+      "den": 8
+    },
+    {
+      "id": "ngon-ngu",
+      "tu": 8,
+      "den": 15
+    },
+    {
+      "id": "gan-ban",
+      "tu": 15,
+      "den": 23
+    },
+    {
+      "id": "nghe",
+      "tu": 23,
+      "den": 31
+    },
+    {
+      "id": "ba-chieu",
+      "tu": 31,
+      "den": 38
+    },
+    {
+      "id": "dong-thoi-gian",
+      "tu": 38,
+      "den": 45
+    },
+    {
+      "id": "goi-y",
+      "tu": 45,
+      "den": 51
+    },
+    {
+      "id": "nguon",
+      "tu": 51,
+      "den": 56
+    },
+    {
+      "id": "ket",
+      "tu": 56,
+      "den": 60
+    }
+  ],
+  "doc": [
+    {
+      "id": "logo",
+      "tu": 0,
+      "den": 3
+    },
+    {
+      "id": "mo-dau",
+      "tu": 3,
+      "den": 6
+    },
+    {
+      "id": "ngon-ngu",
+      "tu": 6,
+      "den": 12
+    },
+    {
+      "id": "gan-ban",
+      "tu": 12,
+      "den": 20
+    },
+    {
+      "id": "nghe",
+      "tu": 20,
+      "den": 28
+    },
+    {
+      "id": "ba-chieu",
+      "tu": 28,
+      "den": 34
+    },
+    {
+      "id": "goi-y",
+      "tu": 34,
+      "den": 40
+    },
+    {
+      "id": "ket",
+      "tu": 40,
+      "den": 45
+    }
+  ],
+  "chu": {
+    "vi": {
+      "mo-dau": [
+        "Đến Việt Nam?",
+        "Mỗi nơi bạn đi qua đều có một câu chuyện."
+      ],
+      "ngon-ngu": [
+        "Chọn ngôn ngữ của bạn",
+        "Không cần tài khoản."
+      ],
+      "gan-ban": [
+        "Di sản gần bạn",
+        "Tìm di sản quanh bạn trên bản đồ. Vị trí chỉ dùng trên điện thoại, không lưu lại."
+      ],
+      "nghe": [
+        "Nghe thuyết minh",
+        "Nghe giới thiệu bằng ngôn ngữ của bạn. Tóm tắt và phần nghe mở bằng một quảng cáo ngắn, dùng trong 24 giờ."
+      ],
+      "ba-chieu": [
+        "Ngắm mô hình 3D",
+        "Xoay mô hình, ngắm từ mọi phía."
+      ],
+      "dong-thoi-gian": [
+        "Dòng thời gian",
+        "Đi dọc lịch sử của từng di sản."
+      ],
+      "goi-y": [
+        "Gợi ý cho bạn",
+        "Gợi ý nơi tiếp theo theo những gì bạn đã xem. Lịch sử xóa được bất cứ lúc nào."
+      ],
+      "nguon": [
+        "Có nguồn rõ ràng",
+        "Thông tin dựa trên dữ liệu của Cục Di sản văn hóa, tóm lược và ghi nguồn."
+      ],
+      "ket": [
+        "Vietnam Heritage",
+        "Mở trên trình duyệt hoặc cài app Android. Miễn phí."
+      ],
+      "ghi-cong": "Dữ liệu: Cục Di sản văn hóa (dsvh.gov.vn) · Nhạc: nhóm dự án tự soạn",
+      "ghi-chu-dich": "",
+      "ghi-chu-man-hinh": ""
+    },
+    "en": {
+      "mo-dau": [
+        "Visiting Vietnam?",
+        "Every place you pass has a story."
+      ],
+      "ngon-ngu": [
+        "Pick your language",
+        "No account needed."
+      ],
+      "gan-ban": [
+        "Heritage near you",
+        "Find heritage sites around you on the map. Your location stays on your phone."
+      ],
+      "nghe": [
+        "Listen to the guide",
+        "Hear it in your own language. The summary and audio unlock with one short ad, for 24 hours."
+      ],
+      "ba-chieu": [
+        "Explore in 3D",
+        "Turn the model and see it from every side."
+      ],
+      "dong-thoi-gian": [
+        "Timeline",
+        "Travel through each site's history."
+      ],
+      "goi-y": [
+        "Ideas for you",
+        "Get ideas for where to go next. Clear your history any time."
+      ],
+      "nguon": [
+        "Clear sources",
+        "Based on data from Vietnam's Department of Cultural Heritage, summarised with sources."
+      ],
+      "ket": [
+        "Vietnam Heritage",
+        "Open it in your browser or get the Android app. Free."
+      ],
+      "ghi-cong": "Data: Department of Cultural Heritage (dsvh.gov.vn) · Music: original by the project team",
+      "ghi-chu-dich": "",
+      "ghi-chu-man-hinh": "Screens from the demo version; some heritage content is shown in Vietnamese."
+    },
+    "ko": {
+      "mo-dau": [
+        "베트남 여행 중이신가요?",
+        "지나가는 곳마다 이야기가 있습니다."
+      ],
+      "ngon-ngu": [
+        "언어를 선택하세요",
+        "계정이 필요 없습니다."
+      ],
+      "gan-ban": [
+        "내 주변의 유산",
+        "지도에서 주변 유산을 찾아보세요. 위치 정보는 휴대폰에서만 쓰이고 저장되지 않습니다."
+      ],
+      "nghe": [
+        "음성 해설 듣기",
+        "내 언어로 해설을 들어 보세요. 요약과 음성은 짧은 광고 한 편으로 24시간 동안 열립니다."
+      ],
+      "ba-chieu": [
+        "3D로 둘러보기",
+        "모델을 돌려 모든 방향에서 살펴보세요."
+      ],
+      "dong-thoi-gian": [
+        "타임라인",
+        "유산마다 역사를 따라가 보세요."
+      ],
+      "goi-y": [
+        "추천",
+        "본 곳을 바탕으로 다음 갈 곳을 추천합니다. 기록은 언제든지 지울 수 있습니다."
+      ],
+      "nguon": [
+        "분명한 출처",
+        "베트남 문화유산국의 자료를 바탕으로 요약하고 출처를 밝힙니다."
+      ],
+      "ket": [
+        "Vietnam Heritage",
+        "브라우저에서 열거나 Android 앱을 설치하세요. 무료입니다."
+      ],
+      "ghi-cong": "자료: 베트남 문화유산국 (dsvh.gov.vn) · 음악: 프로젝트 팀 창작",
+      "ghi-chu-dich": "앱의 한국어 내용은 기계 번역입니다.",
+      "ghi-chu-man-hinh": "화면은 데모 버전이며 일부 유산 내용은 베트남어로 표시됩니다."
+    },
+    "zh-Hans": {
+      "mo-dau": [
+        "来越南旅行？",
+        "你走过的每个地方都有一个故事。"
+      ],
+      "ngon-ngu": [
+        "选择你的语言",
+        "无需注册账号。"
+      ],
+      "gan-ban": [
+        "身边的遗产",
+        "在地图上查找你附近的遗产。位置信息只在手机上使用，不会被保存。"
+      ],
+      "nghe": [
+        "收听语音讲解",
+        "用你的语言收听讲解。观看一段简短广告即可解锁摘要和语音，有效 24 小时。"
+      ],
+      "ba-chieu": [
+        "3D 观赏",
+        "旋转模型，从各个角度欣赏。"
+      ],
+      "dong-thoi-gian": [
+        "时间线",
+        "沿着每处遗产的历史一路走来。"
+      ],
+      "goi-y": [
+        "为你推荐",
+        "根据你看过的内容推荐下一站。浏览记录随时可以清除。"
+      ],
+      "nguon": [
+        "来源清楚",
+        "信息基于越南文化遗产局的资料，经摘要整理并注明出处。"
+      ],
+      "ket": [
+        "Vietnam Heritage",
+        "在浏览器中打开，或安装 Android 应用。免费。"
+      ],
+      "ghi-cong": "资料：越南文化遗产局 (dsvh.gov.vn) · 音乐：项目团队原创",
+      "ghi-chu-dich": "应用中的中文内容为机器翻译。",
+      "ghi-chu-man-hinh": "画面来自演示版，部分遗产内容以越南语显示。"
+    },
+    "ja": {
+      "mo-dau": [
+        "ベトナムを旅していますか？",
+        "訪れる場所すべてに物語があります。"
+      ],
+      "ngon-ngu": [
+        "言語を選ぶだけ",
+        "アカウントは不要です。"
+      ],
+      "gan-ban": [
+        "近くの遺産",
+        "地図で周辺の遺産を探せます。位置情報は端末内だけで使われ、保存されません。"
+      ],
+      "nghe": [
+        "音声ガイドを聴く",
+        "あなたの言語で解説を聴けます。要約と音声は短い広告を1本見ると24時間使えます。"
+      ],
+      "ba-chieu": [
+        "3Dで見る",
+        "モデルを回して、あらゆる角度から眺められます。"
+      ],
+      "dong-thoi-gian": [
+        "タイムライン",
+        "遺産ごとの歴史をたどれます。"
+      ],
+      "goi-y": [
+        "あなたへのおすすめ",
+        "見た場所をもとに次の行き先を提案します。履歴はいつでも消せます。"
+      ],
+      "nguon": [
+        "出典を明記",
+        "ベトナム文化遺産局のデータをもとに要約し、出典を示しています。"
+      ],
+      "ket": [
+        "Vietnam Heritage",
+        "ブラウザで開くか、Android アプリをインストール。無料です。"
+      ],
+      "ghi-cong": "データ：ベトナム文化遺産局 (dsvh.gov.vn) · 音楽：プロジェクトチームのオリジナル",
+      "ghi-chu-dich": "アプリ内の日本語は機械翻訳です。",
+      "ghi-chu-man-hinh": "画面はデモ版で、一部の遺産情報はベトナム語で表示されています。"
+    }
+  },
+  "chao": [
+    "Xin chào",
+    "Hello",
+    "안녕하세요",
+    "你好",
+    "こんにちは"
+  ]
+}
