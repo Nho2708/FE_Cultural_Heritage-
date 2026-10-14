@@ -2,7 +2,7 @@ import * as Leaflet from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import type {} from 'leaflet.markercluster';
-import { EAST_SEA_LABEL, VIETNAM_ARCHIPELAGOS } from './seas';
+import { EAST_SEA_LABEL, VIETNAM_ARCHIPELAGOS, VIETNAM_MAX_BOUNDS } from './seas';
 
 // Nền dùng chung của mọi bản đồ trong web học tập, dựng bằng Leaflet (BSD-2-Clause) với ô bản đồ OpenStreetMap
 // (dữ liệu © những người đóng góp OpenStreetMap, giấy phép ODbL). Chỉ được nạp khi mở trang có bản đồ (import động).
@@ -84,10 +84,31 @@ export interface BaseMapOptions {
 }
 
 export function createBaseMap(L: LeafletLib, element: HTMLElement, { scrollWheelZoom = true, labels = MAP_LABELS_VI }: BaseMapOptions = {}): Leaflet.Map {
-  const map = L.map(element, { zoomControl: false, scrollWheelZoom, minZoom: 4, maxZoom: 18 });
+  const map = L.map(element, {
+    zoomControl: false,
+    scrollWheelZoom,
+    minZoom: 4,
+    maxZoom: 18,
+    maxBounds: VIETNAM_MAX_BOUNDS,
+    maxBoundsViscosity: 1.0,
+  });
   map.attributionControl.setPrefix(LEAFLET_PREFIX);
   const attribution = `${labels.attribution.prefix} <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">${labels.attribution.owners}</a>`;
-  L.tileLayer(TILE_URL, { maxZoom: 19, attribution }).addTo(map);
+  const tileLayer = L.tileLayer(TILE_URL, { maxZoom: 19, attribution }).addTo(map);
+  tileLayer.on('tileerror', (event: Leaflet.TileErrorEvent) => {
+    const tile = event.tile;
+    const coords = event.coords;
+    if (tile && coords) {
+      const step = Number(tile.dataset.fallbackStep ?? '0');
+      if (step === 0) {
+        tile.dataset.fallbackStep = '1';
+        tile.src = `https://tile.openstreetmap.de/${coords.z}/${coords.x}/${coords.y}.png`;
+      } else if (step === 1) {
+        tile.dataset.fallbackStep = '2';
+        tile.src = `https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/${coords.z}/${coords.y}/${coords.x}`;
+      }
+    }
+  });
   L.control.zoom({ position: 'bottomright', zoomInTitle: labels.zoomIn, zoomOutTitle: labels.zoomOut }).addTo(map);
   addVietnamSeas(L, map, labels);
   return map;

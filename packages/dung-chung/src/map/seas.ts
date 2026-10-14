@@ -54,3 +54,10 @@ export const VIETNAM_BOUNDS: [[number, number], [number, number]] = [
   [6.6, 102.0],
   [23.8, 116.6],
 ];
+
+/** Giới hạn không gian di chuyển bản đồ: khóa chặt trong phạm vi lãnh thổ và vùng biển Việt Nam. */
+export const VIETNAM_MAX_BOUNDS: [[number, number], [number, number]] = [
+  [5.5, 99.5],
+  [24.5, 121.0],
+];
+
