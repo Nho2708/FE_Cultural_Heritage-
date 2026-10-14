@@ -406,6 +406,7 @@ export const ja: Strings = {
     videoTitle: '紹介動画',
     videoLabel: 'Vietnam Heritage の紹介動画',
     videoNoSupport: 'このブラウザでは動画を再生できません。',
+    videoUnavailable: '紹介動画はまだありません。後でもう一度お試しください。',
   },
 
   schoolsNote: {

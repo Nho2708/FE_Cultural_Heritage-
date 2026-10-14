@@ -4,6 +4,7 @@ import { RequireAccess } from '../access/RequireAccess';
 import { SCREENS, screen, type ScreenKey } from '../access/screens';
 import { FullScreenLayout, MainLayout, RootLayout } from '../components/layout/Layouts';
 import { EmbedLayout } from '../embed/EmbedLayout';
+import { EmbedIntroVideoPage } from '../embed/EmbedIntroVideoPage';
 import { EmbedMapPage } from '../embed/EmbedMapPage';
 import { EmbedModelPage } from '../embed/EmbedModelPage';
 import { ChangePasswordPage } from '../pages/ChangePasswordPage';
@@ -73,11 +74,12 @@ export const routes: RouteObject[] = [
         children: [...screenRoutes((fullScreen) => !fullScreen), { path: '*', element: <NotFoundPage /> }],
       },
       { element: <FullScreenLayout />, children: screenRoutes((fullScreen) => fullScreen) },
-      // Trang nhúng cho app mobile (WebView): bản đồ và trình xem 3D, công khai, không thanh điều hướng.
+      // Trang nhúng cho app mobile (WebView): bản đồ, trình xem 3D và video giới thiệu, công khai, không thanh điều hướng.
       {
         element: <EmbedLayout />,
         children: [
           { path: 'nhung/ban-do', element: <EmbedMapPage /> },
+          { path: 'nhung/video-gioi-thieu', element: <EmbedIntroVideoPage /> },
           { path: 'nhung/3d/:slug', element: <EmbedModelPage /> },
         ],
       },

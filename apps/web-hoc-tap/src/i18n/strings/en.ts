@@ -407,6 +407,7 @@ export const en: Strings = {
     videoTitle: 'Introduction video',
     videoLabel: 'Vietnam Heritage introduction video',
     videoNoSupport: 'This browser cannot play the video.',
+    videoUnavailable: 'The intro video is not available yet. Please try again later.',
   },
 
   schoolsNote: {

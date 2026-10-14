@@ -411,6 +411,7 @@ export const vi = {
     videoTitle: 'Video giới thiệu',
     videoLabel: 'Video giới thiệu Vietnam Heritage',
     videoNoSupport: 'Trình duyệt này không phát được video.',
+    videoUnavailable: 'Chưa có video giới thiệu. Bạn hãy thử lại sau.',
   },
 
   schoolsNote: {
