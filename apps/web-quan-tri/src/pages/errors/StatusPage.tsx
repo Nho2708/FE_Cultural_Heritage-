@@ -12,7 +12,7 @@ interface StatusPageProps {
 export function StatusPage({ kicker, title, children, actions }: StatusPageProps) {
   return (
     <section className="dsv-content flex min-h-[60dvh] flex-col items-start justify-center gap-4 py-16">
-      <title>{`${title} · DSVHVN`}</title>
+      <title>{`${title} · Vietnam Heritage`}</title>
       <p className="type-label-kicker text-on-surface-muted">{kicker}</p>
       <h1 className="max-w-[760px] type-h1 text-on-surface">{title}</h1>
       {children && <div className="max-w-[760px] type-body-m text-on-surface-variant">{children}</div>}

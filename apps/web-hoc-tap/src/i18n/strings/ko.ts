@@ -61,7 +61,7 @@ export const ko: Strings = {
   },
 
   home: {
-    title: 'Vietnam Heritage · DSVHVN',
+    title: 'Vietnam Heritage',
     kicker: '베트남 문화유산',
     heroTitle: '베트남의 문화유산을 만나 보세요',
     heroText: (total) =>
