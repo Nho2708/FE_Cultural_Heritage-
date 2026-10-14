@@ -1,9 +1,9 @@
 import type { Strings } from './vi';
 
 export const ja: Strings = {
-  brandName: 'Học di sản',
+  brandName: 'Vietnam Heritage',
   brandTagline: 'ベトナムの文化遺産',
-  documentTitle: (page) => `${page} · Học di sản`,
+  documentTitle: (page) => `${page} · Vietnam Heritage`,
 
   common: {
     close: '閉じる',
@@ -54,14 +54,14 @@ export const ja: Strings = {
     android: 'Androidアプリを入手',
     about: '学校や教師がベトナムの遺産に関する授業とテストを作るためのプラットフォームです。どなたでも遺産を探せます。',
     source: '遺産の内容はベトナム文化遺産局（dsvh.gov.vn）の資料を参考にしています。写真はWikimedia Commonsのもので、写真ごとにクレジットを表示しています。',
-    aboutColumn: 'Học di sản について',
+    aboutColumn: 'Vietnam Heritage について',
     intro: '紹介',
     forSchools: '学校の方へ',
-    copyright: '© 2026 Học di sản',
+    copyright: '© 2026 Vietnam Heritage',
   },
 
   home: {
-    title: 'Học di sản · DSVHVN',
+    title: 'Vietnam Heritage · DSVHVN',
     kicker: 'ベトナムの文化遺産',
     heroTitle: 'ベトナムの文化遺産を探そう',
     heroText: (total) =>
@@ -88,7 +88,7 @@ export const ja: Strings = {
     circleCount: (n) => `${n} 件`,
     appKicker: 'モバイルアプリ',
     appTitle: 'ひとつのアプリに、観光と学習の2つのモード',
-    appText: 'Học di sản のスマートフォンアプリには2つのモードがあり、最初に開いたときに選びます。',
+    appText: 'Vietnam Heritage のスマートフォンアプリには2つのモードがあり、最初に開いたときに選びます。',
     appVisitorTitle: '観光客',
     appVisitorText: '遺産マップと「近くの遺産」、年表、3Dモデル、5か国語の音声ガイド。アカウントは不要です。',
     appStudentTitle: '生徒',
@@ -244,7 +244,7 @@ export const ja: Strings = {
     problem: {
       closed: '広告を最後まで見なかったため、要約はまだ開いていません。もう一度、最後まで見てください。',
       noFill: '現在表示できる広告がありません。しばらくしてからもう一度お試しください。',
-      unsupported: 'このブラウザまたは端末ではリワード広告を表示できません。スマートフォンでお試しいただくか、Học di sản アプリをご利用ください。',
+      unsupported: 'このブラウザまたは端末ではリワード広告を表示できません。スマートフォンでお試しいただくか、Vietnam Heritage アプリをご利用ください。',
       blocked: '広告を読み込めませんでした。広告ブロッカーをお使いの場合は、このページで無効にしてからもう一度お試しください。',
       timeout: '広告の読み込みに時間がかかっています。しばらくしてからもう一度お試しください。',
       rejected: '要約を開けませんでした。広告を最後まで見るか、しばらくしてからもう一度お試しください。',
@@ -381,10 +381,10 @@ export const ja: Strings = {
     title: '紹介',
     kicker: '紹介',
     heroTitle: 'ベトナムの遺産を、あなたの言葉で',
-    heroText: 'Học di sản は、ベトナムの文化遺産と自然遺産を探せる無料のウェブサイトとアプリです。ベトナム語・英語・韓国語・中国語・日本語に対応し、アカウントは不要です。',
+    heroText: 'Vietnam Heritage は、ベトナムの文化遺産と自然遺産を探せる無料のウェブサイトとアプリです。ベトナム語・英語・韓国語・中国語・日本語に対応し、アカウントは不要です。',
     start: '探し始める',
     openMap: '遺産マップを開く',
-    featuresTitle: 'Học di sản でできること',
+    featuresTitle: 'Vietnam Heritage でできること',
     nearbyTitle: '地図で近くの遺産を探す',
     nearbyText: 'すべての遺産が、ホアンサ諸島・チュオンサ諸島を含むベトナムの地図上にピンで表示されます。「近くの遺産」をオンにすると周辺の遺産が見られます。位置情報は距離の計算にのみ使われ、保存されません。',
     nearbyLink: '遺産マップを開く',
@@ -396,15 +396,15 @@ export const ja: Strings = {
     modelText: '3Dモデルを回して遺産をあらゆる角度から眺め、年表をたどって時代や出来事を順に見ていきましょう。',
     modelLink: '年表を見る',
     sourceTitle: '情報の出典',
-    sourceText: '情報はベトナム文化遺産局（dsvh.gov.vn）のデータに基づいて要約し、遺産ごとに出典を示しています。Học di sản は同局の公式サイトではありません。写真はWikimedia Commonsのもので、写真ごとにクレジットを表示しています。',
+    sourceText: '情報はベトナム文化遺産局（dsvh.gov.vn）のデータに基づいて要約し、遺産ごとに出典を示しています。Vietnam Heritage は同局の公式サイトではありません。写真はWikimedia Commonsのもので、写真ごとにクレジットを表示しています。',
     appTitle: 'スマートフォンでも',
-    appText: 'Android版の Học di sản アプリを入れて観光客モードを選ぶと、旅先で地図、「近くの遺産」、3Dモデル、音声ガイドが使えます。',
+    appText: 'Android版の Vietnam Heritage アプリを入れて観光客モードを選ぶと、旅先で地図、「近くの遺産」、3Dモデル、音声ガイドが使えます。',
     appWeb: 'インストールしなくても、上の機能はすべてブラウザでそのまま使えます。',
     schoolsTitle: '学校の方へ',
     schoolsText: '先生はクラス向けに遺産の授業とテストを作成し、生徒は授業コードを使って小学校・中学校・高校の段階に合わせて学びます。',
     schoolsLink: '学校向けページを見る',
     videoTitle: '紹介動画',
-    videoLabel: 'Học di sản の紹介動画',
+    videoLabel: 'Vietnam Heritage の紹介動画',
     videoNoSupport: 'このブラウザでは動画を再生できません。',
   },
 
