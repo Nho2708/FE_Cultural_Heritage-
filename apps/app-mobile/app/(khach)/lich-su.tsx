@@ -102,6 +102,12 @@ export default function HistoryAndSettings() {
           </View>
           <Divider />
           <View style={local.setting}>
+            <Txt variant="label">{t('intro.videoTitle')}</Txt>
+            <Txt variant="caption">{t('intro.videoText')}</Txt>
+            <Button label={t('intro.watchVideo')} variant="secondary" onPress={() => router.push('/video-gioi-thieu')} />
+          </View>
+          <Divider />
+          <View style={local.setting}>
             <View style={ui.row}>
               <View style={ui.grow}>
                 <Txt variant="label">{t('settings.location')}</Txt>

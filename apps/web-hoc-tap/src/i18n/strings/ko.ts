@@ -406,6 +406,7 @@ export const ko: Strings = {
     videoTitle: '소개 영상',
     videoLabel: 'Vietnam Heritage 소개 영상',
     videoNoSupport: '이 브라우저에서는 영상을 재생할 수 없습니다.',
+    videoUnavailable: '소개 영상이 아직 없습니다. 나중에 다시 시도해 주세요.',
   },
 
   schoolsNote: {
