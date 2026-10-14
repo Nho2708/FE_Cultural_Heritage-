@@ -14,6 +14,7 @@ Nguồn duy nhất: `apps/web-hoc-tap/src/access/screens.ts` — 14 màn hình (
 | `/` | Trang chủ | Khách, học sinh | Đã dựng ([khám phá di sản](kham-pha-di-san.md)): ảnh lớn đầu trang, ô tìm kiếm, di sản nổi bật, khám phá theo vùng và loại, giới thiệu app; nút "Học sinh đăng nhập" hoặc "Vào trang học của em"; không có ô nhập mã |
 | `/di-san`, `/ban-do`, `/di-san/:diSan`, `/dong-thoi-gian[/:diSan]` | Tìm kiếm và lọc, bản đồ, chi tiết di sản, dòng thời gian | Khách, học sinh | Đã dựng ([khám phá di sản](kham-pha-di-san.md)) |
 | `/dang-nhap` | Học sinh đăng nhập | Khách | Đã dựng |
+| `/nha-truong` | Dành cho nhà trường | Khách, học sinh | Đã dựng, chỉ tiếng Việt: bốn bước của giáo viên, ba cấp học, cách để trường bắt đầu và biểu mẫu "Liên hệ để được tạo tài khoản cho trường" (xem mục 5) |
 | `/doi-mat-khau` | Đổi mật khẩu | Học sinh | Đã dựng (chế độ bắt buộc và tự đổi) |
 | `/hoc` | Trang học của em | Học sinh | Ba bản bố cục theo cấp (cấp 1, 2, 3): lời chào, thông tin của em, Lớp của em, lối vào nhập mã bài học; các khối bài học, gợi ý, huy hiệu dựng ở luồng sau ([lop-hoc-sinh.md](lop-hoc-sinh.md)) |
 | `/nhap-ma`, `/bai-hoc/:maBaiHoc` | Nhập mã bài học, Bài học (ba bố cục theo cấp) | Học sinh | Đã dựng ([bai-hoc-theo-cap.md](bai-hoc-theo-cap.md)) |
@@ -93,3 +94,12 @@ với học sinh xưng "em" do máy chủ trả.
   tràn ngang, không lỗi JavaScript; đăng nhập với backend hiện tại hiện câu lỗi hệ thống (chưa có endpoint).
 - Build: bundle khởi đầu khoảng 125 KB gzip (mục tiêu ≤ 300 KB).
 - Backend cần thêm `http://localhost:5174` vào `Cors:AllowedOrigins` để web học tập gọi được API.
+
+## 5. Biểu mẫu liên hệ của trường
+
+Cuối trang Dành cho nhà trường (`src/intro/SchoolContactForm.tsx`): tên trường, tỉnh/thành, họ tên người liên hệ, chức vụ, email, số điện thoại, nội dung (tối đa 2000 ký tự).
+Gọi `POST /api/v1/public/school-inquiries` (công khai, không gắn token) qua `createSchoolInquiryApi` của gói dùng chung; backend gửi email cho quản trị hệ thống, không gửi thư xác nhận về địa chỉ đã nhập.
+
+- Kiểm hợp lệ phía giao diện cùng luật với backend (`validateSchoolInquiry`); lỗi theo trường hiện dưới ô nhập và focus chuyển tới ô lỗi đầu tiên.
+- Đang gửi: nút khóa và hiện vòng quay. Thành công: "Đã gửi. Nhóm sẽ liên hệ lại qua email." trong vùng trạng thái (`aria-live`), form ẩn và có nút "Gửi thêm một liên hệ khác". Lỗi: câu của máy chủ (503 "Chưa gửi được, vui lòng thử lại sau."); 429 báo "Bạn đã gửi quá nhiều lần" kèm thời gian chờ.
+- Ô bẫy `website` ẩn khỏi mắt, bàn phím và trình đọc màn hình; người thật để trống. Có giá trị thì backend vẫn trả 202 nhưng không gửi thư.
