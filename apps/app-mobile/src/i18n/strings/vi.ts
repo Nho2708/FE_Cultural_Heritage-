@@ -42,6 +42,10 @@ export interface Strings {
     title: string;
     replay: string;
     replayText: string;
+    videoTitle: string;
+    videoText: string;
+    watchVideo: string;
+    videoOffline: string;
     skip: string;
     next: string;
     start: string;
@@ -225,6 +229,10 @@ export const vi: Strings = {
     title: 'Giới thiệu ứng dụng',
     replay: 'Xem lại',
     replayText: 'Xem lại bốn thẻ giới thiệu ngắn về ứng dụng.',
+    videoTitle: 'Video giới thiệu',
+    videoText: 'Xem video giới thiệu ngắn về ứng dụng, cần kết nối mạng.',
+    watchVideo: 'Xem video giới thiệu',
+    videoOffline: 'Cần kết nối mạng để xem video',
     skip: 'Bỏ qua',
     next: 'Tiếp',
     start: 'Bắt đầu',

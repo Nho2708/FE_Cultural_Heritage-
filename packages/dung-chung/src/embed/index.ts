@@ -11,6 +11,7 @@ export const EMBED_PROTOCOL_VERSION = 1;
 /** Đường dẫn trang nhúng trên web học tập. */
 export const EMBED_PATHS = {
   map: '/nhung/ban-do',
+  introVideo: '/nhung/video-gioi-thieu',
   model: (slug: string) => `/nhung/3d/${encodeURIComponent(slug)}`,
 } as const;
 
@@ -167,6 +168,11 @@ export function embedMapUrl(baseUrl: string, filter: DiscoveryFilter, language: 
 export function embedModelUrl(baseUrl: string, slug: string, language?: LanguageCode): string {
   const query = language ? `?${EMBED_PARAM.language}=${encodeURIComponent(language)}` : '';
   return `${baseUrl.replace(/\/+$/, '')}${EMBED_PATHS.model(slug)}${query}`;
+}
+
+/** Địa chỉ trang video giới thiệu nhúng: chỉ có trình phát video khách theo ngôn ngữ của app. */
+export function embedIntroVideoUrl(baseUrl: string, language: LanguageCode): string {
+  return `${baseUrl.replace(/\/+$/, '')}${EMBED_PATHS.introVideo}?${EMBED_PARAM.language}=${encodeURIComponent(language)}`;
 }
 
 /** Bộ lọc và ngôn ngữ đọc lại từ tham số của địa chỉ trang nhúng (phía trang web). */

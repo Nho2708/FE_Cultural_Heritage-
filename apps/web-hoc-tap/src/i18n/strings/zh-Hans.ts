@@ -404,6 +404,7 @@ export const zhHans: Strings = {
     videoTitle: '介绍视频',
     videoLabel: 'Vietnam Heritage 介绍视频',
     videoNoSupport: '此浏览器无法播放视频。',
+    videoUnavailable: '暂时还没有介绍视频，请稍后再试。',
   },
 
   schoolsNote: {

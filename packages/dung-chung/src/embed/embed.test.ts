@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { embedMapUrl, embedModelUrl, originOf, parseEmbedCommand, parseEmbedMessage, readEmbedMapParams, serializeEmbedMessage } from './index';
+import { embedIntroVideoUrl, embedMapUrl, embedModelUrl, originOf, parseEmbedCommand, parseEmbedMessage, readEmbedMapParams, serializeEmbedMessage } from './index';
 
 describe('hợp đồng thông điệp với trang nhúng', () => {
   it('đọc các thông điệp đúng khuôn từ chuỗi JSON hoặc đối tượng', () => {
@@ -78,6 +78,7 @@ describe('hợp đồng thông điệp với trang nhúng', () => {
   it('địa chỉ trang 3D mã hóa mã di sản và so được origin', () => {
     expect(embedModelUrl('http://web.test:5174', 'a b')).toBe('http://web.test:5174/nhung/3d/a%20b');
     expect(embedModelUrl('http://web.test:5174/', 'hue', 'zh-Hans')).toBe('http://web.test:5174/nhung/3d/hue?lang=zh-Hans');
+    expect(embedIntroVideoUrl('http://web.test:5174/', 'zh-Hans')).toBe('http://web.test:5174/nhung/video-gioi-thieu?lang=zh-Hans');
     expect(originOf('http://web.test:5174/nhung/ban-do?x=1')).toBe('http://web.test:5174');
     expect(originOf('không phải địa chỉ')).toBeNull();
   });
