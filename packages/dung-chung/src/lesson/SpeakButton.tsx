@@ -1,3 +1,4 @@
+import { cn } from '../cn';
 import { Icon } from '../ui';
 
 // Nút loa đọc to bằng giọng đọc có sẵn của trình duyệt (cấp 1). Trình duyệt không có giọng đọc thì không hiện nút.
@@ -6,7 +7,23 @@ function canSpeak(): boolean {
   return typeof window !== 'undefined' && 'speechSynthesis' in window && typeof SpeechSynthesisUtterance !== 'undefined';
 }
 
-export function SpeakButton({ text, label }: { text: string; label: string }) {
+const SIZE_MAP = {
+  sm: { button: 'size-10', icon: 20 },
+  md: { button: 'size-12', icon: 24 },
+  lg: { button: 'size-14', icon: 28 },
+};
+
+export function SpeakButton({
+  text,
+  label,
+  className,
+  size = 'md',
+}: {
+  text: string;
+  label: string;
+  className?: string;
+  size?: 'sm' | 'md' | 'lg';
+}) {
   if (!canSpeak()) return null;
   const speak = () => {
     window.speechSynthesis.cancel();
@@ -14,14 +31,19 @@ export function SpeakButton({ text, label }: { text: string; label: string }) {
     utterance.lang = 'vi-VN';
     window.speechSynthesis.speak(utterance);
   };
+  const s = SIZE_MAP[size] ?? SIZE_MAP.md;
   return (
     <button
       type="button"
       onClick={speak}
       aria-label={label}
-      className="flex size-14 shrink-0 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container transition-transform active:scale-95"
+      className={cn(
+        'flex shrink-0 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container shadow-xs transition-transform hover:scale-105 active:scale-95',
+        s.button,
+        className,
+      )}
     >
-      <Icon name="volume" size={28} />
+      <Icon name="volume" size={s.icon} />
     </button>
   );
 }

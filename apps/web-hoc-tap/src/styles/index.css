@@ -13,6 +13,13 @@
  * Biến riêng của khu học, giá trị của bộ giao diện mặc định. ThemeProvider ghi đè cùng các token ngữ nghĩa
  * (--dsv-color-*, --dsv-text-*, --dsv-radius-*) trên thẻ <html> theo cấp học của học sinh đang đăng nhập.
  */
+@theme {
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 28px;
+  --radius-4xl: 36px;
+}
+
 :root {
   --dsv-question-size: 18px;
   --dsv-question-line-height: 28px;
@@ -21,6 +28,240 @@
   --dsv-block-gap: 24px;
   --dsv-inline-gap: 16px;
 }
+
+/* =========================================================================
+ * GIAO DIỆN HỌC SINH CẤP 1 (TIỂU HỌC) — MỀM MẠI, BO TRÒN, MÀU TƯƠI SÁNG
+ * ========================================================================= */
+
+/* =========================================================================
+ * GIAO DIỆN HỌC SINH CẤP 1 (TIỂU HỌC) — MỀM MẠI, BO TRÒN, MÀU TƯƠI SÁNG
+ * ========================================================================= */
+
+/* Thẻ chào mừng Hero Banner */
+.dsv-hero-banner,
+[data-bo-cuc="cap-1"] .dsv-hero-banner {
+  border-radius: 32px !important;
+  background: linear-gradient(135deg, #E0F2FE 0%, #FEF9C3 50%, #FFEDD5 100%) !important;
+  border: 2.5px solid #BAE6FD !important;
+  box-shadow: 0 12px 28px -6px rgba(186, 230, 253, 0.7), 0 4px 10px -2px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Khung avatar linh vật */
+.dsv-mascot-avatar,
+[data-bo-cuc="cap-1"] .dsv-mascot-avatar {
+  border-radius: 9999px !important;
+  background: #FFFFFF !important;
+  border: 4px solid #FCD34D !important;
+  box-shadow: 0 8px 20px -2px rgba(251, 191, 36, 0.4) !important;
+}
+
+/* Thẻ nhiệm vụ: Nhập mã bài học */
+.dsv-mission-card,
+[data-bo-cuc="cap-1"] .dsv-mission-card {
+  border-radius: 30px !important;
+  background: linear-gradient(135deg, #1D4ED8 0%, #2563EB 50%, #4F46E5 100%) !important;
+  border: 2.5px solid #93C5FD !important;
+  box-shadow: 0 14px 30px -6px rgba(37, 99, 235, 0.4) !important;
+}
+
+/* Nút nhập mã vàng rực rỡ */
+.dsv-mission-btn,
+[data-bo-cuc="cap-1"] .dsv-mission-btn {
+  border-radius: 9999px !important;
+  background: #FBBF24 !important;
+  color: #451A03 !important;
+  border: 2.5px solid #FDE68A !important;
+  box-shadow: 0 6px 18px -2px rgba(245, 158, 11, 0.5) !important;
+  font-weight: 800 !important;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+.dsv-mission-btn:hover,
+[data-bo-cuc="cap-1"] .dsv-mission-btn:hover {
+  background: #FCD34D !important;
+  transform: translateY(-2px) scale(1.04) !important;
+  box-shadow: 0 10px 24px -3px rgba(245, 158, 11, 0.6) !important;
+}
+
+/* Thẻ Lớp của em (Hộ chiếu học sinh nhí) */
+.dsv-school-card,
+[data-bo-cuc="cap-1"] .dsv-school-card {
+  border-radius: 32px !important;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFFBEB 100%) !important;
+  border: 2.5px solid #FDE68A !important;
+  box-shadow: 0 10px 24px -4px rgba(254, 240, 138, 0.5) !important;
+}
+
+/* 3 thẻ thông tin lớp - bo tròn mềm mại với màu pastel */
+.dsv-info-badge-class,
+[data-bo-cuc="cap-1"] .dsv-info-badge-class {
+  border-radius: 22px !important;
+  background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%) !important;
+  border: 2px solid #BAE6FD !important;
+  box-shadow: 0 4px 12px -2px rgba(186, 230, 253, 0.5) !important;
+}
+
+.dsv-info-badge-teacher,
+[data-bo-cuc="cap-1"] .dsv-info-badge-teacher {
+  border-radius: 22px !important;
+  background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%) !important;
+  border: 2px solid #FECDD3 !important;
+  box-shadow: 0 4px 12px -2px rgba(254, 205, 211, 0.5) !important;
+}
+
+.dsv-info-badge-school,
+[data-bo-cuc="cap-1"] .dsv-info-badge-school {
+  border-radius: 22px !important;
+  background: linear-gradient(135deg, #FEFCE8 0%, #FEF9C3 100%) !important;
+  border: 2px solid #FDE68A !important;
+  box-shadow: 0 4px 12px -2px rgba(253, 230, 138, 0.5) !important;
+}
+
+/* Khối mã học sinh */
+.dsv-code-badge,
+[data-bo-cuc="cap-1"] .dsv-code-badge {
+  border-radius: 22px !important;
+  background: #FFFFFF !important;
+  border: 2px solid #E0E7FF !important;
+  box-shadow: 0 4px 12px -2px rgba(99, 102, 241, 0.12) !important;
+}
+
+.dsv-code-pill,
+[data-bo-cuc="cap-1"] .dsv-code-pill {
+  border-radius: 9999px !important;
+  background: #EEF2FF !important;
+  border: 2px solid #C7D2FE !important;
+  color: #3730A3 !important;
+  letter-spacing: 0.08em !important;
+}
+
+/* Thẻ bài chơi đang chờ / bài học / huy hiệu */
+.dsv-cap1-entry,
+[data-bo-cuc="cap-1"] .dsv-cap1-entry {
+  border-radius: 28px !important;
+  background: linear-gradient(135deg, #FFFFFF 0%, #FAFAFA 60%, #FFFBEB 100%) !important;
+  border: 2.5px solid #FDE68A !important;
+  box-shadow: 0 8px 20px -3px rgba(253, 230, 138, 0.35) !important;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+.dsv-cap1-entry:hover,
+[data-bo-cuc="cap-1"] .dsv-cap1-entry:hover {
+  border-color: #FBBF24 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 24px -4px rgba(245, 158, 11, 0.25) !important;
+}
+
+/* Chip thông tin trong bài */
+.dsv-info-chip,
+[data-bo-cuc="cap-1"] .dsv-info-chip {
+  border-radius: 9999px !important;
+  background: #F1F5F9 !important;
+  border: 1.5px solid #CBD5E1 !important;
+  color: #334155 !important;
+}
+
+/* Nút làm bài chơi xanh ngọc mềm mại */
+.dsv-btn-play,
+[data-bo-cuc="cap-1"] .dsv-btn-play {
+  border-radius: 9999px !important;
+  background: linear-gradient(135deg, #059669 0%, #10B981 100%) !important;
+  color: #FFFFFF !important;
+  border: 2.5px solid #6EE7B7 !important;
+  box-shadow: 0 6px 18px -2px rgba(16, 185, 129, 0.45) !important;
+  font-weight: 800 !important;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+.dsv-btn-play:hover,
+[data-bo-cuc="cap-1"] .dsv-btn-play:hover {
+  transform: translateY(-2px) scale(1.04) !important;
+  box-shadow: 0 10px 24px -3px rgba(16, 185, 129, 0.55) !important;
+}
+
+/* Nút mở bài học xanh dương */
+.dsv-btn-lesson,
+[data-bo-cuc="cap-1"] .dsv-btn-lesson {
+  border-radius: 9999px !important;
+  background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%) !important;
+  color: #FFFFFF !important;
+  border: 2.5px solid #93C5FD !important;
+  box-shadow: 0 6px 18px -2px rgba(37, 99, 235, 0.45) !important;
+  font-weight: 800 !important;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+.dsv-btn-lesson:hover,
+[data-bo-cuc="cap-1"] .dsv-btn-lesson:hover {
+  transform: translateY(-2px) scale(1.04) !important;
+  box-shadow: 0 10px 24px -3px rgba(37, 99, 235, 0.55) !important;
+}
+
+/* Nút loa đọc to */
+.dsv-speak-btn,
+[data-bo-cuc="cap-1"] .dsv-speak-btn {
+  border-radius: 9999px !important;
+  background: #FDE047 !important;
+  color: #713F12 !important;
+  border: 2px solid #FFFFFF !important;
+  box-shadow: 0 4px 12px -2px rgba(234, 179, 8, 0.4) !important;
+  transition: all 0.2s ease !important;
+}
+.dsv-speak-btn:hover,
+[data-bo-cuc="cap-1"] .dsv-speak-btn:hover {
+  transform: scale(1.1) !important;
+  background: #FACC15 !important;
+}
+
+/* Card gợi ý Cấp 1 */
+.dsv-rec-card,
+[data-bo-cuc="cap-1"] .dsv-rec-card {
+  border-radius: 26px !important;
+  border: 2.5px solid #FDE68A !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 8px 18px -4px rgba(254, 240, 138, 0.45) !important;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+.dsv-rec-card:hover,
+[data-bo-cuc="cap-1"] .dsv-rec-card:hover {
+  border-color: #FBBF24 !important;
+  transform: translateY(-3px) scale(1.02) !important;
+  box-shadow: 0 12px 24px -4px rgba(245, 158, 11, 0.35) !important;
+}
+
+/* Khối trạng thái trống (Empty state) */
+.dsv-empty-box,
+[data-bo-cuc="cap-1"] .dsv-empty-box {
+  border-radius: 30px !important;
+  background: linear-gradient(135deg, #FFFDF5 0%, #FEF9C3 100%) !important;
+  border: 2.5px dashed #FCD34D !important;
+  box-shadow: 0 6px 16px -2px rgba(251, 191, 36, 0.25) !important;
+}
+
+/* Bo góc mềm mại, ấm áp cho toàn bộ giao diện Cấp 1 (Tiểu học) */
+[data-bo-cuc="cap-1"] .rounded-lg,
+[data-bo-cuc="cap-1"] .rounded-md {
+  border-radius: 24px !important;
+}
+
+[data-bo-cuc="cap-1"] .rounded-2xl {
+  border-radius: 22px !important;
+}
+
+[data-bo-cuc="cap-1"] .rounded-3xl {
+  border-radius: 30px !important;
+}
+
+[data-bo-cuc="cap-1"] button:not(.dsv-square-override),
+[data-bo-cuc="cap-1"] a[class*="ButtonLink"],
+[data-bo-cuc="cap-1"] a[class*="Button"] {
+  border-radius: 9999px !important;
+}
+
+/* Thẻ kết quả bài làm Cấp 1 */
+[data-bo-cuc="cap-1"] .dsv-result-hero {
+  border-radius: 32px !important;
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 50%, #FCD34D 100%) !important;
+  border: 2.5px solid #F59E0B !important;
+  box-shadow: 0 12px 28px -6px rgba(245, 158, 11, 0.4) !important;
+}
+
 
 /*
  * Lớp phủ của hai thẻ lối vào ở trang chủ (Bản đồ di sản, Dòng thời gian): chữ trắng nằm trên ảnh nổi bật có thể rất sáng nên
