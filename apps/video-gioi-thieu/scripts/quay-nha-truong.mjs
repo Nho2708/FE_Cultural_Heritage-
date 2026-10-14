@@ -252,7 +252,7 @@ await buoc('04', async () => {
           appDownloadUrl: null,
           instructions: [
             `Mở trang học tập: ${HOC_TAP}/dang-nhap`,
-            'Hoặc cài ứng dụng DSVHVN trên điện thoại, mở ứng dụng và chọn chế độ "Học sinh" (không chọn "Khách tham quan").',
+            'Hoặc cài ứng dụng Vietnam Heritage trên điện thoại, mở ứng dụng và chọn chế độ "Học sinh" (không chọn "Khách tham quan").',
             'Đăng nhập bằng mã học sinh và mật khẩu tạm ghi trên phiếu.',
           ],
           firstLoginReminder: 'Em sẽ phải đổi mật khẩu ở lần đăng nhập đầu tiên.',

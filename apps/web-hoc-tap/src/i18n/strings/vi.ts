@@ -65,7 +65,7 @@ export const vi = {
   },
 
   home: {
-    title: 'Vietnam Heritage · DSVHVN',
+    title: 'Vietnam Heritage',
     kicker: 'DI SẢN VĂN HÓA VIỆT NAM',
     heroTitle: 'Khám phá di sản Việt Nam',
     heroText: (total: string | null) =>
