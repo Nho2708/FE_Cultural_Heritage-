@@ -61,7 +61,7 @@ export const zhHans: Strings = {
   },
 
   home: {
-    title: 'Vietnam Heritage · DSVHVN',
+    title: 'Vietnam Heritage',
     kicker: '越南文化遗产',
     heroTitle: '探索越南文化遗产',
     heroText: (total) =>

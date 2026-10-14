@@ -245,7 +245,7 @@ export function sheetOf(students: ReadonlyArray<{ id: number; name: string; code
     appDownloadUrl: null,
     instructions: [
       'Mở trang học tập: http://localhost:5174/dang-nhap',
-      'Hoặc cài ứng dụng DSVHVN trên điện thoại, mở ứng dụng và chọn chế độ "Học sinh" (không chọn "Khách tham quan").',
+      'Hoặc cài ứng dụng Vietnam Heritage trên điện thoại, mở ứng dụng và chọn chế độ "Học sinh" (không chọn "Khách tham quan").',
       'Đăng nhập bằng mã học sinh và mật khẩu tạm ghi trên phiếu.',
     ],
     firstLoginReminder: 'Em sẽ phải đổi mật khẩu ở lần đăng nhập đầu tiên.',

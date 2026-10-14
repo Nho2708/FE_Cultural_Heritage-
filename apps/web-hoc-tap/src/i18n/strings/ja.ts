@@ -61,7 +61,7 @@ export const ja: Strings = {
   },
 
   home: {
-    title: 'Vietnam Heritage · DSVHVN',
+    title: 'Vietnam Heritage',
     kicker: 'ベトナムの文化遺産',
     heroTitle: 'ベトナムの文化遺産を探そう',
     heroText: (total) =>

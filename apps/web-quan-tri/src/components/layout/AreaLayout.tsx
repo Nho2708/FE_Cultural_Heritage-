@@ -48,7 +48,7 @@ export function AreaLayout({ title, context, items, root, theme = 'light', banne
         <Link to="/" className="flex items-start gap-3 rounded-sm px-3 py-1">
           <BrandLogo variant="emblem" size={32} decorative className="mt-0.5" />
           <span className="flex min-w-0 flex-col">
-            <span className="type-h3 text-on-surface">DSVHVN</span>
+            <span className="type-h3 text-on-surface">Vietnam Heritage</span>
             <span className="type-label text-on-surface-muted">{title}</span>
             {context && <span className="mt-1 type-body-s text-on-surface-variant">{context}</span>}
           </span>
@@ -71,7 +71,7 @@ export function AreaLayout({ title, context, items, root, theme = 'light', banne
         <header className="flex h-(--dsv-topbar-height) items-center gap-3 border-b border-border bg-surface px-4 dsvmd:px-6">
           <Link to="/" className="flex items-center gap-2 type-h3 text-on-surface dsvmd:hidden">
             <BrandLogo variant="emblem" size={32} decorative />
-            DSVHVN
+            Vietnam Heritage
           </Link>
           <nav aria-label="Vị trí hiện tại" className="min-w-0 flex-1">
             <ol className="flex items-center gap-2 truncate type-body-s text-on-surface-variant">
