@@ -35,7 +35,7 @@ export function TheKet({ chu }: { chu: ChuQuangCao['theKet'] }) {
             <AnhDiTich id="pho-nha-vang" tieuDiem={[0.5, 0.42]} tiLe={1.15} />
           </div>
         ) : (
-          <HuyHieuVao f={f} canh={CANH_HUY_HIEU} />
+          <HuyHieuVao f={f} canh={CANH_HUY_HIEU} moc={m} />
         )}
       </div>
       <div style={{ position: 'absolute', top: 668 + DOI, left: 0, right: 0, textAlign: 'center', fontFamily: PHONG_TIEU_DE, fontWeight: 700, fontSize: 92, lineHeight: 1.1, color: MAU.kem, whiteSpace: 'nowrap', ...truot(tienDo(f, m.ten)) }}>

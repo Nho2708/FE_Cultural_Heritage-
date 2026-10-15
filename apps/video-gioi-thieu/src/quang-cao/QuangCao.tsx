@@ -1,12 +1,17 @@
 import type { ReactNode } from 'react';
-import { AbsoluteFill, Sequence } from 'remotion';
+import { AbsoluteFill, Html5Audio, Sequence, staticFile } from 'remotion';
 import { PHONG_CHU } from '../brand';
 import { DungTruocDiTich, HieuRoi } from './canh/AnhPho';
+import { BanDoTrongMay } from './canh/BanDoTrongMay';
+import { BanDoZoom } from './canh/BanDoZoom';
+import { ChiTietBiAn } from './canh/ChiTietBiAn';
+import { MoApp } from './canh/MoApp';
 import { DoiNgonNgu } from './canh/DoiNgonNgu';
 import { TheKet } from './canh/TheKet';
 import { chuQuangCao } from './chuoi';
 import { NenThuongHieu } from './nen';
 import { CANH_DOC_30, type Canh } from './nhip';
+import { useBanDo } from './ui/BanDo';
 
 export interface QuangCaoProps {
   ngonNgu: string;
@@ -16,14 +21,24 @@ export interface QuangCaoProps {
 /** Video quảng cáo cho khách du lịch, bản dọc 30 giây: vấn đề → giải pháp (gần bạn, nghe thuyết minh, xem 3D) → kết quả → thẻ kết. */
 export function QuangCao({ ngonNgu }: QuangCaoProps) {
   const chu = chuQuangCao(ngonNgu);
+  const banDo = useBanDo();
+  const cau = (id: Canh['id']) => chu.canh[id] ?? '';
   const noiDung = (c: Canh): ReactNode => {
     switch (c.id) {
       case 'dung-truoc-di-tich':
-        return <DungTruocDiTich chu={chu.canh[c.id] ?? ''} />;
+        return <DungTruocDiTich chu={cau(c.id)} />;
+      case 'chi-tiet-bi-an':
+        return <ChiTietBiAn chu={cau(c.id)} />;
+      case 'mo-app':
+        return banDo ? <MoApp chuCanhTruoc={cau('chi-tiet-bi-an')} banDo={banDo} /> : null;
+      case 'ban-do-zoom':
+        return banDo ? <BanDoZoom chu={cau(c.id)} banDo={banDo} /> : null;
+      case 'ban-do-trong-may':
+        return banDo ? <BanDoTrongMay banDo={banDo} tenDiTich={chu.giaoDien.tenDiTich} khoangCach={chu.giaoDien.khoangCach} /> : null;
       case 'doi-ngon-ngu':
         return <DoiNgonNgu batDau={c.tu} ds={chu.giaoDien.ngonNguNghe} tienTrinhDau={0.28} tienTrinhCuoi={0.36} />;
       case 'hieu-roi':
-        return <HieuRoi chu={chu.canh[c.id] ?? ''} />;
+        return <HieuRoi chu={cau(c.id)} />;
       case 'the-ket':
         return <TheKet chu={chu.theKet} />;
       default:
@@ -37,6 +52,8 @@ export function QuangCao({ ngonNgu }: QuangCaoProps) {
           {noiDung(c)}
         </Sequence>
       ))}
+      {/* Nhạc đã chuẩn hóa -14 LUFS sẵn trong tệp (scripts/tao-nhac-quang-cao.py), phát nguyên mức. */}
+      <Html5Audio src={staticFile('nhac/quang-cao-30s.wav')} />
     </NenThuongHieu>
   );
 }
