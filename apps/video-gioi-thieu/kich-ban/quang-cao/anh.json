@@ -1,0 +1,30 @@
+{
+  "ghiChu": "Ảnh di tích thật cho video quảng cáo, lấy từ Wikimedia Commons. Chỉ nhận ảnh CC0 hoặc phạm vi công cộng để video không phải ghi công trên hình; scripts/tai-anh-di-tich.py kiểm lại giấy phép khi tải và dừng nếu khác. Tránh ảnh có người nhận ra được mặt (video dùng để quảng cáo).",
+  "anh": [
+    {
+      "id": "pho-nha-vang",
+      "dung": "Cảnh mở đầu và cảnh hiểu rồi: phố nhà vàng có đèn lồng, nhìn ngang tầm mắt",
+      "tep": "File:Hoi An - HoiAn1435.jpg"
+    },
+    {
+      "id": "rong-hoi-quan",
+      "dung": "Dải ảnh chi tiết: tượng rồng ở hội quán người Hoa",
+      "tep": "File:Dragons at the Chinese Assembly Hall of Hoi An.jpg"
+    },
+    {
+      "id": "mai-ngoi",
+      "dung": "Dải ảnh chi tiết: mái ngói âm dương nhìn từ trên cao",
+      "tep": "File:View from Museum of Trade Ceramics, Hoi An (15405680206).jpg"
+    },
+    {
+      "id": "den-long-trang",
+      "dung": "Dải ảnh chi tiết: đèn lồng dưới mái hiên",
+      "tep": "File:Outdoor Light Decor (Unsplash).jpg"
+    },
+    {
+      "id": "den-long-song-dem",
+      "dung": "Cảnh đổi ngôn ngữ: đèn lồng bên sông Hoài buổi tối",
+      "tep": "File:Hội An, Vietnam (Unsplash E ySzvSJRI).jpg"
+    }
+  ]
+}
