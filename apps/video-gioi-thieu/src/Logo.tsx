@@ -11,14 +11,14 @@ import { MAU, expoOut, mo, ms } from './brand';
 // Lớp cổng và lớp chữ là ảnh tách từ logo gốc (public/logo), cùng khung với huy hiệu.
 
 /** Năm dải ngang của cổng lầu, từ dưới lên: [mép trên, mép dưới] theo phần trăm cạnh huy hiệu. */
-const TANG: ReadonlyArray<readonly [number, number]> = [
+export const TANG: ReadonlyArray<readonly [number, number]> = [
   [65.5, 100],
   [57.1, 65.5],
   [49.6, 57.1],
   [41.6, 49.6],
   [0, 41.6],
 ];
-const CHONG = 0.6;
+export const CHONG = 0.6;
 
 export const THOI_LUONG_LOGO = ms(2400);
 

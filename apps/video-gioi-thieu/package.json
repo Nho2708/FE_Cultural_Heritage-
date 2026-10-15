@@ -14,11 +14,13 @@
   "dependencies": {
     "@remotion/cli": "4.0.530",
     "@remotion/google-fonts": "4.0.530",
+    "qrcode": "1.5.4",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "remotion": "4.0.530"
   },
   "devDependencies": {
+    "@types/qrcode": "1.5.5",
     "@types/react": "^19.3.0",
     "playwright-core": "1.63.0",
     "typescript": "6.0.3"

@@ -1,0 +1,40 @@
+{
+  "ngonNgu": "en",
+  "canh": {
+    "dung-truoc-di-tich": "You're standing right here",
+    "chi-tiet-bi-an": "What are you looking at?",
+    "ban-do-zoom": "It finds where you're standing",
+    "trang-chi-tiet": "Hear its story in your language",
+    "mo-hinh-xoay": "See it from every side",
+    "hieu-roi": "Now it makes sense"
+  },
+  "giaoDien": {
+    "tenDiTich": "Hoi An Ancient Town",
+    "khoangCach": "80 m",
+    "ngonNguNghe": [
+      {
+        "ma": "en",
+        "ten": "English"
+      },
+      {
+        "ma": "ko",
+        "ten": "한국어"
+      },
+      {
+        "ma": "zh-Hans",
+        "ten": "中文"
+      },
+      {
+        "ma": "ja",
+        "ten": "日本語"
+      }
+    ]
+  },
+  "theKet": {
+    "ten": "Vietnam Heritage",
+    "phu": "Free · Web · Android",
+    "diaChiHien": "maynard-unphysical-planographically.ngrok-free.dev",
+    "lienKetQr": "https://maynard-unphysical-planographically.ngrok-free.dev"
+  },
+  "moTaBaiDang": "Vietnam Heritage: free on the web and Android. Credits: 3D model \"Hoi An House\" by NGUYENNGHIAKK on Sketchfab (CC BY 4.0, compressed for the web). Map data © OpenStreetMap contributors (openstreetmap.org/copyright). Heritage data: Vietnam's Department of Cultural Heritage (dsvh.gov.vn). Photos: Wikimedia Commons (CC0). Music: original, made by the project team."
+}
