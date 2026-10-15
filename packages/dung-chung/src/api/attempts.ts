@@ -279,6 +279,8 @@ export interface StudentHome {
   openQuizzes: StudentOpenQuiz[];
   myLessons: StudentLessonRef[];
   recentBadges: StudentRecentBadge[];
+  streakDays?: number | null;
+  cheer?: string | null;
 }
 
 export function createAttemptsApi(client: ApiClient) {
