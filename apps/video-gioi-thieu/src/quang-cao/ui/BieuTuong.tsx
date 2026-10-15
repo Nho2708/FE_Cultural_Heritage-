@@ -35,3 +35,39 @@ export function BieuTuongTaiNghe({ canh, mau }: { canh: number; mau: string }) {
     </svg>
   );
 }
+
+export function BieuTuongTrang({ canh, mau }: { canh: number; mau: string }) {
+  return (
+    <svg width={canh} height={canh} viewBox="0 0 24 24" stroke={mau} {...NET}>
+      <path d="M6 3h9l4 4v14H6z" />
+      <path d="M9.5 11h6M9.5 14.5h6M9.5 18h4" />
+    </svg>
+  );
+}
+
+export function BieuTuongKhoi({ canh, mau }: { canh: number; mau: string }) {
+  return (
+    <svg width={canh} height={canh} viewBox="0 0 24 24" stroke={mau} {...NET}>
+      <path d="M12 2.8l8 4.6v9.2l-8 4.6-8-4.6V7.4z" />
+      <path d="M4 7.4l8 4.6 8-4.6M12 12v9.2" />
+    </svg>
+  );
+}
+
+export function BieuTuongGhim({ canh, mau }: { canh: number; mau: string }) {
+  return (
+    <svg width={canh} height={canh} viewBox="0 0 24 24" stroke={mau} {...NET}>
+      <path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z" />
+      <circle cx="12" cy="10" r="2.4" />
+    </svg>
+  );
+}
+
+export function BieuTuongVeLai({ canh, mau }: { canh: number; mau: string }) {
+  return (
+    <svg width={canh} height={canh} viewBox="0 0 24 24" stroke={mau} {...NET}>
+      <path d="M20 12a8 8 0 1 1-2.6-5.9" />
+      <path d="M20 4v5h-5" />
+    </svg>
+  );
+}

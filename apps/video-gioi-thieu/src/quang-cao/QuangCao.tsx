@@ -1,22 +1,33 @@
 import type { ReactNode } from 'react';
-import { AbsoluteFill, Html5Audio, Sequence, staticFile } from 'remotion';
-import { PHONG_CHU } from '../brand';
+import { Html5Audio, Sequence, staticFile } from 'remotion';
 import { DungTruocDiTich, HieuRoi } from './canh/AnhPho';
 import { BanDoTrongMay } from './canh/BanDoTrongMay';
 import { BanDoZoom } from './canh/BanDoZoom';
 import { ChiTietBiAn } from './canh/ChiTietBiAn';
-import { MoApp } from './canh/MoApp';
 import { DoiNgonNgu } from './canh/DoiNgonNgu';
+import { MoApp } from './canh/MoApp';
+import { MoHinhGocCao, MoHinhTrongMay, MoHinhXoay } from './canh/MoHinh';
+import { SongAmCanCanh } from './canh/SongAmCanCanh';
 import { TheKet } from './canh/TheKet';
+import { TrangChiTiet } from './canh/TrangChiTiet';
 import { chuQuangCao } from './chuoi';
 import { NenThuongHieu } from './nen';
-import { CANH_DOC_30, type Canh } from './nhip';
+import { CANH_DOC_30, MOC, type Canh } from './nhip';
 import { useBanDo } from './ui/BanDo';
+import { useMoHinh, type MoHinh } from './ui/MoHinh3D';
 
 export interface QuangCaoProps {
   ngonNgu: string;
   [key: string]: unknown;
 }
+
+/** Chỉ vẽ cảnh 3D khi mô hình đã tải xong (mô hình tải một lần, chỉ ở các cảnh có 3D). */
+function CoMoHinh({ ve }: { ve: (moHinh: MoHinh) => ReactNode }) {
+  const moHinh = useMoHinh();
+  return moHinh ? <>{ve(moHinh)}</> : null;
+}
+
+const canhTheoId = (id: Canh['id']) => CANH_DOC_30.find((c) => c.id === id)!;
 
 /** Video quảng cáo cho khách du lịch, bản dọc 30 giây: vấn đề → giải pháp (gần bạn, nghe thuyết minh, xem 3D) → kết quả → thẻ kết. */
 export function QuangCao({ ngonNgu }: QuangCaoProps) {
@@ -35,14 +46,22 @@ export function QuangCao({ ngonNgu }: QuangCaoProps) {
         return banDo ? <BanDoZoom chu={cau(c.id)} banDo={banDo} /> : null;
       case 'ban-do-trong-may':
         return banDo ? <BanDoTrongMay banDo={banDo} tenDiTich={chu.giaoDien.tenDiTich} khoangCach={chu.giaoDien.khoangCach} /> : null;
+      case 'trang-chi-tiet':
+        return banDo ? <TrangChiTiet chu={cau(c.id)} banDo={banDo} tenDiTich={chu.giaoDien.tenDiTich} khoangCach={chu.giaoDien.khoangCach} /> : null;
+      case 'song-am':
+        return <SongAmCanCanh batDau={c.tu} />;
       case 'doi-ngon-ngu':
-        return <DoiNgonNgu batDau={c.tu} ds={chu.giaoDien.ngonNguNghe} tienTrinhDau={0.28} tienTrinhCuoi={0.36} />;
+        return <DoiNgonNgu batDau={c.tu} ds={chu.giaoDien.ngonNguNghe} tienTrinhDau={MOC.songAm.tienTrinh[1]} tienTrinhCuoi={MOC.doiNgonNgu.tienTrinhCuoi} />;
+      case 'mo-hinh-xoay':
+        return <CoMoHinh ve={(m) => <MoHinhXoay chu={cau(c.id)} moHinh={m} />} />;
+      case 'mo-hinh-goc-cao':
+        return <CoMoHinh ve={(m) => <MoHinhGocCao moHinh={m} khungCanhTruoc={canhTheoId('mo-hinh-xoay').dai} />} />;
+      case 'mo-hinh-trong-may':
+        return <CoMoHinh ve={(m) => <MoHinhTrongMay moHinh={m} />} />;
       case 'hieu-roi':
         return <HieuRoi chu={cau(c.id)} />;
       case 'the-ket':
         return <TheKet chu={chu.theKet} />;
-      default:
-        return <ChuaDung id={c.id} />;
     }
   };
   return (
@@ -56,9 +75,4 @@ export function QuangCao({ ngonNgu }: QuangCaoProps) {
       <Html5Audio src={staticFile('nhac/quang-cao-30s.wav')} />
     </NenThuongHieu>
   );
-}
-
-/** Cảnh chưa dựng (các cổng duyệt sau), chỉ để xem khung thời gian trong Remotion Studio. */
-function ChuaDung({ id }: { id: string }) {
-  return <AbsoluteFill style={{ alignItems: 'center', justifyContent: 'center', fontFamily: PHONG_CHU, fontSize: 36, color: 'rgba(255,255,255,0.35)' }}>{id}</AbsoluteFill>;
 }
