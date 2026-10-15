@@ -7,7 +7,8 @@ import { join } from 'node:path';
 
 const thuMuc = new URL('../kich-ban/quang-cao/', import.meta.url).pathname.replace(/^\/(\w:)/, '$1');
 const chon = process.argv.slice(2);
-const tep = readdirSync(thuMuc).filter((t) => /^[a-z-]+\.json$/i.test(t) && t !== 'anh.json' && (chon.length === 0 || chon.includes(t.replace('.json', ''))));
+// Tệp chữ theo ngôn ngữ đặt tên theo mã ngôn ngữ (en.json, vi.json, zh-Hans.json); anh.json và canh.json không phải tệp chữ.
+const tep = readdirSync(thuMuc).filter((t) => /^[a-z]{2}(-[A-Za-z]+)?\.json$/.test(t) && (chon.length === 0 || chon.includes(t.replace('.json', ''))));
 const TOI_DA_CAU = 7;
 const TOI_DA_TONG = 44;
 const dem = (s) => s.split(/\s+/).filter((w) => w && w !== '·').length;

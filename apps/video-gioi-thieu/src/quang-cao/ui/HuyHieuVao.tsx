@@ -2,14 +2,13 @@ import type { CSSProperties } from 'react';
 import { Img, interpolate, staticFile } from 'remotion';
 import { MAU } from '../../brand';
 import { CHONG, TANG } from '../../Logo';
-import { MOC, tienDo } from '../nhip';
+import { tienDo, type MocHuyHieu } from '../nhip';
 
 /**
- * Huy hiệu dựng lên trong thẻ kết, cùng các lớp với logo chuyển động của web (vòng vàng, đĩa kem, năm tầng cổng, chữ theo cung)
- * nhưng nén lại theo mốc MOC.theKet. `f` tính từ đầu thẻ kết.
+ * Huy hiệu dựng lên, cùng các lớp với logo chuyển động của web (vòng vàng, đĩa kem, năm tầng cổng, chữ theo cung)
+ * nhưng nén lại theo mốc truyền vào (màn hình chờ trong cảnh mở app, thẻ kết). `f` tính từ đầu cảnh.
  */
-export function HuyHieuVao({ f, canh }: { f: number; canh: number }) {
-  const m = MOC.theKet;
+export function HuyHieuVao({ f, canh, moc: m }: { f: number; canh: number; moc: MocHuyHieu }) {
   const vong = tienDo(f, m.vong);
   const dia = tienDo(f, m.dia);
   const quet = 390 * tienDo(f, m.chuCung);

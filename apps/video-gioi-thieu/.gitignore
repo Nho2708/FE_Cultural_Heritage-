@@ -7,3 +7,5 @@ public/man-hinh/
 scripts/tai-khoan.local.json
 public/giong/
 public/anh-di-tich/
+public/ban-do/
+__pycache__/
