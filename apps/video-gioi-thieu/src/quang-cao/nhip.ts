@@ -35,7 +35,7 @@ export interface Canh {
   id: IdCanh;
   /** Khung bắt đầu trong video. */
   tu: number;
-  /** Số khung. Mỗi cảnh tối đa 75 khung (2,5 giây); riêng thẻ kết gồm hai cảnh nối nhau, xem MOC.theKet.doiAnh. */
+  /** Số khung. Mỗi cảnh tối đa 75 khung (2,5 giây); riêng thẻ kết dài hơn để mã QR và địa chỉ đứng trên màn hình đủ lâu. */
   dai: number;
 }
 
@@ -99,8 +99,6 @@ export const MOC = {
     chuCung: [27, 45],
     ten: [12, 24],
     phu: [16, 28],
-    /** Khung cắt sang cảnh thứ hai của thẻ kết: chỉ đổi nửa trên, khối mã QR và địa chỉ đứng yên. */
-    doiAnh: 4 * PHACH,
     nhacTat: [105, 134],
   },
 } as const;
