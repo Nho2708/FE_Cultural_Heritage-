@@ -4,11 +4,9 @@ import { HatMin } from '../nen';
 import { DI, MOC, tienDo } from '../nhip';
 import { AnhDiTich, CauTieuDe, GhimVang } from '../thanh-phan';
 
-/** Ảnh mở đầu: Chùa Cầu lúc chạng vạng (ảnh dọc). Cảnh hiểu rồi dùng phố nhà vàng (thẻ kết cũng dùng ảnh này). */
-const ANH_MO_DAU = 'chua-cau';
-const TIEU_DIEM_MO_DAU: [number, number] = [0.5, 0.42];
-const ANH_HIEU_ROI = 'pho-nha-vang';
-const TIEU_DIEM_HIEU_ROI: [number, number] = [0.5, 0.42];
+/** Chùa Cầu lúc chạng vạng (ảnh dọc): mở đầu video và trở lại ở cảnh hiểu rồi. */
+const ANH_CHUA_CAU = 'chua-cau';
+const TIEU_DIEM: [number, number] = [0.5, 0.42];
 const PHONG_TOI = 1.06;
 /** Dòng chữ nằm ở phần tối của ảnh, trên vùng 420 px dưới cùng mà mạng xã hội che. */
 const DINH_CHU = 1360;
@@ -32,7 +30,7 @@ export function DungTruocDiTich({ chu, tinh = false }: { chu: string; tinh?: boo
   const tGach = tienDo(f, m.gach);
   return (
     <AbsoluteFill>
-      <AnhDiTich id={ANH_MO_DAU} tiLe={phong} tieuDiem={TIEU_DIEM_MO_DAU} style={{ opacity: tienDo(f, m.hien) }} />
+      <AnhDiTich id={ANH_CHUA_CAU} tiLe={phong} tieuDiem={TIEU_DIEM} style={{ opacity: tienDo(f, m.hien) }} />
       <DaiToi />
       <HatMin doDam={0.04} />
       <div style={{ position: 'absolute', left: 90, top: DINH_CHU, display: 'flex', alignItems: 'flex-end', gap: 22 }}>
@@ -44,7 +42,7 @@ export function DungTruocDiTich({ chu, tinh = false }: { chu: string; tinh?: boo
   );
 }
 
-/** Cảnh kết quả: lại phố của cảnh mở đầu, ảnh thu về ngược chiều, ghim tỏa vòng sáng, rồi tối dần về thẻ kết. */
+/** Cảnh kết quả: lại Chùa Cầu của cảnh mở đầu, ảnh thu về ngược chiều, ghim tỏa vòng sáng, rồi tối dần về thẻ kết. */
 export function HieuRoi({ chu }: { chu: string }) {
   const f = useCurrentFrame();
   const m = MOC.hieuRoi;
@@ -54,7 +52,7 @@ export function HieuRoi({ chu }: { chu: string }) {
   const toi = tienDo(f, m.toiDan, DI);
   return (
     <AbsoluteFill>
-      <AnhDiTich id={ANH_HIEU_ROI} tiLe={phong} tieuDiem={TIEU_DIEM_HIEU_ROI} />
+      <AnhDiTich id={ANH_CHUA_CAU} tiLe={phong} tieuDiem={TIEU_DIEM} />
       <DaiToi />
       <HatMin doDam={0.04} />
       <div style={{ position: 'absolute', left: 90, top: DINH_CHU, display: 'flex', alignItems: 'flex-end', gap: 22 }}>

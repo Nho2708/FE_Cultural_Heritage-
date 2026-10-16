@@ -3,7 +3,7 @@ dây gảy kiểu đàn tranh trên thang ngũ cung, hợp âm nền quãng năm
 thứ tự cảnh lấy từ kich-ban/quang-cao/canh.json (dùng chung với src/quang-cao/nhip.ts).
 
 Bố cục: cảnh mở đầu chỉ có nhịp đệm và một tiếng mõ; giai điệu vào từ cảnh thứ hai; mõ gỗ ở các cảnh trong danh sách "moGo";
-vào thẻ kết thì dừng nhịp, rải hợp âm kết, mõ thêm một tiếng ở cảnh sau của thẻ kết, tắt dần trong giây cuối.
+vào thẻ kết thì dừng nhịp, rải hợp âm kết, tắt dần trong giây cuối.
 Sau cùng chuẩn hóa về -14 LUFS, đỉnh thật -1 dBTP (hai lượt loudnorm của ffmpeg đi kèm Remotion).
 Ra: public/nhac/quang-cao-30s.wav. Chạy: python scripts/tao-nhac-quang-cao.py (cần numpy, Node.js).
 """
@@ -35,7 +35,6 @@ def bai(ds, hat_giong):
     rng = np.random.default_rng(hat_giong)
     moc, dai = moc_canh(ds)
     ket = moc["the-ket"]
-    ket_sau = ket + 4 * PHACH
     tron = np.zeros((2, int(dai * SR)))
     # Nhịp đệm: dây trầm gảy ngắn mỗi phách, phách đầu mỗi ô (4 phách) mạnh hơn; tiếng gõ nhẹ ở nửa phách.
     t = 0.0
@@ -71,10 +70,9 @@ def bai(ds, hat_giong):
             dat(tron, gay(cao_do, 1.4, 0.2 if buoc % 4 == 0 else 0.13, rng), tt, 0.25 if buoc % 2 else -0.1)
         t += len(cau) * PHACH / 2
         lan += 1
-    # Mõ gỗ ở các cảnh được chọn và ở cảnh sau của thẻ kết; hợp âm kết rải.
+    # Mõ gỗ ở các cảnh được chọn; hợp âm kết rải.
     for ten in BANG["moGo"]:
         dat(tron, mo_go(0.24), moc[ten])
-    dat(tron, mo_go(0.2), ket_sau)
     for i, m in enumerate([60, 67, 72, 74, 79]):
         dat(tron, gay(m, dai - ket, 0.2, rng, 0.998), ket + 0.06 * i, -0.3 + 0.15 * i)
     # Tắt dần trong giây cuối.

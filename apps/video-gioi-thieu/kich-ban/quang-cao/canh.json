@@ -1,5 +1,5 @@
 {
-  "ghiChu": "Thứ tự cảnh và độ dài (tính bằng phách) của video quảng cáo. src/quang-cao/nhip.ts và scripts/tao-nhac-quang-cao.py cùng đọc tệp này để điểm cắt hình và nhịp nhạc luôn khớp. Mỗi cảnh tối đa 5 phách (2,5 giây); thẻ kết 9 phách gồm hai cảnh nối nhau.",
+  "ghiChu": "Thứ tự cảnh và độ dài (tính bằng phách) của video quảng cáo. src/quang-cao/nhip.ts và scripts/tao-nhac-quang-cao.py cùng đọc tệp này để điểm cắt hình và nhịp nhạc luôn khớp. Mỗi cảnh tối đa 5 phách (2,5 giây); thẻ kết 9 phách (4,5 giây) là một cảnh đứng yên để mã QR và địa chỉ ở trên màn hình đủ lâu.",
   "khungMoiGiay": 30,
   "nhipMoiPhut": 120,
   "doc30": [
