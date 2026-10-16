@@ -49,7 +49,7 @@ Mã nguồn ở `src/quang-cao/`, kịch bản ở `kich-ban/quang-cao/`:
 
 - `canh.json`: thứ tự cảnh và độ dài theo phách (120 phách mỗi phút, mọi điểm cắt rơi đúng phách). `src/quang-cao/nhip.ts` (mốc chuyển động trong từng cảnh, hai đường cong dùng chung) và script nhạc cùng đọc tệp này, nên đổi độ dài cảnh thì chạy lại script nhạc.
 - `en.json`: toàn bộ chữ trên hình của bản tiếng Anh (câu theo cảnh, nhãn giao diện, chữ của trang chi tiết dựng lại giống trang thật của web, hai câu thuyết minh hiện chữ, thẻ kết, địa chỉ trong mã QR) và `moTaBaiDang` là phần ghi công đặt ở mô tả bài đăng (mô hình 3D, ảnh CC BY và CC BY-SA, OpenStreetMap, Natural Earth, nhạc). Làm bản ngôn ngữ khác: thêm tệp `<mã>.json` cùng cấu trúc, đăng ký trong `src/quang-cao/chuoi.ts` và thêm composition. Kiểm chữ: `node scripts/kiem-chu-quang-cao.mjs` (câu dẫn tối đa 7 từ, không dấu chấm cuối; câu dẫn cộng nhãn và thẻ kết dưới 45 từ; chữ trang chi tiết và lời thuyết minh in riêng).
-- `anh.json`: ảnh di tích trên Wikimedia Commons (Chùa Cầu, rồng ở hội quán, Ngọ Môn Huế, cổng thành nhà Hồ, ảnh đại diện Hội An của app...), nhận CC0, phạm vi công cộng, CC BY, CC BY-SA.
+- `anh.json`: ảnh di tích trên Wikimedia Commons (nhà cổ treo đèn lồng ở phố cổ Hội An, rồng ở hội quán, Ngọ Môn Huế, cổng thành nhà Hồ, ảnh đại diện Hội An của app...), nhận CC0, phạm vi công cộng, CC BY, CC BY-SA.
 
 Tài nguyên không đưa vào git, tạo lại bằng:
 
