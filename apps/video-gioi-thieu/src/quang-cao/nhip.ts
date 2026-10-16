@@ -26,7 +26,7 @@ export type IdCanh =
   | 'song-am'
   | 'doi-ngon-ngu'
   | 'mo-hinh-xoay'
-  | 'mo-hinh-goc-cao'
+  | 'mo-hinh-hue'
   | 'mo-hinh-trong-may'
   | 'hieu-roi'
   | 'the-ket';
@@ -55,29 +55,39 @@ export const TONG_DOC_30 = CANH_DOC_30[CANH_DOC_30.length - 1].tu + CANH_DOC_30[
 
 /** Mốc bên trong từng cảnh, tính bằng khung kể từ đầu cảnh. [a, b] = chạy từ khung a tới khung b. */
 export const MOC = {
-  dungTruocDiTich: { phong: [0, 59], chu: [3, 15], ghim: [10, 22], gach: [18, 36] },
-  chiTietBiAn: { dai2Vao: [0, 12], dai3Vao: [4, 16], troi: [0, 59], chu: [6, 18], vachNgan: [18, 36] },
+  /** Ảnh Chùa Cầu hiện lên (từ nền tối) rồi phóng chậm; chữ trượt lên, ghim rơi, gạch chân kẻ ra. */
+  dungTruocDiTich: { hien: [0, 8], phong: [0, 59], chu: [3, 15], ghim: [10, 22], gach: [18, 36] },
+  /**
+   * Ba dải ảnh lần lượt trượt từ phải sang trái phủ lên ảnh cảnh trước (dải i bắt đầu ở batDau + i·lech), mỗi dải mang vạch vàng ở mép trái;
+   * khi đã nằm yên, vạch ngăn dải đậm dần (vachDam, dải sau muộn hơn lechVach). Ảnh trong dải trôi ngang chậm.
+   */
+  chiTietBiAn: { daiVao: { batDau: 0, lech: 5, dai: 14 }, troi: [0, 59], chu: [14, 26], vachDam: [18, 34], lechVach: 6 },
   moApp: {
     nenNhoe: [0, 12],
     mayTroi: [0, 15],
-    logo: { vong: [4, 14], dia: [6, 16], tangCong: { batDau: 8, lech: 2, dai: 8 }, chuCung: [16, 28] },
-    banDoHien: [27, 33],
-    xuyenMan: [33, 44],
+    logo: { vong: [6, 16], dia: [8, 18], tangCong: { batDau: 10, lech: 2, dai: 8 }, chuCung: [14, 26] },
+    /** Màn hình chuyển sang bản đồ cả nước, camera xuyên vào màn hình, rồi bản đồ lao xuống Hội An cho tới đúng tầm đầu cảnh sau. */
+    banDoHien: [24, 30],
+    xuyenMan: [30, 44],
+    laoXuong: [34, 59],
   },
   banDoZoom: { phong: [2, 52], chu: [6, 18], nguoi: [14, 24], ghim: [32, 42], ghimLon: [56, 66] },
-  banDoTrongMay: { mayKhep: [0, 15], theTruot: [13, 29], cham: [44, 54], nhan: [44, 52] },
+  banDoTrongMay: { mayKhep: [0, 15], theTruot: [13, 29], cham: [36, 46], nhan: [36, 44] },
   /**
    * Trang chi tiết. moTrang tính từ đầu cảnh, số âm là trước điểm cắt: thẻ bắt đầu mở thành trang ở phách cuối cảnh bản đồ trong máy,
    * cắt sang khung cận giữa lúc đang mở (cắt trên chuyển động). Camera đẩy dần về nút nghe, nút nhịp hai lần, ngón tay chạm nút ở phách thứ tư.
    */
   trangChiTiet: { moTrang: [-12, 12], noiDung: [-6, 10], chu: [6, 18], day: [0, 59], nutNhip: [12, 36], ngonVao: [36, 44], cham: [44, 54], ngonRa: [50, 58] },
-  /** Cận cảnh bảng nghe: nút nhún và đổi sang tạm dừng, sóng âm dâng lên, vạch tô nhảy sang câu sau, tiến trình chạy đều. */
-  songAm: { nhan: [0, 8], gon: [0, 16], doiNut: 4, dangLen: [3, 15], doiCau: [44, 54], day: [0, 74], tienTrinh: [0, 0.28] },
+  /**
+   * Cận cảnh bảng nghe: nút nhún và đổi sang tạm dừng, sóng âm dâng lên, chữ câu thứ nhất hiện từng từ theo giọng đọc
+   * (từ thứ i hiện ở cau1 + i·moiTu, mỗi từ mất hienTu khung), vạch tô nhảy sang câu sau rồi câu sau hiện tương tự; tiến trình chạy đều.
+   */
+  songAm: { nhan: [0, 8], gon: [0, 16], doiNut: 4, dangLen: [3, 15], cau1: 8, cau2: 52, moiTu: 3, hienTu: 5, doiCau: [44, 54], day: [0, 74], tienTrinh: [0, 0.28] },
   doiNgonNgu: { moiNgonNgu: PHACH, doiChu: 6, lia: [0, 59], tienTrinhCuoi: 0.36 },
   /** Mô hình đứng một mình: xoay đều, camera tiến lại gần (khoảng cách nhân hệ số), chữ vào. */
   moHinhXoay: { tien: [0, 59], khoangCach: [1.15, 1], ngang: 10, chu: [4, 16] },
-  /** Cùng mô hình, khung chặt hơn: xoay tiếp không ngắt, camera ngẩng lên cao cho thấy mái ngói. */
-  moHinhGocCao: { ngang: [16, 58], khoangCach: 0.74, nhinCao: 0.55, ngangLen: [0, 59] },
+  /** Mô hình thứ hai (Cao Đỉnh, Hoàng thành Huế) đứng một mình: xoay tiếp cùng nhịp không ngắt qua điểm cắt, camera ngẩng dần lên. */
+  moHinhHue: { ngang: [8, 32], khoangCach: 0.92, nhinCao: 0.46, ngangLen: [0, 59] },
   /** Hộp 3D của app trong điện thoại lớn: ngón tay đặt xuống, kéo ngang, mô hình xoay theo ngón rồi ngón nhấc lên. */
   moHinhTrongMay: { mayLen: [0, 12], ngonVao: [2, 10], keo: [10, 40], ngonRa: [42, 50], doiX: [-160, 160], xoayThem: 90, gocDau: 25, ngang: 14 },
   hieuRoi: { phong: [0, 74], chu: [4, 16], vongSang: [10, 40], toiDan: [60, 74] },

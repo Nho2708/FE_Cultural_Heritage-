@@ -1,9 +1,14 @@
 {
-  "ghiChu": "Ảnh di tích thật cho video quảng cáo, lấy từ Wikimedia Commons. Chỉ nhận ảnh CC0 hoặc phạm vi công cộng để video không phải ghi công trên hình; scripts/tai-anh-di-tich.py kiểm lại giấy phép khi tải và dừng nếu khác. Tránh ảnh có người nhận ra được mặt (video dùng để quảng cáo).",
+  "ghiChu": "Ảnh di tích thật cho video quảng cáo, lấy từ Wikimedia Commons. Nhận CC0, phạm vi công cộng, CC BY và CC BY-SA (không nhận NC, ND); scripts/tai-anh-di-tich.py kiểm lại giấy phép khi tải và dừng nếu khác. Ảnh có giấy phép CC BY, CC BY-SA được ghi công ở mô tả bài đăng (moTaBaiDang trong tệp chữ); ảnh đầu trang chi tiết là ảnh thật của app nên dòng ghi nguồn hiện đúng như trên trang. Tránh ảnh có người nhận ra được mặt.",
   "anh": [
     {
+      "id": "chua-cau",
+      "dung": "Cảnh mở đầu: Chùa Cầu Hội An lúc chạng vạng, sau đợt tu bổ 2024 (ảnh dọc)",
+      "tep": "File:2024 Hội An - Japanese Covered Bridge (Chùa Cầu) after renovation - img 10.jpg"
+    },
+    {
       "id": "pho-nha-vang",
-      "dung": "Cảnh mở đầu và cảnh hiểu rồi: phố nhà vàng có đèn lồng, nhìn ngang tầm mắt",
+      "dung": "Cảnh hiểu rồi và thẻ kết: phố nhà vàng có đèn lồng, nhìn ngang tầm mắt",
       "tep": "File:Hoi An - HoiAn1435.jpg"
     },
     {
@@ -12,14 +17,19 @@
       "tep": "File:Dragons at the Chinese Assembly Hall of Hoi An.jpg"
     },
     {
-      "id": "mai-ngoi",
-      "dung": "Dải ảnh chi tiết: mái ngói âm dương nhìn từ trên cao",
-      "tep": "File:View from Museum of Trade Ceramics, Hoi An (15405680206).jpg"
+      "id": "ngo-mon-hue",
+      "dung": "Dải ảnh chi tiết: Ngọ Môn, Hoàng thành Huế (quần thể di tích Cố đô Huế)",
+      "tep": "File:Huế (2024) - Meridian Gate - Ngọ Môn (Hoàng thành Huế) - img 05.jpg"
     },
     {
-      "id": "den-long-trang",
-      "dung": "Dải ảnh chi tiết: đèn lồng dưới mái hiên",
-      "tep": "File:Outdoor Light Decor (Unsplash).jpg"
+      "id": "thanh-nha-ho",
+      "dung": "Dải ảnh chi tiết: cổng Nam thành nhà Hồ, tường đá vôi",
+      "tep": "File:Tay Do castle South gate.JPG"
+    },
+    {
+      "id": "anh-dau-hoi-an",
+      "dung": "Thẻ di sản và ảnh đầu trang chi tiết: đúng ảnh đại diện của Đô thị cổ Hội An trong app",
+      "tep": "File:Hội An, Ancient Town, 2020-01 CN-06.jpg"
     },
     {
       "id": "den-long-song-dem",

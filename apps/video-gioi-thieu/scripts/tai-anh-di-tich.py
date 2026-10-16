@@ -1,12 +1,13 @@
 """Tải ảnh di tích cho video quảng cáo từ Wikimedia Commons (danh sách ở kich-ban/quang-cao/anh.json) về public/anh-di-tich/.
 
-Mỗi ảnh được kiểm giấy phép ngay lúc tải: chỉ nhận CC0 hoặc phạm vi công cộng, khác thì dừng (video không ghi công ảnh trên hình).
+Mỗi ảnh được kiểm giấy phép ngay lúc tải: nhận CC0, phạm vi công cộng, CC BY, CC BY-SA; gặp NC, ND hay giấy phép khác thì dừng.
+Ảnh CC BY, CC BY-SA ghi công ở mô tả bài đăng (tác giả, giấy phép lấy từ nguon.json).
 Ảnh thu về cạnh dài tối đa 3000 px, JPEG chất lượng 92. Ghi kèm public/anh-di-tich/nguon.json (tác giả, giấy phép, trang nguồn)
 để đưa vào phần mô tả khi đăng video. Chạy: python scripts/tai-anh-di-tich.py (cần Pillow).
 """
 import html, io, json, pathlib, re, sys, time, urllib.error, urllib.parse, urllib.request
 
-from PIL import Image
+from PIL import Image, ImageOps
 
 GOC = pathlib.Path(__file__).resolve().parent.parent
 DANH_SACH = GOC / "kich-ban" / "quang-cao" / "anh.json"
@@ -42,7 +43,10 @@ def tai(url):
 
 def mo(giay_phep):
     g = giay_phep.lower()
-    return g.startswith("cc0") or "public domain" in g or g == "pd"
+    tu = g.replace("-", " ").split()
+    if "nc" in tu or "nd" in tu:
+        return False
+    return g.startswith("cc0") or "public domain" in g or g == "pd" or g.startswith("cc by")
 
 
 def main():
@@ -51,10 +55,12 @@ def main():
     for a in json.load(open(DANH_SACH, encoding="utf-8"))["anh"]:
         url, giay_phep, tac_gia, trang = thong_tin(a["tep"])
         if not mo(giay_phep):
-            sys.exit(f"{a['tep']}: giấy phép {giay_phep!r}, không phải CC0 hay phạm vi công cộng.")
+            sys.exit(f"{a['tep']}: giấy phép {giay_phep!r}, không thuộc CC0, phạm vi công cộng, CC BY, CC BY-SA.")
         dich = RA / f"{a['id']}.jpg"
         if not dich.exists():
-            anh = Image.open(io.BytesIO(tai(url))).convert("RGB")
+            time.sleep(3)  # Commons trả 429 khi tải dồn dập
+            # Ảnh điện thoại thường lưu nằm ngang kèm cờ xoay EXIF: xoay đúng chiều trước khi thu nhỏ.
+            anh = ImageOps.exif_transpose(Image.open(io.BytesIO(tai(url)))).convert("RGB")
             anh.thumbnail((CANH_DAI, CANH_DAI), Image.LANCZOS)
             anh.save(dich, "JPEG", quality=92, optimize=True)
         with Image.open(dich) as anh:

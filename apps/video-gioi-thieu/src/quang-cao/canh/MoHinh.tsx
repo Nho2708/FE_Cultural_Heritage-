@@ -36,10 +36,13 @@ export function MoHinhXoay({ chu, moHinh }: { chu: string; moHinh: MoHinh }) {
   );
 }
 
-/** Cùng mô hình, khung chặt hơn: xoay tiếp không ngắt từ cảnh trước, camera ngẩng lên cao cho thấy mái ngói. Không có chữ. */
-export function MoHinhGocCao({ moHinh, khungCanhTruoc }: { moHinh: MoHinh; khungCanhTruoc: number }) {
+/**
+ * Mô hình thứ hai đứng một mình (Cao Đỉnh, một trong Cửu Đỉnh ở Hoàng thành Huế, quét 3D thật): cắt trên chuyển động, góc xoay chạy tiếp
+ * đúng nhịp từ cảnh trước nên vật thể đổi mà vòng xoay không ngắt; camera ngẩng dần lên. Không có chữ.
+ */
+export function MoHinhHue({ moHinh, khungCanhTruoc }: { moHinh: MoHinh; khungCanhTruoc: number }) {
   const f = useCurrentFrame();
-  const m = MOC.moHinhGocCao;
+  const m = MOC.moHinhHue;
   const ngang = m.ngang[0] + (m.ngang[1] - m.ngang[0]) * tienDo(f, m.ngangLen, DI);
   return (
     <AbsoluteFill>
