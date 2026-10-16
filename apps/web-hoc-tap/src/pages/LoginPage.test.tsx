@@ -14,7 +14,7 @@ describe('Học sinh đăng nhập', () => {
     mockApi();
     renderApp('/dang-nhap');
     expect(await screen.findByRole('heading', { level: 1, name: 'Học sinh đăng nhập' })).toBeInTheDocument();
-    expect(screen.getByText('Quên mật khẩu? Em hãy nhờ thầy cô đặt lại.')).toBeInTheDocument();
+    expect(screen.getByText('Quên mật khẩu?')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Mở trang quản trị' })).toHaveAttribute('href', 'http://quantri.test');
     expect(screen.queryByRole('link', { name: /quên mật khẩu/i })).not.toBeInTheDocument();
   });
