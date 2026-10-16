@@ -55,7 +55,7 @@ export const TONG_DOC_30 = CANH_DOC_30[CANH_DOC_30.length - 1].tu + CANH_DOC_30[
 
 /** Mốc bên trong từng cảnh, tính bằng khung kể từ đầu cảnh. [a, b] = chạy từ khung a tới khung b. */
 export const MOC = {
-  /** Ảnh Chùa Cầu hiện lên (từ nền tối) rồi phóng chậm; chữ trượt lên, ghim rơi, gạch chân kẻ ra. */
+  /** Ảnh nhà cổ treo đèn lồng hiện lên (từ nền tối) rồi phóng chậm; chữ trượt lên, ghim rơi, gạch chân kẻ ra. */
   dungTruocDiTich: { hien: [0, 8], phong: [0, 59], chu: [3, 15], ghim: [10, 22], gach: [18, 36] },
   /**
    * Ba dải ảnh lần lượt trượt từ phải sang trái phủ lên ảnh cảnh trước (dải i bắt đầu ở batDau + i·lech), mỗi dải mang vạch vàng ở mép trái;

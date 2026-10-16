@@ -4,9 +4,12 @@ import { HatMin } from '../nen';
 import { DI, MOC, tienDo } from '../nhip';
 import { AnhDiTich, CauTieuDe, GhimVang } from '../thanh-phan';
 
-/** Chùa Cầu lúc chạng vạng (ảnh dọc): mở đầu video và trở lại ở cảnh hiểu rồi. */
-const ANH_CHUA_CAU = 'chua-cau';
-const TIEU_DIEM: [number, number] = [0.5, 0.42];
+/**
+ * Ảnh mở đầu video, trở lại ở cảnh hiểu rồi: nhà cổ tường vàng ở phố cổ Hội An lúc chập tối, treo đèn lồng nhiều màu (ảnh dọc).
+ * Tiêu điểm lệch trái để khung dọc giữ chùm đèn lồng và cắt bớt người đứng ở mép phải ảnh.
+ */
+const ANH_DI_TICH = 'pho-den-long';
+const TIEU_DIEM: [number, number] = [0.2, 0.45];
 const PHONG_TOI = 1.06;
 /** Dòng chữ nằm ở phần tối của ảnh, trên vùng 420 px dưới cùng mà mạng xã hội che. */
 const DINH_CHU = 1360;
@@ -17,7 +20,7 @@ function DaiToi() {
 }
 
 /**
- * Cảnh mở đầu: Chùa Cầu Hội An tràn khung hiện lên từ nền tối, câu "đang đứng ở đây" và ghim vàng.
+ * Cảnh mở đầu: nhà cổ treo đèn lồng ở phố cổ Hội An tràn khung hiện lên từ nền tối, câu "đang đứng ở đây" và ghim vàng.
  * `tinh` = khung cuối, đứng yên (làm nền cho các dải ảnh cảnh sau trượt lên phủ).
  */
 export function DungTruocDiTich({ chu, tinh = false }: { chu: string; tinh?: boolean }) {
@@ -30,7 +33,7 @@ export function DungTruocDiTich({ chu, tinh = false }: { chu: string; tinh?: boo
   const tGach = tienDo(f, m.gach);
   return (
     <AbsoluteFill>
-      <AnhDiTich id={ANH_CHUA_CAU} tiLe={phong} tieuDiem={TIEU_DIEM} style={{ opacity: tienDo(f, m.hien) }} />
+      <AnhDiTich id={ANH_DI_TICH} tiLe={phong} tieuDiem={TIEU_DIEM} style={{ opacity: tienDo(f, m.hien) }} />
       <DaiToi />
       <HatMin doDam={0.04} />
       <div style={{ position: 'absolute', left: 90, top: DINH_CHU, display: 'flex', alignItems: 'flex-end', gap: 22 }}>
@@ -42,7 +45,7 @@ export function DungTruocDiTich({ chu, tinh = false }: { chu: string; tinh?: boo
   );
 }
 
-/** Cảnh kết quả: lại Chùa Cầu của cảnh mở đầu, ảnh thu về ngược chiều, ghim tỏa vòng sáng, rồi tối dần về thẻ kết. */
+/** Cảnh kết quả: lại ảnh của cảnh mở đầu, ảnh thu về ngược chiều, ghim tỏa vòng sáng, rồi tối dần về thẻ kết. */
 export function HieuRoi({ chu }: { chu: string }) {
   const f = useCurrentFrame();
   const m = MOC.hieuRoi;
@@ -52,7 +55,7 @@ export function HieuRoi({ chu }: { chu: string }) {
   const toi = tienDo(f, m.toiDan, DI);
   return (
     <AbsoluteFill>
-      <AnhDiTich id={ANH_CHUA_CAU} tiLe={phong} tieuDiem={TIEU_DIEM} />
+      <AnhDiTich id={ANH_DI_TICH} tiLe={phong} tieuDiem={TIEU_DIEM} />
       <DaiToi />
       <HatMin doDam={0.04} />
       <div style={{ position: 'absolute', left: 90, top: DINH_CHU, display: 'flex', alignItems: 'flex-end', gap: 22 }}>
