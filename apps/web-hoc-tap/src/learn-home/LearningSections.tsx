@@ -33,44 +33,63 @@ function Entry({
   return (
     <li
       className={cn(
-        level === 1 && 'flex flex-col gap-3 rounded-lg border-2 border-border bg-surface p-5',
+        level === 1 &&
+          'dsv-cap1-entry flex flex-col sm:flex-row sm:items-center justify-between gap-5 p-6',
         level === 2 && 'flex flex-col gap-2 rounded-md border border-border bg-surface p-4',
         level === 3 && 'flex flex-wrap items-center gap-3 px-4 py-3',
       )}
     >
       <div className="min-w-0 flex-1">
-        {labels && <div className="mb-1 flex flex-wrap gap-2">{labels}</div>}
-        <p className={level === 1 ? 'type-h3 text-on-surface' : 'type-label text-on-surface'}>{title}</p>
-        {lines.map((line) => (
-          <p key={line} className={cn('mt-1 text-on-surface-variant', level === 1 ? 'type-body-m' : 'type-body-s')}>
-            {line}
-          </p>
-        ))}
+        {labels && <div className="mb-2.5 flex flex-wrap gap-2">{labels}</div>}
+        <p className={level === 1 ? 'type-h3 text-on-surface font-black tracking-tight' : 'type-label text-on-surface'}>{title}</p>
+        <div className={cn(level === 1 ? 'mt-3 flex flex-wrap gap-2' : 'mt-1')}>
+          {lines.map((line) =>
+            level === 1 ? (
+              <span
+                key={line}
+                className="dsv-info-chip inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold"
+              >
+                {line}
+              </span>
+            ) : (
+              <p key={line} className="text-on-surface-variant type-body-s">
+                {line}
+              </p>
+            ),
+          )}
+        </div>
         {progress && (
-          <div className="mt-2">
-            <p className="flex justify-between type-body-s text-on-surface">
+          <div className="mt-3">
+            <p className="flex justify-between type-body-s font-semibold text-on-surface">
               <span>Bài kiểm tra</span>
-              <span className="tabular-nums">
+              <span className="tabular-nums font-bold">
                 {progress.value} / {progress.max}
               </span>
             </p>
-            <Bar className="mt-1" ratio={progress.max > 0 ? progress.value / progress.max : 0} label={`Đã làm ${progress.value} trên ${progress.max} bài kiểm tra`} />
+            <Bar className="mt-1.5" ratio={progress.max > 0 ? progress.value / progress.max : 0} label={`Đã làm ${progress.value} trên ${progress.max} bài kiểm tra`} />
           </div>
         )}
       </div>
-      {action}
+      <div className={level === 1 ? 'shrink-0 sm:self-center' : undefined}>{action}</div>
     </li>
   );
 }
 
 function Section({ id, level, title, hint, children, speak }: { id: string; level: Level; title: string; hint?: string; children: ReactNode; speak?: string }) {
+  const icon =
+    id === 'dang-lam-do' ? '⚡' : id === 'bai-kiem-tra-dang-cho' ? '🎮' : id === 'bai-hoc-cua-em' ? '📖' : id === 'huy-hieu-gan-day' ? '🏆' : null;
   return (
-    <section aria-labelledby={id} className="flex flex-col gap-3">
+    <section aria-labelledby={id} className="flex flex-col gap-3.5">
       <div className="flex items-center gap-3">
-        <h2 id={id} className={level === 1 ? 'type-h2' : 'type-h2 text-on-surface'}>
+        {level === 1 && icon && (
+          <span className="flex size-11 items-center justify-center rounded-2xl bg-amber-200/80 text-xl shadow-xs text-amber-900" aria-hidden="true">
+            {icon}
+          </span>
+        )}
+        <h2 id={id} className={level === 1 ? 'type-h2 font-black text-on-surface' : 'type-h2 text-on-surface'}>
           {title}
         </h2>
-        {level === 1 && speak && <SpeakButton text={speak} label={`Nghe: ${title}`} />}
+        {level === 1 && speak && <SpeakButton text={speak} label={`Nghe: ${title}`} size="sm" className="dsv-speak-btn" />}
       </div>
       {hint && level !== 1 && <p className="type-body-s text-on-surface-variant">{hint}</p>}
       {children}
@@ -122,11 +141,31 @@ function Sections({ home, level }: { home: StudentHome; level: Level }) {
                   ]}
                   action={
                     code ? (
-                      <ButtonLink to={takeQuizPath(code, item.quizId)} state={{ confirmed: true }} size={size} className={pill}>
+                      <ButtonLink
+                        to={takeQuizPath(code, item.quizId)}
+                        state={{ confirmed: true }}
+                        size={size}
+                        className={cn(
+                          level === 1
+                            ? 'dsv-btn-play px-7 py-3.5 flex items-center justify-center gap-2'
+                            : pill,
+                        )}
+                      >
+                        {level === 1 && <Icon name="play" size={20} />}
                         Làm tiếp
                       </ButtonLink>
                     ) : (
-                      <ButtonLink to={pathOf('enterCode')} variant="secondary" size={size} className={pill}>
+                      <ButtonLink
+                        to={pathOf('enterCode')}
+                        variant="secondary"
+                        size={size}
+                        className={cn(
+                          level === 1
+                            ? 'dsv-mission-btn px-6 py-3.5 flex items-center justify-center gap-2'
+                            : pill,
+                        )}
+                      >
+                        {level === 1 && <Icon name="key" size={20} />}
                         Nhập mã bài học
                       </ButtonLink>
                     )
@@ -162,12 +201,30 @@ function Sections({ home, level }: { home: StudentHome; level: Level }) {
                   ]}
                   action={
                     code ? (
-                      <ButtonLink to={takeQuizPath(code, quiz.quizId)} size={size} className={pill}>
+                      <ButtonLink
+                        to={takeQuizPath(code, quiz.quizId)}
+                        size={size}
+                        className={cn(
+                          level === 1
+                            ? 'dsv-btn-play px-7 py-3.5 flex items-center justify-center gap-2'
+                            : pill,
+                        )}
+                      >
                         {level === 1 && <Icon name="play" size={22} />}
                         Làm bài
                       </ButtonLink>
                     ) : (
-                      <ButtonLink to={pathOf('enterCode')} variant="secondary" size={size} className={pill}>
+                      <ButtonLink
+                        to={pathOf('enterCode')}
+                        variant="secondary"
+                        size={size}
+                        className={cn(
+                          level === 1
+                            ? 'dsv-mission-btn px-6 py-3.5 flex items-center justify-center gap-2'
+                            : pill,
+                        )}
+                      >
+                        {level === 1 && <Icon name="key" size={20} />}
                         Nhập mã bài học
                       </ButtonLink>
                     )
@@ -191,7 +248,17 @@ function Sections({ home, level }: { home: StudentHome; level: Level }) {
                 progress={lesson.quizzesPublished > 0 ? { value: lesson.quizzesDone, max: lesson.quizzesPublished } : undefined}
                 action={
                   lesson.accessCode && (
-                    <ButtonLink to={lessonPath(lesson.accessCode)} variant={level === 1 ? 'primary' : 'secondary'} size={size} className={pill}>
+                    <ButtonLink
+                      to={lessonPath(lesson.accessCode)}
+                      variant={level === 1 ? 'primary' : 'secondary'}
+                      size={size}
+                      className={cn(
+                        level === 1
+                          ? 'dsv-btn-lesson px-7 py-3.5 flex items-center justify-center gap-2'
+                          : pill,
+                      )}
+                    >
+                      {level === 1 && <Icon name="book-open" size={20} />}
                       Mở bài học
                     </ButtonLink>
                   )
@@ -212,11 +279,28 @@ function Sections({ home, level }: { home: StudentHome; level: Level }) {
                 key={`${badge.code}-${badge.attemptId}`}
                 level={level}
                 title={badge.name}
-                labels={<Icon name="star" size={18} className="text-warning" />}
+                labels={
+                  level === 1 ? (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 border border-amber-300 px-3 py-1 text-xs font-bold text-amber-900 shadow-2xs">
+                      <Icon name="star" size={16} className="text-warning fill-amber-400" />
+                      Huy hiệu xuất sắc
+                    </span>
+                  ) : (
+                    <Icon name="star" size={18} className="text-warning" />
+                  )
+                }
                 lines={[[badge.quizName, badge.earnedAt ? formatDateTime(badge.earnedAt) : null].filter(Boolean).join(' · ')]}
                 action={
-                  <ButtonLink to={resultPath(badge.attemptId)} variant="link">
-                    Xem kết quả
+                  <ButtonLink
+                    to={resultPath(badge.attemptId)}
+                    variant={level === 1 ? 'secondary' : 'link'}
+                    className={
+                      level === 1
+                        ? 'dsv-mission-btn px-5 py-2.5 text-sm flex items-center justify-center'
+                        : undefined
+                    }
+                  >
+                    Xem kết quả 🌟
                   </ButtonLink>
                 }
               />
@@ -239,14 +323,31 @@ export function LearningSections({ level }: { level: Level }) {
       <div className="flex flex-col gap-(--dsv-block-gap)">
         <div
           className={cn(
-            'flex items-center gap-(--dsv-inline-gap) p-(--dsv-inline-gap)',
-            level === 1 ? 'rounded-lg border-2 border-dashed border-border-strong' : 'rounded-md border border-border bg-surface',
+            'flex flex-col sm:flex-row items-center gap-4 sm:gap-6 p-6 sm:p-8',
+            level === 1
+              ? 'dsv-empty-box'
+              : 'rounded-md border border-border bg-surface',
           )}
         >
-          <Illustration state="trong" className={level === 3 ? 'size-14' : undefined} />
-          <p className={level === 1 ? 'type-h4' : 'type-body-m text-on-surface-variant'}>
-            {level === 1 ? 'Chưa có bài chơi nào. Em hãy nhờ thầy cô đưa mã bài học nhé!' : MESSAGES.studentNoAttemptsYet}
-          </p>
+          <div
+            className={
+              level === 1
+                ? 'dsv-mascot-avatar flex size-20 sm:size-24 shrink-0 items-center justify-center p-2'
+                : undefined
+            }
+          >
+            <Illustration state="trong" className={level === 3 ? 'size-14' : level === 1 ? 'size-full bg-transparent text-amber-500' : undefined} />
+          </div>
+          <div className="text-center sm:text-left">
+            <p className={level === 1 ? 'type-h3 font-black text-amber-950' : 'type-body-m text-on-surface-variant'}>
+              {level === 1 ? 'Chưa có bài chơi nào. Em hãy nhờ thầy cô đưa mã bài học nhé!' : MESSAGES.studentNoAttemptsYet}
+            </p>
+            {level === 1 && (
+              <p className="mt-1 type-body-s font-bold text-amber-900/80">
+                Khi có bài học mới từ lớp, các trò chơi và bài kiểm tra thú vị sẽ hiện ở đây! ✨
+              </p>
+            )}
+          </div>
         </div>
         <HomeRecommendations level={level} id="goi-y" />
       </div>
