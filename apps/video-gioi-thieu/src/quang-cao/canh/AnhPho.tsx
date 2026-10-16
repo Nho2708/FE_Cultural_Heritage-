@@ -4,8 +4,11 @@ import { HatMin } from '../nen';
 import { DI, MOC, tienDo } from '../nhip';
 import { AnhDiTich, CauTieuDe, GhimVang } from '../thanh-phan';
 
-const ANH = 'pho-nha-vang';
-const TIEU_DIEM: [number, number] = [0.5, 0.42];
+/** Ảnh mở đầu: Chùa Cầu lúc chạng vạng (ảnh dọc). Cảnh hiểu rồi dùng phố nhà vàng (thẻ kết cũng dùng ảnh này). */
+const ANH_MO_DAU = 'chua-cau';
+const TIEU_DIEM_MO_DAU: [number, number] = [0.5, 0.42];
+const ANH_HIEU_ROI = 'pho-nha-vang';
+const TIEU_DIEM_HIEU_ROI: [number, number] = [0.5, 0.42];
 const PHONG_TOI = 1.06;
 /** Dòng chữ nằm ở phần tối của ảnh, trên vùng 420 px dưới cùng mà mạng xã hội che. */
 const DINH_CHU = 1360;
@@ -15,17 +18,21 @@ function DaiToi() {
   return <AbsoluteFill style={{ background: 'linear-gradient(to top, rgba(29,31,41,0.92) 0%, rgba(29,31,41,0.72) 34%, rgba(29,31,41,0) 60%)' }} />;
 }
 
-/** Cảnh mở đầu: phố nhà vàng Hội An tràn khung, câu "đang đứng ở đây" và ghim vàng. */
-export function DungTruocDiTich({ chu }: { chu: string }) {
-  const f = useCurrentFrame();
+/**
+ * Cảnh mở đầu: Chùa Cầu Hội An tràn khung hiện lên từ nền tối, câu "đang đứng ở đây" và ghim vàng.
+ * `tinh` = khung cuối, đứng yên (làm nền cho các dải ảnh cảnh sau trượt lên phủ).
+ */
+export function DungTruocDiTich({ chu, tinh = false }: { chu: string; tinh?: boolean }) {
+  const fThat = useCurrentFrame();
   const m = MOC.dungTruocDiTich;
+  const f = tinh ? m.phong[1] : fThat;
   const phong = 1 + (PHONG_TOI - 1) * tienDo(f, m.phong, DI);
   const tChu = tienDo(f, m.chu);
   const tGhim = tienDo(f, m.ghim);
   const tGach = tienDo(f, m.gach);
   return (
     <AbsoluteFill>
-      <AnhDiTich id={ANH} tiLe={phong} tieuDiem={TIEU_DIEM} />
+      <AnhDiTich id={ANH_MO_DAU} tiLe={phong} tieuDiem={TIEU_DIEM_MO_DAU} style={{ opacity: tienDo(f, m.hien) }} />
       <DaiToi />
       <HatMin doDam={0.04} />
       <div style={{ position: 'absolute', left: 90, top: DINH_CHU, display: 'flex', alignItems: 'flex-end', gap: 22 }}>
@@ -47,7 +54,7 @@ export function HieuRoi({ chu }: { chu: string }) {
   const toi = tienDo(f, m.toiDan, DI);
   return (
     <AbsoluteFill>
-      <AnhDiTich id={ANH} tiLe={phong} tieuDiem={TIEU_DIEM} />
+      <AnhDiTich id={ANH_HIEU_ROI} tiLe={phong} tieuDiem={TIEU_DIEM_HIEU_ROI} />
       <DaiToi />
       <HatMin doDam={0.04} />
       <div style={{ position: 'absolute', left: 90, top: DINH_CHU, display: 'flex', alignItems: 'flex-end', gap: 22 }}>

@@ -48,19 +48,20 @@ npx remotion studio src/index.ts          # xem và chỉnh trong trình duyệt
 Mã nguồn ở `src/quang-cao/`, kịch bản ở `kich-ban/quang-cao/`:
 
 - `canh.json`: thứ tự cảnh và độ dài theo phách (120 phách mỗi phút, mọi điểm cắt rơi đúng phách). `src/quang-cao/nhip.ts` (mốc chuyển động trong từng cảnh, hai đường cong dùng chung) và script nhạc cùng đọc tệp này, nên đổi độ dài cảnh thì chạy lại script nhạc.
-- `en.json`: toàn bộ chữ trên hình của bản tiếng Anh (câu theo cảnh, nhãn giao diện, thẻ kết, địa chỉ trong mã QR) và `moTaBaiDang` là phần ghi công đặt ở mô tả bài đăng (mô hình 3D CC BY 4.0, OpenStreetMap, ảnh, nhạc). Làm bản ngôn ngữ khác: thêm tệp `<mã>.json` cùng cấu trúc, đăng ký trong `src/quang-cao/chuoi.ts` và thêm composition. Kiểm chữ (mỗi câu tối đa 7 từ, không dấu chấm cuối, tổng dưới 45 từ): `node scripts/kiem-chu-quang-cao.mjs`.
-- `anh.json`: ảnh Hội An trên Wikimedia Commons, chỉ nhận giấy phép CC0 hoặc phạm vi công cộng.
+- `en.json`: toàn bộ chữ trên hình của bản tiếng Anh (câu theo cảnh, nhãn giao diện, chữ của trang chi tiết dựng lại giống trang thật của web, hai câu thuyết minh hiện chữ, thẻ kết, địa chỉ trong mã QR) và `moTaBaiDang` là phần ghi công đặt ở mô tả bài đăng (mô hình 3D, ảnh CC BY và CC BY-SA, OpenStreetMap, Natural Earth, nhạc). Làm bản ngôn ngữ khác: thêm tệp `<mã>.json` cùng cấu trúc, đăng ký trong `src/quang-cao/chuoi.ts` và thêm composition. Kiểm chữ: `node scripts/kiem-chu-quang-cao.mjs` (câu dẫn tối đa 7 từ, không dấu chấm cuối; câu dẫn cộng nhãn và thẻ kết dưới 45 từ; chữ trang chi tiết và lời thuyết minh in riêng).
+- `anh.json`: ảnh di tích trên Wikimedia Commons (Chùa Cầu, rồng ở hội quán, Ngọ Môn Huế, cổng thành nhà Hồ, ảnh đại diện Hội An của app...), nhận CC0, phạm vi công cộng, CC BY, CC BY-SA.
 
 Tài nguyên không đưa vào git, tạo lại bằng:
 
 ```powershell
 python scripts/tai-anh-di-tich.py         # ảnh di tích -> public/anh-di-tich/ (kiểm giấy phép khi tải)
 python scripts/tai-ban-do.py              # dữ liệu bản đồ OpenStreetMap quanh phố cổ -> public/ban-do/hoi-an.json
+python scripts/tai-ban-do-viet-nam.py     # bản đồ cả nước (Natural Earth, góc nhìn Việt Nam, có Hoàng Sa, Trường Sa) -> public/ban-do/viet-nam.json
 python scripts/tao-nhac-quang-cao.py      # nhạc 30 giây theo canh.json, chuẩn hóa -14 LUFS -> public/nhac/quang-cao-30s.wav
 node scripts/dung-video.mjs quang-cao-30s-doc-en
 ```
 
-Mô hình 3D là tệp GLB nhà cổ Hội An mà bản demo đang dùng (bản nén cho web của mô hình "Hoi An house" trên Sketchfab, CC BY 4.0), chép vào `public/mo-hinh/nha-hoi-an.glb`. Mô hình vẽ bằng three.js qua `@remotion/three`; khi dựng phải bật WebGL bằng GPU (`--gl=angle`, script dựng đã đặt sẵn).
+Mô hình 3D là hai tệp GLB mà bản demo đang dùng (bản nén cho web của mô hình trên Sketchfab, CC BY 4.0): nhà cổ Hội An ("Hoi An house", NGUYENNGHIAKK) chép vào `public/mo-hinh/nha-hoi-an.glb`, Cao Đỉnh ở Hoàng thành Huế ("Cao Đỉnh", vudn54) chép vào `public/mo-hinh/cao-dinh-hue.glb`. Mô hình vẽ bằng three.js qua `@remotion/three`; khi dựng phải bật WebGL bằng GPU (`--gl=angle`, script dựng đã đặt sẵn).
 
 ## Giới hạn hiện tại
 

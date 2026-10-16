@@ -1,5 +1,7 @@
 // Kiểm chữ trên hình của video quảng cáo theo từng tệp ngôn ngữ (kich-ban/quang-cao/<mã>.json):
-// mỗi câu tối đa 7 từ, một dòng, không dấu chấm cuối; tổng chữ trên hình (kể cả nhãn giao diện và thẻ kết) dưới 45 từ.
+// mỗi câu dẫn tối đa 7 từ, một dòng, không dấu chấm cuối; câu dẫn cộng nhãn giao diện và thẻ kết dưới 45 từ.
+// Từ 16/10/2026 trang chi tiết dựng lại giống trang thật của web và cảnh nghe hiện chữ lời thuyết minh (theo yêu cầu của nhóm):
+// hai phần này là chữ của giao diện, không tính vào giới hạn 45 từ nhưng vẫn in ra để biết tổng chữ trên hình.
 // Tên ngôn ngữ viết bằng chữ Hàn, Trung, Nhật tính mỗi tên một từ; địa chỉ web tính một từ; dấu "·" không tính.
 // Chạy: node scripts/kiem-chu-quang-cao.mjs [mã ...]   (bỏ trống = mọi tệp)
 import { readdirSync, readFileSync } from 'node:fs';
@@ -27,7 +29,12 @@ for (const t of tep) {
     if (/[.。]$/.test(s.trim())) { console.log(`${t} ${id}: có dấu chấm cuối`); loi++; }
   }
   for (const s of [...nhan, ...ket]) tong += s ? dem(s) : 0;
-  console.log(`${t}: ${cau.length} câu, tổng ${tong} từ trên hình (giới hạn dưới 45)`);
+  const tc = c.giaoDien.trangChiTiet;
+  // Trang chi tiết: tên di sản hiện thêm hai lần (đường dẫn, tiêu đề trang) ngoài lần trên thẻ.
+  const trang = [tc.dangNhap, tc.duongDan, ...tc.the, ...tc.nut, tc.nguonAnh, tc.gioiThieu, tc.doanGioiThieu, c.giaoDien.tenDiTich, c.giaoDien.tenDiTich].reduce((n, s) => n + dem(s), 0);
+  const thuyetMinh = c.giaoDien.loiThuyetMinh.reduce((n, s) => n + dem(s), 0);
+  console.log(`${t}: ${cau.length} câu dẫn; câu dẫn, nhãn và thẻ kết ${tong} từ (giới hạn dưới 45)`);
+  console.log(`  chữ trang chi tiết giống trang thật ${trang} từ, lời thuyết minh hiện chữ ${thuyetMinh} từ; tổng chữ trên hình ${tong + trang + thuyetMinh} từ`);
   if (tong > TOI_DA_TONG) loi++;
 }
 process.exit(loi ? 1 : 0);

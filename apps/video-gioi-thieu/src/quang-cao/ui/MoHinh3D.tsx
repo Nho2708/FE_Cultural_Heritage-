@@ -6,7 +6,7 @@ import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
-// Mô hình 3D nhà cổ Hội An (cùng tệp GLB bản demo đang dùng, đặt ở public/mo-hinh/nha-hoi-an.glb), vẽ thật bằng three.js trong Remotion.
+// Mô hình 3D của di sản (cùng tệp GLB bản demo đang dùng, đặt ở public/mo-hinh/<tên>.glb), vẽ thật bằng three.js trong Remotion.
 // Mô hình được đưa về gốc toạ độ: chân đặt trên mặt phẳng y = 0, giữa nằm trên trục đứng, chiều ngang lớn nhất bằng 2 đơn vị.
 
 export interface MoHinh {
@@ -17,10 +17,12 @@ export interface MoHinh {
   cheo: number;
 }
 
-let dangTai: Promise<MoHinh> | null = null;
+const dangTai = new Map<string, Promise<MoHinh>>();
 
-function taiMoHinh(): Promise<MoHinh> {
-  dangTai ??= new GLTFLoader().loadAsync(staticFile('mo-hinh/nha-hoi-an.glb')).then(({ scene }) => {
+function taiMoHinh(tep: string): Promise<MoHinh> {
+  const daCo = dangTai.get(tep);
+  if (daCo) return daCo;
+  const hua = new GLTFLoader().loadAsync(staticFile(`mo-hinh/${tep}.glb`)).then(({ scene }) => {
     scene.traverse((o) => {
       const luoi = o as THREE.Mesh;
       if (!luoi.isMesh) return;
@@ -41,21 +43,22 @@ function taiMoHinh(): Promise<MoHinh> {
     vat.scale.setScalar(tiLe);
     return { vat, cao: co.y * tiLe, cheo: Math.hypot(co.x, co.z) * tiLe };
   });
-  return dangTai;
+  dangTai.set(tep, hua);
+  return hua;
 }
 
-/** Tải mô hình một lần cho mỗi thẻ trình duyệt; giữ khung hình chờ tới khi tải xong. */
-export function useMoHinh(): MoHinh | null {
+/** Tải mô hình `public/mo-hinh/<tep>.glb` một lần cho mỗi thẻ trình duyệt; giữ khung hình chờ tới khi tải xong. */
+export function useMoHinh(tep: string): MoHinh | null {
   const [moHinh, datMoHinh] = useState<MoHinh | null>(null);
-  const [cho] = useState(() => delayRender('Tải mô hình 3D'));
+  const [cho] = useState(() => delayRender(`Tải mô hình 3D ${tep}`));
   useEffect(() => {
-    taiMoHinh()
+    taiMoHinh(tep)
       .then((m) => {
         datMoHinh(m);
         continueRender(cho);
       })
       .catch((loi) => cancelRender(loi));
-  }, [cho]);
+  }, [cho, tep]);
   return moHinh;
 }
 

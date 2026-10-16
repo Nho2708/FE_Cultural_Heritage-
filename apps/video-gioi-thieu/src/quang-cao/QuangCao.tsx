@@ -6,14 +6,14 @@ import { BanDoZoom } from './canh/BanDoZoom';
 import { ChiTietBiAn } from './canh/ChiTietBiAn';
 import { DoiNgonNgu } from './canh/DoiNgonNgu';
 import { MoApp } from './canh/MoApp';
-import { MoHinhGocCao, MoHinhTrongMay, MoHinhXoay } from './canh/MoHinh';
+import { MoHinhHue, MoHinhTrongMay, MoHinhXoay } from './canh/MoHinh';
 import { SongAmCanCanh } from './canh/SongAmCanCanh';
 import { TheKet } from './canh/TheKet';
 import { TrangChiTiet } from './canh/TrangChiTiet';
 import { chuQuangCao } from './chuoi';
 import { NenThuongHieu } from './nen';
 import { CANH_DOC_30, MOC, type Canh } from './nhip';
-import { useBanDo } from './ui/BanDo';
+import { useBanDo, useQuocGia } from './ui/BanDo';
 import { useMoHinh, type MoHinh } from './ui/MoHinh3D';
 
 export interface QuangCaoProps {
@@ -21,43 +21,44 @@ export interface QuangCaoProps {
   [key: string]: unknown;
 }
 
-/** Chỉ vẽ cảnh 3D khi mô hình đã tải xong (mô hình tải một lần, chỉ ở các cảnh có 3D). */
-function CoMoHinh({ ve }: { ve: (moHinh: MoHinh) => ReactNode }) {
-  const moHinh = useMoHinh();
+/** Chỉ vẽ cảnh 3D khi mô hình `public/mo-hinh/<tep>.glb` đã tải xong (mỗi mô hình tải một lần, chỉ ở các cảnh có 3D). */
+function CoMoHinh({ tep, ve }: { tep: string; ve: (moHinh: MoHinh) => ReactNode }) {
+  const moHinh = useMoHinh(tep);
   return moHinh ? <>{ve(moHinh)}</> : null;
 }
 
 const canhTheoId = (id: Canh['id']) => CANH_DOC_30.find((c) => c.id === id)!;
 
-/** Video quảng cáo cho khách du lịch, bản dọc 30 giây: vấn đề → giải pháp (gần bạn, nghe thuyết minh, xem 3D) → kết quả → thẻ kết. */
+/** Video quảng cáo cho khách du lịch, bản dọc 30 giây: vấn đề → giải pháp (gần bạn, nghe thuyết minh, xem 3D hai mô hình) → kết quả → thẻ kết. */
 export function QuangCao({ ngonNgu }: QuangCaoProps) {
   const chu = chuQuangCao(ngonNgu);
   const banDo = useBanDo();
+  const quocGia = useQuocGia();
   const cau = (id: Canh['id']) => chu.canh[id] ?? '';
   const noiDung = (c: Canh): ReactNode => {
     switch (c.id) {
       case 'dung-truoc-di-tich':
         return <DungTruocDiTich chu={cau(c.id)} />;
       case 'chi-tiet-bi-an':
-        return <ChiTietBiAn chu={cau(c.id)} />;
+        return <ChiTietBiAn chu={cau(c.id)} chuCanhTruoc={cau('dung-truoc-di-tich')} />;
       case 'mo-app':
-        return banDo ? <MoApp chuCanhTruoc={cau('chi-tiet-bi-an')} banDo={banDo} /> : null;
+        return banDo && quocGia ? <MoApp chuCanhTruoc={cau('chi-tiet-bi-an')} banDo={banDo} quocGia={quocGia} /> : null;
       case 'ban-do-zoom':
         return banDo ? <BanDoZoom chu={cau(c.id)} banDo={banDo} /> : null;
       case 'ban-do-trong-may':
-        return banDo ? <BanDoTrongMay banDo={banDo} tenDiTich={chu.giaoDien.tenDiTich} khoangCach={chu.giaoDien.khoangCach} /> : null;
+        return banDo ? <BanDoTrongMay banDo={banDo} giaoDien={chu.giaoDien} /> : null;
       case 'trang-chi-tiet':
-        return banDo ? <TrangChiTiet chu={cau(c.id)} banDo={banDo} tenDiTich={chu.giaoDien.tenDiTich} khoangCach={chu.giaoDien.khoangCach} /> : null;
+        return banDo ? <TrangChiTiet chu={cau(c.id)} banDo={banDo} giaoDien={chu.giaoDien} /> : null;
       case 'song-am':
-        return <SongAmCanCanh batDau={c.tu} />;
+        return <SongAmCanCanh batDau={c.tu} cau={chu.giaoDien.loiThuyetMinh} ma={chu.ngonNgu} />;
       case 'doi-ngon-ngu':
         return <DoiNgonNgu batDau={c.tu} ds={chu.giaoDien.ngonNguNghe} tienTrinhDau={MOC.songAm.tienTrinh[1]} tienTrinhCuoi={MOC.doiNgonNgu.tienTrinhCuoi} />;
       case 'mo-hinh-xoay':
-        return <CoMoHinh ve={(m) => <MoHinhXoay chu={cau(c.id)} moHinh={m} />} />;
-      case 'mo-hinh-goc-cao':
-        return <CoMoHinh ve={(m) => <MoHinhGocCao moHinh={m} khungCanhTruoc={canhTheoId('mo-hinh-xoay').dai} />} />;
+        return <CoMoHinh tep="nha-hoi-an" ve={(m) => <MoHinhXoay chu={cau(c.id)} moHinh={m} />} />;
+      case 'mo-hinh-hue':
+        return <CoMoHinh tep="cao-dinh-hue" ve={(m) => <MoHinhHue moHinh={m} khungCanhTruoc={canhTheoId('mo-hinh-xoay').dai} />} />;
       case 'mo-hinh-trong-may':
-        return <CoMoHinh ve={(m) => <MoHinhTrongMay moHinh={m} />} />;
+        return <CoMoHinh tep="nha-hoi-an" ve={(m) => <MoHinhTrongMay moHinh={m} />} />;
       case 'hieu-roi':
         return <HieuRoi chu={cau(c.id)} />;
       case 'the-ket':

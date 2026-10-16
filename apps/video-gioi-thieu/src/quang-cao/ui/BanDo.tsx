@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { continueRender, delayRender, staticFile } from 'remotion';
-import { PHONG_CHU } from '../../brand';
+import { MAU, PHONG_CHU } from '../../brand';
 import { MAU_APP } from './mau-app';
 
 /** Dữ liệu tải bằng scripts/tai-ban-do.py: toạ độ mét quanh điểm di sản, trục y hướng xuống, mỗi hình là dãy [x0, y0, x1, y1, ...]. */
@@ -15,24 +15,41 @@ export interface DuLieuBanDo {
   nguoi: [number, number];
 }
 
-let hua: Promise<DuLieuBanDo> | null = null;
+/** Lớp cả nước tải bằng scripts/tai-ban-do-viet-nam.py (Natural Earth, góc nhìn Việt Nam), cùng phép chiếu và gốc toạ độ với DuLieuBanDo. */
+export interface DuLieuQuocGia {
+  /** Đất liền và đảo lớn của Việt Nam. */
+  vietNam: number[][];
+  /** Tâm các đảo nhỏ của Việt Nam (gồm quần đảo Hoàng Sa, Trường Sa), vẽ thành chấm để còn thấy khi nhìn cả nước. */
+  dao: Array<[number, number]>;
+  lanCan: number[][];
+}
 
-/** Nạp dữ liệu bản đồ một lần cho mỗi tab dựng; Remotion chờ tới khi nạp xong mới chụp khung. */
-export function useBanDo(): DuLieuBanDo | null {
-  const [duLieu, datDuLieu] = useState<DuLieuBanDo | null>(null);
-  const [cho] = useState(() => delayRender('Nạp dữ liệu bản đồ'));
+const daNap = new Map<string, Promise<unknown>>();
+
+/** Nạp một tệp dữ liệu bản đồ trong public/ban-do/ một lần cho mỗi tab dựng; Remotion chờ tới khi nạp xong mới chụp khung. */
+function useDuLieu<T>(tep: string, lenhTao: string): T | null {
+  const [duLieu, datDuLieu] = useState<T | null>(null);
+  const [cho] = useState(() => delayRender(`Nạp ${tep}`));
   useEffect(() => {
-    hua ??= fetch(staticFile('ban-do/hoi-an.json')).then((r) => {
-      if (!r.ok) throw new Error('Thiếu public/ban-do/hoi-an.json: chạy python scripts/tai-ban-do.py');
-      return r.json();
-    });
-    hua.then((d) => {
-      datDuLieu(d);
+    if (!daNap.has(tep)) {
+      daNap.set(
+        tep,
+        fetch(staticFile(`ban-do/${tep}`)).then((r) => {
+          if (!r.ok) throw new Error(`Thiếu public/ban-do/${tep}: chạy ${lenhTao}`);
+          return r.json();
+        }),
+      );
+    }
+    daNap.get(tep)!.then((d) => {
+      datDuLieu(d as T);
       continueRender(cho);
     });
-  }, [cho]);
+  }, [cho, tep, lenhTao]);
   return duLieu;
 }
+
+export const useBanDo = () => useDuLieu<DuLieuBanDo>('hoi-an.json', 'python scripts/tai-ban-do.py');
+export const useQuocGia = () => useDuLieu<DuLieuQuocGia>('viet-nam.json', 'python scripts/tai-ban-do-viet-nam.py');
 
 const duongDan = (ds: number[][], dong: boolean) =>
   ds
@@ -44,7 +61,10 @@ const duongDan = (ds: number[][], dong: boolean) =>
     .join('');
 
 // Màu bản đồ nền OpenStreetMap (kiểu chuẩn) mà app đang dùng.
-const MAU_BD = { dat: '#F2EFE9', xanh: '#D8EBC4', nuoc: '#AAD3DF', nha: '#D9D0C9', vienNha: '#C4B6AB', duong: '#FFFFFF', vienDuong: '#D3C9BC', duongLon: '#F7FABF', vienDuongLon: '#C9C58A' } as const;
+const MAU_BD = { dat: '#F2EFE9', datLanCan: '#E2DED6', xanh: '#D8EBC4', nuoc: '#AAD3DF', nha: '#D9D0C9', vienNha: '#C4B6AB', duong: '#FFFFFF', vienDuong: '#D3C9BC', duongLon: '#F7FABF', vienDuongLon: '#C9C58A' } as const;
+/** Viền vàng quanh lãnh thổ Việt Nam chỉ hiện khi nhìn từ xa: rõ hẳn khi một điểm ảnh từ VIEN_RO mét trở lên, mất khi dưới VIEN_MAT mét. */
+const VIEN_RO = 400;
+const VIEN_MAT = 60;
 
 export interface TamNhin {
   /** Tâm khung nhìn (mét). */
@@ -58,8 +78,9 @@ export interface TamNhin {
  * Bản đồ dựng lại bằng SVG từ dữ liệu OpenStreetMap, theo màu bản đồ nền của app. Đường giữ bề rộng theo điểm ảnh và to dần
  * khi phóng (như bản đồ ô vuông đổi mức phóng); khối nhà hiện dần khi đủ gần. `phongTuongDoi` = mức phóng trên màn hình so với lúc
  * bắt đầu; `tiLeHien` = tỉ lệ mà khung chứa bản đồ đang bị phóng (điện thoại phóng lên che kín khung) để nét đường vẫn đúng bề rộng.
+ * Có `quocGia` thì vẽ thêm lớp cả nước bên dưới (biển, đất liền, nước láng giềng, đảo); `moChiTiet` (0→1) làm lớp đường phố hiện dần khi phóng vào.
  */
-export function BanDo({ duLieu, rong, cao, tam, phongTuongDoi, tiLeHien = 1, ghiNguon }: { duLieu: DuLieuBanDo; rong: number; cao: number; tam: TamNhin; phongTuongDoi: number; tiLeHien?: number; ghiNguon?: React.CSSProperties | false }) {
+export function BanDo({ duLieu, rong, cao, tam, phongTuongDoi, tiLeHien = 1, ghiNguon, quocGia, moChiTiet = 1 }: { duLieu: DuLieuBanDo; rong: number; cao: number; tam: TamNhin; phongTuongDoi: number; tiLeHien?: number; ghiNguon?: React.CSSProperties | false; quocGia?: DuLieuQuocGia | null; moChiTiet?: number }) {
   const p = useMemo(
     () => ({
       nuoc: duongDan(duLieu.nuoc, true),
@@ -71,25 +92,37 @@ export function BanDo({ duLieu, rong, cao, tam, phongTuongDoi, tiLeHien = 1, ghi
     }),
     [duLieu],
   );
+  const q = useMemo(() => (quocGia ? { vn: duongDan(quocGia.vietNam, true), lanCan: duongDan(quocGia.lanCan, true) } : null), [quocGia]);
   const { x, y, m } = tam;
+  const vien = Math.min(1, Math.max(0, Math.log(m / VIEN_MAT) / Math.log(VIEN_RO / VIEN_MAT)));
   const z = phongTuongDoi;
   const nho = (2.2 * z ** 0.75) / tiLeHien;
   const lon = (4 * z ** 0.6) / tiLeHien;
   const nha = Math.min(1, Math.max(0, (z - 2.4) / 1.6));
   const tron = { fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round', vectorEffect: 'non-scaling-stroke' } as const;
   return (
-    <div style={{ position: 'relative', width: rong, height: cao, overflow: 'hidden', backgroundColor: MAU_BD.dat }}>
+    <div style={{ position: 'relative', width: rong, height: cao, overflow: 'hidden', backgroundColor: q ? MAU_BD.nuoc : MAU_BD.dat }}>
       <svg width={rong} height={cao} viewBox={`${x - (rong * m) / 2} ${y - (cao * m) / 2} ${rong * m} ${cao * m}`} style={{ position: 'absolute', inset: 0 }}>
-        <path d={p.xanh} fill={MAU_BD.xanh} />
-        <path d={p.nuoc} fill={MAU_BD.nuoc} />
-        {p.song.map((s, i) => (
-          <path key={i} d={s.d} fill="none" stroke={MAU_BD.nuoc} strokeWidth={s.rong} strokeLinecap="round" strokeLinejoin="round" />
-        ))}
-        <path d={p.nha} fill={MAU_BD.nha} stroke={MAU_BD.vienNha} strokeWidth={0.6} vectorEffect="non-scaling-stroke" opacity={nha} />
-        <path d={p.duongNho} {...tron} stroke={MAU_BD.vienDuong} strokeWidth={nho + 2} />
-        <path d={p.duongLon} {...tron} stroke={MAU_BD.vienDuongLon} strokeWidth={lon + 2.4} />
-        <path d={p.duongNho} {...tron} stroke={MAU_BD.duong} strokeWidth={nho} />
-        <path d={p.duongLon} {...tron} stroke={MAU_BD.duongLon} strokeWidth={lon} />
+        {q && quocGia ? (
+          <>
+            <path d={q.lanCan} fill={MAU_BD.datLanCan} />
+            <path d={q.vn} fill={MAU_BD.dat} />
+            {vien > 0 ? <path d={q.vn} fill="none" stroke={MAU.vang} strokeWidth={1.6 / tiLeHien} strokeLinejoin="round" vectorEffect="non-scaling-stroke" opacity={vien} /> : null}
+            {vien > 0 ? quocGia.dao.map(([dx, dy], i) => <circle key={i} cx={dx} cy={dy} r={(2.6 * m) / tiLeHien} fill={MAU_BD.dat} stroke={MAU.vang} strokeWidth={1.2 / tiLeHien} vectorEffect="non-scaling-stroke" opacity={vien} />) : null}
+          </>
+        ) : null}
+        <g opacity={moChiTiet}>
+          <path d={p.xanh} fill={MAU_BD.xanh} />
+          <path d={p.nuoc} fill={MAU_BD.nuoc} />
+          {p.song.map((s, i) => (
+            <path key={i} d={s.d} fill="none" stroke={MAU_BD.nuoc} strokeWidth={s.rong} strokeLinecap="round" strokeLinejoin="round" />
+          ))}
+          <path d={p.nha} fill={MAU_BD.nha} stroke={MAU_BD.vienNha} strokeWidth={0.6} vectorEffect="non-scaling-stroke" opacity={nha} />
+          <path d={p.duongNho} {...tron} stroke={MAU_BD.vienDuong} strokeWidth={nho + 2} />
+          <path d={p.duongLon} {...tron} stroke={MAU_BD.vienDuongLon} strokeWidth={lon + 2.4} />
+          <path d={p.duongNho} {...tron} stroke={MAU_BD.duong} strokeWidth={nho} />
+          <path d={p.duongLon} {...tron} stroke={MAU_BD.duongLon} strokeWidth={lon} />
+        </g>
       </svg>
       {ghiNguon === false ? null : <GhiNguonBanDo co={Math.max(15, rong / 54) / tiLeHien} style={ghiNguon} />}
     </div>

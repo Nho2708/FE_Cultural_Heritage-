@@ -28,6 +28,28 @@
         "ma": "ja",
         "ten": "日本語"
       }
+    ],
+    "trangChiTiet": {
+      "dangNhap": "Student sign-in",
+      "duongDan": "Explore",
+      "the": [
+        "Tangible",
+        "World Heritage (UNESCO)",
+        "Recognized in 1999",
+        "Da Nang City"
+      ],
+      "nut": [
+        "Summary",
+        "Listen",
+        "View in 3D"
+      ],
+      "nguonAnh": "Photo: Steffen Schmitz · CC BY-SA 4.0 · Wikimedia Commons",
+      "gioiThieu": "Introduction",
+      "doanGioiThieu": "Hoi An Ancient Town lies on the lower Thu Bon River near the sea, about 28 km south of central Da Nang."
+    },
+    "loiThuyetMinh": [
+      "A bustling trading port on the Thu Bon River in the 17th–18th centuries",
+      "World Heritage (UNESCO, 1999)"
     ]
   },
   "theKet": {
@@ -36,5 +58,5 @@
     "diaChiHien": "maynard-unphysical-planographically.ngrok-free.dev",
     "lienKetQr": "https://maynard-unphysical-planographically.ngrok-free.dev"
   },
-  "moTaBaiDang": "Vietnam Heritage: free on the web and Android. Credits: 3D model \"Hoi An House\" by NGUYENNGHIAKK on Sketchfab (CC BY 4.0, compressed for the web). Map data © OpenStreetMap contributors (openstreetmap.org/copyright). Heritage data: Vietnam's Department of Cultural Heritage (dsvh.gov.vn). Photos: Wikimedia Commons (CC0). Music: original, made by the project team."
+  "moTaBaiDang": "Vietnam Heritage: free on the web and Android. Credits: 3D models \"Hoi An house - Nhà Hội An\" by NGUYENNGHIAKK and \"Cao Đỉnh\" by vudn54 on Sketchfab (CC BY 4.0, compressed for the web). Photos from Wikimedia Commons: Japanese Covered Bridge (Chùa Cầu) and Meridian Gate, Huế by Chainwit (CC BY 4.0); Hội An Ancient Town street by Steffen Schmitz (CC BY-SA 4.0); Tây Đô (Hồ Dynasty) Citadel south gate by Silviculture (public domain); other photos CC0. Map data © OpenStreetMap contributors (openstreetmap.org/copyright); country outlines: Natural Earth. Heritage data: Vietnam's Department of Cultural Heritage (dsvh.gov.vn). Music: original, made by the project team."
 }

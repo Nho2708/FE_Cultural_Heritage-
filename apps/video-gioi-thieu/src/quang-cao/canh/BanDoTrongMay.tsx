@@ -1,4 +1,5 @@
 import { AbsoluteFill, useCurrentFrame } from 'remotion';
+import type { ChuQuangCao } from '../chuoi';
 import { BAN_DO, CANH_DOC_30, DI, MOC, tienDo } from '../nhip';
 import { BanDo, ChamNguoiXem, GhimDiSan, veDiem, type DuLieuBanDo } from '../ui/BanDo';
 import { KhungMay, coMay } from '../ui/KhungMay';
@@ -38,7 +39,7 @@ export function LopBanDo({ banDo, f }: { banDo: DuLieuBanDo; f: number }) {
  * thẻ di sản trượt lên ở đáy màn hình (ảnh, tên, chip khoảng cách như thẻ "Gần bạn" của app), một vòng chạm lên thẻ,
  * rồi thẻ bắt đầu mở thành trang chi tiết ngay trước điểm cắt.
  */
-export function BanDoTrongMay({ banDo, tenDiTich, khoangCach }: { banDo: DuLieuBanDo; tenDiTich: string; khoangCach: string }) {
+export function BanDoTrongMay({ banDo, giaoDien }: { banDo: DuLieuBanDo; giaoDien: ChuQuangCao['giaoDien'] }) {
   const f = useCurrentFrame();
   const m = MOC.banDoTrongMay;
   const r = MAY_TRONG_MAY.rongMan;
@@ -54,9 +55,9 @@ export function BanDoTrongMay({ banDo, tenDiTich, khoangCach }: { banDo: DuLieuB
     <AbsoluteFill style={{ transform: `scale(${phong})`, transformOrigin: '540px 960px' }}>
       <KhungMay rongMan={r} style={{ left: (1080 - c.rong) / 2, top: (1920 - c.cao) / 2 }}>
         <LopBanDo banDo={banDo} f={f} />
-        <TheMoThanhTrang k={k} tMo={tMo} doiY={(1 - tThe) * (caoThe + THE.day + 20) * k} nhan={nhan} tenDiTich={tenDiTich} khoangCach={khoangCach}>
+        <TheMoThanhTrang k={k} tMo={tMo} doiY={(1 - tThe) * (caoThe + THE.day + 20) * k} nhan={nhan} tenDiTich={giaoDien.tenDiTich} khoangCach={giaoDien.khoangCach} dangNhap={giaoDien.trangChiTiet.dangNhap}>
           <VongCham x={((MAN.rong - THE.le * 2) / 2) * k} y={(caoThe / 2) * k} canh={64 * k} t={tienDo(f, m.cham)} />
-          {f >= DAI + MOC.trangChiTiet.noiDung[0] ? <NoiDungTrang k={k} t={tienDo(f - DAI, MOC.trangChiTiet.noiDung)} tNhip={0} tCham={0} /> : null}
+          {f >= DAI + MOC.trangChiTiet.noiDung[0] ? <NoiDungTrang k={k} t={tienDo(f - DAI, MOC.trangChiTiet.noiDung)} tNhip={0} tCham={0} tenDiTich={giaoDien.tenDiTich} chu={giaoDien.trangChiTiet} /> : null}
         </TheMoThanhTrang>
       </KhungMay>
     </AbsoluteFill>
