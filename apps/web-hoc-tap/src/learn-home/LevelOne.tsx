@@ -8,6 +8,7 @@ import { LearningSections } from './LearningSections';
 import { useStudentHome } from './useStudentHome';
 import { takeQuizPath } from '../quiz/quizData';
 import { lessonPath } from '../lessons/lessonData';
+import { Link } from 'react-router';
 
 // Trang học của em — bản cấp 1 (khối 1-5): Thiết kế chuẩn gamification theo phong cách Duolingo:
 // 1. Cột chính: Con đường bài học uốn lượn ziczac (Winding Snake Path), Unit Banner xanh lá, các trạm nút tròn 3D có bóng đổ dày,
@@ -29,6 +30,11 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
     l.quizzesPublished > 0 && l.quizzesDone >= l.quizzesPublished;
 
   const unfinishedLesson = myLessons.find((l) => !isLessonDone(l));
+  const allDone =
+    myLessons.length > 0 &&
+    myLessons.every(isLessonDone) &&
+    openQuizzes.length === 0 &&
+    inProgress.length === 0;
 
   const cheer = home?.cheer ?? 'Cùng vượt qua các trạm trên con đường di sản để nhận Sao và mở Rương Kho Báu! 🌟';
   const greeting = `Chào ${name}! Hôm nay mình cùng khám phá nhé!`;
@@ -103,13 +109,13 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
       });
     }
 
-    // 5. Trạm đích cuối cùng: Rương Kho Báu Di Sản (đích đến tự nhiên của chặng, không gượng ép bong bóng)
+    // 5. Trạm đích cuối cùng: Rương Kho Báu Di Sản (chỉ khi hoàn thành hết các bài mới mở quà)
     nodes.push({
       id: 'chest-end',
       title: 'Rương Kho Báu Di Sản',
       type: 'chest',
       icon: '🎁',
-      bubble: null,
+      bubble: allDone ? 'MỞ QUÀ! 🎁' : null,
       to: pathOf('progress'),
     });
 
@@ -179,7 +185,7 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
                       : isLesson
                         ? 'duo-node-lesson'
                         : isChest
-                          ? 'duo-node-chest animate-bounce'
+                          ? cn('duo-node-chest', allDone && 'animate-bounce')
                           : 'duo-node-locked';
 
                   return (
@@ -261,7 +267,16 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
             </div>
 
             {/* Chi tiết danh sách bài chơi, bài học & gợi ý (theo hợp đồng kiểm thử) */}
-            <div className="mt-2">
+            <div className="mt-4">
+              {/* Tiêu đề ngăn cách: phân biệt con đường tổng quan phía trên và danh sách chi tiết hành động bên dưới */}
+              <div className="flex items-center gap-3 mb-4 px-1">
+                <div className="flex-1 h-px bg-amber-200/80" />
+                <span className="text-[11px] font-black uppercase tracking-widest text-amber-700/70 flex items-center gap-1.5">
+                  <span aria-hidden="true">📋</span>
+                  Chi tiết bài học
+                </span>
+                <div className="flex-1 h-px bg-amber-200/80" />
+              </div>
               <LearningSections level={1} />
             </div>
 
@@ -276,31 +291,43 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
                 THÀNH TÍCH CỦA EM
               </p>
               <div className="grid grid-cols-3 gap-2">
-                <div className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-orange-50 border-2 border-orange-200 border-b-4 border-b-orange-400">
-                  <span className="text-2xl mb-0.5">🔥</span>
+                <Link
+                  to={pathOf('progress')}
+                  className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-orange-50 border-2 border-orange-200 border-b-4 border-b-orange-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-2 no-underline cursor-pointer group"
+                  title="Xem số ngày chăm chỉ trên trang tiến độ"
+                >
+                  <span className="text-2xl mb-0.5 group-hover:scale-110 transition-transform" aria-hidden="true">🔥</span>
                   <span className="text-sm font-black text-orange-600">
-                    {home?.streakDays ? `${home.streakDays} ngày` : '1 ngày'}
+                    {home?.streakDays ? `${home.streakDays} ngày` : '–'}
                   </span>
                   <span className="text-[10px] font-bold text-orange-950/60 uppercase">Chăm chỉ</span>
-                </div>
-                <div className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-amber-50 border-2 border-amber-200 border-b-4 border-b-amber-400">
-                  <span className="text-2xl mb-0.5">⭐</span>
+                </Link>
+                <Link
+                  to={pathOf('progress')}
+                  className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-amber-50 border-2 border-amber-200 border-b-4 border-b-amber-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-2 no-underline cursor-pointer group"
+                  title="Xem tổng số sao đạt được"
+                >
+                  <span className="text-2xl mb-0.5 group-hover:scale-110 transition-transform" aria-hidden="true">⭐</span>
                   <span className="text-sm font-black text-amber-700">
                     {home?.totalStars ?? 0} Sao
                   </span>
                   <span className="text-[10px] font-bold text-amber-950/60 uppercase">Điểm thưởng</span>
-                </div>
-                <div className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-purple-50 border-2 border-purple-200 border-b-4 border-b-purple-400">
-                  <span className="text-2xl mb-0.5">🏆</span>
+                </Link>
+                <Link
+                  to={`${pathOf('progress')}?tab=huy-hieu`}
+                  className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-purple-50 border-2 border-purple-200 border-b-4 border-b-purple-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-2 no-underline cursor-pointer group"
+                  title="Xem bộ sưu tập huy hiệu của em"
+                >
+                  <span className="text-2xl mb-0.5 group-hover:scale-110 transition-transform" aria-hidden="true">🏆</span>
                   <span className="text-sm font-black text-purple-700">
                     {home?.recentBadges?.length ?? 0}
                   </span>
                   <span className="text-[10px] font-bold text-purple-950/60 uppercase">Huy hiệu</span>
-                </div>
+                </Link>
               </div>
             </div>
 
-            {/* Khối nhiệm vụ: Nhập mã bài học (Nút to 3D Duolingo) */}
+            {/* Khối nhiệm vụ: Nhập mã bài học (Nút to 3D Duolingo) — luôn hiển thị vì học sinh cần nhập mã để mở bài, nhưng nội dung thay đổi theo tiến độ */}
             <div className="relative overflow-hidden rounded-3xl border-2 border-sky-400 border-b-6 border-b-sky-600 bg-gradient-to-br from-sky-500 to-blue-600 p-5 text-white shadow-md">
               <div className="flex items-center gap-3 mb-2">
                 <span className="flex size-10 items-center justify-center rounded-xl bg-white/20 text-xl shadow-inner">
@@ -308,15 +335,17 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
                 </span>
                 <div>
                   <span className="text-[11px] font-black uppercase tracking-wider text-amber-300">
-                    MỞ KHÓA TRẠM MỚI
+                    {myLessons.length === 0 ? 'MỞ KHÓA TRẠM MỚI' : 'BÀI HỌC MỚI TỪ THẦY CÔ?'}
                   </span>
                   <h3 className="text-lg font-black text-white leading-tight">
-                    Em đã có mã bài học chưa?
+                    {myLessons.length === 0 ? 'Em đã có mã bài học chưa?' : 'Nhập mã để mở thêm bài nhé!'}
                   </h3>
                 </div>
               </div>
               <p className="text-xs text-sky-100 font-medium mb-4">
-                Nhập mã thầy cô đưa để vào chặng khám phá và nhận sao thưởng nhé!
+                {myLessons.length === 0
+                  ? 'Nhập mã thầy cô đưa để vào chặng khám phá và nhận sao thưởng nhé!'
+                  : 'Khi thầy cô giao bài mới, em nhập mã ở đây để mở thêm trạm học!'}
               </p>
               <ButtonLink
                 to={pathOf('enterCode')}
