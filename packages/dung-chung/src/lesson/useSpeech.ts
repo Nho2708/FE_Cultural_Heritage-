@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { getBestVietnameseVoice, VI_SPEECH_OPTIONS } from './speechVoice';
 
 /** Giọng đọc có sẵn của trình duyệt (không gọi dịch vụ ngoài). Trình duyệt không có thì `supported` là false. `speak` và `stop` giữ nguyên giữa các lần vẽ nên đặt được trong mảng phụ thuộc của hiệu ứng. */
 export function useSpeech() {
@@ -19,6 +20,10 @@ export function useSpeech() {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'vi-VN';
+      const voice = getBestVietnameseVoice();
+      if (voice) utterance.voice = voice;
+      utterance.rate = VI_SPEECH_OPTIONS.rate;
+      utterance.pitch = VI_SPEECH_OPTIONS.pitch;
       utterance.onend = () => {
         if (active.current) {
           active.current = false;
