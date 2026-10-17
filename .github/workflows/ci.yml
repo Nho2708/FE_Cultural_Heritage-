@@ -105,7 +105,11 @@ jobs:
             ma=$(printf '%s' "$dau" | head -n 1 | cut -d' ' -f2)
             echo "$1 -> $ma"
             test "$ma" = "$2"
-            if [ -n "${3:-}" ]; then printf '%s\n' "$dau" | cat - "$RUNNER_TEMP/than" | grep -qi -- "$3"; fi
+            # Ghi ra tệp rồi mới tìm: grep -q dừng sớm làm lệnh ghi trong ống báo lỗi khi bật pipefail.
+            if [ -n "${3:-}" ]; then
+              { printf '%s\n' "$dau"; cat "$RUNNER_TEMP/than"; } > "$RUNNER_TEMP/phan-hoi"
+              grep -qi -- "$3" "$RUNNER_TEMP/phan-hoi"
+            fi
           }
           kiem http://127.0.0.1:8080/ 200 'cache-control: no-cache'
           kiem http://127.0.0.1:8080/di-san/hoang-thanh-thang-long 200 '<div id="root">'
