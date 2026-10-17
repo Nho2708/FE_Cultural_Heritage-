@@ -127,7 +127,7 @@ describe('chọn ngôn ngữ', () => {
 
     expect(await screen.findByRole('heading', { level: 1, name: "Discover Viet Nam's cultural heritage" })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Language: English' })).toBeInTheDocument();
-    expect(screen.getAllByRole('link', { name: 'Student sign-in' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: 'Sign-in' }).length).toBeGreaterThan(0);
   });
 
   it('học sinh đã đăng nhập luôn xem tiếng Việt, không có mục Ngôn ngữ, lựa chọn đã nhớ của khách không bị ghi đè', async () => {

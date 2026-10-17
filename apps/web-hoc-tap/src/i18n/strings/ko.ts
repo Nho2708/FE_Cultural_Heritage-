@@ -22,7 +22,7 @@ export const ko: Strings = {
     explore: '탐색',
     map: '지도',
     timeline: '연표',
-    studentSignIn: '학생 로그인',
+    studentSignIn: '로그인',
     openMenu: '메뉴 열기',
     closeMenu: '메뉴 닫기',
     menu: '탐색',
