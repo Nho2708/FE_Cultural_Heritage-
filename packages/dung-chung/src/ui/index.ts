@@ -14,6 +14,7 @@ export * from './Pagination';
 export * from './SearchForm';
 export * from './Tabs';
 export * from './TextLink';
+export * from './ThemeToggle';
 export * from './Toast';
 export * from './toastContext';
 export * from './usePopover';

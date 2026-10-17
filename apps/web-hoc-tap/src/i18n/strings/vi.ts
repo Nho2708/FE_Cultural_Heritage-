@@ -26,7 +26,7 @@ export const vi = {
     explore: 'Khám phá',
     map: 'Bản đồ',
     timeline: 'Dòng thời gian',
-    studentSignIn: 'Học sinh đăng nhập',
+    studentSignIn: 'Đăng nhập',
     openMenu: 'Mở điều hướng',
     closeMenu: 'Đóng điều hướng',
     menu: 'Điều hướng',
