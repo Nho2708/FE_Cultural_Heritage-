@@ -79,6 +79,9 @@ export function LevelOneLesson({ lesson, initialPosition, onPositionChange }: Le
   const firstHeritage = lesson.heritages[0];
   const firstHeritageTo = firstHeritage ? links.heritage(firstHeritage.slug) : null;
 
+  const hasPlayableQuiz = playStep >= 0 && lesson.quizzes.some(canTakeQuiz);
+  const hasSubmittedQuiz = lesson.quizzes.some((q) => q.state === 'SUBMITTED');
+
   return (
     <section className="dsv-content dsv-section" data-bo-cuc="cap-1" aria-labelledby="tieu-de-bai">
       {!links.preview && <title>{`${lesson.title ?? 'Bài học'} · Vietnam Heritage`}</title>}
@@ -214,10 +217,16 @@ export function LevelOneLesson({ lesson, initialPosition, onPositionChange }: Le
                 <h2 id="nhan-sao" className="type-h2">
                   Em học xong rồi! Giỏi quá!
                 </h2>
-                <p className="mt-2 type-body-m">Em làm bài chơi hoặc bài kiểm tra của bài để nhận sao nhé.</p>
+                <p className="mt-2 type-body-m">
+                  {hasPlayableQuiz
+                    ? 'Em làm bài chơi hoặc bài kiểm tra của bài để nhận sao nhé.'
+                    : hasSubmittedQuiz
+                      ? 'Em đã hoàn thành bài học và bài kiểm tra rồi! Giỏi lắm!'
+                      : 'Em đã hoàn thành bài học này rồi! Bấm "Về trang học" bên dưới để tiếp tục hành trình nhé.'}
+                </p>
               </div>
             </div>
-            {playStep >= 0 && lesson.quizzes.some(canTakeQuiz) && (
+            {hasPlayableQuiz && (
               <Button size="lg" className="self-start rounded-full" onClick={() => go({ step: playStep, part: 0 })}>
                 <Icon name="play" size={22} />
                 Chơi để nhận sao

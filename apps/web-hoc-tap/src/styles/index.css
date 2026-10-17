@@ -29,9 +29,10 @@
   --dsv-inline-gap: 16px;
 }
 
-/* =========================================================================
- * GIAO DIỆN HỌC SINH CẤP 1 (TIỂU HỌC) — MỀM MẠI, BO TRÒN, MÀU TƯƠI SÁNG
- * ========================================================================= */
+html, body {
+  overflow-x: hidden;
+}
+
 
 /* =========================================================================
  * GIAO DIỆN HỌC SINH CẤP 1 (TIỂU HỌC) — MỀM MẠI, BO TRÒN, MÀU TƯƠI SÁNG
@@ -261,6 +262,348 @@
   border: 2.5px solid #F59E0B !important;
   box-shadow: 0 12px 28px -6px rgba(245, 158, 11, 0.4) !important;
 }
+
+/* ==========================================================================
+   PHONG CÁCH DUOLINGO CHO HỌC SINH CẤP 1 (TIỂU HỌC)
+   Nút 3D nổi khối, hiệu ứng nhấn lún (tactile push), bong bóng thoại linh vật
+   ========================================================================== */
+
+/* Nút 3D Duolingo Xanh lá (Làm bài, Khởi hành, Hoàn thành) */
+.duo-btn-green,
+[data-bo-cuc="cap-1"] .duo-btn-green {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 9999px !important;
+  background: #58CC02 !important;
+  border: 2px solid #58CC02 !important;
+  border-bottom: 5px solid #46A302 !important;
+  color: #FFFFFF !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  box-shadow: 0 4px 12px rgba(88, 204, 2, 0.25) !important;
+  transition: transform 0.08s ease, border-bottom-width 0.08s ease, background 0.15s ease !important;
+  cursor: pointer !important;
+}
+.duo-btn-green:hover,
+[data-bo-cuc="cap-1"] .duo-btn-green:hover {
+  background: #61E002 !important;
+}
+.duo-btn-green:active,
+[data-bo-cuc="cap-1"] .duo-btn-green:active {
+  transform: translateY(3px) !important;
+  border-bottom-width: 2px !important;
+}
+
+/* Nút 3D Duolingo Xanh dương (Mở bài học, Khám phá) */
+.duo-btn-blue,
+[data-bo-cuc="cap-1"] .duo-btn-blue {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 9999px !important;
+  background: #1CB0F6 !important;
+  border: 2px solid #1CB0F6 !important;
+  border-bottom: 5px solid #1899D6 !important;
+  color: #FFFFFF !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  box-shadow: 0 4px 12px rgba(28, 176, 246, 0.25) !important;
+  transition: transform 0.08s ease, border-bottom-width 0.08s ease, background 0.15s ease !important;
+  cursor: pointer !important;
+}
+.duo-btn-blue:hover,
+[data-bo-cuc="cap-1"] .duo-btn-blue:hover {
+  background: #2BD0FF !important;
+}
+.duo-btn-blue:active,
+[data-bo-cuc="cap-1"] .duo-btn-blue:active {
+  transform: translateY(3px) !important;
+  border-bottom-width: 2px !important;
+}
+
+/* Nút 3D Duolingo Vàng kim (Nhập mã, Nhận thưởng, Sao) */
+.duo-btn-yellow,
+[data-bo-cuc="cap-1"] .duo-btn-yellow {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 9999px !important;
+  background: #FFC800 !important;
+  border: 2px solid #FFC800 !important;
+  border-bottom: 5px solid #E5A500 !important;
+  color: #5B3F00 !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  box-shadow: 0 4px 12px rgba(255, 200, 0, 0.3) !important;
+  transition: transform 0.08s ease, border-bottom-width 0.08s ease, background 0.15s ease !important;
+  cursor: pointer !important;
+}
+.duo-btn-yellow:hover,
+[data-bo-cuc="cap-1"] .duo-btn-yellow:hover {
+  background: #FFD426 !important;
+}
+.duo-btn-yellow:active,
+[data-bo-cuc="cap-1"] .duo-btn-yellow:active {
+  transform: translateY(3px) !important;
+  border-bottom-width: 2px !important;
+}
+
+/* Nút 3D Duolingo Đỏ San hô / Đỏ Sơn mài */
+.duo-btn-coral,
+[data-bo-cuc="cap-1"] .duo-btn-coral {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 9999px !important;
+  background: #FF4B4B !important;
+  border: 2px solid #FF4B4B !important;
+  border-bottom: 5px solid #EA2B2B !important;
+  color: #FFFFFF !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  box-shadow: 0 4px 12px rgba(255, 75, 75, 0.25) !important;
+  transition: transform 0.08s ease, border-bottom-width 0.08s ease, background 0.15s ease !important;
+  cursor: pointer !important;
+}
+.duo-btn-coral:hover,
+[data-bo-cuc="cap-1"] .duo-btn-coral:hover {
+  background: #FF6666 !important;
+}
+.duo-btn-coral:active,
+[data-bo-cuc="cap-1"] .duo-btn-coral:active {
+  transform: translateY(3px) !important;
+  border-bottom-width: 2px !important;
+}
+
+/* Thẻ bài học & hộp Duolingo với viền đáy 3D */
+.duo-card,
+[data-bo-cuc="cap-1"] .duo-card {
+  border-radius: 28px !important;
+  border: 2.5px solid #E5E7EB !important;
+  border-bottom: 5px solid #D1D5DB !important;
+  background: #FFFFFF !important;
+  transition: transform 0.15s ease, border-color 0.15s ease !important;
+}
+.duo-card:hover,
+[data-bo-cuc="cap-1"] .duo-card:hover {
+  transform: translateY(-2px) !important;
+  border-color: #BAE6FD !important;
+  border-bottom-color: #7DD3FC !important;
+}
+
+/* Bong bóng thoại Duolingo cho Linh vật */
+.duo-speech-bubble {
+  position: relative;
+  background: #FFFFFF;
+  border: 3px solid #FCD34D;
+  border-bottom: 6px solid #F59E0B;
+  border-radius: 28px;
+  box-shadow: 0 8px 24px -4px rgba(245, 158, 11, 0.18);
+}
+@media (min-width: 640px) {
+  .duo-speech-bubble::before {
+    content: '';
+    position: absolute;
+    top: 32px;
+    left: -14px;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 14px solid #FCD34D;
+  }
+  .duo-speech-bubble::after {
+    content: '';
+    position: absolute;
+    top: 34px;
+    left: -10px;
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 11px solid #FFFFFF;
+  }
+}
+
+/* Huy hiệu chỉ số trên đầu trang (Streak, Stars, Hearts) */
+.duo-stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-weight: 900;
+  font-size: 14px;
+  border: 2px solid;
+  border-bottom: 4px solid;
+  transition: transform 0.1s ease;
+  user-select: none;
+}
+.duo-stat-pill:hover {
+  transform: translateY(-2px);
+}
+
+/* Nút trạm tròn kiểu Duolingo (Round Milestone Node) */
+.duo-node-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 3px solid;
+  border-bottom: 6px solid;
+  transition: transform 0.08s ease, border-bottom-width 0.08s ease;
+}
+.duo-node-btn:active {
+  transform: translateY(3px);
+  border-bottom-width: 3px;
+}
+
+/* Nút trạm bài học Duolingo Đang hoạt động (Active Node with 3D Ring) */
+.duo-node-active {
+  width: 78px;
+  height: 78px;
+  border-radius: 9999px;
+  background: #58CC02 !important;
+  border: 4px solid #FFFFFF !important;
+  box-shadow: 0 0 0 4px #58CC02, 0 8px 0 4px #46A302, 0 16px 24px rgba(88, 204, 2, 0.35) !important;
+  color: #FFFFFF !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.duo-node-active:hover {
+  transform: translateY(-2px) scale(1.06);
+}
+.duo-node-active:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 4px #58CC02, 0 2px 0 4px #46A302 !important;
+}
+
+/* Nút trạm đã hoàn thành (Done Node - Golden Star) */
+.duo-node-done {
+  width: 72px;
+  height: 72px;
+  border-radius: 9999px;
+  background: #FFC800 !important;
+  border: 4px solid #FFFFFF !important;
+  box-shadow: 0 0 0 4px #FFC800, 0 7px 0 4px #E5A500 !important;
+  color: #5B3F00 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+.duo-node-done:hover {
+  transform: translateY(-2px) scale(1.05);
+}
+
+/* Nút trạm bài học (Lesson Node - Sky Blue) */
+.duo-node-lesson {
+  width: 72px;
+  height: 72px;
+  border-radius: 9999px;
+  background: #1CB0F6 !important;
+  border: 4px solid #FFFFFF !important;
+  box-shadow: 0 0 0 4px #1CB0F6, 0 7px 0 4px #1899D6 !important;
+  color: #FFFFFF !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+.duo-node-lesson:hover {
+  transform: translateY(-2px) scale(1.05);
+}
+
+/* Nút trạm khóa (Locked Node) */
+.duo-node-locked {
+  width: 68px;
+  height: 68px;
+  border-radius: 9999px;
+  background: #E5E7EB !important;
+  border: 4px solid #FFFFFF !important;
+  box-shadow: 0 0 0 4px #E5E7EB, 0 6px 0 4px #D1D5DB !important;
+  color: #9CA3AF !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+/* Rương kho báu cuối chặng (Treasure Chest Node) */
+.duo-node-chest {
+  width: 82px;
+  height: 82px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #FEF08A 0%, #FDE047 100%) !important;
+  border: 4px solid #FFFFFF !important;
+  box-shadow: 0 0 0 4px #FACC15, 0 8px 0 4px #EAB308, 0 16px 28px rgba(234, 179, 8, 0.4) !important;
+  color: #713F12 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+.duo-node-chest:hover {
+  transform: translateY(-3px) scale(1.08);
+}
+
+/* Bong bóng BẮT ĐẦU! nảy phía trên trạm bài học (Floating Start Bubble) */
+.duo-start-bubble {
+  position: absolute;
+  bottom: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #FFFFFF;
+  border: 2.5px solid #58CC02;
+  border-bottom: 5px solid #46A302;
+  border-radius: 16px;
+  padding: 5px 14px;
+  font-weight: 900;
+  font-size: 13px;
+  color: #46A302;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(88, 204, 2, 0.25);
+  animation: duo-bob 1.6s infinite ease-in-out;
+  z-index: 30;
+}
+.duo-start-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 7px solid #46A302;
+}
+
+@keyframes duo-bob {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-7px);
+  }
+}
+
+
 
 
 /*
