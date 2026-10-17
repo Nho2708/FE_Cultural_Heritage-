@@ -1,5 +1,5 @@
 import { cn } from '@dsvhvn/dung-chung';
-import { BrandLogo, Icon, PillLink } from '@dsvhvn/dung-chung/ui';
+import { BrandLogo, Icon, PillLink, ThemeToggle } from '@dsvhvn/dung-chung/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router';
 import { pathOf } from '../../access/screens';
@@ -172,6 +172,7 @@ export function TopBar() {
           </button>
         )}
 
+        {!user && <ThemeToggle className="ml-1" />}
         {user ? (
           <span className="ml-1 dsvmd:ml-4">
             <AccountMenu />
