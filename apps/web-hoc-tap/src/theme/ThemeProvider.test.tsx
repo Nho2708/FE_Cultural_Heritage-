@@ -19,7 +19,7 @@ describe('bộ giao diện theo cấp học', () => {
     expect(await screen.findByRole('heading', { level: 1 })).toBeInTheDocument();
     expect(root()).toHaveAttribute('data-bo-giao-dien', 'mac-dinh');
     expect(cssVar('--dsv-color-primary')).toBe(LEARNING_THEMES['mac-dinh'].color.primary);
-    expect(screen.getAllByRole('link', { name: 'Học sinh đăng nhập' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: 'Đăng nhập' }).length).toBeGreaterThan(0);
   });
 
   it.each([
