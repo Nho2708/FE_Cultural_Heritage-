@@ -22,7 +22,7 @@ export const ja: Strings = {
     explore: '探す',
     map: '地図',
     timeline: '年表',
-    studentSignIn: '生徒ログイン',
+    studentSignIn: 'ログイン',
     openMenu: 'メニューを開く',
     closeMenu: 'メニューを閉じる',
     menu: 'ナビゲーション',

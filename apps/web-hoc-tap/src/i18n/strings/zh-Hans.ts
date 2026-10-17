@@ -22,7 +22,7 @@ export const zhHans: Strings = {
     explore: '探索',
     map: '地图',
     timeline: '时间线',
-    studentSignIn: '学生登录',
+    studentSignIn: '登录',
     openMenu: '打开导航',
     closeMenu: '关闭导航',
     menu: '导航',
