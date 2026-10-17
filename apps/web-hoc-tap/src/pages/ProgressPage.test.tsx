@@ -93,7 +93,7 @@ describe('Tiến độ của em — cấp 2 và 3', () => {
 });
 
 describe('Sao của em — cấp 1', () => {
-  it('tổng số sao, bài gần nhất, sao từng bài, huy hiệu; không có điểm hay phần trăm; tab Bài đã chơi', async () => {
+  it('tổng số sao, bài gần nhất, sao từng bài, huy hiệu; không có điểm hay phần trăm; tab Bài đã học', async () => {
     const user = userEvent.setup();
     const rows = [
       rowOf(3, { quizName: 'Đố vui: Văn Miếu', stars: 3, score: null, totalPoint: null, percent: null }),
@@ -109,7 +109,7 @@ describe('Sao của em — cấp 1', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'Sao của em' })).toBeInTheDocument();
     expect(document.querySelector('[data-bo-cuc]')).toHaveAttribute('data-bo-cuc', 'cap-1');
     expect(screen.getByText('24 sao')).toBeInTheDocument();
-    expect(screen.getByText('Em đã chơi 9 bài')).toBeInTheDocument();
+    expect(screen.getByText('Em đã hoàn thành 9 bài')).toBeInTheDocument();
     expect(screen.getByText('Bài gần nhất: Đố vui: Văn Miếu')).toBeInTheDocument();
     expect(screen.getByText('Em được 3 sao!')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Sao của từng bài' })).toBeInTheDocument();
@@ -117,8 +117,8 @@ describe('Sao của em — cấp 1', () => {
     expect(screen.queryByText(/%/)).not.toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('tab', { name: 'Bài đã chơi' }));
-    expect(screen.getAllByRole('link', { name: 'Xem sao' })).toHaveLength(2);
-    expect(screen.getAllByRole('link', { name: 'Xem sao' })[0]).toHaveAttribute('href', '/ket-qua/3');
+    await user.click(screen.getByRole('tab', { name: 'Bài đã học' }));
+    expect(screen.getAllByRole('link', { name: 'Xem kết quả ⭐' })).toHaveLength(2);
+    expect(screen.getAllByRole('link', { name: 'Xem kết quả ⭐' })[0]).toHaveAttribute('href', '/ket-qua/3');
   });
 });
