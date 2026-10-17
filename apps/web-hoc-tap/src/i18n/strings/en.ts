@@ -22,7 +22,7 @@ export const en: Strings = {
     explore: 'Explore',
     map: 'Map',
     timeline: 'Timeline',
-    studentSignIn: 'Student sign-in',
+    studentSignIn: 'Sign-in',
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
     menu: 'Navigation',
