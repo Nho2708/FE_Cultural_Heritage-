@@ -402,6 +402,15 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
                 <span className="inline-block rounded-full border-2 border-emerald-500 bg-white px-4 py-1 font-mono font-black text-base text-emerald-800 shadow-xs">
                   {studentCodeOf(user)}
                 </span>
+                <div className="mt-2.5 pt-2 border-t border-emerald-200/60">
+                  <Link
+                    to={pathOf('profile')}
+                    className="inline-flex items-center gap-1.5 text-xs font-black text-emerald-700 hover:text-emerald-800 hover:underline"
+                  >
+                    <Icon name="user" size={15} />
+                    Xem Hộ chiếu Di sản của em ▶
+                  </Link>
+                </div>
               </div>
             </section>
 
