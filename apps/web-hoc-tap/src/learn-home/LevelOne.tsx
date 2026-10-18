@@ -40,6 +40,18 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
   const greeting = `Chào ${name}! Hôm nay mình cùng khám phá nhé!`;
   const facts = classFacts(classroom).filter((f) => ['Lớp', 'Giáo viên', 'Trường'].includes(f.label));
 
+  // Số ngày chăm chỉ: lấy từ máy chủ, hoặc tính từ các ngày thực tế em đã hoàn thành bài học (không bị mất ngày khi nghỉ)
+  const activeDays = (() => {
+    if (home?.streakDays && home.streakDays > 0) return home.streakDays;
+    const dates = myLessons
+      .map((l) => l.lastAttemptAt)
+      .filter((d): d is string => Boolean(d))
+      .map((d) => d.slice(0, 10));
+    const unique = new Set(dates);
+    if (unique.size > 0) return unique.size;
+    return (home?.totalStars ?? 0) > 0 ? 1 : 0;
+  })();
+
   // Tạo các trạm trên con đường học tập từ chính dữ liệu bài của học sinh:
   const pathNodes = (() => {
     const nodes: Array<{
@@ -289,7 +301,7 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
                 >
                   <span className="text-2xl group-hover:scale-110 transition-transform leading-none" aria-hidden="true">🔥</span>
                   <span className="text-lg font-black text-orange-600 leading-none my-1">
-                    {home?.streakDays ?? 0}
+                    {activeDays}
                   </span>
                   <span className="text-[10px] font-bold text-orange-950/70 uppercase tracking-wide leading-none">
                     Chăm chỉ

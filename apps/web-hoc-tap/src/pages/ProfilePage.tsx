@@ -23,7 +23,19 @@ function ProfileLevelOne({
   const name = user.fullName ?? 'Em';
   const code = studentCodeOf(user);
 
-  const speechIntro = `Thẻ học sinh của em. Họ và tên: ${name}. Mã học sinh: ${code}. Học sinh lớp ${classroom.name}, trường ${classroom.organization?.name ?? 'Trường học'}. Thầy cô giáo: ${classroom.teacherName ?? 'đang cập nhật'}. Em đã đạt được ${home?.totalStars ?? 0} ngôi sao và ${home?.recentBadges?.length ?? 0} huy hiệu. Chúc em học thật vui!`;
+  // Số ngày chăm chỉ: lấy từ máy chủ, hoặc tính từ các ngày thực tế em đã hoàn thành bài học (không bị mất ngày khi nghỉ)
+  const activeDays = (() => {
+    if (home?.streakDays && home.streakDays > 0) return home.streakDays;
+    const dates = (home?.myLessons ?? [])
+      .map((l) => l.lastAttemptAt)
+      .filter((d): d is string => Boolean(d))
+      .map((d) => d.slice(0, 10));
+    const unique = new Set(dates);
+    if (unique.size > 0) return unique.size;
+    return (home?.totalStars ?? 0) > 0 ? 1 : 0;
+  })();
+
+  const speechIntro = `Thẻ học sinh của em. Họ và tên: ${name}. Mã học sinh: ${code}. Học sinh lớp ${classroom.name}, trường ${classroom.organization?.name ?? 'Trường học'}. Thầy cô giáo: ${classroom.teacherName ?? 'đang cập nhật'}. Em đã đạt được ${home?.totalStars ?? 0} ngôi sao và ${activeDays} ngày chăm chỉ. Chúc em học thật vui!`;
 
   return (
     <section className="dsv-content dsv-section" data-bo-cuc="cap-1">
@@ -114,7 +126,7 @@ function ProfileLevelOne({
               >
                 <span className="text-2xl sm:text-3xl group-hover:scale-110 transition-transform leading-none" aria-hidden="true">🔥</span>
                 <span className="text-xl sm:text-2xl font-black text-orange-600 leading-tight my-1">
-                  {home?.streakDays ?? 0}
+                  {activeDays}
                 </span>
                 <span className="text-[11px] font-bold text-orange-950/70 uppercase tracking-wide leading-none">
                   Chăm chỉ
