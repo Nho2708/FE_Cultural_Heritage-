@@ -7,10 +7,10 @@ const student = { mustChangePassword: false };
 const mustChange = { mustChangePassword: true };
 
 describe('bảng màn hình của web học tập', () => {
-  it('18 màn hình: 9 khám phá công khai, 9 khu học; 1 hộp thoại; route chữ thường không dấu', () => {
-    expect(SCREENS).toHaveLength(18);
+  it('19 màn hình: 9 khám phá công khai, 10 khu học; 1 hộp thoại; route chữ thường không dấu', () => {
+    expect(SCREENS).toHaveLength(19);
     expect(ALL.filter((s) => s.area === 'explore')).toHaveLength(9);
-    expect(ALL.filter((s) => s.area === 'learning')).toHaveLength(9);
+    expect(ALL.filter((s) => s.area === 'learning')).toHaveLength(10);
     expect(ALL.filter((s) => s.path === null).map((s) => s.name)).toEqual(['Bắt đầu bài kiểm tra']);
     const paths = ALL.flatMap((s) => [s.path, ...(s.aliases ?? [])]).filter((p) => p !== null);
     expect(paths.every((p) => /^\/[a-z0-9/:-]*$/i.test(p) && !/[A-Z]/.test(p.replace(/:[A-Za-z]+/g, '')))).toBe(true);
@@ -21,7 +21,7 @@ describe('bảng màn hình của web học tập', () => {
       expect(resolveAccess(screen(key), null)).toBe('allow');
       expect(resolveAccess(screen(key), student)).toBe('allow');
     }
-    for (const key of ['changePassword', 'learnHome', 'enterCode', 'lesson', 'takeQuiz', 'result', 'progress'] as const) {
+    for (const key of ['changePassword', 'learnHome', 'enterCode', 'lesson', 'takeQuiz', 'result', 'progress', 'profile'] as const) {
       expect(resolveAccess(screen(key), null)).toBe('login');
       expect(resolveAccess(screen(key), student)).toBe('allow');
     }

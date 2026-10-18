@@ -61,6 +61,12 @@ export function AccountMenu() {
         </div>
         <ul className="py-1">
           <li>
+            <Link to={pathOf('profile')} onClick={close} className={MENU_ITEM}>
+              <Icon name="user" size={20} />
+              {user.schoolLevel === 1 ? 'Hộ chiếu của em' : 'Hồ sơ của em'}
+            </Link>
+          </li>
+          <li>
             <Link to={pathOf('changePassword')} onClick={close} className={MENU_ITEM}>
               <Icon name="key" size={20} />
               Đổi mật khẩu
