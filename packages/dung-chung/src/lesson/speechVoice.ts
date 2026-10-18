@@ -91,8 +91,11 @@ export async function fetchCloudTtsAudioUrl(text: string, signal?: AbortSignal):
     });
     if (!res.ok) return null;
     const json = await res.json();
-    const audioUrl = json?.data?.audioUrl;
+    let audioUrl = json?.data?.audioUrl;
     if (typeof audioUrl === 'string' && audioUrl.length > 0) {
+      if (audioUrl.startsWith('/')) {
+        audioUrl = `${ttsBaseUrl}${audioUrl.replace(/^\/api\/v1/, '')}`;
+      }
       ttsAudioCache.set(trimmed, audioUrl);
       return audioUrl;
     }
