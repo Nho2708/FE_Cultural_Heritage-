@@ -293,36 +293,42 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
               <div className="grid grid-cols-3 gap-2">
                 <Link
                   to={pathOf('progress')}
-                  className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-orange-50 border border-orange-200 border-b-3 border-b-orange-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 no-underline cursor-pointer group"
+                  className="flex flex-col items-center justify-between h-[96px] p-2 rounded-2xl bg-orange-50 border border-orange-200 border-b-3 border-b-orange-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 no-underline cursor-pointer group text-center min-w-0"
                   title="Xem số ngày chăm chỉ trên trang tiến độ"
                 >
-                  <span className="text-2xl mb-0.5 group-hover:scale-110 transition-transform" aria-hidden="true">🔥</span>
-                  <span className="text-sm font-black text-orange-600">
-                    {home?.streakDays ? `${home.streakDays} ngày` : '–'}
+                  <span className="text-2xl group-hover:scale-110 transition-transform" aria-hidden="true">🔥</span>
+                  <span className="text-sm font-black text-orange-600 truncate max-w-full">
+                    {home?.streakDays ? `${home.streakDays} ngày` : '0 ngày'}
                   </span>
-                  <span className="text-[10px] font-bold text-orange-950/60 uppercase">Chăm chỉ</span>
+                  <span className="text-[10px] font-bold text-orange-950/70 uppercase tracking-wide truncate max-w-full whitespace-nowrap">
+                    Chăm chỉ
+                  </span>
                 </Link>
                 <Link
                   to={pathOf('progress')}
-                  className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-amber-50 border border-amber-200 border-b-3 border-b-amber-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 no-underline cursor-pointer group"
+                  className="flex flex-col items-center justify-between h-[96px] p-2 rounded-2xl bg-amber-50 border border-amber-200 border-b-3 border-b-amber-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 no-underline cursor-pointer group text-center min-w-0"
                   title="Xem tổng số sao đạt được"
                 >
-                  <span className="text-2xl mb-0.5 group-hover:scale-110 transition-transform" aria-hidden="true">⭐</span>
-                  <span className="text-sm font-black text-amber-700">
-                    {home?.totalStars ?? 0} Sao
+                  <span className="text-2xl group-hover:scale-110 transition-transform" aria-hidden="true">⭐</span>
+                  <span className="text-sm font-black text-amber-700 truncate max-w-full">
+                    {home?.totalStars ?? 0} sao
                   </span>
-                  <span className="text-[10px] font-bold text-amber-950/60 uppercase">Điểm thưởng</span>
+                  <span className="text-[10px] font-bold text-amber-950/70 uppercase tracking-wide truncate max-w-full whitespace-nowrap">
+                    Sao thưởng
+                  </span>
                 </Link>
                 <Link
                   to={`${pathOf('progress')}?tab=huy-hieu`}
-                  className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-purple-50 border border-purple-200 border-b-3 border-b-purple-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 no-underline cursor-pointer group"
+                  className="flex flex-col items-center justify-between h-[96px] p-2 rounded-2xl bg-purple-50 border border-purple-200 border-b-3 border-b-purple-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 no-underline cursor-pointer group text-center min-w-0"
                   title="Xem bộ sưu tập huy hiệu của em"
                 >
-                  <span className="text-2xl mb-0.5 group-hover:scale-110 transition-transform" aria-hidden="true">🏆</span>
-                  <span className="text-sm font-black text-purple-700">
-                    {home?.recentBadges?.length ?? 0}
+                  <span className="text-2xl group-hover:scale-110 transition-transform" aria-hidden="true">🏆</span>
+                  <span className="text-sm font-black text-purple-700 truncate max-w-full">
+                    {home?.recentBadges?.length ?? 0} huy hiệu
                   </span>
-                  <span className="text-[10px] font-bold text-purple-950/60 uppercase">Huy hiệu</span>
+                  <span className="text-[10px] font-bold text-purple-950/70 uppercase tracking-wide truncate max-w-full whitespace-nowrap">
+                    Huy hiệu
+                  </span>
                 </Link>
               </div>
             </div>

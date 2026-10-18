@@ -4,7 +4,7 @@ import { mockApi, studentOf, studentServer } from '../test/fixtures';
 import { renderApp, signInAs } from '../test/renderApp';
 
 describe('Trang hồ sơ học sinh — ProfilePage', () => {
-  it('cấp 1: giao diện Hộ chiếu Di sản Nhí, có data-bo-cuc="cap-1", tên, mã học sinh, nút loa, thẻ thành tích không điểm số', async () => {
+  it('cấp 1: giao diện Thẻ học sinh của em, có data-bo-cuc="cap-1", tên, mã học sinh, nút loa, dải thành tích không điểm số', async () => {
     const student = studentOf(4, { fullName: 'Trần Minh Khôi' });
     signInAs(student);
     mockApi(studentServer(student));
@@ -13,7 +13,7 @@ describe('Trang hồ sơ học sinh — ProfilePage', () => {
     // 1. Tiêu đề và Tên học sinh
     expect(await screen.findByRole('heading', { level: 1, name: 'Trần Minh Khôi' })).toBeInTheDocument();
     expect(document.querySelector('[data-bo-cuc]')).toHaveAttribute('data-bo-cuc', 'cap-1');
-    expect(screen.getByText('HỘ CHIẾU DI SẢN NHÍ')).toBeInTheDocument();
+    expect(screen.getByText('THẺ HỌC SINH CỦA EM')).toBeInTheDocument();
 
     // 2. Mã học sinh
     expect(screen.getAllByText('HS8K2QX7').length).toBeGreaterThanOrEqual(1);
@@ -21,10 +21,9 @@ describe('Trang hồ sơ học sinh — ProfilePage', () => {
     // 3. Nút loa đọc to
     expect(screen.getByRole('button', { name: 'Nghe thông tin hồ sơ của em' })).toBeInTheDocument();
 
-    // 4. Các thẻ thành tích khích lệ (Sao, Chăm chỉ, Bài học, Huy hiệu)
+    // 4. Các thẻ thành tích khích lệ (Sao, Chăm chỉ, Huy hiệu)
     expect(screen.getByText('Sao tích lũy')).toBeInTheDocument();
     expect(screen.getByText('Chăm chỉ')).toBeInTheDocument();
-    expect(screen.getByText('Bài đã mở')).toBeInTheDocument();
     expect(screen.getByText('Huy hiệu')).toBeInTheDocument();
 
     // 5. Khối Trường & Lớp của em
@@ -34,7 +33,7 @@ describe('Trang hồ sơ học sinh — ProfilePage', () => {
 
     // 6. Liên kết đổi mật khẩu và về trang học
     const cap1Section = document.querySelector('[data-bo-cuc="cap-1"]')!;
-    expect(within(cap1Section as HTMLElement).getByRole('link', { name: /Trang học ▶/ })).toHaveAttribute('href', '/hoc');
+    expect(within(cap1Section as HTMLElement).getByRole('link', { name: /Về trang học/ })).toHaveAttribute('href', '/hoc');
     expect(within(cap1Section as HTMLElement).getByRole('link', { name: /Đổi mật khẩu/ })).toHaveAttribute('href', '/doi-mat-khau');
   });
 
