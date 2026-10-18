@@ -30,10 +30,35 @@ export function splitParagraphs(text: string): string[] {
     .filter(Boolean);
 }
 
-/** Giọng đọc phù hợp nhất với mã giọng đọc (`ko-KR`): trùng cả vùng thì chọn, không thì giọng cùng ngôn ngữ; không có thì undefined. */
-export function pickVoice<T extends { lang: string }>(voices: readonly T[], speechTag: string): T | undefined {
+/** Giọng đọc phù hợp nhất với mã giọng đọc (`ko-KR`): trùng cả vùng thì chọn, không thì giọng cùng ngôn ngữ; ưu tiên giọng Nữ và Natural; không có thì undefined. */
+export function pickVoice<T extends { lang: string; name?: string }>(voices: readonly T[], speechTag: string): T | undefined {
   const normalize = (tag: string) => tag.replaceAll('_', '-').toLowerCase();
   const wanted = normalize(speechTag);
   const primary = wanted.split('-')[0];
-  return voices.find((voice) => normalize(voice.lang) === wanted) ?? voices.find((voice) => normalize(voice.lang).split('-')[0] === primary);
+
+  const matching = voices.filter((voice) => {
+    const lang = normalize(voice.lang);
+    return lang === wanted || lang.split('-')[0] === primary;
+  });
+
+  if (matching.length === 0) return undefined;
+
+  // Nếu là tiếng Việt, ưu tiên giọng Nữ Natural (Hoài My), giọng Nữ, rồi giọng Natural khác
+  if (primary === 'vi') {
+    const femaleNatural = matching.find(
+      (v) => /natural|neural/i.test(v.name ?? '') && /hoaimy|female|nữ|woman/i.test(v.name ?? ''),
+    );
+    if (femaleNatural) return femaleNatural;
+
+    const female = matching.find((v) => /female|nữ|woman|hoaimy/i.test(v.name ?? ''));
+    if (female) return female;
+
+    const natural = matching.find((v) => /natural|neural/i.test(v.name ?? ''));
+    if (natural) return natural;
+
+    const nonAn = matching.find((v) => !/\ban\b/i.test(v.name ?? ''));
+    if (nonAn) return nonAn;
+  }
+
+  return matching.find((voice) => normalize(voice.lang) === wanted) ?? matching[0];
 }
