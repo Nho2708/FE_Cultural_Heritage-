@@ -35,13 +35,13 @@ function CardOne({ item }: { item: Suggestion }) {
         {item.hasImage ? (
           <Thumbnail url={item.imageUrl} width={400} />
         ) : (
-          <span className="absolute inset-0 flex items-center justify-center text-on-surface-muted bg-amber-50/50" aria-hidden="true">
-            <Icon name={item.group === 'newLesson' ? 'sparkles' : item.group === 'quiz' ? 'play' : 'book-open'} size={40} className="text-amber-500" />
+          <span className="absolute inset-0 flex items-center justify-center text-on-surface-muted bg-emerald-50/50" aria-hidden="true">
+            <Icon name={item.group === 'newLesson' ? 'sparkles' : item.group === 'quiz' ? 'play' : 'book-open'} size={40} className="text-emerald-600" />
           </span>
         )}
       </div>
       <div className="flex flex-1 flex-col gap-2 p-3.5">
-        <span className="w-fit rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-900 border border-amber-300" style={{ borderRadius: '9999px' }}>{short}</span>
+        <span className="w-fit rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-800 border border-emerald-200" style={{ borderRadius: '9999px' }}>{short}</span>
         <h3 className="type-h4 font-bold text-on-surface line-clamp-2">
           {item.action ? (
             <Link to={item.action.to} className="after:absolute after:inset-0 after:content-[''] hover:text-primary">

@@ -126,8 +126,8 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
     <section className="dsv-content dsv-section" data-bo-cuc="cap-1">
       <title>Trang học của em · Vietnam Heritage</title>
       <div className="mx-auto w-full max-w-[1040px]">
-        {/* Banner chính: Gộp Lời chào + Unit Banner xanh lá Duolingo gọn gàng, không bị 2 tầng rườm rà */}
-        <div className="mb-6 rounded-3xl bg-gradient-to-r from-[#58CC02] to-[#46A302] p-5 sm:p-7 text-white shadow-[0_6px_0_#388501]">
+        {/* Banner chính: Gộp Lời chào + Chặng 1 — tông Xanh Ngọc Di Sản mịn màng, thanh lịch */}
+        <div className="mb-6 rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 p-5 sm:p-7 text-white shadow-md border border-emerald-500/30">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-5">
             <div className="flex items-center gap-4 sm:gap-5">
               <div className="size-16 sm:size-20 shrink-0">
@@ -135,11 +135,11 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
               </div>
               <div className="min-w-0 flex-1 text-center sm:text-left">
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                  <span className="rounded-full bg-black/20 px-3 py-0.5 text-xs font-black uppercase tracking-wider text-green-100">
+                  <span className="rounded-full bg-white/20 backdrop-blur-xs px-3 py-0.5 text-xs font-black uppercase tracking-wider text-emerald-50">
                     CHẶNG 1 · LỚP {classroom.name}
                   </span>
                   {classroom.teacherName && (
-                    <span className="text-xs font-bold text-green-100">
+                    <span className="text-xs font-bold text-emerald-100">
                       👩‍🏫 Thầy cô: {classroom.teacherName}
                     </span>
                   )}
@@ -147,7 +147,7 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
                 <h1 className="type-h1 font-black text-white tracking-tight leading-tight mt-1.5">
                   {greeting}
                 </h1>
-                <p className="text-green-100 font-medium text-xs sm:text-sm mt-1">
+                <p className="text-emerald-100 font-medium text-xs sm:text-sm mt-1">
                   {cheer}
                 </p>
               </div>
@@ -167,8 +167,8 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
           {/* CỘT CHÍNH: Con đường học tập Duolingo (The Winding Snake Path) */}
           <div className="flex min-w-0 flex-col gap-6">
             
-            {/* CON ĐƯỜNG UỐN LƯỢN (Không còn khung nét đứt thô ráp, không gian mở thoáng đãng) */}
-            <div className="relative flex flex-col items-center py-6 px-4">
+            {/* CON ĐƯỜNG UỐN LƯỢN (Đặt trong khung nền mịn màng, dịu mắt) */}
+            <div className="relative flex flex-col items-center py-8 px-4 sm:px-6 rounded-3xl bg-white/80 backdrop-blur-xs border border-emerald-100 shadow-xs">
               
               <div className="flex flex-col items-center w-full py-2">
                 {pathNodes.map((node, index) => {
@@ -226,12 +226,12 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
                         )}
 
                         {/* Tên trạm hiển thị tự nhiên, không bị gò bó trong hộp hẹp */}
-                        <p className="mt-2 text-xs font-black text-amber-950/85 text-center max-w-[150px] leading-tight">
+                        <p className="mt-2 text-xs font-black text-emerald-950 text-center max-w-[150px] leading-tight">
                           {node.title}
                         </p>
                       </div>
 
-                      {/* Các phiến đá nối giữa các trạm — uốn lượn liên tục theo hướng ziczac */}
+                      {/* Các phiến đá nối giữa các trạm — uốn lượn liên tục theo hướng ziczac với màu xanh ngọc dịu mát */}
                       {index < pathNodes.length - 1 && (() => {
                         const nextX = X_OFFSETS[(index + 1) % X_OFFSETS.length] ?? 0;
                         const p1 = Math.round(xOffset + (nextX - xOffset) * 0.28);
@@ -245,15 +245,15 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
                           >
                             <span
                               style={{ transform: `translateX(${p1}px)` }}
-                              className="block w-4 h-3 rounded-full bg-amber-200 border-2 border-amber-300 shadow-[0_2.5px_0_#D97706]"
+                              className="block w-4 h-3 rounded-full bg-emerald-100 border border-emerald-300 shadow-[0_2px_0_#A7F3D0]"
                             />
                             <span
                               style={{ transform: `translateX(${p2}px)` }}
-                              className="block w-4 h-3 rounded-full bg-amber-200 border-2 border-amber-300 shadow-[0_2.5px_0_#D97706]"
+                              className="block w-4 h-3 rounded-full bg-emerald-100 border border-emerald-300 shadow-[0_2px_0_#A7F3D0]"
                             />
                             <span
                               style={{ transform: `translateX(${p3}px)` }}
-                              className="block w-4 h-3 rounded-full bg-amber-200 border-2 border-amber-300 shadow-[0_2.5px_0_#D97706]"
+                              className="block w-4 h-3 rounded-full bg-emerald-100 border border-emerald-300 shadow-[0_2px_0_#A7F3D0]"
                             />
                           </div>
                         );
@@ -270,12 +270,12 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
             <div className="mt-4">
               {/* Tiêu đề ngăn cách: phân biệt con đường tổng quan phía trên và danh sách chi tiết hành động bên dưới */}
               <div className="flex items-center gap-3 mb-4 px-1">
-                <div className="flex-1 h-px bg-amber-200/80" />
-                <span className="text-[11px] font-black uppercase tracking-widest text-amber-700/70 flex items-center gap-1.5">
+                <div className="flex-1 h-px bg-emerald-200" />
+                <span className="text-[11px] font-black uppercase tracking-widest text-emerald-800/80 flex items-center gap-1.5">
                   <span aria-hidden="true">📋</span>
                   Chi tiết bài học
                 </span>
-                <div className="flex-1 h-px bg-amber-200/80" />
+                <div className="flex-1 h-px bg-emerald-200" />
               </div>
               <LearningSections level={1} />
             </div>
@@ -285,15 +285,15 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
           {/* CỘT PHỤ: Thanh chỉ số Duolingo, Hộ chiếu học sinh & Nhiệm vụ mở mã (Sidebar) */}
           <div className="flex min-w-0 flex-col gap-6 lg:sticky lg:top-20">
             
-            {/* Thanh trạng thái Duolingo (Streak, Sao, Trái tim) */}
-            <div className="duo-card p-5 border-2 border-border/80">
-              <p className="text-xs font-black uppercase tracking-wider text-amber-950/70 mb-3 text-center">
+            {/* Thanh trạng thái Duolingo (Streak, Sao, Huy hiệu) */}
+            <div className="duo-card p-5">
+              <p className="text-xs font-black uppercase tracking-wider text-emerald-950/70 mb-3 text-center">
                 THÀNH TÍCH CỦA EM
               </p>
               <div className="grid grid-cols-3 gap-2">
                 <Link
                   to={pathOf('progress')}
-                  className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-orange-50 border-2 border-orange-200 border-b-4 border-b-orange-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-2 no-underline cursor-pointer group"
+                  className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-orange-50 border border-orange-200 border-b-3 border-b-orange-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 no-underline cursor-pointer group"
                   title="Xem số ngày chăm chỉ trên trang tiến độ"
                 >
                   <span className="text-2xl mb-0.5 group-hover:scale-110 transition-transform" aria-hidden="true">🔥</span>
@@ -304,7 +304,7 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
                 </Link>
                 <Link
                   to={pathOf('progress')}
-                  className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-amber-50 border-2 border-amber-200 border-b-4 border-b-amber-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-2 no-underline cursor-pointer group"
+                  className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-amber-50 border border-amber-200 border-b-3 border-b-amber-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 no-underline cursor-pointer group"
                   title="Xem tổng số sao đạt được"
                 >
                   <span className="text-2xl mb-0.5 group-hover:scale-110 transition-transform" aria-hidden="true">⭐</span>
@@ -315,7 +315,7 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
                 </Link>
                 <Link
                   to={`${pathOf('progress')}?tab=huy-hieu`}
-                  className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-purple-50 border-2 border-purple-200 border-b-4 border-b-purple-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-2 no-underline cursor-pointer group"
+                  className="flex flex-col items-center justify-center p-2.5 rounded-2xl bg-purple-50 border border-purple-200 border-b-3 border-b-purple-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 no-underline cursor-pointer group"
                   title="Xem bộ sưu tập huy hiệu của em"
                 >
                   <span className="text-2xl mb-0.5 group-hover:scale-110 transition-transform" aria-hidden="true">🏆</span>
@@ -327,8 +327,8 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
               </div>
             </div>
 
-            {/* Khối nhiệm vụ: Nhập mã bài học (Nút to 3D Duolingo) — luôn hiển thị vì học sinh cần nhập mã để mở bài, nhưng nội dung thay đổi theo tiến độ */}
-            <div className="relative overflow-hidden rounded-3xl border-2 border-sky-400 border-b-6 border-b-sky-600 bg-gradient-to-br from-sky-500 to-blue-600 p-5 text-white shadow-md">
+            {/* Khối nhiệm vụ: Nhập mã bài học */}
+            <div className="relative overflow-hidden rounded-3xl border border-emerald-400/40 bg-gradient-to-br from-emerald-700 via-teal-800 to-emerald-900 p-5 text-white shadow-md">
               <div className="flex items-center gap-3 mb-2">
                 <span className="flex size-10 items-center justify-center rounded-xl bg-white/20 text-xl shadow-inner">
                   🔑
@@ -342,7 +342,7 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
                   </h3>
                 </div>
               </div>
-              <p className="text-xs text-sky-100 font-medium mb-4">
+              <p className="text-xs text-emerald-100/90 font-medium mb-4">
                 {myLessons.length === 0
                   ? 'Nhập mã thầy cô đưa để vào chặng khám phá và nhận sao thưởng nhé!'
                   : 'Khi thầy cô giao bài mới, em nhập mã ở đây để mở thêm trạm học!'}
@@ -358,11 +358,11 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
             </div>
 
             {/* Thẻ học sinh: Lớp của em (Hộ chiếu thám hiểm) */}
-            <section aria-labelledby="lop-cua-em" className="duo-card p-5 border-2 border-border/80">
-              <div className="flex items-center justify-between gap-3 pb-3 border-b-2 border-border/60">
+            <section aria-labelledby="lop-cua-em" className="duo-card p-5">
+              <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2.5">
                   <span className="text-2xl" aria-hidden="true">🎒</span>
-                  <h2 id="lop-cua-em" className="type-h3 font-black text-amber-950">
+                  <h2 id="lop-cua-em" className="type-h3 font-black text-emerald-950">
                     Lớp của em
                   </h2>
                 </div>
@@ -380,13 +380,13 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
                   const isTeacher = fact.label === 'Giáo viên';
                   const icon = isClass ? '📚' : isTeacher ? '👩‍🏫' : '🏫';
                   const cardClass = isClass
-                    ? 'border-sky-300 border-b-sky-400 bg-sky-50 text-sky-950'
+                    ? 'border-emerald-200 bg-emerald-50/70 text-emerald-950'
                     : isTeacher
-                      ? 'border-rose-300 border-b-rose-400 bg-rose-50 text-rose-950'
-                      : 'border-amber-300 border-b-amber-400 bg-amber-50 text-amber-950';
+                      ? 'border-rose-200 bg-rose-50/70 text-rose-950'
+                      : 'border-amber-200 bg-amber-50/70 text-amber-950';
 
                   return (
-                    <div key={fact.label} className={cn('rounded-xl border-2 border-b-4 p-3 flex items-center justify-between', cardClass)}>
+                    <div key={fact.label} className={cn('rounded-2xl border-2 p-3 flex items-center justify-between', cardClass)}>
                       <div className="flex items-center gap-2">
                         <span className="text-lg" aria-hidden="true">{icon}</span>
                         <dt className="text-xs font-black uppercase tracking-wider opacity-80">{fact.label}</dt>
@@ -397,9 +397,9 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
                 })}
               </dl>
 
-              <div className="mt-4 rounded-xl border-2 border-indigo-200 border-b-4 border-b-indigo-300 bg-indigo-50/70 p-3 text-center">
-                <p className="text-xs font-black text-indigo-950 mb-1">Mã học sinh của em:</p>
-                <span className="inline-block rounded-full border-2 border-indigo-400 bg-white px-4 py-1 font-mono font-black text-base text-indigo-800 shadow-xs">
+              <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50/50 p-3 text-center">
+                <p className="text-xs font-black text-emerald-950 mb-1.5">Mã học sinh của em:</p>
+                <span className="inline-block rounded-full border-2 border-emerald-500 bg-white px-4 py-1 font-mono font-black text-base text-emerald-800 shadow-xs">
                   {studentCodeOf(user)}
                 </span>
               </div>
