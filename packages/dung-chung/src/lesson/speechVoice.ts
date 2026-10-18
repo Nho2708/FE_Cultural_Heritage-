@@ -26,19 +26,23 @@ export function getBestVietnameseVoice(): SpeechSynthesisVoice | undefined {
     return undefined;
   }
 
-  // 1. Ưu tiên giọng Natural / Neural của Microsoft Edge (HoaiMy, NamMinh Online Natural)
+  // 1. Ưu tiên giọng Nữ Natural / Neural của Microsoft Edge (Microsoft HoaiMy Online Natural)
+  const femaleNatural = viVoices.find((v) => /natural|neural/i.test(v.name) && /hoaimy|female|nữ|woman/i.test(v.name));
+  if (femaleNatural) return femaleNatural;
+
+  // 2. Ưu tiên giọng Nữ bất kỳ
+  const female = viVoices.find((v) => /female|nữ|woman|hoaimy/i.test(v.name));
+  if (female) return female;
+
+  // 3. Ưu tiên giọng Natural / Neural khác (NamMinh Online Natural)
   const natural = viVoices.find((v) => /natural|neural/i.test(v.name));
   if (natural) return natural;
 
-  // 2. Ưu tiên giọng Nữ (Ban Mai, HoaiMy, LinhSan, etc.)
-  const female = viVoices.find((v) => /female|nữ|woman/i.test(v.name));
-  if (female) return female;
-
-  // 3. Ưu tiên giọng Google Vietnamese
+  // 4. Ưu tiên giọng Google Vietnamese
   const google = viVoices.find((v) => /google/i.test(v.name));
   if (google) return google;
 
-  // 4. Ưu tiên giọng tiếng Việt khác không phải Microsoft An (SAPI5 offline cũ)
+  // 5. Ưu tiên giọng tiếng Việt khác không phải Microsoft An (SAPI5 offline cũ)
   const nonAn = viVoices.find((v) => !/\ban\b/i.test(v.name));
   if (nonAn) return nonAn;
 
