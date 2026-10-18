@@ -10,13 +10,13 @@ describe('tts api', () => {
       baseUrl: BASE,
       getAccessToken: () => null,
     });
-    // Giả lập fetch thành công
+    let capturedText: string | null = null;
     const originalFetch = globalThis.fetch;
     globalThis.fetch = async (input, init) => {
       const url = String(input);
       if (url === `${BASE}${TTS_ENDPOINTS.synthesize}`) {
-        const body = JSON.parse(String(init?.body));
-        expect(body.text).toBe('Xin chào');
+        const body = JSON.parse(String(init?.body)) as { text?: string };
+        capturedText = body.text ?? null;
         return new Response(JSON.stringify({ success: true, data: { audioUrl: 'https://file.fpt.ai/audio.mp3' } }), {
           status: 200,
           headers: { 'Content-Type': 'application/json' },
@@ -28,6 +28,7 @@ describe('tts api', () => {
     try {
       const api = createTtsApi(client);
       const url = await api.synthesize('Xin chào');
+      expect(capturedText).toBe('Xin chào');
       expect(url).toBe('https://file.fpt.ai/audio.mp3');
     } finally {
       globalThis.fetch = originalFetch;
