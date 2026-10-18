@@ -70,9 +70,8 @@ export function getTtsBaseUrl(): string {
 const ttsAudioCache = new Map<string, string>();
 let currentPlayingAudio: HTMLAudioElement | null = null;
 
-const isTestEnv =
-  typeof process !== 'undefined' &&
-  (process.env?.NODE_ENV === 'test' || Boolean(process.env?.VITEST));
+const proc = typeof globalThis !== 'undefined' ? (globalThis as { process?: { env?: Record<string, string> } }).process : undefined;
+const isTestEnv = proc?.env?.NODE_ENV === 'test' || Boolean(proc?.env?.VITEST);
 
 export async function fetchCloudTtsAudioUrl(text: string, signal?: AbortSignal): Promise<string | null> {
   const trimmed = text.trim();
