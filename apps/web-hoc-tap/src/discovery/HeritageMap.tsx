@@ -34,7 +34,19 @@ interface HeritageMapProps {
   userLabel?: string;
   /** Tên vùng bản đồ (đọc cho trình đọc màn hình). */
   mapLabel?: string;
+  /**
+   * Phần mép trên và mép dưới của bản đồ (điểm ảnh) bị các lớp nổi của trang che (thanh bộ lọc, thẻ ghi chú): khung nhìn cả nước
+   * và khung nhìn theo ghim được căn vào phần còn lại để không bị che. Đo xong trước khi bản đồ dựng là đủ (Leaflet nạp động).
+   */
+  fitPadding?: FitPadding;
 }
+
+export interface FitPadding {
+  top: number;
+  bottom: number;
+}
+
+const NO_PADDING: FitPadding = { top: 0, bottom: 0 };
 
 export default function HeritageMap({
   pins,
@@ -48,9 +60,17 @@ export default function HeritageMap({
   mapLabel = 'Bản đồ di sản',
   userPosition = null,
   userLabel = 'Vị trí của bạn',
+  fitPadding = NO_PADDING,
 }: HeritageMapProps) {
   const labelsRef = useRef(labels);
   const closeLabelRef = useRef(closeLabel);
+  const paddingRef = useRef(fitPadding);
+  useEffect(() => {
+    paddingRef.current = fitPadding;
+  }, [fitPadding]);
+  /** Khung nhìn cả nước và hai quần đảo, tránh phần bị lớp nổi che. */
+  const fitCountry = (map: Leaflet.Map) =>
+    map.fitBounds(VIETNAM_BOUNDS, { paddingTopLeft: [0, paddingRef.current.top], paddingBottomRight: [0, paddingRef.current.bottom] });
   const containerRef = useRef<HTMLElement>(null);
   const [engine, setEngine] = useState<Engine | null>(null);
   const [popupNode, setPopupNode] = useState<HTMLElement | null>(null);
@@ -72,9 +92,10 @@ export default function HeritageMap({
     void loadLeaflet().then((L) => {
       const element = containerRef.current;
       if (cancelled || !element) return;
-      const map = createBaseMap(L, element, { labels: labelsRef.current });
+      // Bước thu phóng nửa mức để khung nhìn cả nước sát phần không bị che (một mức thì hoặc quá nhỏ, hoặc bị che hai đầu).
+      const map = createBaseMap(L, element, { labels: labelsRef.current, zoomSnap: 0.5 });
       created = map;
-      map.fitBounds(VIETNAM_BOUNDS);
+      fitCountry(map);
       const cluster = L.markerClusterGroup({
         showCoverageOnHover: false,
         maxClusterRadius: 48,
@@ -134,9 +155,14 @@ export default function HeritageMap({
     const { L, map } = engine;
     if (selectedSlug && pins.some((pin) => pin.slug === selectedSlug)) return;
     if (fitToPins && pins.length > 0) {
-      map.fitBounds(L.latLngBounds(pins.map((pin) => [pin.latitude, pin.longitude] as [number, number])), { padding: [72, 72], maxZoom: 9 });
+      const { top, bottom } = paddingRef.current;
+      map.fitBounds(L.latLngBounds(pins.map((pin) => [pin.latitude, pin.longitude] as [number, number])), {
+        paddingTopLeft: [72, 72 + top],
+        paddingBottomRight: [72, 72 + bottom],
+        maxZoom: 9,
+      });
     } else {
-      map.fitBounds(VIETNAM_BOUNDS);
+      fitCountry(map);
     }
     // Chỉ theo fitKey: chọn ghim không được làm bản đồ nhảy lại.
     // eslint-disable-next-line react-hooks/exhaustive-deps
