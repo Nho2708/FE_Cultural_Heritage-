@@ -222,7 +222,7 @@ describe('Trang chỉ đường nhúng', () => {
   it('báo sẵn sàng khi có tọa độ di sản, chờ vị trí từ app rồi mới gọi OSRM; không tự xin vị trí của trình duyệt', async () => {
     const messages = mockNativeBridge();
     const calls = directionsApi();
-    const getCurrentPosition = vi.fn();
+    const getCurrentPosition = vi.fn<() => void>();
     Object.defineProperty(navigator, 'geolocation', { value: { getCurrentPosition }, configurable: true });
     renderApp(`/nhung/chi-duong/${HUE.slug}?lang=en`);
 

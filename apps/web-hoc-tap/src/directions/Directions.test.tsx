@@ -66,7 +66,7 @@ type GeoError = (error: { code: number; PERMISSION_DENIED: number }) => void;
 
 /** Geolocation giả của trình duyệt: `answer` quyết định trả vị trí hay lỗi. */
 function mockGeolocation(answer: (success: GeoSuccess, error: GeoError) => void) {
-  const getCurrentPosition = vi.fn((success: GeoSuccess, error: GeoError) => answer(success, error));
+  const getCurrentPosition = vi.fn<(success: GeoSuccess, error: GeoError) => void>((success, error) => answer(success, error));
   Object.defineProperty(navigator, 'geolocation', { value: { getCurrentPosition }, configurable: true });
   return getCurrentPosition;
 }
@@ -76,7 +76,7 @@ const deny = () => mockGeolocation((_success, error) => error({ code: 1, PERMISS
 const timeout = () => mockGeolocation((_success, error) => error({ code: 3, PERMISSION_DENIED: 1 }));
 
 beforeEach(() => {
-  Element.prototype.scrollIntoView = vi.fn();
+  Element.prototype.scrollIntoView = vi.fn<() => void>();
 });
 
 afterEach(() => {
