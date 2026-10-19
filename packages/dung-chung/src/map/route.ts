@@ -1,5 +1,5 @@
 import type { LanguageCode } from '../api/discovery';
-import { VIETNAM_MAX_BOUNDS } from './seas';
+import { VIETNAM_TERRITORY_BOUNDS } from './seas';
 
 // Chỉ đường tới di sản: gọi thẳng máy chủ OSRM (mặc định máy chủ công cộng của FOSSGIS, dữ liệu OpenStreetMap) từ trình duyệt hoặc WebView,
 // KHÔNG đi qua backend của dự án nên vị trí của khách không tới máy chủ của Vietnam Heritage và không được lưu ở đâu. Chỉ gọi khi khách bấm "Chỉ đường",
@@ -104,9 +104,12 @@ const MODIFIERS: readonly ManeuverModifier[] = ['left', 'right', 'sharp left', '
 
 const fixed = (value: number) => value.toFixed(6).replace(/\.?0+$/, '');
 
-/** Vị trí nằm trong khung tọa độ của Việt Nam (đất liền và hai quần đảo); ngoài khung thì không hỏi máy chủ. */
+/**
+ * Vị trí nằm trong khung tọa độ lãnh thổ Việt Nam (đất liền, hai quần đảo và vùng biển quanh); ngoài khung thì không hỏi máy chủ.
+ * Không dùng giới hạn kéo bản đồ (rộng hơn lãnh thổ nhiều để căn khung nhìn cả nước).
+ */
 export function isInsideVietnam(point: RoutePoint): boolean {
-  const [[south, west], [north, east]] = VIETNAM_MAX_BOUNDS;
+  const [[south, west], [north, east]] = VIETNAM_TERRITORY_BOUNDS;
   return point.latitude >= south && point.latitude <= north && point.longitude >= west && point.longitude <= east;
 }
 
