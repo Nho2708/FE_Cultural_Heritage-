@@ -16,7 +16,7 @@ import { publicHref } from '../../../src/navigation/publicRoutes';
 import { useApp } from '../../../src/state/AppProvider';
 import { DefaultThemeScope, useTheme } from '../../../src/theme/ThemeProvider';
 
-// Chi tiết di sản (khách và học sinh đều xem được): ảnh, mô tả, tóm tắt, nghe thuyết minh, xem 3D, dòng thời gian, bản đồ, hình ảnh và nguồn tham khảo.
+// Chi tiết di sản (khách và học sinh đều xem được): ảnh, mô tả, tóm tắt, nghe thuyết minh, xem 3D, dòng thời gian, bản đồ, chỉ đường, hình ảnh và nguồn tham khảo.
 // Mở trang thì ghi "đã xem" vào lịch sử trên máy.
 
 /** Bộ giao diện mặc định cho cả khách và học sinh (kể cả khi học sinh mở từ thẻ di sản của bài học). */
@@ -123,6 +123,9 @@ function HeritageDetail() {
               variant="secondary"
               onPress={() => router.push(publicHref(mode, 'map', { chon: data.slug }))}
             />
+          ) : null}
+          {canMap ? (
+            <Button label={t('directions.button')} variant="secondary" onPress={() => router.push({ pathname: '/di-san/[slug]/chi-duong', params: { slug: data.slug } })} />
           ) : null}
         </View>
 

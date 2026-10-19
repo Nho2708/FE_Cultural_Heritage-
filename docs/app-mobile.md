@@ -12,8 +12,9 @@ Một app, hai chế độ, cùng API `/api/v1` và cùng bộ kiểu dữ liệ
 | Chung | Chọn ngôn ngữ, Chọn chế độ | Lần đầu mở; lần sau mở thẳng chế độ đã chọn. Ngôn ngữ mặc định theo máy nếu thuộc năm ngôn ngữ, không thì tiếng Anh. Chọn Học sinh thì luôn tiếng Việt. |
 | Khách tham quan | Trang chủ | Ô tìm, "Gợi ý cho bạn" (theo lịch sử trên máy, chưa có thì di sản nổi bật), "Gần bạn" (xin vị trí, tính khoảng cách trên máy), theo loại và theo vùng, di sản nổi bật |
 | | Tìm kiếm | Tìm không dấu (máy chủ), lọc loại, vùng, tỉnh thành, cấp xếp hạng, thời kỳ; tải thêm từng trang; từ khóa gần đây |
-| | Bản đồ | Trang nhúng của web học tập (Leaflet + OpenStreetMap, có Hoàng Sa, Trường Sa) trong WebView; chạm ghim rồi "Xem chi tiết" thì app mở trang chi tiết |
-| | Chi tiết di sản | Ảnh và ghi công, nhãn bản dịch máy, báo lùi tiếng Việt, tóm tắt (đọc), nghe thuyết minh (từng câu, tô sáng, tạm dừng, tốc độ), Xem 3D, Dòng thời gian, bản đồ, hình ảnh, nguồn tham khảo |
+| | Bản đồ | Trang nhúng của web học tập (Leaflet + OpenStreetMap, có Hoàng Sa, Trường Sa) trong WebView; chạm ghim rồi "Xem chi tiết", "Mở dòng thời gian" hoặc "Chỉ đường" thì app mở màn hình tương ứng |
+| | Chi tiết di sản | Ảnh và ghi công, nhãn bản dịch máy, báo lùi tiếng Việt, tóm tắt (đọc), nghe thuyết minh (từng câu, tô sáng, tạm dừng, tốc độ), Xem 3D, Dòng thời gian, bản đồ, Chỉ đường, hình ảnh, nguồn tham khảo |
+| | Chỉ đường (cả hai chế độ) | App xin quyền vị trí (expo-location) rồi mở trang nhúng `/nhung/chi-duong/:slug` trong WebView và gửi vị trí bằng lệnh `set-position`; trang tự gọi OSRM, vẽ tuyến và các bước theo ngôn ngữ app. Bị từ chối, không lấy được vị trí hay trang không tải được thì giải thích; luôn có nút "Mở trong Google Maps" (ứng dụng bản đồ của máy). Vị trí không lưu, không gửi tới máy chủ của dự án |
 | | Dòng thời gian, Xem 3D | Xem 3D qua trang nhúng `<model-viewer>`; lỗi hoặc thiết bị không có WebGL thì quay về bộ ảnh |
 | | Lịch sử và cài đặt | Từ khóa đã tìm, di sản đã xem, nghe, xem 3D; xóa từng mục hoặc xóa hết; tự xóa sau 90 ngày; đổi ngôn ngữ, bật tắt vị trí, đổi chế độ |
 | Học sinh | Đăng nhập, Đổi mật khẩu | Mã học sinh + mật khẩu; token trong SecureStore; lần đầu và sau khi được đặt lại bị buộc đổi mật khẩu |

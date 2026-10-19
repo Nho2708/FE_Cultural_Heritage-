@@ -50,6 +50,17 @@ nhãn của máy chủ kèm khoảng năm).
 Trên điện thoại (dưới 841px) hàng lọc thu thành nút "Bộ lọc" mở ra các ô; ghi chú số di sản nằm dưới bản đồ để không che ghi công của
 bản đồ nền; thẻ tóm tắt là popup tự cuộn bản đồ cho khỏi bị thanh lọc che.
 
+## Chỉ đường tới di sản
+
+| Mục | Giá trị |
+|---|---|
+| Nơi có | Mục vị trí của trang chi tiết di sản (nút "Chỉ đường" cạnh "Xem trên bản đồ"), thẻ ghim trên trang Bản đồ (mở trang chi tiết với `?chi-duong=1`, bảng mở sẵn và trang cuộn tới), trang nhúng `/nhung/chi-duong/:slug?lang=…` cho app mobile (web và app dùng chung một bảng, mã ở `src/directions/`) |
+| Tính đường | Gọi **thẳng máy chủ OSRM từ trình duyệt** (mặc định máy chủ công cộng của FOSSGIS `https://routing.openstreetmap.de`, đổi bằng `VITE_ROUTING_BASE_URL`), không qua backend của dự án: vị trí của khách không tới máy chủ của Vietnam Heritage, không lưu, không vào địa chỉ trang. Hai cách đi: "Đi xe" (hồ sơ ô tô, ghi chú là ước tính cho xe máy, ô tô) và "Đi bộ". Chỉ gọi khi khách bấm, mỗi cách đi một lần cho một vị trí, hủy khi rời trang (`packages/dung-chung/src/map/route.ts`) |
+| Vị trí | Bấm "Chỉ đường" mới xin quyền vị trí của trình duyệt (làm tròn 4 chữ số, khoảng 11 m). Trang nhúng không tự xin: app gửi vị trí bằng lệnh `set-position` |
+| Trạng thái | Đang lấy vị trí, đang tìm đường, bị chặn quyền, không lấy được vị trí, ở ngoài khung tọa độ Việt Nam (không hỏi máy chủ), không có đường (mã `NoRoute` hoặc điểm bị nắn về đường xa hơn 3 km, ví dụ di sản ngoài biển), dịch vụ lỗi; mỗi trạng thái một câu bằng năm ngôn ngữ và luôn có nút "Mở trong Google Maps" (`maps/dir/?api=1&destination=…&travelmode=…`, thêm `origin` khi đã có vị trí) |
+| Hiển thị | Tuyến vẽ lên bản đồ nhỏ ở lớp riêng (`routeLayer.ts`, trên lớp phủ mặc định, dưới nhãn biển đảo), chấm xuất phát, khớp khung theo tuyến và cho kéo, phóng; tóm tắt quãng đường, thời gian (định dạng theo ngôn ngữ bằng `Intl`); danh sách bước với câu hướng dẫn do web tự dựng cho năm ngôn ngữ (`routeInstructions.ts`, không dùng osrm-text-instructions vì gói đó gộp 31 ngôn ngữ và bản tiếng Việt dùng phương ngữ); dòng ghi công "Chỉ đường: OSRM · dữ liệu © những người đóng góp OpenStreetMap" |
+| Lưu ý vận hành | Máy chủ OSRM công cộng chỉ phù hợp lượng truy cập nhỏ theo chính sách của FOSSGIS; triển khai thật cần máy chủ OSRM riêng (đặt `VITE_ROUTING_BASE_URL`) |
+
 ## Ảnh và ghi công
 
 - Ảnh di sản lưu đường dẫn tới **tệp gốc** trên Wikimedia Commons (thường vài MB). Trang hiển thị bản thu nhỏ do chính Commons phục vụ

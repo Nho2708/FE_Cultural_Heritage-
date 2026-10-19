@@ -183,6 +183,18 @@ export const en: Strings = {
     listInstead: 'View the list of sites',
     withoutLocation: '{{count}} sites have no coordinates',
   },
+  directions: {
+    button: 'Directions',
+    title: 'Directions',
+    locating: 'Finding your location…',
+    denied: 'Location access is not allowed, so directions cannot be calculated. Turn it on in your phone settings, or open in Google Maps.',
+    unavailable: 'Your location could not be determined. Try again or open in Google Maps.',
+    allow: 'Try again',
+    openSettings: 'Open settings',
+    openGoogleMaps: 'Open in Google Maps',
+    pageUnavailable: 'Directions could not be loaded. Open in Google Maps instead.',
+    privacy: 'Your location is only used to calculate the route and is never stored.',
+  },
   history: {
     title: 'Your history',
     empty: 'No history yet. Sites you search, view, listen to or view in 3D will show up here.',

@@ -2,7 +2,7 @@ import type { DiscoveryFilter, HeritagePeriod, LanguageCode } from '../api/disco
 import type { HeritageType, RecognitionLevel } from '../api/heritage';
 import { parseLanguage } from '../i18n/languages';
 
-// Hợp đồng giữa app mobile và hai trang nhúng của web học tập (bản đồ, trình xem 3D). App mở trang nhúng trong WebView và hai bên nói chuyện
+// Hợp đồng giữa app mobile và các trang nhúng của web học tập (bản đồ, trình xem 3D, video giới thiệu, chỉ đường). App mở trang nhúng trong WebView và hai bên nói chuyện
 // bằng `postMessage` với thông điệp JSON có `type` và `version`. Trang nhúng không nhận token nào; app chỉ cho WebView mở đúng origin của web học tập
 // và bỏ qua mọi thông điệp lạ hoặc sai phiên bản.
 
@@ -13,6 +13,7 @@ export const EMBED_PATHS = {
   map: '/nhung/ban-do',
   introVideo: '/nhung/video-gioi-thieu',
   model: (slug: string) => `/nhung/3d/${encodeURIComponent(slug)}`,
+  directions: (slug: string) => `/nhung/chi-duong/${encodeURIComponent(slug)}`,
 } as const;
 
 /** Tên tham số trên địa chỉ trang nhúng. */
@@ -59,6 +60,8 @@ export type EmbedMessage =
   | { type: 'pin-selected'; version: 1; slug: string }
   /** Khách chạm một ghim rồi bấm mở dòng thời gian: app đi tới dòng thời gian của di sản. */
   | { type: 'timeline-selected'; version: 1; slug: string }
+  /** Khách chạm một ghim rồi bấm "Chỉ đường": app mở màn hình chỉ đường tới di sản (xin vị trí rồi mở trang chỉ đường nhúng). */
+  | { type: 'directions-selected'; version: 1; slug: string }
   /** Tiến trình tải mô hình, 0 đến 1. */
   | { type: 'model-progress'; version: 1; fraction: number }
   | { type: 'model-loaded'; version: 1 }
@@ -69,7 +72,10 @@ export type EmbedMessage =
 export type EmbedCommand =
   | { type: 'set-filter'; version: 1; filter: EmbedMapFilter }
   | { type: 'focus'; version: 1; slug: string }
-  /** Vị trí của khách ("Gần bạn"): bản đồ vẽ một chấm tại đó và đưa khung nhìn tới. `null` thì bỏ chấm. */
+  /**
+   * Vị trí của khách: bản đồ vẽ một chấm "Gần bạn" tại đó và đưa khung nhìn tới; trang chỉ đường lấy đó làm điểm xuất phát (trang nhúng không tự xin
+   * vị trí, app xin bằng quyền của hệ điều hành rồi gửi sang). `null` thì bỏ chấm.
+   */
   | { type: 'set-position'; version: 1; position: EmbedPosition | null };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -94,6 +100,8 @@ export function parseEmbedMessage(raw: unknown): EmbedMessage | null {
       return typeof value.slug === 'string' && value.slug !== '' && value.slug.length <= 200 ? { type: 'pin-selected', version: 1, slug: value.slug } : null;
     case 'timeline-selected':
       return typeof value.slug === 'string' && value.slug !== '' && value.slug.length <= 200 ? { type: 'timeline-selected', version: 1, slug: value.slug } : null;
+    case 'directions-selected':
+      return typeof value.slug === 'string' && value.slug !== '' && value.slug.length <= 200 ? { type: 'directions-selected', version: 1, slug: value.slug } : null;
     case 'model-progress':
       return typeof value.fraction === 'number' && Number.isFinite(value.fraction)
         ? { type: 'model-progress', version: 1, fraction: Math.min(1, Math.max(0, value.fraction)) }
@@ -168,6 +176,11 @@ export function embedMapUrl(baseUrl: string, filter: DiscoveryFilter, language: 
 export function embedModelUrl(baseUrl: string, slug: string, language?: LanguageCode): string {
   const query = language ? `?${EMBED_PARAM.language}=${encodeURIComponent(language)}` : '';
   return `${baseUrl.replace(/\/+$/, '')}${EMBED_PATHS.model(slug)}${query}`;
+}
+
+/** Địa chỉ trang chỉ đường nhúng: bản đồ tuyến và các bước tới di sản; app gửi vị trí của khách bằng lệnh `set-position`. */
+export function embedDirectionsUrl(baseUrl: string, slug: string, language: LanguageCode): string {
+  return `${baseUrl.replace(/\/+$/, '')}${EMBED_PATHS.directions(slug)}?${EMBED_PARAM.language}=${encodeURIComponent(language)}`;
 }
 
 /** Địa chỉ trang video giới thiệu nhúng: chỉ có trình phát video khách theo ngôn ngữ của app. */
