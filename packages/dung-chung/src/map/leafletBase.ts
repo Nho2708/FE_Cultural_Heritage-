@@ -88,16 +88,19 @@ export interface BaseMapOptions {
   labels?: MapLabels;
   /** Che mọi thứ ngoài lãnh thổ Việt Nam để chỉ hiện Việt Nam (mặc định bật). */
   onlyVietnam?: boolean;
+  /** Bước thu phóng (mặc định 1 mức); 0.5 cho phép căn khung nhìn sát hơn khi trang có lớp nổi che mép bản đồ. */
+  zoomSnap?: number;
 }
 
 export function createBaseMap(
   L: LeafletLib,
   element: HTMLElement,
-  { scrollWheelZoom = true, labels = MAP_LABELS_VI, onlyVietnam = true }: BaseMapOptions = {},
+  { scrollWheelZoom = true, labels = MAP_LABELS_VI, onlyVietnam = true, zoomSnap = 1 }: BaseMapOptions = {},
 ): Leaflet.Map {
   const map = L.map(element, {
     zoomControl: false,
     scrollWheelZoom,
+    zoomSnap,
     minZoom: MIN_ZOOM,
     maxZoom: 18,
     maxBounds: VIETNAM_MAX_BOUNDS,
