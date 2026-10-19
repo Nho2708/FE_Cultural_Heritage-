@@ -67,8 +67,9 @@ describe('lớp che ngoài lãnh thổ trên nền bản đồ dùng chung', () 
     expect(path?.classList.contains('leaflet-interactive')).toBe(false);
     // Chấm đảo của hai quần đảo vẫn vẽ trên lớp che.
     expect(element.querySelectorAll('.dsv-island').length).toBeGreaterThanOrEqual(12);
-    expect(map.getMinZoom()).toBe(map.getZoom());
-    expect(map.getMinZoom()).toBeGreaterThanOrEqual(5);
+    // Khung 1440 x 900: cả nước vừa ở mức 6, cho thu nhỏ thêm một mức.
+    expect(map.getZoom()).toBe(6);
+    expect(map.getMinZoom()).toBe(5);
     map.remove();
   });
 
