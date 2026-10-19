@@ -177,6 +177,18 @@ export const ja: Strings = {
     listInstead: '遺産の一覧を見る',
     withoutLocation: '座標のない遺産 {{count}} 件',
   },
+  directions: {
+    button: '経路案内',
+    title: '経路案内',
+    locating: '現在地を取得しています…',
+    denied: '位置情報の利用が許可されていないため、経路を計算できません。端末の設定で許可するか、Google マップで開いてください。',
+    unavailable: '現在地を特定できませんでした。再試行するか、Google マップで開いてください。',
+    allow: '再試行',
+    openSettings: '設定を開く',
+    openGoogleMaps: 'Google マップで開く',
+    pageUnavailable: '経路案内を読み込めませんでした。代わりに Google マップで開いてください。',
+    privacy: '位置情報は経路の計算にのみ使用され、保存されません。',
+  },
   history: {
     title: 'あなたの履歴',
     empty: 'まだ履歴がありません。検索・閲覧・視聴・3D表示した遺産がここに表示されます。',
