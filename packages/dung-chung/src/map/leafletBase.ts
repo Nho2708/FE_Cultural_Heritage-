@@ -104,8 +104,9 @@ export function createBaseMap(
     maxBoundsViscosity: 1.0,
   });
   if (onlyVietnam) {
-    // Ngoài lãnh thổ đã bị che nên thu nhỏ quá khung nhìn cả nước chỉ thấy thêm mảng màu nền: chặn ở mức vừa cả nước.
-    const limitZoomOut = () => map.setMinZoom(Math.max(MIN_ZOOM, map.getBoundsZoom(VIETNAM_BOUNDS)));
+    // Ngoài lãnh thổ đã bị che nên thu nhỏ quá khung nhìn cả nước chỉ thấy thêm mảng màu nền: chỉ cho thu nhỏ thêm một mức
+    // so với khung nhìn cả nước (đủ để thấy trọn hai đầu đất nước khi các bảng nổi của trang che mép bản đồ).
+    const limitZoomOut = () => map.setMinZoom(Math.max(MIN_ZOOM, map.getBoundsZoom(VIETNAM_BOUNDS) - 1));
     limitZoomOut();
     map.on('resize', limitZoomOut);
   }
