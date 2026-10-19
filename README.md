@@ -89,6 +89,10 @@ Chạy riêng một workspace: `npm test -w @dsvhvn/web-hoc-tap`, `npm run build
 - Mỗi ứng dụng có `.env.development` (trong git) và `.env.example`. Đổi trên máy mình: tạo `.env.development.local` trong
   thư mục của ứng dụng (tệp `*.local` không vào git).
 - `npm run build` là chế độ production: thiếu biến thì ứng dụng dừng ngay khi mở và báo lỗi, không tự trỏ về localhost.
+- Máy chủ Google Cloud dùng ảnh Docker "web" (`Dockerfile`): build hai web với `VITE_API_BASE_URL=/api/v1` và địa chỉ hai web
+  truyền bằng `--build-arg` (CD lấy từ biến repo `GCP_LEARNING_WEB_URL`, `GCP_ADMIN_WEB_URL`), rồi phục vụ bằng Caddy theo
+  `scripts/trien-khai/Caddyfile` (cùng quy tắc với `web.config` của IIS trên máy demo). Cách cài máy chủ: `deploy/google-cloud/README.md`
+  của repo backend.
 
 ## Cấu trúc
 
