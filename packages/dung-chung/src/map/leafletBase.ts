@@ -2,15 +2,20 @@ import * as Leaflet from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import type {} from 'leaflet.markercluster';
-import { EAST_SEA_LABEL, VIETNAM_ARCHIPELAGOS, VIETNAM_MAX_BOUNDS } from './seas';
+import { addVietnamLandMask } from './landMask';
+import { EAST_SEA_LABEL, VIETNAM_ARCHIPELAGOS, VIETNAM_BOUNDS, VIETNAM_MAX_BOUNDS } from './seas';
 
 // Nền dùng chung của mọi bản đồ trong web học tập, dựng bằng Leaflet (BSD-2-Clause) với ô bản đồ OpenStreetMap
 // (dữ liệu © những người đóng góp OpenStreetMap, giấy phép ODbL). Chỉ được nạp khi mở trang có bản đồ (import động).
 // Không dùng react-leaflet vì giấy phép Hippocratic-2.1 không phải giấy phép mã nguồn mở thông thường.
+// Mặc định chỉ hiện Việt Nam: lớp che (landMask.ts) phủ kín mọi thứ ngoài đất liền và đảo ven bờ, không cho thu nhỏ quá
+// khung nhìn cả nước.
 
 export type LeafletLib = typeof Leaflet;
 
 const TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+/** Mức thu nhỏ thấp nhất: cả nước và hai quần đảo vừa khung điện thoại dọc; màn hình rộng hơn được nâng lên theo khung nhìn cả nước. */
+const MIN_ZOOM = 5;
 const LEAFLET_PREFIX = '<a href="https://leafletjs.com" target="_blank" rel="noopener noreferrer">Leaflet</a>';
 const PIN_PATH = 'M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Zm-8 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z';
 
@@ -81,17 +86,30 @@ export interface BaseMapOptions {
   scrollWheelZoom?: boolean;
   /** Chữ trên bản đồ; bỏ trống thì tiếng Việt. */
   labels?: MapLabels;
+  /** Che mọi thứ ngoài lãnh thổ Việt Nam để chỉ hiện Việt Nam (mặc định bật). */
+  onlyVietnam?: boolean;
 }
 
-export function createBaseMap(L: LeafletLib, element: HTMLElement, { scrollWheelZoom = true, labels = MAP_LABELS_VI }: BaseMapOptions = {}): Leaflet.Map {
+export function createBaseMap(
+  L: LeafletLib,
+  element: HTMLElement,
+  { scrollWheelZoom = true, labels = MAP_LABELS_VI, onlyVietnam = true }: BaseMapOptions = {},
+): Leaflet.Map {
   const map = L.map(element, {
     zoomControl: false,
     scrollWheelZoom,
-    minZoom: 4,
+    minZoom: MIN_ZOOM,
     maxZoom: 18,
     maxBounds: VIETNAM_MAX_BOUNDS,
     maxBoundsViscosity: 1.0,
   });
+  if (onlyVietnam) {
+    // Ngoài lãnh thổ đã bị che nên thu nhỏ quá khung nhìn cả nước chỉ thấy thêm mảng màu nền: chỉ cho thu nhỏ thêm một mức
+    // so với khung nhìn cả nước (đủ để thấy trọn hai đầu đất nước khi các bảng nổi của trang che mép bản đồ).
+    const limitZoomOut = () => map.setMinZoom(Math.max(MIN_ZOOM, map.getBoundsZoom(VIETNAM_BOUNDS) - 1));
+    limitZoomOut();
+    map.on('resize', limitZoomOut);
+  }
   map.attributionControl.setPrefix(LEAFLET_PREFIX);
   const attribution = `${labels.attribution.prefix} <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">${labels.attribution.owners}</a>`;
   const tileLayer = L.tileLayer(TILE_URL, { maxZoom: 19, attribution }).addTo(map);
@@ -110,6 +128,7 @@ export function createBaseMap(L: LeafletLib, element: HTMLElement, { scrollWheel
     }
   });
   L.control.zoom({ position: 'bottomright', zoomInTitle: labels.zoomIn, zoomOutTitle: labels.zoomOut }).addTo(map);
+  if (onlyVietnam) addVietnamLandMask(L, map);
   addVietnamSeas(L, map, labels);
   return map;
 }
