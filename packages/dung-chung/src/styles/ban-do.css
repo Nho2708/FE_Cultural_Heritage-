@@ -67,11 +67,14 @@
   border: 0;
 }
 
+/* Nhãn quần đảo dài thì xuống dòng (tên quần đảo một dòng, "(Việt Nam)" dòng dưới) để không tràn khỏi khung ở khổ điện thoại. */
 .dsv-map-label {
   display: block;
   width: max-content;
+  max-width: 11em;
   transform: translate(-50%, -50%);
-  white-space: nowrap;
+  text-align: center;
+  white-space: normal;
   color: var(--dsv-color-on-surface);
   font-size: var(--dsv-text-label-size);
   line-height: var(--dsv-text-label-line-height);

@@ -73,6 +73,24 @@ describe('Bản đồ Leaflet', () => {
     await waitFor(() => expect(container.querySelector('.leaflet-overlay-pane path[fill="#1a56db"]')).toBeNull());
   });
 
+  it('đệm mép trên theo lớp nổi thì khung nhìn cả nước dời xuống, không bị thanh bộ lọc che', async () => {
+    const props = { pins: [], selectedSlug: null, onSelect: vi.fn<(slug: string | null) => void>(), fitKey: '1', fitToPins: false, renderPopup: () => null };
+    const labelY = (container: HTMLElement) => {
+      const label = container.querySelector<HTMLElement>('.dsv-map-label-wrap');
+      // jsdom không có biến đổi 3D nên Leaflet đặt vị trí bằng top/left; trình duyệt thật đặt translate3d(x, y, 0).
+      const transformed = /translate(?:3d)?\([^,]+, (-?[\d.]+)px/.exec(label?.style.transform ?? '')?.[1];
+      return transformed === undefined ? Number.parseFloat(label?.style.top ?? '') : Number(transformed);
+    };
+    const plain = render(<HeritageMap {...props} />);
+    await waitFor(() => expect(plain.container.querySelector('.dsv-map-label-wrap')).not.toBeNull());
+    const withoutPadding = labelY(plain.container);
+    plain.unmount();
+
+    const padded = render(<HeritageMap {...props} fitPadding={{ top: 200, bottom: 0, left: 0 }} />);
+    await waitFor(() => expect(padded.container.querySelector('.dsv-map-label-wrap')).not.toBeNull());
+    expect(labelY(padded.container)).toBeGreaterThan(withoutPadding);
+  });
+
   it('dữ liệu ghim đổi thì ghim cũ bị thay bằng ghim mới', async () => {
     const props = { selectedSlug: null, onSelect: vi.fn<(slug: string | null) => void>(), fitKey: '1', fitToPins: false, renderPopup: () => null };
     const { rerender } = render(<HeritageMap pins={[HUE]} {...props} />);

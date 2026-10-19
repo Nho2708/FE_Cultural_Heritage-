@@ -12,7 +12,7 @@ export interface Archipelago {
   key: 'hoang-sa' | 'truong-sa';
   /** Nhãn hiển thị trên bản đồ. */
   label: string;
-  /** Vị trí đặt nhãn (nằm cạnh cụm đảo, không đè lên đảo). */
+  /** Vị trí đặt nhãn: phía trên cụm đảo, không đè lên đảo, và đủ cách mép đông của khung nhìn cả nước để không bị cắt ở khổ điện thoại. */
   labelAt: [latitude: number, longitude: number];
   islands: Island[];
 }
@@ -21,7 +21,7 @@ export const VIETNAM_ARCHIPELAGOS: readonly Archipelago[] = [
   {
     key: 'hoang-sa',
     label: 'Quần đảo Hoàng Sa (Việt Nam)',
-    labelAt: [17.35, 112.0],
+    labelAt: [17.5, 112.0],
     islands: [
       { name: 'Đảo Hoàng Sa', latitude: 16.53, longitude: 111.61 },
       { name: 'Đảo Quang Ảnh', latitude: 16.45, longitude: 111.52 },
@@ -34,7 +34,7 @@ export const VIETNAM_ARCHIPELAGOS: readonly Archipelago[] = [
   {
     key: 'truong-sa',
     label: 'Quần đảo Trường Sa (Việt Nam)',
-    labelAt: [12.15, 114.35],
+    labelAt: [12.3, 113.5],
     islands: [
       { name: 'Đảo Song Tử Tây', latitude: 11.43, longitude: 114.33 },
       { name: 'Đảo Sơn Ca', latitude: 10.38, longitude: 114.48 },
@@ -55,9 +55,13 @@ export const VIETNAM_BOUNDS: [[number, number], [number, number]] = [
   [23.8, 116.6],
 ];
 
-/** Giới hạn không gian di chuyển bản đồ: khóa chặt trong phạm vi lãnh thổ và vùng biển Việt Nam. */
+/**
+ * Giới hạn không gian di chuyển bản đồ, rộng hơn lãnh thổ một khoảng (ngoài lãnh thổ đã bị lớp che phủ nên không thấy gì khác).
+ * Phải đủ rộng để khung nhìn cả nước của trang Bản đồ (có chừa thanh bộ lọc ở trên và thẻ ghi chú ở góc dưới trái, tâm bản đồ lệch
+ * về tây nam) không chạm mép: chạm mép thì Leaflet ép tâm bản đồ trở lại và phần chừa không còn tác dụng.
+ */
 export const VIETNAM_MAX_BOUNDS: [[number, number], [number, number]] = [
-  [5.5, 99.5],
-  [24.5, 121.0],
+  [-5.0, 70.0],
+  [35.0, 150.0],
 ];
 
