@@ -42,6 +42,9 @@
       "@dsvhvn/dung-chung/embed": [
         "../../packages/dung-chung/src/embed/index.ts"
       ],
+      "@dsvhvn/dung-chung/map/route": [
+        "../../packages/dung-chung/src/map/route.ts"
+      ],
       "@dsvhvn/dung-chung/lesson-data": [
         "../../packages/dung-chung/src/lesson/lessonData.ts"
       ],
