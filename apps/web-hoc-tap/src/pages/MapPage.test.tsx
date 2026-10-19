@@ -84,6 +84,8 @@ describe('Bản đồ di sản', () => {
     expect(within(card).getByText('Thành phố Huế · Vật thể')).toBeInTheDocument();
     expect(within(card).getByRole('link', { name: 'Xem chi tiết' })).toHaveAttribute('href', '/di-san/quan-the-di-tich-co-do-hue');
     expect(within(card).getByRole('link', { name: 'Mở dòng thời gian' })).toHaveAttribute('href', '/dong-thoi-gian/quan-the-di-tich-co-do-hue');
+    // "Chỉ đường" mở trang chi tiết với phần chỉ đường sẵn (trang chi tiết mới xin vị trí, bản đồ không xin).
+    expect(within(card).getByRole('link', { name: 'Chỉ đường' })).toHaveAttribute('href', '/di-san/quan-the-di-tich-co-do-hue?chi-duong=1');
   });
 
   it('di sản chưa có dòng thời gian thì thẻ không có nút "Mở dòng thời gian"', async () => {

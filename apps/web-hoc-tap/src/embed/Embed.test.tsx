@@ -1,14 +1,14 @@
 import type { HeritagePin } from '@dsvhvn/dung-chung/api';
 import { parseEmbedMessage } from '@dsvhvn/dung-chung/embed';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { mapOf, publicApi, THANG_LONG } from '../test/discoveryFixtures';
+import { detailOf, HUE, mapOf, publicApi, THANG_LONG } from '../test/discoveryFixtures';
 import { envelope, mockApi } from '../test/fixtures';
 import { renderApp } from '../test/renderApp';
 
-// Hai trang nhúng cho app mobile: bản đồ và trình xem 3D. Trang không có thanh điều hướng, ngôn ngữ lấy từ địa chỉ, và nói chuyện với app bằng thông điệp
+// Các trang nhúng cho app mobile: bản đồ, trình xem 3D và chỉ đường. Trang không có thanh điều hướng, ngôn ngữ lấy từ địa chỉ, và nói chuyện với app bằng thông điệp
 // theo hợp đồng của gói dùng chung. Bản đồ thật (Leaflet) và trình xem thật (WebGL) được thay bằng khung giả; bản thật chạy ở smoke test.
 
 interface FakeMapProps {
@@ -27,6 +27,10 @@ vi.mock('../discovery/HeritageMap', () => ({
       {pins.filter((pin) => pin.slug === selectedSlug).map((pin) => <div key={pin.slug}>{renderPopup(pin)}</div>)}
     </div>
   ),
+}));
+
+vi.mock('../discovery/LocationMap', () => ({
+  default: ({ route }: { route: { coordinates: unknown[] } | null }) => <div data-testid="ban-do-nho">{route ? `tuyến ${route.coordinates.length} điểm` : 'chưa có tuyến'}</div>,
 }));
 
 vi.mock('@dsvhvn/dung-chung/model3d', async () => {
@@ -94,6 +98,18 @@ describe('Trang bản đồ nhúng', () => {
     await user.click(await screen.findByRole('button', { name: 'Mở dòng thời gian' }));
 
     expect(messages()).toContainEqual({ type: 'timeline-selected', version: 1, slug: 'quan-the-di-tich-co-do-hue' });
+  });
+
+  it('bấm "Chỉ đường" trên thẻ thì gửi thông điệp để app mở màn hình chỉ đường, không xin vị trí ở trang này', async () => {
+    const messages = mockNativeBridge();
+    mockApi(publicApi());
+    const user = userEvent.setup();
+    renderApp('/nhung/ban-do');
+
+    await user.click(await screen.findByRole('button', { name: /Ghim Quần thể di tích Cố đô Huế/ }));
+    await user.click(await screen.findByRole('button', { name: 'Chỉ đường' }));
+
+    expect(messages()).toContainEqual({ type: 'directions-selected', version: 1, slug: 'quan-the-di-tich-co-do-hue' });
   });
 
   it('nhận lệnh đổi bộ lọc đủ tỉnh, cấp xếp hạng, thời kỳ và hỏi lại ghim theo bộ lọc mới', async () => {
@@ -177,5 +193,61 @@ describe('Trang xem 3D nhúng', () => {
 
     await waitFor(() => expect(messages()).toContainEqual({ type: 'model-error', version: 1, reason: 'load' }));
     expect(screen.queryByTestId('trinh-xem')).not.toBeInTheDocument();
+  });
+});
+
+describe('Trang chỉ đường nhúng', () => {
+  const OSRM = {
+    code: 'Ok',
+    waypoints: [{ distance: 12 }, { distance: 30 }],
+    routes: [
+      {
+        distance: 2313.1,
+        duration: 248.7,
+        geometry: { coordinates: [[105.8514, 21.0288], [105.8407, 21.0351]] },
+        legs: [{ steps: [{ name: 'Phố Lê Thái Tổ', distance: 325.4, duration: 33.4, maneuver: { type: 'depart', modifier: 'left', bearing_after: 191 } }, { name: '', distance: 0, duration: 0, maneuver: { type: 'arrive', modifier: 'right', bearing_after: 0 } }] }],
+      },
+    ],
+  };
+
+  function directionsApi() {
+    const detail = detailOf();
+    return mockApi(
+      (call) => (call.path.startsWith('/routed-') ? new Response(JSON.stringify(OSRM), { status: 200 }) : undefined),
+      (call) => (call.path.split('?')[0] === `/public/heritages/${detail.slug}` ? envelope(200, { data: detail }) : undefined),
+      publicApi(),
+    );
+  }
+
+  it('báo sẵn sàng khi có tọa độ di sản, chờ vị trí từ app rồi mới gọi OSRM; không tự xin vị trí của trình duyệt', async () => {
+    const messages = mockNativeBridge();
+    const calls = directionsApi();
+    const getCurrentPosition = vi.fn();
+    Object.defineProperty(navigator, 'geolocation', { value: { getCurrentPosition }, configurable: true });
+    renderApp(`/nhung/chi-duong/${HUE.slug}?lang=en`);
+
+    const panel = await screen.findByRole('region', { name: 'Directions to this site' });
+    await waitFor(() => expect(messages()).toContainEqual({ type: 'ready', version: 1 }));
+    expect(within(panel).getByText('Waiting for your location from the app…')).toBeInTheDocument();
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(calls.filter((call) => call.path.startsWith('/routed-'))).toHaveLength(0);
+
+    window.dispatchEvent(new MessageEvent('message', { data: JSON.stringify({ type: 'set-position', version: 1, position: { latitude: 21.0287, longitude: 105.8524 } }) }));
+
+    expect(await within(panel).findByText('2.3 km · about 4 min')).toBeInTheDocument();
+    expect(within(panel).getByText('Head south on Phố Lê Thái Tổ')).toBeInTheDocument();
+    expect(screen.getByTestId('ban-do-nho')).toHaveTextContent('tuyến 2 điểm');
+    expect(within(panel).getByRole('link', { name: 'Open in Google Maps' })).toHaveAttribute('href', expect.stringContaining('origin=21.0287%2C105.8524'));
+    expect(getCurrentPosition).not.toHaveBeenCalled();
+    expect(calls.filter((call) => call.path.startsWith('/routed-'))).toHaveLength(1);
+    delete (navigator as { geolocation?: unknown }).geolocation;
+  });
+
+  it('di sản không có thì báo không tìm thấy', async () => {
+    mockNativeBridge();
+    mockApi(() => envelope(404, { errorCode: 'BLOCKED', message: 'Không tìm thấy di sản.' }));
+    renderApp('/nhung/chi-duong/khong-co');
+
+    expect(await screen.findByText('Không tìm thấy di sản này')).toBeInTheDocument();
   });
 });

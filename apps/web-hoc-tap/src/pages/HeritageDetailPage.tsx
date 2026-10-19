@@ -257,7 +257,8 @@ function LocationSection({ detail, latitude, longitude, preview }: { detail: Pub
     if (directions.status === 'idle') start();
   };
 
-  const route = directions.status === 'ready' ? directions.route : null;
+  // Ẩn bảng thì bỏ tuyến khỏi bản đồ nhỏ (mở lại dùng tuyến đã nhớ, không hỏi máy chủ lần nữa).
+  const route = open && directions.status === 'ready' ? directions.route : null;
   return (
     <section ref={sectionRef} aria-label={t.detail.locationAria} className="scroll-mt-24 overflow-hidden rounded-md border border-border bg-surface">
       <div className={route ? 'isolate h-[320px]' : 'isolate h-[220px]'}>
