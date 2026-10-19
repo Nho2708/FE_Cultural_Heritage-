@@ -31,7 +31,8 @@
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run",
     "gen:tokens": "node scripts/gen-tokens.mjs",
-    "check:tokens": "node scripts/gen-tokens.mjs --check"
+    "check:tokens": "node scripts/gen-tokens.mjs --check",
+    "gen:vietnam-land": "node scripts/gen-vietnam-land.mjs"
   },
   "dependencies": {
     "@google/model-viewer": "^4.3.1",
