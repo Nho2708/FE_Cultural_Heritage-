@@ -35,18 +35,36 @@ interface HeritageMapProps {
   /** Tên vùng bản đồ (đọc cho trình đọc màn hình). */
   mapLabel?: string;
   /**
-   * Phần mép trên và mép dưới của bản đồ (điểm ảnh) bị các lớp nổi của trang che (thanh bộ lọc, thẻ ghi chú): khung nhìn cả nước
-   * và khung nhìn theo ghim được căn vào phần còn lại để không bị che. Đo xong trước khi bản đồ dựng là đủ (Leaflet nạp động).
+   * Phần mép bản đồ (điểm ảnh) bị các lớp nổi của trang che (thanh bộ lọc ở mép trên, thẻ ghi chú ở góc dưới trái): khung nhìn
+   * cả nước và khung nhìn theo ghim được căn vào phần còn lại để không bị che. Đo xong trước khi bản đồ dựng là đủ (Leaflet nạp động).
    */
   fitPadding?: FitPadding;
 }
 
 export interface FitPadding {
+  /** Mép trên bị che (thanh bộ lọc). */
   top: number;
+  /** Mép dưới bị che (thẻ ghi chú, tính cả chiều cao của thẻ). */
   bottom: number;
+  /** Mép trái bị che (bề rộng thẻ ghi chú): thẻ chỉ che góc dưới trái nên có thể chừa cạnh trái thay vì cả mép dưới. */
+  left: number;
 }
 
-const NO_PADDING: FitPadding = { top: 0, bottom: 0 };
+const NO_PADDING: FitPadding = { top: 0, bottom: 0, left: 0 };
+
+/**
+ * Căn `bounds` vào phần bản đồ không bị che. Thẻ ghi chú chỉ che góc dưới trái nên có hai cách chừa: cả mép dưới, hoặc cả cạnh trái;
+ * chọn cách cho mức thu phóng lớn hơn (bản đồ to hơn). `extra` là khoảng cách thêm quanh `bounds`.
+ */
+function fitClear(L: LeafletLib, map: Leaflet.Map, bounds: Leaflet.LatLngBoundsExpression, padding: FitPadding, extra: number, maxZoom?: number) {
+  const latLngBounds = L.latLngBounds(bounds as Leaflet.LatLngBoundsLiteral);
+  const candidates: Leaflet.FitBoundsOptions[] = [{ paddingTopLeft: [extra, extra + padding.top], paddingBottomRight: [extra, extra + padding.bottom] }];
+  if (padding.left > 0) candidates.push({ paddingTopLeft: [extra + padding.left, extra + padding.top], paddingBottomRight: [extra, extra] });
+  const zoomOf = (option: Leaflet.FitBoundsOptions) =>
+    map.getBoundsZoom(latLngBounds, false, L.point(option.paddingTopLeft as [number, number]).add(L.point(option.paddingBottomRight as [number, number])));
+  const best = candidates.reduce((chosen, option) => (zoomOf(option) > zoomOf(chosen) ? option : chosen));
+  map.fitBounds(latLngBounds, maxZoom === undefined ? best : { ...best, maxZoom });
+}
 
 export default function HeritageMap({
   pins,
@@ -69,8 +87,7 @@ export default function HeritageMap({
     paddingRef.current = fitPadding;
   }, [fitPadding]);
   /** Khung nhìn cả nước và hai quần đảo, tránh phần bị lớp nổi che. */
-  const fitCountry = (map: Leaflet.Map) =>
-    map.fitBounds(VIETNAM_BOUNDS, { paddingTopLeft: [0, paddingRef.current.top], paddingBottomRight: [0, paddingRef.current.bottom] });
+  const fitCountry = (L: LeafletLib, map: Leaflet.Map) => fitClear(L, map, VIETNAM_BOUNDS, paddingRef.current, 0);
   const containerRef = useRef<HTMLElement>(null);
   const [engine, setEngine] = useState<Engine | null>(null);
   const [popupNode, setPopupNode] = useState<HTMLElement | null>(null);
@@ -92,10 +109,11 @@ export default function HeritageMap({
     void loadLeaflet().then((L) => {
       const element = containerRef.current;
       if (cancelled || !element) return;
-      // Bước thu phóng nửa mức để khung nhìn cả nước sát phần không bị che (một mức thì hoặc quá nhỏ, hoặc bị che hai đầu).
-      const map = createBaseMap(L, element, { labels: labelsRef.current, zoomSnap: 0.5 });
+      // Bước thu phóng một phần tư mức để khung nhìn cả nước lấp gần kín phần không bị che (một mức thì hoặc quá nhỏ, hoặc bị che
+      // hai đầu); nút phóng to, thu nhỏ vẫn đi từng mức.
+      const map = createBaseMap(L, element, { labels: labelsRef.current, zoomSnap: 0.25 });
       created = map;
-      fitCountry(map);
+      fitCountry(L, map);
       const cluster = L.markerClusterGroup({
         showCoverageOnHover: false,
         maxClusterRadius: 48,
@@ -155,18 +173,22 @@ export default function HeritageMap({
     const { L, map } = engine;
     if (selectedSlug && pins.some((pin) => pin.slug === selectedSlug)) return;
     if (fitToPins && pins.length > 0) {
-      const { top, bottom } = paddingRef.current;
-      map.fitBounds(L.latLngBounds(pins.map((pin) => [pin.latitude, pin.longitude] as [number, number])), {
-        paddingTopLeft: [72, 72 + top],
-        paddingBottomRight: [72, 72 + bottom],
-        maxZoom: 9,
-      });
+      fitClear(L, map, L.latLngBounds(pins.map((pin) => [pin.latitude, pin.longitude] as [number, number])), paddingRef.current, 72, 9);
     } else {
-      fitCountry(map);
+      fitCountry(L, map);
     }
     // Chỉ theo fitKey: chọn ghim không được làm bản đồ nhảy lại.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [engine, fitKey]);
+
+  // Lớp nổi đo xong sau lần căn (thẻ ghi chú xuất hiện cùng dữ liệu) hoặc cửa sổ đổi cỡ: căn lại khung nhìn cả nước. Đang lọc
+  // hoặc đang chọn ghim thì giữ nguyên.
+  useEffect(() => {
+    if (!engine || fitToPins || selectedSlug) return;
+    fitCountry(engine.L, engine.map);
+    // Chỉ theo fitPadding: đổi bộ lọc hay ghim đang chọn không được làm bản đồ nhảy lại.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [engine, fitPadding]);
 
   // Ghim đang chọn: đổi kiểu ghim và mở popup.
   useEffect(() => {

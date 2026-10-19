@@ -57,11 +57,11 @@ export const VIETNAM_BOUNDS: [[number, number], [number, number]] = [
 
 /**
  * Giới hạn không gian di chuyển bản đồ, rộng hơn lãnh thổ một khoảng (ngoài lãnh thổ đã bị lớp che phủ nên không thấy gì khác).
- * Phải rộng hơn khung nhìn ở mức thu nhỏ của bản đồ cả nước (khoảng 28 độ vĩ ở khung 1440 x 900, 32 độ ở 1280 x 720): khi khung
- * nhìn rộng hơn giới hạn, Leaflet ép tâm bản đồ về giữa giới hạn và phần đệm cho các lớp nổi của trang không còn tác dụng.
+ * Phải đủ rộng để khung nhìn cả nước của trang Bản đồ (có chừa thanh bộ lọc ở trên và thẻ ghi chú ở góc dưới trái, tâm bản đồ lệch
+ * về tây nam) không chạm mép: chạm mép thì Leaflet ép tâm bản đồ trở lại và phần chừa không còn tác dụng.
  */
 export const VIETNAM_MAX_BOUNDS: [[number, number], [number, number]] = [
-  [-5.0, 90.0],
-  [35.0, 130.0],
+  [-5.0, 70.0],
+  [35.0, 150.0],
 ];
 

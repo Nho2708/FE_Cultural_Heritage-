@@ -86,7 +86,7 @@ describe('Bản đồ Leaflet', () => {
     const withoutPadding = labelY(plain.container);
     plain.unmount();
 
-    const padded = render(<HeritageMap {...props} fitPadding={{ top: 200, bottom: 0 }} />);
+    const padded = render(<HeritageMap {...props} fitPadding={{ top: 200, bottom: 0, left: 0 }} />);
     await waitFor(() => expect(padded.container.querySelector('.dsv-map-label-wrap')).not.toBeNull());
     expect(labelY(padded.container)).toBeGreaterThan(withoutPadding);
   });

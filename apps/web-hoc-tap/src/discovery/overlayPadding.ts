@@ -7,19 +7,25 @@ import type { FitPadding } from './HeritageMap';
 interface Box {
   top: number;
   bottom: number;
+  left: number;
+  right: number;
 }
 
 /** Khoảng cách giữa lớp nổi và phần bản đồ muốn thấy. */
 const GAP = 16;
 
 /**
- * Phần mép trên, mép dưới (điểm ảnh) của vùng bản đồ `area` bị `bar` (thanh bộ lọc, luôn nổi) và `note` (thẻ ghi chú: nổi ở
- * màn hình rộng, nằm dưới bản đồ ở khổ hẹp nên không che) che. Lớp không giao với vùng bản đồ thì không tính.
+ * Phần mép (điểm ảnh) của vùng bản đồ `area` bị `bar` (thanh bộ lọc, luôn nổi ở mép trên) và `note` (thẻ ghi chú: nổi ở góc dưới
+ * trái của màn hình rộng, nằm dưới bản đồ ở khổ hẹp nên không che) che. Thẻ ghi chú cho cả mép dưới lẫn cạnh trái để bản đồ chọn
+ * cách chừa cho khung nhìn to hơn. Lớp không giao với vùng bản đồ thì không tính.
  */
 export function overlayPadding(area: Box, bar: Box | null, note: Box | null): FitPadding {
   const top = bar && bar.bottom > area.top && bar.top < area.bottom ? bar.bottom - area.top + GAP : 0;
-  const bottom = note && note.top < area.bottom && note.bottom > area.top ? area.bottom - note.top + GAP : 0;
-  return { top: Math.max(0, Math.round(top)), bottom: Math.max(0, Math.round(bottom)) };
+  const noteOverlaps = note !== null && note.top < area.bottom && note.bottom > area.top && note.right > area.left && note.left < area.right;
+  const bottom = noteOverlaps ? area.bottom - note.top + GAP : 0;
+  const left = noteOverlaps ? note.right - area.left + GAP : 0;
+  const px = (value: number) => Math.max(0, Math.round(value));
+  return { top: px(top), bottom: px(bottom), left: px(left) };
 }
 
 /**
@@ -27,13 +33,13 @@ export function overlayPadding(area: Box, bar: Box | null, note: Box | null): Fi
  * chú chỉ xuất hiện khi có dữ liệu. Trả về cùng một đối tượng khi số không đổi để không dựng lại hiệu ứng ở nơi dùng.
  */
 export function useOverlayPadding(areaRef: RefObject<HTMLElement | null>, barRef: RefObject<HTMLElement | null>, note: HTMLElement | null): FitPadding {
-  const [padding, setPadding] = useState<FitPadding>({ top: 0, bottom: 0 });
+  const [padding, setPadding] = useState<FitPadding>({ top: 0, bottom: 0, left: 0 });
   useLayoutEffect(() => {
     const area = areaRef.current;
     if (!area) return;
     const measure = () => {
       const next = overlayPadding(area.getBoundingClientRect(), barRef.current?.getBoundingClientRect() ?? null, note?.getBoundingClientRect() ?? null);
-      setPadding((previous) => (previous.top === next.top && previous.bottom === next.bottom ? previous : next));
+      setPadding((previous) => (previous.top === next.top && previous.bottom === next.bottom && previous.left === next.left ? previous : next));
     };
     measure();
     const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);
