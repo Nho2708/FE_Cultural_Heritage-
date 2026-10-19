@@ -14,6 +14,8 @@
     "./map/base": "./src/map/leafletBase.ts",
     "./map/seas": "./src/map/seas.ts",
     "./map/CoordinatePicker": "./src/map/CoordinatePicker.tsx",
+    "./map/route": "./src/map/route.ts",
+    "./map/route-layer": "./src/map/routeLayer.ts",
     "./i18n": "./src/i18n/index.ts",
     "./speech": "./src/speech/index.ts",
     "./embed": "./src/embed/index.ts",

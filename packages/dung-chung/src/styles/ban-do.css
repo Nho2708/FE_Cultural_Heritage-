@@ -166,3 +166,19 @@
 .leaflet-control-attribution a {
   color: var(--dsv-color-link);
 }
+
+/* Tuyến đường tới di sản (routeLayer.ts): viền sáng dưới nét màu chủ đạo, chấm xuất phát của khách. */
+.dsv-route-casing {
+  stroke: var(--dsv-color-surface);
+  fill: none;
+}
+
+.dsv-route-line {
+  stroke: var(--dsv-color-primary);
+  fill: none;
+}
+
+.dsv-route-start {
+  stroke: var(--dsv-color-surface);
+  fill: #1a56db; /* cùng màu chấm "Gần bạn" trên bản đồ di sản, khác màu nét tuyến */
+}

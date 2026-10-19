@@ -46,6 +46,7 @@ function Navigation() {
         <Stack.Screen name="di-san/[slug]/index" options={{ title: '' }} />
         <Stack.Screen name="di-san/[slug]/dong-thoi-gian" options={{ title: t('timeline.title') }} />
         <Stack.Screen name="di-san/[slug]/3d" options={{ title: t('model.title') }} />
+        <Stack.Screen name="di-san/[slug]/chi-duong" options={{ title: t('directions.title') }} />
         <Stack.Screen name="goi-y" options={{ title: t('home.recommended') }} />
         <Stack.Screen name="tim-kiem-di-san" options={{ title: t('search.title') }} />
         <Stack.Screen name="dong-thoi-gian-di-san" options={{ title: t('timeline.title') }} />

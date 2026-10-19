@@ -7,7 +7,7 @@ import { ListNotes } from '../components/ListNotes';
 import { PublicErrorState } from '../components/PublicErrorState';
 import { ClearFilters, FilterSelects } from '../discovery/FilterSelects';
 import { FILTER_PARAM, KEYWORD_MAX, KEYWORD_MIN, filterFromParams, hasActiveFilter, keywordInvalid, paramsFromFilter, selectFilterCount, toSearch } from '../discovery/filters';
-import { heritagePath, timelinePath } from '../discovery/paths';
+import { directionsPathOf, heritagePath, timelinePath } from '../discovery/paths';
 import { useIsGuest } from '../guest/guestData';
 import { MapNearby } from '../guest/MapNearby';
 import { mapPositionOf, useNearby } from '../guest/useNearby';
@@ -32,7 +32,7 @@ function MapSkeleton() {
   );
 }
 
-/** Thẻ tóm tắt trong popup của ghim: ảnh, tên, tỉnh và loại, mô tả ngắn, hai nút. */
+/** Thẻ tóm tắt trong popup của ghim: ảnh, tên, tỉnh và loại, mô tả ngắn, nút xem chi tiết, mở dòng thời gian và chỉ đường (mở trang chi tiết với phần chỉ đường sẵn). */
 function PinCard({ pin }: { pin: HeritagePin }) {
   const { language, t } = useI18n();
   const meta = [provinceName(pin.provinceName, language), pin.heritageType ? HERITAGE_TYPE_NAME[language][pin.heritageType] : null].filter(Boolean).join(' · ');
@@ -55,6 +55,10 @@ function PinCard({ pin }: { pin: HeritagePin }) {
               {t.map.openTimeline}
             </ButtonLink>
           )}
+          <ButtonLink to={directionsPathOf(pin.slug)} variant="secondary" className="basis-full px-3">
+            <Icon name="navigation" size={16} />
+            {t.directions.button}
+          </ButtonLink>
         </div>
       </div>
     </article>
