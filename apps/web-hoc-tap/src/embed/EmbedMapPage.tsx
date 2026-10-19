@@ -12,7 +12,7 @@ import { postToHost, useHostCommands } from './hostMessages';
 
 // Trang bản đồ nhúng cho app mobile (và dùng được trực tiếp trên web): cùng bản đồ Leaflet + OpenStreetMap, cùng Hoàng Sa, Trường Sa với trang Bản đồ,
 // nhưng không có thanh điều hướng. Bộ lọc, ngôn ngữ và ghim cần làm nổi nằm trên địa chỉ; app đổi bộ lọc hoặc làm nổi một ghim bằng lệnh `postMessage`.
-// Chạm ghim mở thẻ di sản; bấm "Xem chi tiết" hoặc "Mở dòng thời gian" thì gửi thông điệp để app đi tới trang chi tiết hoặc dòng thời gian của di sản.
+// Chạm ghim mở thẻ di sản; bấm "Xem chi tiết", "Mở dòng thời gian" hoặc "Chỉ đường" thì gửi thông điệp để app đi tới trang chi tiết, dòng thời gian hoặc màn hình chỉ đường.
 // App cũng gửi lệnh đổi bộ lọc (tỉnh, vùng, loại, cấp xếp hạng, thời kỳ) và vị trí của khách để bản đồ vẽ chấm "Gần bạn"; vị trí chỉ nằm trong bộ nhớ của trang.
 
 const HeritageMap = lazy(() => import('../discovery/HeritageMap'));
@@ -36,6 +36,9 @@ function EmbedPinCard({ pin }: { pin: HeritagePin }) {
               {t.map.openTimeline}
             </Button>
           )}
+          <Button variant="secondary" onClick={() => postToHost({ type: 'directions-selected', version: 1, slug: pin.slug })}>
+            {t.directions.button}
+          </Button>
         </div>
       </div>
     </article>

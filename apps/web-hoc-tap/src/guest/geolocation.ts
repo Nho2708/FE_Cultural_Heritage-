@@ -20,8 +20,11 @@ export class LocationError extends Error {
 
 export const hasGeolocation = () => typeof navigator !== 'undefined' && 'geolocation' in navigator;
 
-/** Làm tròn 3 chữ số thập phân. */
-export const roundCoordinate = (value: number) => Math.round(value * 1000) / 1000;
+/** Làm tròn `decimals` chữ số thập phân (mặc định 3, khoảng 110 m). */
+export const roundCoordinate = (value: number, decimals = 3) => {
+  const factor = 10 ** decimals;
+  return Math.round(value * factor) / factor;
+};
 
 /** Trạng thái quyền vị trí của trình duyệt mà không hỏi khách. Trình duyệt không có Permissions API thì coi như chưa hỏi (`prompt`). */
 export async function readPermission(): Promise<LocationPermission> {
@@ -56,15 +59,18 @@ export function watchPermission(onChange: (permission: LocationPermission) => vo
   };
 }
 
-/** Lấy vị trí hiện tại (trình duyệt hỏi quyền nếu chưa hỏi). Chấp nhận vị trí lưu tạm của trình duyệt tới 5 phút để khỏi hỏi lại thiết bị liên tục. */
-export function currentPosition(): Promise<Position> {
+/**
+ * Lấy vị trí hiện tại (trình duyệt hỏi quyền nếu chưa hỏi). Chấp nhận vị trí lưu tạm của trình duyệt tới 5 phút để khỏi hỏi lại thiết bị liên tục.
+ * "Gần bạn" làm tròn 3 chữ số (đủ cho khoảng cách); chỉ đường cần 4 chữ số (khoảng 11 m) để điểm xuất phát nằm đúng phố.
+ */
+export function currentPosition({ decimals = 3 }: { decimals?: number } = {}): Promise<Position> {
   return new Promise<Position>((resolve, reject) => {
     if (!hasGeolocation()) {
       reject(new LocationError('unavailable'));
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      (result) => resolve({ latitude: roundCoordinate(result.coords.latitude), longitude: roundCoordinate(result.coords.longitude) }),
+      (result) => resolve({ latitude: roundCoordinate(result.coords.latitude, decimals), longitude: roundCoordinate(result.coords.longitude, decimals) }),
       (error) => reject(new LocationError(error.code === error.PERMISSION_DENIED ? 'denied' : 'unavailable')),
       { enableHighAccuracy: false, timeout: 10_000, maximumAge: 5 * 60_000 },
     );
