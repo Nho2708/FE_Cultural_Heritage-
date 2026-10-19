@@ -57,6 +57,15 @@ export function useDirections({ destination, position: external = null, baseUrl 
   const [failure, setFailure] = useState<'denied' | 'unavailable' | null>(null);
   const [known, setKnown] = useState<Known>({ position: null, routes: {}, errors: {} });
   const generation = useRef(0);
+  // Rời trang khi đang lấy vị trí thì bỏ kết quả về sau. Dùng cờ riêng (không tăng `generation`) để lần dựng kép của StrictMode không làm mất kết quả
+  // của lời xin vị trí đã bắt đầu ở lần dựng đầu.
+  const alive = useRef(true);
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+    };
+  }, []);
 
   const position = external ?? own;
   const started = active || external !== null;
@@ -70,12 +79,12 @@ export function useDirections({ destination, position: external = null, baseUrl 
     setLocating(true);
     currentPosition({ decimals: 4 }).then(
       (found) => {
-        if (mine !== generation.current) return;
+        if (mine !== generation.current || !alive.current) return;
         setLocating(false);
         setOwn(found);
       },
       (error: unknown) => {
-        if (mine !== generation.current) return;
+        if (mine !== generation.current || !alive.current) return;
         setLocating(false);
         setFailure(error instanceof LocationError ? error.reason : 'unavailable');
       },
@@ -118,14 +127,6 @@ export function useDirections({ destination, position: external = null, baseUrl 
     );
     return () => controller.abort();
   }, [needRoute, position, mode, destination, baseUrl]);
-
-  // Rời trang khi đang lấy vị trí: bỏ kết quả về sau.
-  useEffect(
-    () => () => {
-      generation.current++;
-    },
-    [],
-  );
 
   let status: DirectionsStatus = 'idle';
   if (!started) status = 'idle';

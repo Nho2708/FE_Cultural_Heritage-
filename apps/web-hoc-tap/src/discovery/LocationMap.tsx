@@ -62,7 +62,7 @@ export default function LocationMap({ latitude, longitude, label, labels, route 
     if (!engine || !route) return;
     const { L, map } = engine;
     map.invalidateSize(); // khung bản đồ cao hơn khi có tuyến; đo lại trước khi khớp khung
-    const layer = drawRoute(L, map, route, { startLabel, padding: [28, 28] });
+    const layer = drawRoute(L, map, route, { startLabel, padding: [56, 56] }); // đệm rộng để nhãn chấm xuất phát không bị cắt ở mép
     map.dragging.enable();
     map.scrollWheelZoom.enable();
     return () => {
