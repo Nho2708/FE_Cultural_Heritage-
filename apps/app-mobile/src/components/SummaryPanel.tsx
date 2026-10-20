@@ -8,14 +8,15 @@ import { isUnlockRequired } from '../ads/gate';
 import { adsAvailable } from '../ads/rewarded';
 import { useSummary } from '../guest/queries';
 import { SPEEDS } from '../speech/narrator';
-import { useNarration } from '../speech/useNarration';
+import { useSummaryNarration } from '../speech/useSummaryNarration';
 import { useApp } from '../state/AppProvider';
 import { useTheme } from '../theme/ThemeProvider';
 import { AdGatePanel } from './AdGatePanel';
 import { Badge, Button, Card, Chip, ErrorState, Loading, Notice, Txt, styles as ui } from './ui';
 
 // Tóm tắt di sản: bản chi tiết để đọc và bản ngắn để nghe, lưu sẵn theo ngôn ngữ (không gọi AI khi xem). Bản Hàn, Trung, Nhật gắn nhãn "bản dịch máy"; ngôn ngữ chưa có
-// tóm tắt thì hiện tiếng Việt kèm thông báo. Nghe bằng giọng của điện thoại, tô sáng câu đang đọc. Máy chủ khóa tóm tắt và nghe bằng cổng quảng cáo có thưởng (403 cần mở khóa): khi đó hiện lời mời xem quảng cáo thay nội dung.
+// tóm tắt thì hiện tiếng Việt kèm thông báo. Nghe bằng tệp thuyết minh tạo sẵn khi có (bấm một câu thì phát từ câu đó), không có hoặc tệp hỏng thì bằng giọng của điện thoại;
+// tô sáng câu đang đọc. Máy chủ khóa tóm tắt và nghe bằng cổng quảng cáo có thưởng (403 cần mở khóa): khi đó hiện lời mời xem quảng cáo thay nội dung.
 
 export type SummaryTab = 'read' | 'listen';
 
@@ -34,8 +35,10 @@ export function SummaryPanel({ slug, initialTab, onListen }: Props) {
 
   const speechTag = languageOption(summary.data?.localization.language ?? language).speechTag;
   const shortText = summary.data?.shortText ?? '';
-  const narration = useNarration(shortText, speechTag);
+  const narration = useSummaryNarration(shortText, speechTag, summary.data?.narration);
   const stopNarration = narration.stop;
+  // Chỉ cần giọng của điện thoại khi không có tệp thuyết minh tạo sẵn.
+  const voiceState = narration.usingAudio ? 'ready' : narration.voiceState;
 
   // Chuyển sang tab Đọc thì dừng nghe.
   useEffect(() => {
@@ -86,14 +89,14 @@ export function SummaryPanel({ slug, initialTab, onListen }: Props) {
             <Txt variant="caption" muted>
               {t('summary.short')}
             </Txt>
-            {narration.voiceState === 'unsupported' ? <Notice text={t('speech.unsupported')} /> : null}
-            {narration.voiceState === 'missing' ? <Notice text={t('speech.missingVoice', { language: languageNames(localization.language) })} /> : null}
+            {voiceState === 'unsupported' ? <Notice text={t('speech.unsupported')} /> : null}
+            {voiceState === 'missing' ? <Notice text={t('speech.missingVoice', { language: languageNames(localization.language) })} /> : null}
             <View style={ui.wrap}>
               {narration.status === 'idle' ? (
                 <Button
                   label={t('speech.play')}
                   icon="▶"
-                  disabled={narration.voiceState === 'unsupported' || narration.sentences.length === 0}
+                  disabled={voiceState === 'unsupported' || narration.sentences.length === 0}
                   onPress={() => {
                     onListen();
                     narration.play();
@@ -119,6 +122,16 @@ export function SummaryPanel({ slug, initialTab, onListen }: Props) {
                 <Txt
                   key={index}
                   accessibilityLabel={index === narration.index ? `${t('speech.sentence')}: ${sentence}` : sentence}
+                  // Tệp tạo sẵn biết mốc từng câu: bấm vào câu thì phát từ đầu câu đó.
+                  accessibilityRole={narration.usingAudio ? 'button' : undefined}
+                  onPress={
+                    narration.usingAudio
+                      ? () => {
+                          if (narration.status === 'idle') onListen();
+                          narration.seekTo(index);
+                        }
+                      : undefined
+                  }
                   style={index === narration.index ? { backgroundColor: theme.color.accent, color: theme.color.onAccent, borderRadius: 4 } : undefined}
                 >
                   {sentence}

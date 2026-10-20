@@ -1,23 +1,26 @@
-import { cn } from '@dsvhvn/dung-chung';
-import { ApiError, ERROR_CODES, type PublicSummary } from '@dsvhvn/dung-chung/api';
+import { cn, resolveFileUrl } from '@dsvhvn/dung-chung';
+import { ApiError, ERROR_CODES, type PublicNarration, type PublicSummary } from '@dsvhvn/dung-chung/api';
 import { Button, Icon, InlineMessage, Modal, TabPanel, Tabs } from '@dsvhvn/dung-chung/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useRef } from 'react';
 import { serverTime, useAdUnlockStatus, useAtExpiry } from '../ads/adsData';
 import { useRewardedUnlock } from '../ads/useRewardedUnlock';
+import { API_BASE_URL } from '../config/env';
 import { SUMMARY_KEY, useHeritageSummary } from '../discovery/queries';
 import { useIsGuest, useRecordListen } from '../guest/guestData';
 import { useI18n } from '../i18n/context';
 import { formatDateTime } from '../i18n/format';
 import { languageOption } from '../i18n/languages';
+import { useAudioNarration } from '../narration/useAudioNarration';
 import { SPEEDS, useNarration } from '../narration/useNarration';
 import { splitParagraphs, splitSentences } from '../narration/sentences';
 import { AdGate } from './AdGate';
 import { LocalizationNotice } from './LocalizationNotice';
 import { PublicErrorState } from './PublicErrorState';
 
-// Hộp thoại "Tóm tắt và thuyết minh" của chi tiết di sản: tab Đọc (bản tóm tắt chi tiết) và tab Nghe (bản tóm tắt ngắn đọc bằng giọng của
-// trình duyệt, có phát, tạm dừng, dừng, tốc độ và tô sáng câu đang đọc). Nội dung lấy từ bản đã lưu theo ngôn ngữ đang chọn, không gọi AI khi xem.
+// Hộp thoại "Tóm tắt và thuyết minh" của chi tiết di sản: tab Đọc (bản tóm tắt chi tiết) và tab Nghe (bản tóm tắt ngắn, có phát, tạm dừng, dừng,
+// tốc độ và tô sáng câu đang đọc). Có thuyết minh tạo sẵn thì phát tệp MP3 giọng tự host theo mốc từng câu; không có hoặc tệp hỏng thì đọc bằng giọng của
+// trình duyệt. Nội dung lấy từ bản đã lưu theo ngôn ngữ đang chọn, không gọi AI khi xem.
 // Ngôn ngữ chưa có tóm tắt hiện hành thì hiện bản tiếng Việt kèm thông báo và đọc bằng giọng tiếng Việt, không dùng giọng của ngôn ngữ khác.
 // Khách (chưa đăng nhập) xem tóm tắt và nghe thuyết minh của một di sản sau khi xem một quảng cáo có thưởng (mở 24 giờ trên thiết bị): máy chủ trả 403 khi chưa mở khóa
 // thì hộp thoại hiện lời mời xem quảng cáo thay cho nội dung; hết hạn thì tự quay lại lời mời. Học sinh đã đăng nhập không bao giờ thấy quảng cáo.
@@ -26,24 +29,48 @@ export type SummaryTab = 'doc' | 'nghe';
 
 const PREFIX = 'tom-tat';
 
+/** Thuyết minh tạo sẵn dùng được: có tệp và có ít nhất một câu có mốc. */
+function usableNarration(summary: PublicSummary): PublicNarration | null {
+  const narration = summary.narration;
+  return narration && narration.audioUrl && narration.sentences.length > 0 ? narration : null;
+}
+
 function Narrator({ summary }: { summary: PublicSummary }) {
   const { t } = useI18n();
   // Ngôn ngữ của chữ đang hiện (khác ngôn ngữ yêu cầu khi lùi về tiếng Việt) quyết định giọng đọc.
   const spoken = languageOption(summary.localization.language);
-  const sentences = useMemo(() => splitSentences(summary.shortText, spoken.speechTag), [summary.shortText, spoken.speechTag]);
-  const narration = useNarration(sentences, spoken.speechTag);
-  const { voiceState, status, index } = narration;
+  const deviceSentences = useMemo(() => splitSentences(summary.shortText, spoken.speechTag), [summary.shortText, spoken.speechTag]);
+  const device = useNarration(deviceSentences, spoken.speechTag);
+  // Có thuyết minh tạo sẵn thì phát tệp và hiện đúng các câu đã có mốc; tệp hỏng thì lùi về giọng thiết bị, đang nghe dở thì đọc tiếp luôn bằng giọng đó.
+  const prepared = usableNarration(summary);
+  const devicePlay = device.play;
+  const audio = useAudioNarration(
+    prepared,
+    resolveFileUrl(prepared?.audioUrl, API_BASE_URL),
+    useCallback((wasActive: boolean) => wasActive && devicePlay(), [devicePlay]),
+  );
+  const usingAudio = prepared !== null && !audio.failed;
+  const sentences = usingAudio ? prepared.sentences.map((sentence) => sentence.text) : deviceSentences;
+  const narration = usingAudio ? audio : device;
+  const { voiceState } = device;
+  const { status, index } = narration;
   // Nghe chạy trên trình duyệt nên máy chủ không tự biết: ghi một lượt "nghe" vào lịch sử của khách ở lần bấm Phát đầu tiên (học sinh không ghi).
   const recordListen = useRecordListen();
   const listened = useRef(false);
+  const markListened = () => {
+    if (listened.current) return;
+    listened.current = true;
+    recordListen(summary.slug);
+  };
   const play = () => {
-    if (!listened.current) {
-      listened.current = true;
-      recordListen(summary.slug);
-    }
+    markListened();
     narration.play();
   };
-  const blocked = voiceState === 'unsupported' || voiceState === 'missing';
+  const seek = (position: number) => {
+    markListened();
+    audio.seekTo(position);
+  };
+  const blocked = !usingAudio && (voiceState === 'unsupported' || voiceState === 'missing');
 
   return (
     <div className="flex flex-col gap-4">
@@ -56,13 +83,29 @@ function Narrator({ summary }: { summary: PublicSummary }) {
       <div className="flex flex-col gap-4 rounded-md border border-border p-5">
         <p lang={spoken.code} className="type-body-l text-on-surface">
           {sentences.map((sentence, position) => (
-            <span
-              key={position}
-              aria-current={position === index ? 'true' : undefined}
-              className={cn('rounded-xs', position === index && 'bg-primary-container font-medium text-on-primary-container')}
-            >
-              {sentence}{' '}
-            </span>
+            <Fragment key={position}>
+              {usingAudio ? (
+                // Bấm vào một câu thì phát từ đầu câu đó (chỉ có với tệp tạo sẵn vì biết mốc từng câu).
+                <button
+                  type="button"
+                  onClick={() => seek(position)}
+                  aria-current={position === index ? 'true' : undefined}
+                  className={cn(
+                    'inline rounded-xs text-left hover:bg-surface-container-low',
+                    position === index && 'bg-primary-container font-medium text-on-primary-container hover:bg-primary-container',
+                  )}
+                >
+                  {sentence}
+                </button>
+              ) : (
+                <span
+                  aria-current={position === index ? 'true' : undefined}
+                  className={cn('rounded-xs', position === index && 'bg-primary-container font-medium text-on-primary-container')}
+                >
+                  {sentence}
+                </span>
+              )}{' '}
+            </Fragment>
           ))}
         </p>
         <div className="flex flex-wrap items-center gap-3">
@@ -105,7 +148,8 @@ function Narrator({ summary }: { summary: PublicSummary }) {
           </fieldset>
         </div>
         <output className="block type-label text-on-surface-variant">
-          {status === 'idle' ? t.summary.ready(sentences.length) : t.summary.reading(index + 1, sentences.length)} · {t.summary.deviceVoice}
+          {status === 'idle' ? t.summary.ready(sentences.length) : t.summary.reading(index + 1, sentences.length)}
+          {!usingAudio && ` · ${t.summary.deviceVoice}`}
         </output>
       </div>
     </div>
