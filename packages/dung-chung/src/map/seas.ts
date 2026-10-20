@@ -56,6 +56,15 @@ export const VIETNAM_BOUNDS: [[number, number], [number, number]] = [
 ];
 
 /**
+ * Khung tọa độ lãnh thổ và vùng biển Việt Nam (đất liền, hai quần đảo và vùng biển quanh), dùng để xét một vị trí có ở Việt Nam
+ * không (vd. chỉ đường: ngoài khung thì không hỏi máy chủ). Không dùng làm giới hạn kéo bản đồ.
+ */
+export const VIETNAM_TERRITORY_BOUNDS: [[number, number], [number, number]] = [
+  [5.5, 99.5],
+  [24.5, 121.0],
+];
+
+/**
  * Giới hạn không gian di chuyển bản đồ, rộng hơn lãnh thổ một khoảng (ngoài lãnh thổ đã bị lớp che phủ nên không thấy gì khác).
  * Phải đủ rộng để khung nhìn cả nước của trang Bản đồ (có chừa thanh bộ lọc ở trên và thẻ ghi chú ở góc dưới trái, tâm bản đồ lệch
  * về tây nam) không chạm mép: chạm mép thì Leaflet ép tâm bản đồ trở lại và phần chừa không còn tác dụng.
