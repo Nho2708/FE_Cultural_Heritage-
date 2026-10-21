@@ -25,9 +25,9 @@ export default function ChooseMode() {
 
   return (
     <Screen style={{ paddingTop: insets.top + 24 }}>
-      {/* Huy hiệu không có chữ nên tên "DiViet" viết ngay dưới (không dịch theo ngôn ngữ); huy hiệu chỉ là hình trang trí. */}
+      {/* Biểu tượng không có chữ nên tên "DiViet" viết ngay dưới (không dịch theo ngôn ngữ); biểu tượng chỉ là hình trang trí. */}
       <View style={styles.brand}>
-        <Image source={require('../assets/images/huy-hieu.png')} accessible={false} style={styles.logo} resizeMode="contain" />
+        <Image source={require('../assets/images/bieu-tuong.png')} accessible={false} style={styles.logo} resizeMode="contain" />
         <Txt variant="title" color={theme.color.primary} style={styles.brandName}>
           DiViet
         </Txt>
@@ -67,6 +67,6 @@ export default function ChooseMode() {
 const styles = StyleSheet.create({
   card: { padding: 16 },
   brand: { alignItems: 'center', gap: 8 },
-  logo: { width: 112, height: 112 },
+  logo: { width: 140, aspectRatio: 1.4 },
   brandName: { textAlign: 'center' },
 });

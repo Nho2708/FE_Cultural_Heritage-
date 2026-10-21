@@ -1,66 +1,44 @@
-import { useState, type CSSProperties } from 'react';
-import gateLayerSrc from '../assets/brand/huy-hieu-lop-cong-400.png';
 import { cn } from '../cn';
 import { BRAND_NAME, BrandLogo } from './BrandLogo';
+import { BRAND_MARK_FULL } from './brandMark';
 import { usePrefersReducedMotion } from './motion';
 
-// Huy hiệu "DiViet" chuyển động khi vào trang (đoạn "Logo vào" của kế hoạch chuyển động giới thiệu), dựng từ
-// ảnh logo đã tách lớp vì logo chưa có bản vector:
-//   0–400 ms     vòng vàng tự vẽ theo chiều kim đồng hồ từ đỉnh (nét SVG), vành xanh than hiện mờ dần;
-//   200–700 ms   đĩa kem phóng từ 92% lên 100% và hiện dần;
-//   500–1400 ms  cổng lầu mọc lên từ bậc thềm theo năm dải ngang, mỗi dải lệch 120 ms, mái trên "đáp" nhẹ;
-//   tới 1800 ms  giữ yên. Chạy một lần, không lặp.
-// Huy hiệu không còn chữ: tên "DiViet" do trang viết cạnh huy hiệu khi cần.
-// Chuyển động chỉ bắt đầu khi ảnh lớp cổng đã tải (hoặc tải lỗi), để cổng không hiện muộn giữa chừng.
-// Người dùng bật giảm chuyển động thì hiện ảnh huy hiệu tĩnh. Kiểu và khung thời gian ở styles/chuyen-dong.css.
-
-/** Năm dải ngang của cổng lầu, từ dưới lên: [mép trên, mép dưới] theo phần trăm cạnh huy hiệu. */
-const TIERS: ReadonlyArray<readonly [number, number]> = [
-  [65.5, 100], // bậc thềm và thân dưới
-  [57.1, 65.5], // mái dưới
-  [49.6, 57.1], // thân giữa và lan can
-  [41.6, 49.6], // mái giữa
-  [0, 41.6], // mái trên
-];
-
-/** Các dải chồng lên nhau 0,6% để mép cắt không để lộ đường kẻ mảnh. */
-const OVERLAP = 0.6;
+// Biểu tượng "DiViet" chuyển động khi vào trang (đoạn "Logo vào" của kế hoạch chuyển động giới thiệu), dựng từ bốn phần
+// của biểu tượng vector. Chạy một lần khi hiện ra, khoảng 1,1 giây rồi giữ yên:
+//   0–450 ms     hai trang sách mở ra từ gáy sách (phóng ngang từ 15% lên 100%), hiện dần trong 200 ms đầu;
+//   250–850 ms   mái đình từ trên rơi xuống, vượt nhẹ rồi về chỗ;
+//   550–1050 ms  nóc rơi xuống cùng kiểu, trễ hơn mái.
+// Người dùng bật giảm chuyển động thì hiện biểu tượng tĩnh. Kiểu và khung thời gian ở styles/chuyen-dong.css.
 
 export interface AnimatedLogoProps {
-  /** Cạnh huy hiệu theo px. Bỏ trống để đặt cạnh bằng lớp CSS (đổi cỡ theo bề rộng màn hình). */
+  /** Chiều cao theo px. Bỏ trống để đặt chiều rộng bằng lớp CSS (đổi cỡ theo bề rộng màn hình), chiều cao theo tỉ lệ hình. */
   size?: number;
-  /** Có tên thương hiệu bằng chữ ngay cạnh thì để true: huy hiệu không đọc lên lần nữa. */
+  /** Có tên thương hiệu bằng chữ ngay cạnh thì để true: biểu tượng không đọc lên lần nữa. */
   decorative?: boolean;
+  /** Luôn dùng bộ màu cho nền tối (khối nền xanh than cố định), bất kể giao diện đang chọn. */
+  onDark?: boolean;
   className?: string;
 }
 
-export function AnimatedLogo({ size, decorative = false, className }: AnimatedLogoProps) {
+export function AnimatedLogo({ size, decorative = false, onDark = false, className }: AnimatedLogoProps) {
   const reduced = usePrefersReducedMotion();
-  const [loaded, setLoaded] = useState(false);
-  const markLoaded = () => setLoaded(true);
-  if (reduced) return <BrandLogo variant="badge" size={size ?? 160} decorative={decorative} className={className} />;
+  if (reduced) return <BrandLogo variant="badge" size={size ?? 112} decorative={decorative} onDark={onDark} className={className} />;
 
   const label = decorative ? { 'aria-hidden': true } : { role: 'img', 'aria-label': BRAND_NAME };
   return (
-    <span {...label} data-logo-motion={loaded ? 'ready' : 'loading'} className={cn('dsv-logo-motion', className)} style={size === undefined ? undefined : { width: size, height: size }}>
-      <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false" className="dsv-logo-motion__ring">
-        <circle cx="50" cy="50" r="48.4" className="dsv-logo-motion__navy" />
-        <circle cx="50" cy="50" r="48.9" pathLength={1} transform="rotate(-90 50 50)" className="dsv-logo-motion__gold" />
-      </svg>
-      <span aria-hidden="true" className="dsv-logo-motion__disc" />
-      {TIERS.map(([top, bottom], index) => (
-        <img
-          key={top}
-          src={gateLayerSrc}
-          alt=""
-          aria-hidden="true"
-          decoding="async"
-          onLoad={index === 0 ? markLoaded : undefined}
-          onError={index === 0 ? markLoaded : undefined}
-          className={cn('dsv-logo-motion__tier', index === TIERS.length - 1 && 'dsv-logo-motion__tier--roof')}
-          style={{ '--tier': index, clipPath: `inset(${Math.max(0, top - OVERLAP)}% 0 ${100 - bottom}% 0)` } as CSSProperties}
-        />
+    <svg
+      {...label}
+      focusable="false"
+      viewBox={BRAND_MARK_FULL.viewBox}
+      width={size === undefined ? undefined : Math.round(size * BRAND_MARK_FULL.aspect * 100) / 100}
+      height={size}
+      data-logo-motion="play"
+      style={{ aspectRatio: BRAND_MARK_FULL.aspect }}
+      className={cn('dsv-brand-mark dsv-logo-motion shrink-0', onDark && 'dsv-brand-mark--on-dark', className)}
+    >
+      {BRAND_MARK_FULL.parts.map((part) => (
+        <path key={part.id} d={part.d} className={cn(`dsv-brand-mark__${part.role}`, `dsv-logo-motion__${part.id}`)} />
       ))}
-    </span>
+    </svg>
   );
 }
