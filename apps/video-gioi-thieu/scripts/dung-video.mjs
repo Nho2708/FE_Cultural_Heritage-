@@ -39,7 +39,7 @@ for (const v of viec.filter((v) => chon.length === 0 || chon.includes(v.id))) {
   console.log(`${v.id}: ${((Date.now() - batDau) / 1000).toFixed(0)} giây`);
 }
 
-// Ảnh bìa không chữ (dùng chung mọi ngôn ngữ): khung huy hiệu đầy đủ của đoạn logo, bản ngang và bản dọc, JPEG.
+// Ảnh bìa (dùng chung mọi ngôn ngữ, tên DiViet không dịch): khung cuối của đoạn logo, bản ngang và bản dọc, JPEG.
 if (chon.length === 0 || chon.includes('anh-bia')) {
   for (const [id, co] of [['logo-16x9', '1280x720'], ['logo-9x16', '720x1280']]) {
     chay(['remotion', 'still', 'src/index.ts', id, join(ra, `anh-bia.${co}.jpeg`), '--frame=80', '--scale=0.6667', '--image-format=jpeg', '--jpeg-quality=85', '--log=error']);

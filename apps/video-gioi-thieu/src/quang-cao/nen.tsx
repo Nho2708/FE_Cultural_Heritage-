@@ -4,7 +4,7 @@ import { MAU } from '../brand';
 
 /**
  * Nền thương hiệu: xanh than đậm, quầng vàng góc trên phải, quầng đỏ son góc dưới trái (giữ đúng nền video cũ).
- * Vòng tròn mảnh như vành huy hiệu không vẽ sẵn ở nền: cảnh nào cần thì đặt VongManh đúng chỗ để không cắt ngang chữ.
+ * Vòng tròn mảnh màu vàng không vẽ sẵn ở nền: cảnh nào cần thì đặt VongManh đúng chỗ để không cắt ngang chữ.
  * Thêm lớp hạt mịn khoảng 1,5% để chuyển màu không bị phân dải sau khi nén 8 bit.
  */
 export function NenThuongHieu({ children }: { children?: ReactNode }) {
@@ -36,7 +36,7 @@ export function HatMin({ doDam = 0.06 }: { doDam?: number }) {
   );
 }
 
-/** Vòng tròn mảnh màu vàng như vành huy hiệu, tâm (x, y), bán kính r (px). */
+/** Vòng tròn mảnh màu vàng, tâm (x, y), bán kính r (px). */
 export function VongManh({ x, y, r, doDam = 0.16 }: { x: number; y: number; r: number; doDam?: number }) {
   return <div style={{ position: 'absolute', left: x - r, top: y - r, width: r * 2, height: r * 2, borderRadius: '50%', border: `2px solid rgba(193,141,72,${doDam})` }} />;
 }

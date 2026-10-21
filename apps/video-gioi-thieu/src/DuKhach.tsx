@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
-import { AbsoluteFill, Html5Audio, Img, interpolate, Sequence, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
+import { AbsoluteFill, Html5Audio, interpolate, Sequence, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import kichBan from '../kich-ban/du-khach.json';
 import { FPS, MAU, PHONG_TIEU_DE, expoOut, mo, phong, type NgonNgu } from './brand';
 import { Canh, DienThoai, KhoiChu, LatMai, Nen, chonAnh, useVao, type ManHinh } from './khung';
-import { HuyHieu, LogoChuyenDong } from './Logo';
+import { BieuTuong, ChuDiViet, GOC_PHONG_LOGO, LogoChuyenDong } from './Logo';
 import { coNhac, viTri } from './vi-tri';
 
 type ChuCanh = [string, string];
@@ -16,7 +16,6 @@ export interface DuKhachProps {
 }
 
 const kep = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
-const NOI_DUNG_VI = new Set(['04-gan-ban', '05-ban-do', '06-chi-tiet', '10-dong-thoi-gian', '11-dong-thoi-gian-dai', '12-lich-su-goi-y', '03b-goi-y']);
 
 /** Video cho khách du lịch: bản ngang 60 giây hoặc bản dọc 45 giây, chữ theo một trong năm ngôn ngữ. */
 export function DuKhach({ ngonNgu, doc }: DuKhachProps) {
@@ -66,7 +65,7 @@ function NoiDungCanh({ id, dai, ngonNgu, chu, doc }: { id: string; dai: number; 
   const thuMuc = `man-hinh/du-khach/${ngonNgu}`;
   // CSDL demo chưa có bản dịch thật cho nội dung di sản (tên có tiền tố giữ chỗ như "[en] ..."), nên các ảnh nặng nội dung
   // của bản en/ko/zh/ja lấy từ bản tiếng Việt; thẻ kết ghi rõ điều này. Có bản dịch thật thì chụp lại và bỏ danh sách này.
-  const a = (...ten: string[]) => chonAnh(...ten.map((t) => `${NOI_DUNG_VI.has(t) ? 'man-hinh/du-khach/vi' : thuMuc}/${t}.png`));
+  const a = (...ten: string[]) => chonAnh(...ten.map((t) => `${thuMuc}/${t}.png`));
   const vt = viTri(ngonNgu);
   const caoDt = doc ? 1180 : 860;
   const [tieuDe, phu] = (chu[id] as ChuCanh | undefined) ?? ['', ''];
@@ -84,7 +83,7 @@ function NoiDungCanh({ id, dai, ngonNgu, chu, doc }: { id: string; dai: number; 
       const mo2 = interpolate(f, [84, dai], [1, 0], kep);
       return (
         <AbsoluteFill style={{ alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ transform: `scale(${zoom})`, transformOrigin: '50% 80%', opacity: mo2 }}>
+          <div style={{ transform: `scale(${zoom})`, transformOrigin: GOC_PHONG_LOGO, opacity: mo2 }}>
             <LogoChuyenDong canh={doc ? 760 : 600} />
           </div>
         </AbsoluteFill>
@@ -257,13 +256,13 @@ function SongAm() {
   );
 }
 
-/** Cổng lầu phẳng "dựng đứng" thành khối. */
+/** Biểu tượng nằm phẳng "dựng đứng" lên như một mô hình. */
 function CongDungLen() {
   const f = useCurrentFrame();
   const t = interpolate(f, [16, 50], [0, 1], { ...kep, easing: expoOut });
   return (
     <div style={{ marginTop: 40, perspective: 900, width: 300, height: 220 }}>
-      <Img src={staticFile('logo/lop-cong.png')} style={{ width: 300, height: 300, marginTop: -60, transform: `rotateX(${(1 - t) * 82}deg)`, transformOrigin: '50% 90%', opacity: 0.25 + 0.75 * t }} />
+      <BieuTuong rong={300} style={{ marginTop: 6, transform: `rotateX(${(1 - t) * 82}deg)`, transformOrigin: '50% 95%', opacity: 0.25 + 0.75 * t }} />
     </div>
   );
 }
@@ -283,12 +282,12 @@ function TrucThoiGian() {
   );
 }
 
-/** Thẻ kết: huy hiệu, tên, lời mời, ghi công. Không có mã QR, không ghi địa chỉ khi chưa có tên miền cố định. */
+/** Thẻ kết: logo (biểu tượng, chữ DiViet), lời mời, ghi công. Không có mã QR, không ghi địa chỉ khi chưa có tên miền cố định. */
 function TheKet({ chu, ngonNgu, doc }: { chu: BoChu; ngonNgu: NgonNgu; doc: boolean }) {
   const f = useCurrentFrame();
   const { width } = useVideoConfig();
   const p = phong(ngonNgu);
-  const [ten, loiMoi] = chu.ket as ChuCanh;
+  const [, loiMoi] = chu.ket as ChuCanh;
   const hh = interpolate(f, [0, 24], [0, 1], { ...kep, easing: expoOut });
   const a = useVao(10, 30);
   const b = useVao(18, 24);
@@ -297,9 +296,11 @@ function TheKet({ chu, ngonNgu, doc }: { chu: BoChu; ngonNgu: NgonNgu; doc: bool
   return (
     <AbsoluteFill style={{ alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 80px' }}>
       <div style={{ opacity: hh, transform: `scale(${0.9 + 0.1 * hh})` }}>
-        <HuyHieu canh={doc ? 420 : 340} />
+        <BieuTuong rong={doc ? 400 : 330} />
       </div>
-      <div style={{ ...a, marginTop: 36, fontFamily: PHONG_TIEU_DE, fontWeight: 700, fontSize: doc ? 96 : 88, color: MAU.kem }}>{ten}</div>
+      <div style={{ ...a, marginTop: 20 }}>
+        <ChuDiViet cao={doc ? 124 : 108} />
+      </div>
       <div style={{ ...b, marginTop: 18, maxWidth: width - 200, fontFamily: p.chu, fontWeight: 500, fontSize: doc ? 44 : 40, lineHeight: 1.45, color: '#fff' }}>{loiMoi}</div>
       <div style={{ ...c, marginTop: 48, fontFamily: p.chu, fontSize: doc ? 26 : 24, lineHeight: 1.6, color: 'rgba(223,207,182,0.78)' }}>
         {chu['ghi-cong'] as string}

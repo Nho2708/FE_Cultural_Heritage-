@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
-import { AbsoluteFill, Html5Audio, Img, interpolate, Sequence, staticFile, useCurrentFrame } from 'remotion';
+import { AbsoluteFill, Html5Audio, interpolate, Sequence, staticFile, useCurrentFrame } from 'remotion';
 import kichBan from '../kich-ban/nha-truong.json';
 import { FPS, MAU, PHONG_CHU, PHONG_TIEU_DE, expoOut, mo, phong } from './brand';
 import { Canh, DienThoai, KhoiChu, LatMai, Nen, TrinhDuyet, chonAnh, useVao, type ManMayTinh } from './khung';
-import { HuyHieu, LogoChuyenDong } from './Logo';
+import { BieuTuong, ChuDiViet, GOC_PHONG_LOGO, LogoChuyenDong } from './Logo';
 import { coNhac } from './vi-tri';
 import giongDoc from './giong-doc.json';
 import vungPhong from './vung-nha-truong.json';
@@ -85,7 +85,7 @@ function TrinhDuyetVao({ man: ds, rong = 1120 }: { man: ManMayTinh[]; rong?: num
   const vao = useVao(2, 50, 26);
   return (
     <div style={vao}>
-      <TrinhDuyet rong={rong} man={ds} ten="Vietnam Heritage" style={{ fontFamily: PHONG_CHU }} />
+      <TrinhDuyet rong={rong} man={ds} ten="DiViet" style={{ fontFamily: PHONG_CHU }} />
     </div>
   );
 }
@@ -97,7 +97,7 @@ function NoiDung({ id, dai }: { id: string; dai: number }) {
       const zoom = interpolate(f, [70, dai], [1, 7], { ...kep, easing: (t) => t * t * t });
       return (
         <AbsoluteFill style={{ alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ transform: `scale(${zoom})`, transformOrigin: '50% 80%', opacity: interpolate(f, [84, dai], [1, 0], kep) }}>
+          <div style={{ transform: `scale(${zoom})`, transformOrigin: GOC_PHONG_LOGO, opacity: interpolate(f, [84, dai], [1, 0], kep) }}>
             <LogoChuyenDong canh={600} />
           </div>
         </AbsoluteFill>
@@ -140,7 +140,7 @@ function NoiDung({ id, dai }: { id: string; dai: number }) {
   }
 }
 
-/** Câu hỏi mở đầu, các trang giáo án bay vào xếp thành chồng rồi hóa thành cổng lầu. */
+/** Câu hỏi mở đầu, các trang giáo án bay vào xếp thành chồng rồi hóa thành biểu tượng mái đình. */
 function CauHoi() {
   const f = useCurrentFrame();
   const [tieuDe, phu] = CHU['cau-hoi'] as ChuCanh;
@@ -176,10 +176,7 @@ function CauHoi() {
             </div>
           );
         })}
-        <Img
-          src={staticFile('logo/lop-cong.png')}
-          style={{ position: 'absolute', left: 50, top: -40, width: 420, height: 420, opacity: cong, transform: `translateY(${(1 - cong) * 60}px)` }}
-        />
+        <BieuTuong rong={420} style={{ position: 'absolute', left: 50, top: 60, opacity: cong, transform: `translateY(${(1 - cong) * 60}px)` }} />
       </div>
     </AbsoluteFill>
   );
@@ -287,7 +284,7 @@ function HaiNoi() {
 
 function TheKet() {
   const f = useCurrentFrame();
-  const [ten, loiMoi] = CHU.ket as ChuCanh;
+  const [, loiMoi] = CHU.ket as ChuCanh;
   const hh = interpolate(f, [0, 24], [0, 1], { ...kep, easing: expoOut });
   const a1 = useVao(10, 30);
   const b = useVao(18, 24);
@@ -295,9 +292,11 @@ function TheKet() {
   return (
     <AbsoluteFill style={{ alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 160px' }}>
       <div style={{ opacity: hh, transform: `scale(${0.9 + 0.1 * hh})` }}>
-        <HuyHieu canh={320} />
+        <BieuTuong rong={320} />
       </div>
-      <div style={{ ...a1, marginTop: 32, fontFamily: PHONG_TIEU_DE, fontWeight: 700, fontSize: 88, color: MAU.kem }}>{ten}</div>
+      <div style={{ ...a1, marginTop: 18 }}>
+        <ChuDiViet cao={106} />
+      </div>
       <div style={{ ...b, marginTop: 16, fontFamily: PHONG_CHU, fontWeight: 500, fontSize: 38, lineHeight: 1.45, color: '#fff' }}>{loiMoi}</div>
       <div style={{ ...c, marginTop: 44, fontFamily: PHONG_CHU, fontSize: 24, lineHeight: 1.6, color: 'rgba(223,207,182,0.78)' }}>{CHU['ghi-cong'] as string}</div>
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 10, backgroundColor: MAU.vang, opacity: mo(Math.min(1, f / 20)) }} />
