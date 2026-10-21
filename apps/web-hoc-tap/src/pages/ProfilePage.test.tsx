@@ -48,5 +48,7 @@ describe('Trang hồ sơ học sinh — ProfilePage', () => {
     expect(screen.getByRole('heading', { level: 2, name: 'Thông tin lớp học' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Xem tiến độ' })).toHaveAttribute('href', '/tien-do');
     expect(screen.getByRole('link', { name: /Đổi mật khẩu/ })).toHaveAttribute('href', '/doi-mat-khau');
+    expect(screen.getByText('Bài học')).toBeInTheDocument();
+    expect(screen.getByText('Bài kiểm tra chờ')).toBeInTheDocument();
   });
 });

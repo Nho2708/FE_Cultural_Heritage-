@@ -41,6 +41,7 @@ describe('Tiến độ của em — cấp 2 và 3', () => {
     expect(screen.getByText('77,5%')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Điểm theo thời gian' })).toBeInTheDocument();
     expect(document.querySelector('svg title')?.textContent).toContain('Kiểm tra 10 phút: Văn Miếu: 62,5%');
+    expect(document.querySelector('#scoreAreaGradient')).toBeInTheDocument();
   });
 
   it('tab Lịch sử bài làm: bảng bài, điểm, ngày nộp, trạng thái, liên kết xem kết quả', async () => {

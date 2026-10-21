@@ -87,6 +87,16 @@ describe('Gợi ý cho em — Trang học cấp 2', () => {
     expect(screen.queryByText('Di sản nên ôn')).not.toBeInTheDocument();
   });
 
+  it('cấp 2 và cấp 3: chuẩn hóa lời khen phù hợp lứa tuổi, không dùng từ ngữ trẻ con', async () => {
+    const defaultPraise = 'Em làm đúng hết rồi, giỏi quá! Em hãy thử bài mới nhé.';
+    const recs = open(2, recommendationsOf(2, { reviewPraise: defaultPraise, relatedHeritages: [heritage(21, 'Nhã nhạc', 'Cùng tỉnh')] }));
+    expect(await screen.findByText('Em đã hoàn thành tốt các câu hỏi, không có phần cần ôn lại. Hãy tiếp tục làm bài mới nhé.')).toBeInTheDocument();
+    recs.view.unmount();
+
+    open(3, recommendationsOf(3, { reviewPraise: defaultPraise, relatedHeritages: [heritage(21, 'Nhã nhạc', 'Cùng tỉnh')] }));
+    expect(await screen.findByText('Đã nắm vững toàn bộ kiến thức di sản trong bài kiểm tra. Không có nội dung cần ôn tập thêm.')).toBeInTheDocument();
+  });
+
   it('chưa có lượt nào: lời mời nhập mã bài học; không có gợi ý gì và không có lời mời thì không hiện khối', async () => {
     const first = open(2, recommendationsOf(2, { message: 'Hãy nhập mã bài học thầy cô đưa để nhận gợi ý.' }));
     expect(await screen.findByText('Hãy nhập mã bài học thầy cô đưa để nhận gợi ý.')).toBeInTheDocument();
