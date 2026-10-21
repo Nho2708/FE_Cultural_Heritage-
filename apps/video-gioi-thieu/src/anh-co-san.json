@@ -1,4 +1,13 @@
 [
+  "anh-di-tich/anh-dau-hoi-an.jpg",
+  "anh-di-tich/den-long-song-dem.jpg",
+  "anh-di-tich/ngo-mon-hue.jpg",
+  "anh-di-tich/nguon.json",
+  "anh-di-tich/pho-den-long.jpg",
+  "anh-di-tich/rong-hoi-quan.jpg",
+  "anh-di-tich/thanh-nha-ho.jpg",
+  "ban-do/hoi-an.json",
+  "ban-do/viet-nam.json",
   "giong/nha-truong/ba-cap.wav",
   "giong/nha-truong/cau-hoi.wav",
   "giong/nha-truong/hai-noi.wav",
@@ -8,11 +17,6 @@
   "giong/nha-truong/lop-hoc.wav",
   "giong/nha-truong/soan-bai.wav",
   "giong/nha-truong/vai-tro.wav",
-  "logo/bieu-tuong.png",
-  "logo/huy-hieu.png",
-  "logo/huy-hieu.svg",
-  "logo/lop-chu.png",
-  "logo/lop-cong.png",
   "man-hinh/du-khach/danh-sach.json",
   "man-hinh/du-khach/en/01-chon-ngon-ngu.png",
   "man-hinh/du-khach/en/02-trang-chu.png",
@@ -121,8 +125,11 @@
   "man-hinh/nha-truong/18-nha-truong.png",
   "man-hinh/nha-truong/18b-goi-mien-phi.png",
   "man-hinh/nha-truong/danh-sach.json",
+  "mo-hinh/cao-dinh-hue.glb",
+  "mo-hinh/nha-hoi-an.glb",
   "nhac/du-khach-45s.wav",
   "nhac/du-khach-60s.wav",
   "nhac/logo-3s.wav",
-  "nhac/nha-truong-90s.wav"
+  "nhac/nha-truong-90s.wav",
+  "nhac/quang-cao-30s.wav"
 ]

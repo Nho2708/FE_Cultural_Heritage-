@@ -1,9 +1,10 @@
 import { AbsoluteFill, useCurrentFrame } from 'remotion';
-import { MAU, PHONG_CHU, PHONG_TIEU_DE } from '../../brand';
+import { MAU, PHONG_CHU } from '../../brand';
 import type { ChuQuangCao } from '../chuoi';
 import { DO_TRUOT_CHU, MOC, tienDo } from '../nhip';
 import { VongManh } from '../nen';
-import { HuyHieuVao } from '../ui/HuyHieuVao';
+import { ChuDiViet, TI_LE_BIEU_TUONG } from '../../Logo';
+import { BieuTuongVao } from '../ui/BieuTuongVao';
 import { MaQR } from '../ui/MaQR';
 
 const CANH_HUY_HIEU = 400;
@@ -16,7 +17,7 @@ const CANH_THE_QR = 440;
 const truot = (t: number) => ({ opacity: t, transform: `translateY(${(1 - t) * DO_TRUOT_CHU}px)` });
 
 /**
- * Thẻ kết: huy hiệu dựng lên rồi đứng yên tới hết video, không đổi sang ảnh nào. Tên, dòng phụ, mã QR và địa chỉ vào ngay đầu thẻ
+ * Thẻ kết: biểu tượng dựng lên rồi đứng yên tới hết video, không đổi sang ảnh nào. Tên, dòng phụ, mã QR và địa chỉ vào ngay đầu thẻ
  * rồi đứng yên. Không có chữ nào trong 420 px dưới cùng (vùng chữ và nút của mạng xã hội).
  */
 export function TheKet({ chu }: { chu: ChuQuangCao['theKet'] }) {
@@ -27,11 +28,12 @@ export function TheKet({ chu }: { chu: ChuQuangCao['theKet'] }) {
     <AbsoluteFill>
       <VongManh x={540} y={DINH_HUY_HIEU + CANH_HUY_HIEU / 2} r={CANH_HUY_HIEU * 0.75} />
       <VongManh x={540} y={DINH_HUY_HIEU + CANH_HUY_HIEU / 2} r={CANH_HUY_HIEU * 0.98} doDam={0.08} />
-      <div style={{ position: 'absolute', top: DINH_HUY_HIEU, left: (1080 - CANH_HUY_HIEU) / 2, width: CANH_HUY_HIEU, height: CANH_HUY_HIEU }}>
-        <HuyHieuVao f={f} canh={CANH_HUY_HIEU} moc={m} />
+      <div style={{ position: 'absolute', top: DINH_HUY_HIEU + (CANH_HUY_HIEU - CANH_HUY_HIEU / TI_LE_BIEU_TUONG) / 2, left: (1080 - CANH_HUY_HIEU) / 2 }}>
+        <BieuTuongVao f={f} rong={CANH_HUY_HIEU} moc={m} />
       </div>
-      <div style={{ position: 'absolute', top: 668 + DOI, left: 0, right: 0, textAlign: 'center', fontFamily: PHONG_TIEU_DE, fontWeight: 700, fontSize: 92, lineHeight: 1.1, color: MAU.kem, whiteSpace: 'nowrap', ...truot(tienDo(f, m.ten)) }}>
-        {chu.ten}
+      {/* Tên là chữ của logo (hình), chu.ten chỉ dùng cho mô tả bài đăng. */}
+      <div style={{ position: 'absolute', top: 650 + DOI, left: 0, right: 0, display: 'flex', justifyContent: 'center', ...truot(tienDo(f, m.ten)) }}>
+        <ChuDiViet cao={128} cham={tienDo(f, m.cham)} />
       </div>
       <div style={{ position: 'absolute', top: 790 + DOI, left: 0, right: 0, textAlign: 'center', fontFamily: PHONG_CHU, fontWeight: 500, fontSize: 44, letterSpacing: 1, color: 'rgba(255,255,255,0.92)', whiteSpace: 'nowrap', ...truot(tienDo(f, m.phu)) }}>
         {chu.phu}

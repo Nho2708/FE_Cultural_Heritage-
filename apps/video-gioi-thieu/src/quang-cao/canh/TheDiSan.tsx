@@ -2,10 +2,9 @@ import type { ReactNode } from 'react';
 import { AbsoluteFill } from 'remotion';
 import { MAU, PHONG_CHU, PHONG_TIEU_DE } from '../../brand';
 import type { ChuQuangCao } from '../chuoi';
-import { MOC } from '../nhip';
 import { AnhDiTich } from '../thanh-phan';
 import { BieuTuongKhoi, BieuTuongTaiNghe, BieuTuongTrang } from '../ui/BieuTuong';
-import { HuyHieuVao } from '../ui/HuyHieuVao';
+import { BieuTuong, NEN_SANG } from '../../Logo';
 import { MAU_APP } from '../ui/mau-app';
 
 // Thẻ di sản "Gần bạn" mở thành trang chi tiết, dùng chung cho cảnh bản đồ trong máy và cảnh trang chi tiết: thẻ bắt đầu mở ở cuối cảnh trước,
@@ -39,15 +38,15 @@ function MuiTen({ canh, mau }: { canh: number; mau: string }) {
   );
 }
 
-/** Thanh trên của web học tập: nút trình đơn, huy hiệu, nút đổi giao diện sáng tối, nút đăng nhập của học sinh. */
+/** Thanh trên của web học tập: nút trình đơn, biểu tượng (bản nhỏ), nút đổi giao diện sáng tối, nút đăng nhập của học sinh. */
 function ThanhTren({ k, dangNhap }: { k: number; dangNhap: string }) {
   return (
     <div style={{ position: 'absolute', left: 0, top: 0, width: MAN.rong * k, height: DAU_TRANG.cao * k, backgroundColor: '#fff', boxShadow: `0 ${k}px 0 rgba(42,35,28,0.08)` }}>
       <svg width={24 * k} height={24 * k} viewBox="0 0 24 24" fill="none" stroke="rgba(42,35,28,0.54)" strokeWidth={2} strokeLinecap="round" style={{ position: 'absolute', left: 16 * k, top: 16 * k }}>
         <path d="M4 7h16M4 12h16M4 17h16" />
       </svg>
-      <div style={{ position: 'absolute', left: 64 * k, top: 12 * k }}>
-        <HuyHieuVao f={999} canh={32 * k} moc={MOC.theKet} />
+      <div style={{ position: 'absolute', left: 64 * k, top: 14 * k }}>
+        <BieuTuong rong={38 * k} nho mau={NEN_SANG} />
       </div>
       <div style={{ position: 'absolute', left: 155.3 * k, top: 6 * k, width: 44 * k, height: 44 * k, boxSizing: 'border-box', borderRadius: 8 * k, border: `${k}px solid #8A7866`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <svg width={22 * k} height={22 * k} viewBox="0 0 24 24" fill="none" stroke={MAU_CHU_TRANG} strokeWidth={2} strokeLinecap="round">

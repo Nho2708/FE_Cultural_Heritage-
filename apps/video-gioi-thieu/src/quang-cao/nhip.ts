@@ -65,7 +65,8 @@ export const MOC = {
   moApp: {
     nenNhoe: [0, 12],
     mayTroi: [0, 15],
-    logo: { vong: [6, 16], dia: [8, 18], tangCong: { batDau: 10, lech: 2, dai: 8 }, chuCung: [14, 26] },
+    /** Màn hình chờ của app: hai trang sách mở, mái rồi bờ nóc hạ xuống. */
+    logo: { sach: [6, 16], mai: [9, 19], noc: [12, 22] },
     /** Màn hình chuyển sang bản đồ cả nước, camera xuyên vào màn hình, rồi bản đồ lao xuống Hội An cho tới đúng tầm đầu cảnh sau. */
     banDoHien: [24, 30],
     xuyenMan: [30, 44],
@@ -93,23 +94,16 @@ export const MOC = {
   hieuRoi: { phong: [0, 74], chu: [4, 16], vongSang: [10, 40], toiDan: [60, 74] },
   theKet: {
     khoiQr: [0, 12],
-    vong: [0, 12],
-    dia: [3, 15],
-    tangCong: { batDau: 7, lech: 3, dai: 10 },
-    chuCung: [27, 45],
+    sach: [0, 12],
+    mai: [6, 18],
+    noc: [12, 24],
     ten: [12, 24],
+    /** Hai chấm chữ i của chữ DiViet nảy lên sau cùng. */
+    cham: [24, 34],
     phu: [16, 28],
     nhacTat: [105, 134],
   },
 } as const;
-
-/** Mốc dựng huy hiệu: vòng vàng, đĩa kem, năm tầng cổng lệch nhịp, chữ chạy theo cung. */
-export interface MocHuyHieu {
-  vong: Doan;
-  dia: Doan;
-  tangCong: { batDau: number; lech: number; dai: number };
-  chuCung: Doan;
-}
 
 /**
  * Tầm nhìn bản đồ: số mét trên một điểm ảnh lúc bắt đầu phóng (khung rộng khoảng 3 km) và hệ số phóng tới cuối cảnh.

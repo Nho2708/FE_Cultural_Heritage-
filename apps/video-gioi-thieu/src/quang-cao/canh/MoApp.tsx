@@ -2,7 +2,9 @@ import { AbsoluteFill, useCurrentFrame } from 'remotion';
 import { MAU } from '../../brand';
 import { DI, MOC, tienDo } from '../nhip';
 import { BanDo, type DuLieuBanDo, type DuLieuQuocGia } from '../ui/BanDo';
-import { HuyHieuVao } from '../ui/HuyHieuVao';
+import { MAU_LOGO } from '../../logo-duong-net';
+import { NEN_SANG } from '../../Logo';
+import { BieuTuongVao } from '../ui/BieuTuongVao';
 import { KhungMay, coMay } from '../ui/KhungMay';
 import { MAY_MO_APP, tamNhin } from './ban-do-chung';
 import { ChiTietBiAn } from './ChiTietBiAn';
@@ -19,7 +21,7 @@ function metCaNuoc(qg: DuLieuQuocGia, rongMan: number): number {
 }
 
 /**
- * Cảnh mở app: nền ba dải ảnh nhòe dần, điện thoại lớn trồi lên (mép dưới bị cắt) với màn hình chờ có huy hiệu dựng lên,
+ * Cảnh mở app: nền ba dải ảnh nhòe dần, điện thoại lớn trồi lên (mép dưới bị cắt) với màn hình chờ có biểu tượng dựng lên,
  * màn hình chuyển sang bản đồ cả nước Việt Nam (kể cả Hoàng Sa, Trường Sa), camera xuyên vào màn hình cho tới khi bản đồ che kín khung,
  * rồi bản đồ lao xuống Hội An (phóng theo hàm mũ) tới đúng tầm nhìn đầu cảnh bản đồ tràn khung. Lớp đường phố hiện dần ở chặng cuối.
  */
@@ -51,8 +53,9 @@ export function MoApp({ chuCanhTruoc, banDo, quocGia }: { chuCanhTruoc: string; 
       </AbsoluteFill>
       <AbsoluteFill style={{ transform: `translateY(${doiY}px) scale(${phong})`, transformOrigin: `540px ${tamManY}px` }}>
         <KhungMay rongMan={MAY_MO_APP.rongMan} style={{ left: trai, top: dinh }}>
-          <AbsoluteFill style={{ backgroundColor: MAU.navy, alignItems: 'center', justifyContent: 'center', opacity: 1 - tBanDo }}>
-            <HuyHieuVao f={f} canh={MAY_MO_APP.rongMan * 0.46} moc={m.logo} />
+          {/* Màn hình chờ của app: nền kem, biểu tượng màu cho nền sáng (như app thật). */}
+          <AbsoluteFill style={{ backgroundColor: MAU_LOGO.kem, alignItems: 'center', justifyContent: 'center', opacity: 1 - tBanDo }}>
+            <BieuTuongVao f={f} rong={MAY_MO_APP.rongMan * 0.5} moc={m.logo} mau={NEN_SANG} />
           </AbsoluteFill>
           {tBanDo > 0 ? (
             <AbsoluteFill style={{ opacity: tBanDo }}>

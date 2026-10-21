@@ -2,7 +2,7 @@
   "name": "@dsvhvn/video-gioi-thieu",
   "private": true,
   "version": "0.1.0",
-  "description": "Video giới thiệu Vietnam Heritage dựng bằng Remotion: đoạn logo, video cho khách du lịch (5 ngôn ngữ) và video cho nhà trường. Không triển khai; video xuất ra không đưa vào git.",
+  "description": "Video giới thiệu DiViet dựng bằng Remotion: đoạn logo, video cho khách du lịch (5 ngôn ngữ) và video cho nhà trường. Không triển khai; video xuất ra không đưa vào git.",
   "type": "module",
   "scripts": {
     "studio": "remotion studio src/index.ts",
