@@ -14,7 +14,7 @@ interface PageHeaderProps {
 export function PageHeader({ title, description, actions, before }: PageHeaderProps) {
   return (
     <header className="flex flex-col gap-4 dsvmd:flex-row dsvmd:items-end dsvmd:justify-between">
-      <title>{`${title} · Vietnam Heritage`}</title>
+      <title>{`${title} · DiViet`}</title>
       <div className="min-w-0">
         {before && <div className="mb-2">{before}</div>}
         <h1 className="type-h1 text-on-surface">{title}</h1>

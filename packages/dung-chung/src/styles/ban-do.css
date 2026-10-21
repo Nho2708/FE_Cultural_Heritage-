@@ -1,11 +1,20 @@
 /*
  * Bản đồ di sản (Leaflet). Màu, bo góc và bóng lấy từ token nên bản đồ theo bộ giao diện mặc định như mọi trang khám phá.
- * Ghim và nhóm ghim là divIcon do leafletBase.ts của gói dùng chung dựng; nhãn quần đảo nằm trong lớp riêng "vung-bien".
+ * Ghim và nhóm ghim là divIcon do leafletBase.ts của gói dùng chung dựng; nhãn quần đảo nằm trong lớp riêng "vung-bien";
+ * lớp che ngoài lãnh thổ Việt Nam (landMask.ts) nằm trong lớp "lop-che", cùng màu với nền khung bản đồ.
  */
 .leaflet-container {
   font-family: var(--dsv-font-sans);
   font-size: var(--dsv-text-body-s-size);
   background: var(--dsv-color-surface-container-low);
+}
+
+.dsv-land-mask {
+  fill: var(--dsv-color-surface-container-low);
+  fill-opacity: 1;
+  stroke: var(--dsv-color-outline);
+  stroke-width: 1;
+  stroke-opacity: 0.7;
 }
 
 .dsv-pin,
@@ -58,11 +67,14 @@
   border: 0;
 }
 
+/* Nhãn quần đảo dài thì xuống dòng (tên quần đảo một dòng, "(Việt Nam)" dòng dưới) để không tràn khỏi khung ở khổ điện thoại. */
 .dsv-map-label {
   display: block;
   width: max-content;
+  max-width: 11em;
   transform: translate(-50%, -50%);
-  white-space: nowrap;
+  text-align: center;
+  white-space: normal;
   color: var(--dsv-color-on-surface);
   font-size: var(--dsv-text-label-size);
   line-height: var(--dsv-text-label-line-height);
@@ -153,4 +165,20 @@
 
 .leaflet-control-attribution a {
   color: var(--dsv-color-link);
+}
+
+/* Tuyến đường tới di sản (routeLayer.ts): viền sáng dưới nét màu chủ đạo, chấm xuất phát của khách. */
+.dsv-route-casing {
+  stroke: var(--dsv-color-surface);
+  fill: none;
+}
+
+.dsv-route-line {
+  stroke: var(--dsv-color-primary);
+  fill: none;
+}
+
+.dsv-route-start {
+  stroke: var(--dsv-color-surface);
+  fill: #1a56db; /* cùng màu chấm "Gần bạn" trên bản đồ di sản, khác màu nét tuyến */
 }

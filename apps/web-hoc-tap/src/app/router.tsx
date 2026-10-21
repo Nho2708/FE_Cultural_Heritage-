@@ -3,6 +3,7 @@ import { createBrowserRouter, type RouteObject } from 'react-router';
 import { RequireAccess } from '../access/RequireAccess';
 import { SCREENS, screen, type ScreenKey } from '../access/screens';
 import { FullScreenLayout, MainLayout, RootLayout } from '../components/layout/Layouts';
+import { EmbedDirectionsPage } from '../embed/EmbedDirectionsPage';
 import { EmbedLayout } from '../embed/EmbedLayout';
 import { EmbedIntroVideoPage } from '../embed/EmbedIntroVideoPage';
 import { EmbedMapPage } from '../embed/EmbedMapPage';
@@ -76,13 +77,14 @@ export const routes: RouteObject[] = [
         children: [...screenRoutes((fullScreen) => !fullScreen), { path: '*', element: <NotFoundPage /> }],
       },
       { element: <FullScreenLayout />, children: screenRoutes((fullScreen) => fullScreen) },
-      // Trang nhúng cho app mobile (WebView): bản đồ, trình xem 3D và video giới thiệu, công khai, không thanh điều hướng.
+      // Trang nhúng cho app mobile (WebView): bản đồ, trình xem 3D, video giới thiệu và chỉ đường, công khai, không thanh điều hướng.
       {
         element: <EmbedLayout />,
         children: [
           { path: 'nhung/ban-do', element: <EmbedMapPage /> },
           { path: 'nhung/video-gioi-thieu', element: <EmbedIntroVideoPage /> },
           { path: 'nhung/3d/:slug', element: <EmbedModelPage /> },
+          { path: 'nhung/chi-duong/:slug', element: <EmbedDirectionsPage /> },
         ],
       },
     ],

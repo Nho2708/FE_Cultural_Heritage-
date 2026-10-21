@@ -2,12 +2,12 @@ import type { GuestActivityType, LanguageCode, SimilarityFactor } from '@dsvhvn/
 
 // Chữ giao diện của phần công khai (khám phá di sản) bằng tiếng Việt: bản gốc để dịch sang bốn ngôn ngữ còn lại (en.ts, ko.ts,
 // zh-Hans.ts, ja.ts phải có đúng các khóa của tệp này, kiểm bằng kiểu `Strings`). Khu học của học sinh và web quản trị chỉ có
-// tiếng Việt và không đi qua tệp này. Tên riêng (Vietnam Heritage, UNESCO, OpenStreetMap) giữ nguyên ở mọi ngôn ngữ.
+// tiếng Việt và không đi qua tệp này. Tên riêng (DiViet, UNESCO, OpenStreetMap) giữ nguyên ở mọi ngôn ngữ.
 
 export const vi = {
-  brandName: 'Vietnam Heritage',
+  brandName: 'DiViet',
   brandTagline: 'Di sản văn hóa Việt Nam',
-  documentTitle: (page: string) => `${page} · Vietnam Heritage`,
+  documentTitle: (page: string) => `${page} · DiViet`,
 
   common: {
     close: 'Đóng',
@@ -58,14 +58,14 @@ export const vi = {
     android: 'Tải app cho Android',
     about: 'Nền tảng để trường học và giáo viên tạo bài học, bài kiểm tra về di sản Việt Nam; ai cũng có thể khám phá di sản.',
     source: 'Nội dung di sản tham khảo từ Cục Di sản văn hóa (dsvh.gov.vn). Ảnh từ Wikimedia Commons, ghi công theo từng ảnh.',
-    aboutColumn: 'Về Vietnam Heritage',
+    aboutColumn: 'Về DiViet',
     intro: 'Giới thiệu',
     forSchools: 'Dành cho nhà trường',
-    copyright: '© 2026 Vietnam Heritage',
+    copyright: '© 2026 DiViet',
   },
 
   home: {
-    title: 'Vietnam Heritage',
+    title: 'DiViet',
     kicker: 'DI SẢN VĂN HÓA VIỆT NAM',
     heroTitle: 'Khám phá di sản Việt Nam',
     heroText: (total: string | null) =>
@@ -92,7 +92,7 @@ export const vi = {
     circleCount: (n: string) => `${n} DI SẢN`,
     appKicker: 'ỨNG DỤNG DI ĐỘNG',
     appTitle: 'Một app, hai chế độ: tham quan và học tập',
-    appText: 'App Vietnam Heritage trên điện thoại có hai chế độ, chọn ngay lần đầu mở app.',
+    appText: 'App DiViet trên điện thoại có hai chế độ, chọn ngay lần đầu mở app.',
     appVisitorTitle: 'Khách tham quan',
     appVisitorText: 'Bản đồ di sản và "Gần bạn", dòng thời gian, mô hình 3D, nghe thuyết minh bằng 5 ngôn ngữ. Không cần tài khoản.',
     appStudentTitle: 'Học sinh',
@@ -207,6 +207,32 @@ export const vi = {
     present: 'nay',
   },
 
+  directions: {
+    button: 'Chỉ đường',
+    title: 'Chỉ đường tới di sản',
+    hide: 'Ẩn chỉ đường',
+    modeAria: 'Cách đi',
+    driving: 'Đi xe',
+    walking: 'Đi bộ',
+    drivingNote: 'Ước tính cho xe máy, ô tô theo đường bộ.',
+    walkingNote: 'Ước tính cho người đi bộ.',
+    locating: 'Đang xác định vị trí của bạn…',
+    routing: 'Đang tìm đường…',
+    waitingPosition: 'Đang chờ vị trí từ ứng dụng…',
+    denied: 'Trình duyệt đang chặn quyền vị trí nên chưa chỉ đường được. Hãy cho phép dùng vị trí rồi thử lại, hoặc mở trong Google Maps.',
+    unavailable: 'Không xác định được vị trí của bạn. Hãy thử lại hoặc mở trong Google Maps.',
+    outsideVietnam: 'Bạn đang ở ngoài Việt Nam nên chưa tính được đường đi. Hãy mở trong Google Maps.',
+    noRoute: 'Không tìm được đường bộ tới di sản này (có thể ở trên đảo hoặc chưa có đường trên bản đồ). Hãy mở trong Google Maps.',
+    serviceError: 'Dịch vụ tính đường đang gặp lỗi. Hãy thử lại sau hoặc mở trong Google Maps.',
+    summary: (distance: string, duration: string) => `${distance} · khoảng ${duration}`,
+    steps: 'Các bước',
+    stepDistance: (distance: string) => `Đi ${distance}`,
+    start: 'Vị trí của bạn',
+    openGoogleMaps: 'Mở trong Google Maps',
+    privacy: 'Vị trí của bạn chỉ dùng để tính đường và không được lưu.',
+    attribution: 'Chỉ đường: OSRM · dữ liệu © những người đóng góp OpenStreetMap',
+  },
+
   summary: {
     kicker: 'TÓM TẮT VÀ THUYẾT MINH',
     read: 'Đọc',
@@ -249,7 +275,7 @@ export const vi = {
     problem: {
       closed: 'Bạn chưa xem hết quảng cáo nên chưa mở được tóm tắt. Hãy xem lại và xem đến hết.',
       noFill: 'Hiện chưa có quảng cáo để hiện. Bạn hãy thử lại sau ít phút.',
-      unsupported: 'Trình duyệt hoặc thiết bị này chưa hiện được quảng cáo có thưởng. Bạn hãy thử trên điện thoại hoặc dùng app Vietnam Heritage.',
+      unsupported: 'Trình duyệt hoặc thiết bị này chưa hiện được quảng cáo có thưởng. Bạn hãy thử trên điện thoại hoặc dùng app DiViet.',
       blocked: 'Không tải được quảng cáo. Nếu bạn đang dùng trình chặn quảng cáo, hãy tắt nó cho trang này rồi thử lại.',
       timeout: 'Quảng cáo tải quá lâu. Bạn hãy thử lại sau ít phút.',
       rejected: 'Chưa mở được tóm tắt. Bạn hãy xem hết quảng cáo hoặc thử lại sau ít phút.',
@@ -386,10 +412,10 @@ export const vi = {
     title: 'Giới thiệu',
     kicker: 'GIỚI THIỆU',
     heroTitle: 'Di sản Việt Nam, kể bằng ngôn ngữ của bạn',
-    heroText: 'Vietnam Heritage là trang web và app miễn phí để khám phá di sản văn hóa và thiên nhiên Việt Nam. Đọc được bằng tiếng Việt, Anh, Hàn, Trung hoặc Nhật, không cần tài khoản.',
+    heroText: 'DiViet là trang web và app miễn phí để khám phá di sản văn hóa và thiên nhiên Việt Nam. Đọc được bằng tiếng Việt, Anh, Hàn, Trung hoặc Nhật, không cần tài khoản.',
     start: 'Bắt đầu khám phá',
     openMap: 'Mở bản đồ di sản',
-    featuresTitle: 'Bạn làm được gì với Vietnam Heritage',
+    featuresTitle: 'Bạn làm được gì với DiViet',
     nearbyTitle: 'Tìm di sản gần bạn trên bản đồ',
     nearbyText: 'Mỗi di sản là một ghim trên bản đồ Việt Nam, gồm cả quần đảo Hoàng Sa, Trường Sa. Bật "Gần bạn" để xem các di sản quanh mình; vị trí chỉ dùng để tính khoảng cách và không được lưu.',
     nearbyLink: 'Mở bản đồ di sản',
@@ -401,15 +427,15 @@ export const vi = {
     modelText: 'Xoay mô hình 3D để ngắm di sản từ mọi phía, rồi đi dọc dòng thời gian qua từng giai đoạn và sự kiện của di sản.',
     modelLink: 'Xem dòng thời gian',
     sourceTitle: 'Nguồn thông tin',
-    sourceText: 'Thông tin dựa trên dữ liệu của Cục Di sản văn hóa (dsvh.gov.vn), được tóm lược và ghi nguồn ở từng di sản. Vietnam Heritage không phải trang chính thức của Cục. Ảnh từ Wikimedia Commons, ghi công theo từng ảnh.',
+    sourceText: 'Thông tin dựa trên dữ liệu của Cục Di sản văn hóa (dsvh.gov.vn), được tóm lược và ghi nguồn ở từng di sản. DiViet không phải trang chính thức của Cục. Ảnh từ Wikimedia Commons, ghi công theo từng ảnh.',
     appTitle: 'Mang theo trên điện thoại',
-    appText: 'Cài app Vietnam Heritage cho Android và chọn chế độ Khách tham quan để dùng bản đồ, "Gần bạn", mô hình 3D và nghe thuyết minh khi đi tham quan.',
+    appText: 'Cài app DiViet cho Android và chọn chế độ Khách tham quan để dùng bản đồ, "Gần bạn", mô hình 3D và nghe thuyết minh khi đi tham quan.',
     appWeb: 'Không cần cài đặt: mọi tính năng trên đều dùng được ngay trên trình duyệt.',
     schoolsTitle: 'Dành cho nhà trường',
     schoolsText: 'Giáo viên soạn bài học và bài kiểm tra về di sản cho lớp mình; học sinh học theo cấp 1, 2, 3 bằng mã bài học.',
     schoolsLink: 'Xem trang dành cho nhà trường',
     videoTitle: 'Video giới thiệu',
-    videoLabel: 'Video giới thiệu Vietnam Heritage',
+    videoLabel: 'Video giới thiệu DiViet',
     videoNoSupport: 'Trình duyệt này không phát được video.',
     videoUnavailable: 'Chưa có video giới thiệu. Bạn hãy thử lại sau.',
   },

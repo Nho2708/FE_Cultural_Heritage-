@@ -113,12 +113,14 @@ describe('HeritageMapScreen', () => {
     expect(mockSent).toContainEqual({ type: 'focus', version: 1, slug: 'co-do-hue' });
   });
 
-  it('opens the detail or the timeline of the pin the visitor picked', async () => {
+  it('opens the detail, the timeline or the directions of the pin the visitor picked', async () => {
     const screen = await render();
     await screen.emit({ type: 'pin-selected', version: 1, slug: 'hoang-thanh' });
     expect(mockPush).toHaveBeenLastCalledWith({ pathname: '/di-san/[slug]', params: { slug: 'hoang-thanh' } });
     await screen.emit({ type: 'timeline-selected', version: 1, slug: 'hoang-thanh' });
     expect(mockPush).toHaveBeenLastCalledWith({ pathname: '/di-san/[slug]/dong-thoi-gian', params: { slug: 'hoang-thanh' } });
+    await screen.emit({ type: 'directions-selected', version: 1, slug: 'hoang-thanh' });
+    expect(mockPush).toHaveBeenLastCalledWith({ pathname: '/di-san/[slug]/chi-duong', params: { slug: 'hoang-thanh' } });
   });
 
   it('offers Near you to a visitor but not to a student', async () => {

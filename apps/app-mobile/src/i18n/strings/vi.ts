@@ -156,6 +156,18 @@ export interface Strings {
   };
   model: { title: string; loading: string; unavailable: string; credit: string; license: string; hint: string; backToGallery: string };
   map: { title: string; loading: string; unavailable: string; open: string; listInstead: string; withoutLocation: string };
+  directions: {
+    button: string;
+    title: string;
+    locating: string;
+    denied: string;
+    unavailable: string;
+    allow: string;
+    openSettings: string;
+    openGoogleMaps: string;
+    pageUnavailable: string;
+    privacy: string;
+  };
   history: {
     title: string;
     empty: string;
@@ -189,7 +201,7 @@ export interface Strings {
 }
 
 export const vi: Strings = {
-  appName: 'Vietnam Heritage',
+  appName: 'DiViet',
   common: {
     back: 'Quay lại',
     close: 'Đóng',
@@ -370,6 +382,18 @@ export const vi: Strings = {
     open: 'Mở chi tiết',
     listInstead: 'Xem danh sách di sản',
     withoutLocation: '{{count}} di sản chưa có tọa độ',
+  },
+  directions: {
+    button: 'Chỉ đường',
+    title: 'Chỉ đường',
+    locating: 'Đang xác định vị trí của bạn…',
+    denied: 'Bạn chưa cho phép dùng vị trí nên chưa chỉ đường được. Bạn bật lại trong cài đặt của điện thoại, hoặc mở trong Google Maps.',
+    unavailable: 'Không xác định được vị trí của bạn. Hãy thử lại hoặc mở trong Google Maps.',
+    allow: 'Thử lại',
+    openSettings: 'Mở cài đặt',
+    openGoogleMaps: 'Mở trong Google Maps',
+    pageUnavailable: 'Không tải được phần chỉ đường. Bạn mở trong Google Maps thay thế.',
+    privacy: 'Vị trí chỉ dùng để tính đường và không được lưu.',
   },
   history: {
     title: 'Lịch sử của bạn',

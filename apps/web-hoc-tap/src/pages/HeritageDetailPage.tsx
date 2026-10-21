@@ -1,22 +1,24 @@
 import type { PublicHeritageDetail, PublicMedia } from '@dsvhvn/dung-chung/api';
 import { ButtonLink, Icon } from '@dsvhvn/dung-chung/ui';
-import { lazy, Suspense, useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useParams, useSearchParams } from 'react-router';
 import { pathOf } from '../access/screens';
 import { LocalizationNotice } from '../components/LocalizationNotice';
 import { ModelDialog, type ModelSource } from '../components/ModelDialog';
 import { SummaryDialog, type SummaryTab } from '../components/SummaryDialog';
+import { DirectionsPanel } from '../directions/DirectionsPanel';
+import { useDirections } from '../directions/useDirections';
 import { citationsOf, creditLine, parseContent, parseInline, safeUrl, sourceSummary } from '../discovery/format';
 import { HeritageLoadError } from '../discovery/HeritageNotFound';
 import { RecommendationsSection } from '../guest/RecommendationsSection';
-import { mapPathOf, timelinePath } from '../discovery/paths';
+import { DIRECTIONS_PARAM, mapPathOf, timelinePath } from '../discovery/paths';
 import { useHeritageDetail } from '../discovery/queries';
 import { Thumbnail } from '../discovery/Thumbnail';
 import { useI18n } from '../i18n/context';
 import { coordinatesText, localizeDateText } from '../i18n/format';
 import { HERITAGE_TYPE_NAME, provinceName, RECOGNITION_LEVEL_NAME } from '@dsvhvn/dung-chung/i18n';
 
-// Chi tiết di sản (công khai): ảnh đại diện có ghi công, nhãn, nội dung, thông tin, bản đồ nhỏ, thư viện ảnh kèm ghi công
+// Chi tiết di sản (công khai): ảnh đại diện có ghi công, nhãn, nội dung, thông tin, bản đồ nhỏ kèm chỉ đường, thư viện ảnh kèm ghi công
 // tách ba phần, dòng thời gian rút gọn và nguồn tham khảo. `:diSan` là slug. Di sản nháp, đã ẩn hoặc không có → 404.
 // Tên, mô tả, nội dung, giai đoạn, chú thích ảnh theo ngôn ngữ khách đã chọn; chưa có bản dịch thì hiện tiếng Việt kèm thông báo, bản
 // Hàn, Trung, Nhật kèm nhãn "bản dịch máy". Nút "Tóm tắt" và "Nghe" mở hộp thoại tóm tắt (đọc, nghe bằng giọng của trình duyệt).
@@ -222,27 +224,71 @@ function InfoCard({ detail }: { detail: PublicHeritageDetail }) {
   );
 }
 
-function LocationCard({ detail, preview }: { detail: PublicHeritageDetail; preview: boolean }) {
+const LOCATION_ACTION = 'inline-flex h-11 items-center gap-1 rounded-xs px-1 type-control text-link hover:bg-link-hover-bg';
+
+/**
+ * Vị trí của di sản: bản đồ nhỏ, tọa độ, liên kết sang bản đồ và nút "Chỉ đường". Bấm "Chỉ đường" mới xin vị trí của trình duyệt rồi hỏi máy chủ OSRM;
+ * tuyến vẽ lên bản đồ nhỏ, các bước và nút mở Google Maps ở bảng bên dưới. Mở từ thẻ di sản trên bản đồ (`?chi-duong=1`) thì bảng mở sẵn và trang cuộn tới đây.
+ */
+function LocationSection({ detail, latitude, longitude, preview }: { detail: PublicHeritageDetail; latitude: number; longitude: number; preview: boolean }) {
   const { language, t } = useI18n();
-  if (detail.latitude == null || detail.longitude == null) return null;
+  const [params] = useSearchParams();
+  const fromMap = params.get(DIRECTIONS_PARAM) === '1';
+  const [open, setOpen] = useState(fromMap);
+  const destination = useMemo(() => ({ latitude, longitude }), [latitude, longitude]);
+  const directions = useDirections({ destination });
+  const sectionRef = useRef<HTMLElement>(null);
+  const startedFromMap = useRef(false);
+  const { start } = directions;
+
+  useEffect(() => {
+    if (!fromMap || preview || startedFromMap.current) return;
+    startedFromMap.current = true;
+    start();
+    sectionRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }, [fromMap, preview, start]);
+
+  const toggle = () => {
+    if (open) {
+      setOpen(false);
+      return;
+    }
+    setOpen(true);
+    if (directions.status === 'idle') start();
+  };
+
+  // Ẩn bảng thì bỏ tuyến khỏi bản đồ nhỏ (mở lại dùng tuyến đã nhớ, không hỏi máy chủ lần nữa).
+  const route = open && directions.status === 'ready' ? directions.route : null;
   return (
-    <section aria-label={t.detail.locationAria} className="overflow-hidden rounded-md border border-border bg-surface">
-      <div className="isolate h-[220px]">
+    <section ref={sectionRef} aria-label={t.detail.locationAria} className="scroll-mt-24 overflow-hidden rounded-md border border-border bg-surface">
+      <div className={route ? 'isolate h-[320px]' : 'isolate h-[220px]'}>
         <Suspense fallback={<div className="size-full bg-surface-container-low" />}>
-          <LocationMap key={language} labels={t.map.base} latitude={detail.latitude} longitude={detail.longitude} label={provinceName(detail.province?.name, language)} />
+          <LocationMap key={language} labels={t.map.base} latitude={latitude} longitude={longitude} label={provinceName(detail.province?.name, language)} route={route} startLabel={t.directions.start} />
         </Suspense>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
-        <p className="type-mono-label text-on-surface-variant">{coordinatesText(detail.latitude, detail.longitude, t, language)}</p>
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-3">
+        <p className="type-mono-label text-on-surface-variant">{coordinatesText(latitude, longitude, t, language)}</p>
         {!preview && (
-          <Link to={mapPathOf(detail.slug)} className="inline-flex h-11 items-center gap-1 rounded-xs type-control text-link hover:bg-link-hover-bg">
-            <Icon name="map" size={16} />
-            {t.detail.viewOnMap}
-          </Link>
+          <div className="flex flex-wrap items-center gap-1">
+            <Link to={mapPathOf(detail.slug)} className={LOCATION_ACTION}>
+              <Icon name="map" size={16} />
+              {t.detail.viewOnMap}
+            </Link>
+            <button type="button" aria-expanded={open} onClick={toggle} className={LOCATION_ACTION}>
+              <Icon name="navigation" size={16} />
+              {t.directions.button}
+            </button>
+          </div>
         )}
       </div>
+      {open && !preview && <DirectionsPanel controller={directions} destination={destination} destinationName={detail.name} onHide={() => setOpen(false)} />}
     </section>
   );
+}
+
+function LocationCard({ detail, preview }: { detail: PublicHeritageDetail; preview: boolean }) {
+  if (detail.latitude == null || detail.longitude == null) return null;
+  return <LocationSection detail={detail} latitude={detail.latitude} longitude={detail.longitude} preview={preview} />;
 }
 
 function Gallery({ media }: { media: PublicMedia[] }) {
