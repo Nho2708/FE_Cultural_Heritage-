@@ -5,7 +5,7 @@ import { mockApi } from '../test/fixtures';
 import { renderApp } from '../test/renderApp';
 
 // Trang Giới thiệu (5 ngôn ngữ) và trang Dành cho nhà trường (chỉ tiếng Việt): công khai, không gọi API, liên kết đúng
-// trang đã có, huy hiệu chuyển động hoặc tĩnh khi người dùng bật giảm chuyển động, không có khung video khi chưa cấu hình.
+// trang đã có, biểu tượng chuyển động hoặc tĩnh khi người dùng bật giảm chuyển động, không có khung video khi chưa cấu hình.
 
 function chooseLanguage(code: string) {
   window.localStorage.setItem(LANGUAGE_STORAGE_KEY, code);
@@ -68,7 +68,7 @@ describe('trang Giới thiệu', () => {
     expect(screen.getByRole('link', { name: 'See the page for schools' })).toHaveAttribute('href', '/nha-truong');
   });
 
-  it('huy hiệu chuyển động một lần, là hình trang trí; tên DiViet viết bằng chữ ngay dưới', async () => {
+  it('biểu tượng chuyển động một lần, là hình trang trí; tên DiViet viết bằng chữ ngay dưới', async () => {
     mockApi();
     renderApp('/gioi-thieu');
     const hero = (await screen.findByRole('heading', { level: 1 })).closest('section');
@@ -77,13 +77,12 @@ describe('trang Giới thiệu', () => {
     expect(within(hero).getByText('DiViet')).toBeInTheDocument();
     expect(within(hero).queryByRole('img')).not.toBeInTheDocument();
     const logo = hero.querySelector('[data-logo-motion]');
-    if (!logo) throw new Error('Không thấy huy hiệu chuyển động');
+    if (!logo) throw new Error('Không thấy biểu tượng chuyển động');
     expect(logo).toHaveAttribute('aria-hidden', 'true');
-    expect(logo.querySelectorAll('img')).toHaveLength(5);
-    for (const layer of logo.querySelectorAll('img')) expect(layer).toHaveAttribute('aria-hidden', 'true');
+    expect(logo.querySelectorAll('path')).toHaveLength(4);
   });
 
-  it('người dùng bật giảm chuyển động: hiện huy hiệu tĩnh, các khối hiện ngay không chờ cuộn', async () => {
+  it('người dùng bật giảm chuyển động: hiện biểu tượng tĩnh, các khối hiện ngay không chờ cuộn', async () => {
     prefersReducedMotion(true);
     mockApi();
     renderApp('/gioi-thieu');
@@ -92,7 +91,7 @@ describe('trang Giới thiệu', () => {
 
     expect(within(hero).getByText('DiViet')).toBeInTheDocument();
     expect(within(hero).queryByRole('img')).not.toBeInTheDocument();
-    expect(hero.querySelector('img[alt=""]')).not.toBeNull();
+    expect(hero.querySelector('svg[aria-hidden="true"]')).not.toBeNull();
     expect(hero.querySelector('[data-logo-motion]')).toBeNull();
     for (const group of document.querySelectorAll('[data-reveal]')) expect(group).toHaveAttribute('data-reveal', 'static');
   });

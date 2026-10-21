@@ -69,3 +69,32 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Biểu tượng "DiViet" (BrandLogo, AnimatedLogo): mái đỏ son, sách xanh than trên nền sáng; mái son sáng, sách kem trên nền tối.
+ * Theo data-theme của ThemeProvider như các token khác; `--on-dark` ép bộ màu tối cho khối nền xanh than cố định. */
+.dsv-brand-mark {
+  --dsv-mark-roof: #c8432b;
+  --dsv-mark-book: #292b38;
+  display: inline-block;
+}
+
+[data-theme='dark'] .dsv-brand-mark,
+.dsv-brand-mark--on-dark {
+  --dsv-mark-roof: #e0674a;
+  --dsv-mark-book: #f4ecdd;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme='system'] .dsv-brand-mark {
+    --dsv-mark-roof: #e0674a;
+    --dsv-mark-book: #f4ecdd;
+  }
+}
+
+.dsv-brand-mark__roof {
+  fill: var(--dsv-mark-roof);
+}
+
+.dsv-brand-mark__book {
+  fill: var(--dsv-mark-book);
+}

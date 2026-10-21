@@ -1,10 +1,10 @@
 import '@testing-library/jest-dom/vitest';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { AnimatedLogo } from './AnimatedLogo';
 
-// Huy hiệu chuyển động: dựng từ các lớp ảnh, chỉ chạy khi các lớp đã tải, tôn trọng "giảm chuyển động" (kể cả khi người
-// dùng đổi cài đặt lúc trang đang mở).
+// Biểu tượng chuyển động: dựng từ bốn nét vector (nóc, mái, hai trang sách), tôn trọng "giảm chuyển động" (kể cả khi
+// người dùng đổi cài đặt lúc trang đang mở).
 
 type Listener = () => void;
 
@@ -34,19 +34,15 @@ afterEach(() => {
   Reflect.deleteProperty(window, 'matchMedia');
 });
 
-describe('huy hiệu chuyển động', () => {
-  it('có tên thương hiệu cho trình đọc màn hình, các lớp ảnh ẩn; chờ ảnh lớp cổng tải xong mới chạy', () => {
+describe('biểu tượng chuyển động', () => {
+  it('có tên thương hiệu cho trình đọc màn hình; bốn nét vector, chiều cao theo cỡ, chiều rộng theo tỉ lệ', () => {
     render(<AnimatedLogo size={120} />);
     const logo = screen.getByRole('img', { name: 'DiViet' });
-    expect(logo).toHaveStyle({ width: '120px', height: '120px' });
-    expect(logo).toHaveAttribute('data-logo-motion', 'loading');
-
-    const layers = logo.querySelectorAll('img');
-    expect(layers).toHaveLength(5);
-    for (const layer of layers) expect(layer).toHaveAttribute('alt', '');
-
-    fireEvent.load(layers[0] as HTMLImageElement);
-    expect(logo).toHaveAttribute('data-logo-motion', 'ready');
+    expect(logo).toHaveAttribute('data-logo-motion', 'play');
+    expect(logo).toHaveAttribute('height', '120');
+    expect(logo).toHaveAttribute('width', '168');
+    expect(logo.querySelectorAll('path')).toHaveLength(4);
+    expect(logo.querySelector('img')).toBeNull();
   });
 
   it('trang trí: ẩn hẳn khỏi trình đọc màn hình', () => {
@@ -55,12 +51,17 @@ describe('huy hiệu chuyển động', () => {
     expect(container.firstElementChild).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('giảm chuyển động: ảnh huy hiệu tĩnh; đổi cài đặt lúc đang mở thì đổi theo', () => {
+  it('nền tối cố định: gắn lớp bộ màu tối', () => {
+    const { container } = render(<AnimatedLogo decorative onDark />);
+    expect(container.firstElementChild).toHaveClass('dsv-brand-mark--on-dark');
+  });
+
+  it('giảm chuyển động: biểu tượng tĩnh; đổi cài đặt lúc đang mở thì đổi theo', () => {
     const setReduce = prefersReducedMotion(true);
     const { container } = render(<AnimatedLogo size={96} />);
     const still = screen.getByRole('img', { name: 'DiViet' });
-    expect(still.tagName).toBe('IMG');
-    expect(still).toHaveAttribute('width', '96');
+    expect(still).toHaveAttribute('height', '96');
+    expect(still.querySelectorAll('path')).toHaveLength(4);
     expect(container.querySelector('[data-logo-motion]')).toBeNull();
 
     act(() => setReduce(false));
