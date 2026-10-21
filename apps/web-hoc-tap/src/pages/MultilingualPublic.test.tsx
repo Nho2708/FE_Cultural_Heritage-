@@ -8,7 +8,7 @@ import { envelope, mockApi, type FetchCall } from '../test/fixtures';
 import { renderApp, signInAs } from '../test/renderApp';
 
 // Phần công khai 5 ngôn ngữ: chọn ngôn ngữ (nhớ trên máy), nội dung di sản theo ngôn ngữ (`lang`), nhãn bản dịch máy, thông báo thiếu bản dịch,
-// học sinh luôn tiếng Việt, tóm tắt và nghe thuyết minh bằng giọng của trình duyệt.
+// học sinh luôn tiếng Việt, tóm tắt và nghe thuyết minh (tệp tạo sẵn khi có, không thì giọng của trình duyệt).
 
 vi.mock('../discovery/LocationMap', () => ({ default: () => <div data-testid="ban-do-nho" /> }));
 
@@ -71,6 +71,47 @@ function installSpeech(voices: FakeVoice[]) {
   return { synth, spoken, finish: (index: number) => act(() => spoken[index]?.onend?.()) };
 }
 
+/** Phần tử audio giả cho thuyết minh tạo sẵn: ghi lại tệp đã nạp, số lần phát; test tự phát sự kiện thời gian và lỗi. */
+function installAudio() {
+  class FakeAudio {
+    src = '';
+    preload = '';
+    playbackRate = 1;
+    preservesPitch = false;
+    currentTime = 0;
+    plays = 0;
+    pauses = 0;
+    private listeners = new Map<string, Set<() => void>>();
+    constructor() {
+      elements.push(this);
+    }
+    play() {
+      this.plays += 1;
+      return Promise.resolve();
+    }
+    pause() {
+      this.pauses += 1;
+    }
+    addEventListener(type: string, listener: () => void) {
+      if (!this.listeners.has(type)) this.listeners.set(type, new Set());
+      this.listeners.get(type)!.add(listener);
+    }
+    removeEventListener(type: string, listener: () => void) {
+      this.listeners.get(type)?.delete(listener);
+    }
+    tick(ms: number) {
+      this.currentTime = ms / 1000;
+      this.emit('timeupdate');
+    }
+    emit(type: string) {
+      for (const listener of this.listeners.get(type) ?? []) listener();
+    }
+  }
+  const elements: FakeAudio[] = [];
+  vi.stubGlobal('Audio', FakeAudio);
+  return { elements };
+}
+
 afterEach(() => {
   vi.unstubAllGlobals();
 });
@@ -127,7 +168,7 @@ describe('chọn ngôn ngữ', () => {
 
     expect(await screen.findByRole('heading', { level: 1, name: "Discover Viet Nam's cultural heritage" })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Language: English' })).toBeInTheDocument();
-    expect(screen.getAllByRole('link', { name: 'Student sign-in' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: 'Sign-in' }).length).toBeGreaterThan(0);
   });
 
   it('học sinh đã đăng nhập luôn xem tiếng Việt, không có mục Ngôn ngữ, lựa chọn đã nhớ của khách không bị ghi đè', async () => {
@@ -349,6 +390,76 @@ describe('tóm tắt và nghe thuyết minh', () => {
     act(() => speech.speak.mock.calls[0]![0].onend());
     await waitFor(() => expect(within(dialog).getByText('1 câu · Giọng đọc của thiết bị')).toBeInTheDocument());
     expect(within(dialog).getByRole('button', { name: 'Phát' })).toBeEnabled();
+  });
+
+  const NARRATION = {
+    audioUrl: '/files/thuyet-minh/hue-vi.mp3',
+    durationMs: 12800,
+    voice: 'vieneu-mai-anh',
+    sentences: [
+      { text: 'Kinh thành Huế khởi công năm 1805.', startMs: 150, endMs: 4200 },
+      { text: 'Đây là trung tâm của triều Nguyễn.', startMs: 4550, endMs: 9000 },
+      { text: 'Năm 1993, quần thể được UNESCO ghi danh.', startMs: 9350, endMs: 12800 },
+    ],
+  };
+
+  it('có thuyết minh tạo sẵn: phát tệp MP3 từ máy chủ API, hiện các câu có mốc, tô sáng theo thời điểm phát, đổi tốc độ ngay, bấm câu thì nhảy tới câu đó', async () => {
+    const speech = installSpeech([{ lang: 'vi-VN', name: 'Vietnamese' }]);
+    const audio = installAudio();
+    mockApi(withSummary(summaryOf({ narration: NARRATION })));
+    const user = userEvent.setup();
+    renderApp(`/di-san/${HUE.slug}`);
+
+    await user.click(await screen.findByRole('button', { name: 'Nghe' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(await within(dialog).findByText('3 câu')).toBeInTheDocument();
+    expect(within(dialog).queryByText(/Giọng đọc của thiết bị/)).not.toBeInTheDocument();
+    expect(audio.elements).toHaveLength(1);
+    expect(audio.elements[0]).toMatchObject({ src: 'http://api.test/files/thuyet-minh/hue-vi.mp3', preservesPitch: true });
+
+    await user.click(within(dialog).getByRole('button', { name: 'Phát' }));
+    expect(audio.elements[0]!.plays).toBe(1);
+    expect(speech.spoken).toHaveLength(0);
+    expect(within(dialog).getByText('Đang đọc câu 1 / 3')).toBeInTheDocument();
+    act(() => audio.elements[0]!.tick(5000));
+    expect(within(dialog).getByText('Đây là trung tâm của triều Nguyễn.')).toHaveAttribute('aria-current', 'true');
+    expect(within(dialog).getByText('Đang đọc câu 2 / 3')).toBeInTheDocument();
+
+    await user.click(within(dialog).getByRole('button', { name: '1.5×' }));
+    expect(audio.elements[0]!.playbackRate).toBe(1.5);
+    expect(audio.elements[0]!.plays).toBe(1);
+
+    await user.click(within(dialog).getByRole('button', { name: 'Tạm dừng' }));
+    expect(audio.elements[0]!.pauses).toBe(1);
+    await user.click(within(dialog).getByRole('button', { name: 'Tiếp tục' }));
+    expect(audio.elements[0]!.plays).toBe(2);
+
+    await user.click(within(dialog).getByRole('button', { name: 'Năm 1993, quần thể được UNESCO ghi danh.' }));
+    expect(audio.elements[0]!.currentTime).toBe(9.35);
+    expect(within(dialog).getByText('Năm 1993, quần thể được UNESCO ghi danh.')).toHaveAttribute('aria-current', 'true');
+
+    await user.click(within(dialog).getByRole('button', { name: 'Dừng' }));
+    expect(within(dialog).getByText('3 câu')).toBeInTheDocument();
+    expect(audio.elements[0]!.currentTime).toBe(0);
+  });
+
+  it('tệp thuyết minh hỏng (404, lỗi mạng) thì lùi về giọng của thiết bị, không báo lỗi; hỏng giữa chừng thì đọc tiếp bằng giọng thiết bị', async () => {
+    const speech = installSpeech([{ lang: 'vi-VN', name: 'Vietnamese' }]);
+    const audio = installAudio();
+    mockApi(withSummary(summaryOf({ narration: NARRATION })));
+    const user = userEvent.setup();
+    renderApp(`/di-san/${HUE.slug}`);
+
+    await user.click(await screen.findByRole('button', { name: 'Nghe' }));
+    const dialog = await screen.findByRole('dialog');
+    await within(dialog).findByText('3 câu');
+    await user.click(within(dialog).getByRole('button', { name: 'Phát' }));
+    act(() => audio.elements[0]!.emit('error'));
+
+    expect(within(dialog).queryByRole('alert')).not.toBeInTheDocument();
+    expect(within(dialog).getByText('Đang đọc câu 1 / 3 · Giọng đọc của thiết bị')).toBeInTheDocument();
+    expect(speech.spoken[0]).toMatchObject({ text: 'Kinh thành Huế khởi công năm 1805.', lang: 'vi-VN' });
+    expect(within(dialog).getByText('Kinh thành Huế khởi công năm 1805.')).toHaveAttribute('aria-current', 'true');
   });
 
   it('thiết bị chưa có giọng đọc của ngôn ngữ: báo kèm hướng dẫn cài giọng, khóa nút Phát, vẫn hiện đủ chữ', async () => {

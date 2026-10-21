@@ -1,10 +1,14 @@
 import { cn } from '../cn';
 import { Icon } from '../ui';
+import { speakVietnamese } from './speechVoice';
 
-// Nút loa đọc to bằng giọng đọc có sẵn của trình duyệt (cấp 1). Trình duyệt không có giọng đọc thì không hiện nút.
+// Nút loa đọc to bằng FPT.AI Cloud TTS hoặc giọng có sẵn của trình duyệt.
 
 function canSpeak(): boolean {
-  return typeof window !== 'undefined' && 'speechSynthesis' in window && typeof SpeechSynthesisUtterance !== 'undefined';
+  return (
+    typeof window !== 'undefined' &&
+    (typeof Audio !== 'undefined' || ('speechSynthesis' in window && typeof SpeechSynthesisUtterance !== 'undefined'))
+  );
 }
 
 const SIZE_MAP = {
@@ -26,10 +30,7 @@ export function SpeakButton({
 }) {
   if (!canSpeak()) return null;
   const speak = () => {
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'vi-VN';
-    window.speechSynthesis.speak(utterance);
+    speakVietnamese(text);
   };
   const s = SIZE_MAP[size] ?? SIZE_MAP.md;
   return (

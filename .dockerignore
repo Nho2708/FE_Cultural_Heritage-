@@ -1,0 +1,14 @@
+# Ảnh "web" chỉ cần hai web, gói dùng chung, tệp cấu hình ở gốc và scripts/trien-khai/Caddyfile.
+**/node_modules
+**/dist
+**/dist-ssr
+**/coverage
+**/smoke-shots
+**/*.local
+**/*.log
+.git
+.github
+docs
+apps/app-mobile
+apps/video-gioi-thieu
+scripts/dung-apk.ps1

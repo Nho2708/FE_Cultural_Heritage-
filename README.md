@@ -10,7 +10,7 @@ Repo gồm **hai ứng dụng web** và **một gói dùng chung**, quản lý b
 | Workspace | Thư mục | Tên hiển thị | Cổng dev | Dành cho |
 |---|---|---|---|---|
 | `@dsvhvn/web-quan-tri` | `apps/web-quan-tri` | Trang quản trị | 5173 | Giáo viên (`/giao-vien`), quản trị trường (`/truong`), quản trị hệ thống (`/quan-tri`) — một ứng dụng, menu theo vai trò |
-| `@dsvhvn/web-hoc-tap` | `apps/web-hoc-tap` | Vietnam Heritage | 5174 | Khách (khám phá di sản công khai) và học sinh (khu học), giao diện theo cấp học 1 / 2 / 3 |
+| `@dsvhvn/web-hoc-tap` | `apps/web-hoc-tap` | DiViet | 5174 | Khách (khám phá di sản công khai) và học sinh (khu học), giao diện theo cấp học 1 / 2 / 3 |
 | `@dsvhvn/dung-chung` | `packages/dung-chung` | — | — | Design token và bộ giao diện theo cấp, component giao diện web, lớp gọi API, kiểu dữ liệu, phiên đăng nhập, kiểm tra hợp lệ, câu thông báo |
 
 **App mobile** (React Native + Expo, một app hai chế độ: Khách tham quan và Học sinh) nằm ở [`apps/app-mobile`](apps/app-mobile) nhưng **không thuộc npm workspaces**: Expo SDK 57 cố định React 19.2.3
@@ -89,6 +89,10 @@ Chạy riêng một workspace: `npm test -w @dsvhvn/web-hoc-tap`, `npm run build
 - Mỗi ứng dụng có `.env.development` (trong git) và `.env.example`. Đổi trên máy mình: tạo `.env.development.local` trong
   thư mục của ứng dụng (tệp `*.local` không vào git).
 - `npm run build` là chế độ production: thiếu biến thì ứng dụng dừng ngay khi mở và báo lỗi, không tự trỏ về localhost.
+- Máy chủ Google Cloud dùng ảnh Docker "web" (`Dockerfile`): build hai web với `VITE_API_BASE_URL=/api/v1` và địa chỉ hai web
+  truyền bằng `--build-arg` (CD lấy từ biến repo `GCP_LEARNING_WEB_URL`, `GCP_ADMIN_WEB_URL`), rồi phục vụ bằng Caddy theo
+  `scripts/trien-khai/Caddyfile` (cùng quy tắc với `web.config` của IIS trên máy demo). Cách cài máy chủ: `deploy/google-cloud/README.md`
+  của repo backend.
 
 ## Cấu trúc
 

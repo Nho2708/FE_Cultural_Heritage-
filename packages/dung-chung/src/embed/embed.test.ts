@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { embedIntroVideoUrl, embedMapUrl, embedModelUrl, originOf, parseEmbedCommand, parseEmbedMessage, readEmbedMapParams, serializeEmbedMessage } from './index';
+import { embedDirectionsUrl, embedIntroVideoUrl, embedMapUrl, embedModelUrl, originOf, parseEmbedCommand, parseEmbedMessage, readEmbedMapParams, serializeEmbedMessage } from './index';
 
 describe('hợp đồng thông điệp với trang nhúng', () => {
   it('đọc các thông điệp đúng khuôn từ chuỗi JSON hoặc đối tượng', () => {
@@ -8,6 +8,7 @@ describe('hợp đồng thông điệp với trang nhúng', () => {
     expect(parseEmbedMessage({ type: 'model-error', version: 1, reason: 'webgl' })).toEqual({ type: 'model-error', version: 1, reason: 'webgl' });
     expect(parseEmbedMessage({ type: 'model-loaded', version: 1 })).toEqual({ type: 'model-loaded', version: 1 });
     expect(parseEmbedMessage({ type: 'timeline-selected', version: 1, slug: 'hoang-thanh' })).toEqual({ type: 'timeline-selected', version: 1, slug: 'hoang-thanh' });
+    expect(parseEmbedMessage({ type: 'directions-selected', version: 1, slug: 'hoang-thanh' })).toEqual({ type: 'directions-selected', version: 1, slug: 'hoang-thanh' });
   });
 
   it('cắt tiến trình vào khoảng 0 đến 1', () => {
@@ -16,7 +17,7 @@ describe('hợp đồng thông điệp với trang nhúng', () => {
   });
 
   it('bỏ thông điệp lạ, sai phiên bản hoặc thiếu trường', () => {
-    for (const raw of [null, 'không phải JSON', '[]', { type: 'ready' }, { type: 'ready', version: 2 }, { type: 'pin-selected', version: 1 }, { type: 'pin-selected', version: 1, slug: '' }, { type: 'timeline-selected', version: 1, slug: '' }, { type: 'timeline-selected', version: 1 }, { type: 'model-error', version: 1, reason: 'khác' }, { type: 'lạ', version: 1 }, { type: 'model-progress', version: 1, fraction: Number.NaN }]) {
+    for (const raw of [null, 'không phải JSON', '[]', { type: 'ready' }, { type: 'ready', version: 2 }, { type: 'pin-selected', version: 1 }, { type: 'pin-selected', version: 1, slug: '' }, { type: 'timeline-selected', version: 1, slug: '' }, { type: 'timeline-selected', version: 1 }, { type: 'directions-selected', version: 1, slug: '' }, { type: 'directions-selected', version: 1 }, { type: 'model-error', version: 1, reason: 'khác' }, { type: 'lạ', version: 1 }, { type: 'model-progress', version: 1, fraction: Number.NaN }]) {
       expect(parseEmbedMessage(raw)).toBeNull();
     }
   });
@@ -79,6 +80,7 @@ describe('hợp đồng thông điệp với trang nhúng', () => {
     expect(embedModelUrl('http://web.test:5174', 'a b')).toBe('http://web.test:5174/nhung/3d/a%20b');
     expect(embedModelUrl('http://web.test:5174/', 'hue', 'zh-Hans')).toBe('http://web.test:5174/nhung/3d/hue?lang=zh-Hans');
     expect(embedIntroVideoUrl('http://web.test:5174/', 'zh-Hans')).toBe('http://web.test:5174/nhung/video-gioi-thieu?lang=zh-Hans');
+    expect(embedDirectionsUrl('http://web.test:5174/', 'a b', 'ko')).toBe('http://web.test:5174/nhung/chi-duong/a%20b?lang=ko');
     expect(originOf('http://web.test:5174/nhung/ban-do?x=1')).toBe('http://web.test:5174');
     expect(originOf('không phải địa chỉ')).toBeNull();
   });

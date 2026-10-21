@@ -27,7 +27,7 @@ describe('Trang chủ', () => {
     expect(screen.getByRole('link', { name: /11 DI SẢNs*Miền Bắc/ })).toHaveAttribute('href', `/di-san?vung=${encodeURIComponent('Bắc')}`);
     expect(screen.getByRole('link', { name: /6 DI SẢNs*Phi vật thể/ })).toHaveAttribute('href', '/di-san?loai=INTANGIBLE');
 
-    expect(screen.getAllByRole('link', { name: /Học sinh đăng nhập/ }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: /Đăng nhập/ }).length).toBeGreaterThan(0);
     expect(screen.queryByLabelText(/mã bài học/i)).not.toBeInTheDocument();
     expect(calls.every((call) => call.authorization === undefined)).toBe(true);
   });
@@ -98,7 +98,7 @@ describe('Trang chủ', () => {
 
     const enter = await screen.findByRole('link', { name: 'Vào trang học của em' });
     expect(enter).toHaveAttribute('href', '/hoc');
-    expect(screen.queryByRole('link', { name: 'Học sinh đăng nhập' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Đăng nhập' })).not.toBeInTheDocument();
     expect(document.documentElement).toHaveAttribute('data-bo-giao-dien', 'mac-dinh');
   });
 

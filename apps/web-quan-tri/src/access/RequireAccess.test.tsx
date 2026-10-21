@@ -52,8 +52,8 @@ describe('route guard theo ma trận phân quyền', () => {
     await screen.findByRole('heading', { level: 1, name: 'Đăng nhập' });
     expect(screen.queryByRole('link', { name: /đăng ký/i })).not.toBeInTheDocument();
     expect(screen.getByLabelText('Email hoặc tên đăng nhập')).toBeInTheDocument();
-    expect(screen.getByText(/Học sinh đăng nhập ở trang Vietnam Heritage hoặc ứng dụng trên điện thoại/)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Mở trang Vietnam Heritage/ })).toHaveAttribute('href', 'http://hoc.test');
+    expect(screen.getByText(/Học sinh đăng nhập ở trang DiViet hoặc ứng dụng trên điện thoại/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Mở trang DiViet/ })).toHaveAttribute('href', 'http://hoc.test');
   });
 
   it('giáo viên mở /quan-tri nhận trang 403, URL giữ nguyên, vẫn có thanh bên và menu tài khoản của mình', async () => {

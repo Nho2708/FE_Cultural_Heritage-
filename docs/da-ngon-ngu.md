@@ -24,7 +24,7 @@ Khu học của học sinh và toàn bộ web quản trị **chỉ tiếng Việ
 
 ### Chữ giao diện
 
-- `apps/web-hoc-tap/src/i18n/strings/{vi,en,ko,zh-Hans,ja}.ts`: tiếng Việt là bản gốc, bốn tệp còn lại phải đủ khóa và cùng số tham số của hàm (kiểu `Strings`, kiểm lại ở test). Tên riêng giữ nguyên ở mọi ngôn ngữ ("Vietnam Heritage", UNESCO).
+- `apps/web-hoc-tap/src/i18n/strings/{vi,en,ko,zh-Hans,ja}.ts`: tiếng Việt là bản gốc, bốn tệp còn lại phải đủ khóa và cùng số tham số của hàm (kiểu `Strings`, kiểm lại ở test). Tên riêng giữ nguyên ở mọi ngôn ngữ ("DiViet", UNESCO).
 - `i18n/taxonomy.ts`: tên loại di sản, cấp xếp hạng, vùng, thời kỳ và **34 tỉnh, thành phố** ở năm ngôn ngữ. Máy chủ chỉ trả tên tiếng Việt của các danh mục này nên giao diện tra theo giá trị enum hoặc theo tên tiếng Việt; tên lạ giữ nguyên.
 - `i18n/format.ts`: số, tọa độ (`16,4694° B · 107,5778° Đ` ở tiếng Việt, `16.4694° N · 107.5778° E` ở ngôn ngữ khác) và **năm trước Công nguyên**: chữ ngày tháng máy chủ trả sẵn ("179 TCN", "1962 – nay") được đổi
   sang `179 BCE`, `기원전 179`, `公元前179`, `紀元前179` và "present", "현재", "至今", "現在".

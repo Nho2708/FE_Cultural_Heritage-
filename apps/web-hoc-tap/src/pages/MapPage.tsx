@@ -1,16 +1,17 @@
 import type { DiscoveryFilter, HeritagePin } from '@dsvhvn/dung-chung/api';
 import { Button, ButtonLink, Icon } from '@dsvhvn/dung-chung/ui';
-import { lazy, Suspense, useMemo, useState } from 'react';
+import { lazy, Suspense, useMemo, useRef, useState, type Ref } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { pathOf } from '../access/screens';
 import { ListNotes } from '../components/ListNotes';
 import { PublicErrorState } from '../components/PublicErrorState';
 import { ClearFilters, FilterSelects } from '../discovery/FilterSelects';
 import { FILTER_PARAM, KEYWORD_MAX, KEYWORD_MIN, filterFromParams, hasActiveFilter, keywordInvalid, paramsFromFilter, selectFilterCount, toSearch } from '../discovery/filters';
-import { heritagePath, timelinePath } from '../discovery/paths';
+import { directionsPathOf, heritagePath, timelinePath } from '../discovery/paths';
 import { useIsGuest } from '../guest/guestData';
 import { MapNearby } from '../guest/MapNearby';
 import { mapPositionOf, useNearby } from '../guest/useNearby';
+import { useOverlayPadding } from '../discovery/overlayPadding';
 import { useFilterCatalog, useMapPins } from '../discovery/queries';
 import { Thumbnail } from '../discovery/Thumbnail';
 import { useI18n } from '../i18n/context';
@@ -31,7 +32,7 @@ function MapSkeleton() {
   );
 }
 
-/** Thẻ tóm tắt trong popup của ghim: ảnh, tên, tỉnh và loại, mô tả ngắn, hai nút. */
+/** Thẻ tóm tắt trong popup của ghim: ảnh, tên, tỉnh và loại, mô tả ngắn, nút xem chi tiết, mở dòng thời gian và chỉ đường (mở trang chi tiết với phần chỉ đường sẵn). */
 function PinCard({ pin }: { pin: HeritagePin }) {
   const { language, t } = useI18n();
   const meta = [provinceName(pin.provinceName, language), pin.heritageType ? HERITAGE_TYPE_NAME[language][pin.heritageType] : null].filter(Boolean).join(' · ');
@@ -54,6 +55,10 @@ function PinCard({ pin }: { pin: HeritagePin }) {
               {t.map.openTimeline}
             </ButtonLink>
           )}
+          <ButtonLink to={directionsPathOf(pin.slug)} variant="secondary" className="basis-full px-3">
+            <Icon name="navigation" size={16} />
+            {t.directions.button}
+          </ButtonLink>
         </div>
       </div>
     </article>
@@ -82,11 +87,24 @@ function Legend() {
   );
 }
 
-function MapNote({ matched, withoutLocation, truncated, listSearch }: { matched: number; withoutLocation: number; truncated: boolean; listSearch: string }) {
+function MapNote({
+  matched,
+  withoutLocation,
+  truncated,
+  listSearch,
+  ref,
+}: {
+  matched: number;
+  withoutLocation: number;
+  truncated: boolean;
+  listSearch: string;
+  /** Để trang đo phần bản đồ bị thẻ này che (khi thẻ nổi ở màn hình rộng). */
+  ref?: Ref<HTMLDivElement>;
+}) {
   const { language, t } = useI18n();
   const located = matched - withoutLocation;
   return (
-    <div className="flex flex-col gap-2.5 border-t border-border bg-surface px-4 py-3.5 dsvmd:absolute dsvmd:bottom-6 dsvmd:left-(--dsv-content-gutter) dsvmd:z-10 dsvmd:max-w-[560px] dsvmd:rounded-md dsvmd:border-0 dsvmd:shadow-1">
+    <div ref={ref} className="flex flex-col gap-2.5 border-t border-border bg-surface px-4 py-3.5 dsvmd:absolute dsvmd:bottom-6 dsvmd:left-(--dsv-content-gutter) dsvmd:z-10 dsvmd:max-w-[560px] dsvmd:rounded-md dsvmd:border-0 dsvmd:shadow-1">
       <div className="flex items-start gap-2">
         <Icon name="info" size={18} className="mt-0.5 shrink-0 text-on-surface-variant" />
         <div className="flex flex-col gap-0.5">
@@ -118,6 +136,11 @@ export function MapPage() {
   // "Gần bạn" chỉ cho khách; khách bấm nút mới hỏi vị trí (không tự hỏi khi mở trang để không đè lên ghim đang chọn từ địa chỉ trang).
   const guest = useIsGuest();
   const nearby = useNearby({ auto: false });
+  // Thanh bộ lọc và thẻ ghi chú nổi trên bản đồ: đo phần bị che để khung nhìn cả nước không mất cực Bắc và Cà Mau.
+  const areaRef = useRef<HTMLDivElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
+  const [note, setNote] = useState<HTMLDivElement | null>(null);
+  const fitPadding = useOverlayPadding(areaRef, barRef, note);
 
   const setFilter = (next: DiscoveryFilter) => setParams(paramsFromFilter(next));
   const select = (slug: string | null) =>
@@ -139,7 +162,7 @@ export function MapPage() {
   return (
     <div className="relative flex h-[calc(100dvh-var(--dsv-topbar-height))] min-h-[560px] flex-col">
       <title>{t.documentTitle(t.map.title)}</title>
-      <div className="relative min-h-0 flex-1">
+      <div ref={areaRef} className="relative min-h-0 flex-1">
         {/* Lớp riêng để các lớp z-index bên trong Leaflet (400-1000) không nổi lên trên thanh lọc và thẻ nổi. */}
         <div className="absolute inset-0 isolate">
           <Suspense fallback={<MapSkeleton />}>
@@ -156,11 +179,12 @@ export function MapPage() {
               renderPopup={(pin) => <PinCard pin={pin} />}
               userPosition={mapPositionOf(nearby)}
               userLabel={t.guest.nearby.title}
+              fitPadding={fitPadding}
             />
           </Suspense>
         </div>
 
-        <div className="absolute inset-x-3 top-3 z-10 flex flex-col gap-3 rounded-md bg-surface p-3 shadow-1 dsvmd:inset-x-(--dsv-content-gutter) dsvmd:top-6 dsvmd:flex-row dsvmd:items-center dsvmd:px-4 dsvmd:py-3">
+        <div ref={barRef} className="absolute inset-x-3 top-3 z-10 flex flex-col gap-3 rounded-md bg-surface p-3 shadow-1 dsvmd:inset-x-(--dsv-content-gutter) dsvmd:top-6 dsvmd:flex-row dsvmd:items-center dsvmd:px-4 dsvmd:py-3">
           <div className="flex items-center justify-between gap-3">
             <h1 className="type-h3 whitespace-nowrap text-on-background">{t.map.title}</h1>
             <button
@@ -219,7 +243,7 @@ export function MapPage() {
           </div>
         )}
       </div>
-      {data && <MapNote matched={data.totalMatched} withoutLocation={data.withoutLocation} truncated={data.isTruncated} listSearch={listSearch} />}
+      {data && <MapNote ref={setNote} matched={data.totalMatched} withoutLocation={data.withoutLocation} truncated={data.isTruncated} listSearch={listSearch} />}
     </div>
   );
 }

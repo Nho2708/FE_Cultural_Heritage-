@@ -21,7 +21,7 @@ const NOINDEX = 'noindex, nofollow, noarchive';
 function Notice({ title, children }: { title: string; children: string }) {
   return (
     <section className="dsv-content flex min-h-[50dvh] flex-col items-start justify-center gap-4 py-16">
-      <title>{`${title} · Vietnam Heritage`}</title>
+      <title>{`${title} · DiViet`}</title>
       <meta name="robots" content={NOINDEX} />
       <p className="type-label-kicker text-on-surface-muted">XEM TRƯỚC</p>
       <h1 className="type-h1 text-on-surface">{title}</h1>

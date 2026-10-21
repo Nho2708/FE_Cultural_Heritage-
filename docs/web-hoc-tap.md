@@ -1,6 +1,6 @@
 # Web học tập — khung tối thiểu
 
-Ứng dụng React thứ hai (tên hiển thị "Vietnam Heritage"), tách khỏi web quản trị: khám phá di sản công khai cho khách và học
+Ứng dụng React thứ hai (tên hiển thị "DiViet"), tách khỏi web quản trị: khám phá di sản công khai cho khách và học
 sinh, khu học của học sinh đăng nhập bằng **mã học sinh + mật khẩu**. Giao diện đổi theo **cấp học** của học sinh (suy từ
 khối lớp) bằng bộ token; một bố cục, một bộ component, một bộ câu chữ cho cả ba cấp. Bản này có: năm màn hình khám phá công khai (xem [kham-pha-di-san.md](kham-pha-di-san.md)), học sinh đăng nhập, đổi mật khẩu lần đầu, trang học của em (ba bản bố cục theo cấp) và bốn bộ giao diện. Các
 màn hình khác đã có route và guard, hiện "Đang xây dựng".
@@ -38,7 +38,7 @@ khẩu; Đăng xuất). Dưới 841px gom vào ngăn kéo. Đăng xuất về tr
 | Việc | Cách làm |
 |---|---|
 | Ô mã học sinh | Tự viết hoa, bỏ khoảng trắng và dấu gạch khi gõ ("hs 8k2-qx7" → `HS8K2QX7`); chỉ kiểm bắt buộc nhập, mã sai dạng vẫn gửi để máy chủ trả cùng một câu |
-| Dòng cố định | "Quên mật khẩu? Em hãy nhờ thầy cô đặt lại." (không có liên kết quên mật khẩu qua email) và "Thầy cô đăng nhập ở trang quản trị" kèm đường dẫn web quản trị |
+| Dòng cố định | "Quên mật khẩu?" (không có liên kết quên mật khẩu qua email) và "Thầy cô đăng nhập ở trang quản trị" kèm đường dẫn web quản trị |
 | Lỗi | Câu của máy chủ In line (sai mã hoặc mật khẩu; tạm khóa, vô hiệu, lớp đã xóa). Cửa đăng nhập trả 404 hoặc "không có quyền" (máy chủ chưa có endpoint) thì báo câu lỗi hệ thống |
 | Sau đăng nhập | Cờ `mustChangePassword` bật → Đổi mật khẩu chế độ bắt buộc; không thì trang bị chặn trước đó hoặc trang học |
 | Đổi mật khẩu bắt buộc | Không có thanh điều hướng, không có nút bỏ qua; thanh báo đặt mật khẩu mới; mật khẩu mới + nhập lại (không hỏi mật khẩu hiện tại); danh sách quy tắc đánh dấu khi đạt; máy chủ trả token mới, cờ tắt, vào thẳng trang học (hoặc trang đang chờ) |

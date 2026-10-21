@@ -28,7 +28,7 @@ export function LevelTwoLesson({ lesson }: { lesson: StudentLesson }) {
 
   return (
     <section data-bo-cuc="cap-2" aria-labelledby="tieu-de-bai">
-      {!links.preview && <title>{`${lesson.title ?? 'Bài học'} · Vietnam Heritage`}</title>}
+      {!links.preview && <title>{`${lesson.title ?? 'Bài học'} · DiViet`}</title>}
       <header
         className="relative flex min-h-56 items-end bg-surface-container-low bg-cover bg-center"
         style={hero ? { backgroundImage: `linear-gradient(to top, rgb(0 0 0 / 0.75), rgb(0 0 0 / 0.1)), url("${hero}")` } : undefined}
