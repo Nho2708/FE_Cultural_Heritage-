@@ -241,6 +241,7 @@ function ProfileLevelGeneral({
   const code = studentCodeOf(user);
   const facts = classFacts(classroom);
   const myLessons = home?.myLessons ?? [];
+  const pendingCount = (home?.inProgress.length ?? 0) + (home?.openQuizzes.length ?? 0);
 
   // Số ngày học thực tế
   const activeDays = (() => {
@@ -265,7 +266,7 @@ function ProfileLevelGeneral({
         {/* THẺ HỌC SINH ĐIỆN TỬ (Digital Student ID Card — Chuẩn quy học đường, trang trọng, hiện đại) */}
         <div className="rounded-2xl border border-border bg-surface shadow-xs overflow-hidden">
           {/* Dải đầu thẻ: Header trường & hệ thống DiViet */}
-          <div className="bg-slate-900 px-6 py-4 text-white flex items-center justify-between border-b border-border">
+          <div className="bg-slate-900 px-6 py-4 text-white flex items-center justify-between border-b border-slate-800">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
                 HỆ THỐNG GIÁO DỤC DI SẢN VIỆT NAM · DIVIET
@@ -275,7 +276,11 @@ function ProfileLevelGeneral({
               </p>
             </div>
 
-            <div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-md bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-300 border border-emerald-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Đang học
+              </span>
               <span className="rounded-md bg-white/10 px-2.5 py-1 text-xs font-bold text-slate-200 border border-white/20">
                 {levelTitle}
               </span>
@@ -292,9 +297,9 @@ function ProfileLevelGeneral({
                   Ảnh thẻ 3×4
                 </span>
               </div>
-              <div className="mt-2 text-center" aria-hidden="true">
-                <span className="font-mono text-[9px] tracking-widest text-on-surface-muted select-none">
-                  ||| | |||| || | |||
+              <div className="mt-2.5 text-center" aria-hidden="true">
+                <span className="font-mono text-[10px] tracking-[0.25em] text-on-surface-muted select-none">
+                  ||| | |||| || | ||| ||
                 </span>
               </div>
             </div>
@@ -395,14 +400,14 @@ function ProfileLevelGeneral({
               <Link
                 to={pathOf('progress')}
                 className="p-3 rounded-lg bg-surface border border-border hover:border-primary/50 transition-colors no-underline flex flex-col justify-between"
-                title="Xem kết quả đánh giá"
+                title="Xem bài kiểm tra chờ làm"
               >
                 <div className="flex items-center justify-between text-on-surface-muted">
-                  <span className="text-xs font-semibold">Điểm sao</span>
-                  <Icon name="star" size={15} />
+                  <span className="text-xs font-semibold">Bài kiểm tra chờ</span>
+                  <Icon name="clock" size={15} />
                 </div>
                 <p className="mt-2 text-lg font-bold text-on-surface tabular-nums">
-                  {home?.totalStars ?? 0} <span className="text-xs font-normal text-on-surface-variant">sao</span>
+                  {pendingCount} <span className="text-xs font-normal text-on-surface-variant">bài</span>
                 </p>
               </Link>
             </div>
