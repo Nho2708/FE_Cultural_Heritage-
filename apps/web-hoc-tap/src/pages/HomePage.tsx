@@ -280,7 +280,7 @@ function PhoneIllustration() {
     >
       <div className="flex items-center justify-between type-label text-on-background">
         <span>9:41</span>
-        <span className="text-primary">Vietnam Heritage</span>
+        <span className="text-primary">DiViet</span>
       </div>
       <p className="type-h3 text-on-background">Chào em!</p>
       <div className="flex flex-col gap-1.5 rounded-md border border-border bg-surface p-3">

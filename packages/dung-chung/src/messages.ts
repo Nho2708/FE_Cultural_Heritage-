@@ -67,7 +67,7 @@ export const MESSAGES = {
   /** Học sinh không đăng nhập được: tạm khóa, bị vô hiệu, lớp đã xóa hoặc trường đã ngừng. */
   studentCannotSignIn: (reason: string) => `Tài khoản của em tạm thời chưa đăng nhập được. ${reason}`.trim(),
   /** Dòng nhắc cố định trên màn hình đăng nhập của học sinh. */
-  studentForgotPassword: 'Quên mật khẩu? Em hãy nhờ thầy cô đặt lại.',
+  studentForgotPassword: 'Quên mật khẩu?',
   /** Màn hình đổi mật khẩu bắt buộc: lần đầu đăng nhập hoặc sau khi giáo viên đặt lại. */
   studentMustChangePassword:
     'Em hãy đặt mật khẩu mới của riêng em để bắt đầu học. Mật khẩu cần 8-64 ký tự, có chữ hoa, chữ thường và chữ số.',

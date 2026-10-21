@@ -1,12 +1,12 @@
 ﻿<#
 .SYNOPSIS
-  Dựng tệp APK Android của app "Vietnam Heritage" ngay trên máy này (không cần tài khoản Expo), chạy tay bằng tài khoản người dùng.
+  Dựng tệp APK Android của app "DiViet" ngay trên máy này (không cần tài khoản Expo), chạy tay bằng tài khoản người dùng.
 
 .DESCRIPTION
   Cần Android SDK (ANDROID_HOME hoặc %LOCALAPPDATA%\Android\Sdk), Java 17, Node, và bật đường dẫn dài của Windows
   (LongPathsEnabled = 1; không bật thì ninja báo "build.ninja still dirty").
   Các bước: npm ci (nếu chưa có node_modules) -> expo prebuild -> gradlew assembleRelease (chỉ arm64-v8a)
-  -> chép APK ra apps/app-mobile/dist-apk/vietnam-heritage-<phiên bản>-<yyyyMMdd>.apk -> trả lại package.json.
+  -> chép APK ra apps/app-mobile/dist-apk/diviet-<phiên bản>-<yyyyMMdd>.apk -> trả lại package.json.
   Runner của GitHub trên máy demo chạy bằng NETWORK SERVICE, không có Android SDK, nên APK không dựng trong workflow.
 
 .PARAMETER ApiBaseUrl
@@ -121,7 +121,7 @@ try {
 
     $thuMucRa = Join-Path $ThuMucApp 'dist-apk'
     New-Item -ItemType Directory -Force -Path $thuMucRa | Out-Null
-    $apk = Join-Path $thuMucRa ("vietnam-heritage-{0}-{1}.apk" -f $phienBan, (Get-Date -Format 'yyyyMMdd'))
+    $apk = Join-Path $thuMucRa ("diviet-{0}-{1}.apk" -f $phienBan, (Get-Date -Format 'yyyyMMdd'))
     Copy-Item -LiteralPath $apkGoc -Destination $apk -Force
 
     $tep = Get-Item -LiteralPath $apk

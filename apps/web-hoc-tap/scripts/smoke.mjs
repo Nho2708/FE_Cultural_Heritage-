@@ -67,7 +67,7 @@ try {
   await page.getByRole('heading', { level: 2, name: 'Di sản nổi bật' }).waitFor();
   check('Trang chủ: ảnh lớn đầu trang và di sản nổi bật từ API', true);
   check('Trang chủ: câu giới thiệu có tổng số di sản', await page.getByText(`Tìm hiểu ${EXPECT_TOTAL} di sản`).isVisible());
-  check('Trang chủ: khách thấy nút "Học sinh đăng nhập"', (await page.getByRole('link', { name: 'Học sinh đăng nhập' }).count()) > 0);
+  check('Trang chủ: khách thấy nút "Đăng nhập"', (await page.getByRole('link', { name: 'Đăng nhập' }).count()) > 0);
   check('Trang chủ: không có ô nhập mã bài học', (await page.getByLabel(/mã bài học/i).count()) === 0);
   const featured = await page.locator('section[aria-labelledby="di-san-noi-bat"] a').count();
   check('Trang chủ: tối đa 8 di sản nổi bật', featured >= 1 && featured <= 9, `${featured} liên kết (8 thẻ và 1 liên kết xem tất cả)`);

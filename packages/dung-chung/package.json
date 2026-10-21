@@ -14,6 +14,8 @@
     "./map/base": "./src/map/leafletBase.ts",
     "./map/seas": "./src/map/seas.ts",
     "./map/CoordinatePicker": "./src/map/CoordinatePicker.tsx",
+    "./map/route": "./src/map/route.ts",
+    "./map/route-layer": "./src/map/routeLayer.ts",
     "./i18n": "./src/i18n/index.ts",
     "./speech": "./src/speech/index.ts",
     "./embed": "./src/embed/index.ts",
@@ -31,7 +33,8 @@
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run",
     "gen:tokens": "node scripts/gen-tokens.mjs",
-    "check:tokens": "node scripts/gen-tokens.mjs --check"
+    "check:tokens": "node scripts/gen-tokens.mjs --check",
+    "gen:vietnam-land": "node scripts/gen-vietnam-land.mjs"
   },
   "dependencies": {
     "@google/model-viewer": "^4.3.1",

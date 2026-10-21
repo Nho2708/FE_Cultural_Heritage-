@@ -34,20 +34,20 @@ function Entry({
     <li
       className={cn(
         level === 1 &&
-          'dsv-cap1-entry flex flex-col sm:flex-row sm:items-center justify-between gap-5 p-6',
+          'duo-card flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 sm:p-6',
         level === 2 && 'flex flex-col gap-2 rounded-md border border-border bg-surface p-4',
         level === 3 && 'flex flex-wrap items-center gap-3 px-4 py-3',
       )}
     >
       <div className="min-w-0 flex-1">
         {labels && <div className="mb-2.5 flex flex-wrap gap-2">{labels}</div>}
-        <p className={level === 1 ? 'type-h3 text-on-surface font-black tracking-tight' : 'type-label text-on-surface'}>{title}</p>
+        <p className={level === 1 ? 'type-h3 text-emerald-950 font-black tracking-tight' : 'type-label text-on-surface'}>{title}</p>
         <div className={cn(level === 1 ? 'mt-3 flex flex-wrap gap-2' : 'mt-1')}>
           {lines.map((line) =>
             level === 1 ? (
               <span
                 key={line}
-                className="dsv-info-chip inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold"
+                className="dsv-info-chip inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold"
               >
                 {line}
               </span>
@@ -70,7 +70,7 @@ function Entry({
           </div>
         )}
       </div>
-      <div className={level === 1 ? 'shrink-0 sm:self-center' : undefined}>{action}</div>
+      <div className={level === 1 ? 'shrink-0 self-start md:self-center' : undefined}>{action}</div>
     </li>
   );
 }
@@ -82,11 +82,11 @@ function Section({ id, level, title, hint, children, speak }: { id: string; leve
     <section aria-labelledby={id} className="flex flex-col gap-3.5">
       <div className="flex items-center gap-3">
         {level === 1 && icon && (
-          <span className="flex size-11 items-center justify-center rounded-2xl bg-amber-200/80 text-xl shadow-xs text-amber-900" aria-hidden="true">
+          <span className="duo-node-btn size-11 bg-emerald-50 border-emerald-200 border-b-emerald-400 text-xl text-emerald-800 shadow-xs" aria-hidden="true">
             {icon}
           </span>
         )}
-        <h2 id={id} className={level === 1 ? 'type-h2 font-black text-on-surface' : 'type-h2 text-on-surface'}>
+        <h2 id={id} className={level === 1 ? 'type-h2 font-black text-emerald-950 tracking-tight' : 'type-h2 text-on-surface'}>
           {title}
         </h2>
         {level === 1 && speak && <SpeakButton text={speak} label={`Nghe: ${title}`} size="sm" className="dsv-speak-btn" />}
@@ -147,7 +147,7 @@ function Sections({ home, level }: { home: StudentHome; level: Level }) {
                         size={size}
                         className={cn(
                           level === 1
-                            ? 'dsv-btn-play px-7 py-3.5 flex items-center justify-center gap-2'
+                            ? 'duo-btn-green px-7 py-3.5 flex items-center justify-center gap-2 text-base'
                             : pill,
                         )}
                       >
@@ -161,7 +161,7 @@ function Sections({ home, level }: { home: StudentHome; level: Level }) {
                         size={size}
                         className={cn(
                           level === 1
-                            ? 'dsv-mission-btn px-6 py-3.5 flex items-center justify-center gap-2'
+                            ? 'duo-btn-yellow px-6 py-3.5 flex items-center justify-center gap-2 text-base'
                             : pill,
                         )}
                       >
@@ -206,7 +206,7 @@ function Sections({ home, level }: { home: StudentHome; level: Level }) {
                         size={size}
                         className={cn(
                           level === 1
-                            ? 'dsv-btn-play px-7 py-3.5 flex items-center justify-center gap-2'
+                            ? 'duo-btn-green px-7 py-3.5 flex items-center justify-center gap-2 text-base'
                             : pill,
                         )}
                       >
@@ -220,7 +220,7 @@ function Sections({ home, level }: { home: StudentHome; level: Level }) {
                         size={size}
                         className={cn(
                           level === 1
-                            ? 'dsv-mission-btn px-6 py-3.5 flex items-center justify-center gap-2'
+                            ? 'duo-btn-yellow px-6 py-3.5 flex items-center justify-center gap-2 text-base'
                             : pill,
                         )}
                       >
@@ -254,7 +254,7 @@ function Sections({ home, level }: { home: StudentHome; level: Level }) {
                       size={size}
                       className={cn(
                         level === 1
-                          ? 'dsv-btn-lesson px-7 py-3.5 flex items-center justify-center gap-2'
+                          ? 'duo-btn-blue px-7 py-3.5 flex items-center justify-center gap-2 text-base'
                           : pill,
                       )}
                     >

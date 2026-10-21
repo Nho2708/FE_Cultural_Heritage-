@@ -1,7 +1,7 @@
 import type { Strings } from './vi';
 
 export const zhHans: Strings = {
-  appName: 'Vietnam Heritage',
+  appName: 'DiViet',
   common: {
     back: '返回',
     close: '关闭',
@@ -176,6 +176,18 @@ export const zhHans: Strings = {
     open: '查看详情',
     listInstead: '查看遗产列表',
     withoutLocation: '{{count}} 处遗产没有坐标',
+  },
+  directions: {
+    button: '路线',
+    title: '路线',
+    locating: '正在获取您的位置…',
+    denied: '尚未允许使用位置，暂时无法规划路线。请在手机设置中开启，或在 Google 地图中打开。',
+    unavailable: '无法确定您的位置。请重试，或在 Google 地图中打开。',
+    allow: '重试',
+    openSettings: '打开设置',
+    openGoogleMaps: '在 Google 地图中打开',
+    pageUnavailable: '无法加载路线，请改用 Google 地图打开。',
+    privacy: '您的位置仅用于计算路线，不会被保存。',
   },
   history: {
     title: '您的历史',

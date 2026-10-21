@@ -1,0 +1,36 @@
+# Phục vụ hai web đã build bên trong ảnh "web" (máy chủ Google Cloud): cổng 8080 web học tập, 8081 web quản trị.
+# Chỉ trả tệp tĩnh, không HTTPS: Caddy cửa vào của máy chủ (repo backend, deploy/google-cloud/may-chu/Caddyfile) giữ HTTPS và
+# chuyển /api, /files, /health sang API. Cùng quy tắc với web.config của IIS trên máy demo.
+{
+	admin off
+	auto_https off
+	persist_config off
+}
+
+(mot-trang) {
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+	}
+	# Tệp trong assets/ có băm trong tên nên cache một năm; tệp thiếu trả 404 thật, không trả index.html.
+	handle /assets/* {
+		header Cache-Control "public, max-age=31536000, immutable"
+		file_server
+	}
+	# Còn lại (index.html, đường dẫn của ứng dụng một trang, video, phụ đề) luôn hỏi lại bản mới để nhận bản triển khai mới ngay.
+	handle {
+		header Cache-Control "no-cache"
+		try_files {path} /index.html
+		file_server
+	}
+}
+
+:8080 {
+	root * /srv/web-hoc-tap
+	import mot-trang
+}
+
+:8081 {
+	root * /srv/web-quan-tri
+	import mot-trang
+}

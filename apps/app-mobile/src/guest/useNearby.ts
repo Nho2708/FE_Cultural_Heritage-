@@ -10,9 +10,10 @@ import type { WithDistance } from './nearby';
 
 export type NearbyStatus = 'off' | 'locating' | 'denied' | 'ready' | 'error';
 
-class LocationDenied extends Error {}
+export class LocationDenied extends Error {}
 
-async function currentPosition(): Promise<{ latitude: number; longitude: number }> {
+/** Xin quyền vị trí khi dùng ứng dụng (nếu chưa có) rồi lấy vị trí; bị từ chối thì ném `LocationDenied`. Dùng cho "Gần bạn" và màn hình chỉ đường. */
+export async function currentPosition(): Promise<{ latitude: number; longitude: number }> {
   const permission = await Location.getForegroundPermissionsAsync();
   const granted = permission.granted || (await Location.requestForegroundPermissionsAsync()).granted;
   if (!granted) throw new LocationDenied();

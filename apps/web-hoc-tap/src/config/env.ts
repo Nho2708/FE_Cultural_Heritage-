@@ -28,5 +28,11 @@ export const ANDROID_APP_URL: string | null = import.meta.env.VITE_ANDROID_APP_U
  */
 export const INTRO_VIDEO_BASE_URL: string | null = import.meta.env.VITE_INTRO_VIDEO_BASE_URL?.trim().replace(/\/+$/, '') || null;
 
+/**
+ * Gốc máy chủ OSRM tính đường tới di sản (gọi thẳng từ trình duyệt, không qua backend). Mặc định máy chủ công cộng của FOSSGIS
+ * (routing.openstreetmap.de); đặt biến này để dùng máy chủ riêng. Không có dấu / ở cuối.
+ */
+export const ROUTING_BASE_URL: string = import.meta.env.VITE_ROUTING_BASE_URL?.trim().replace(/\/+$/, '') || 'https://routing.openstreetmap.de';
+
 /** Web quản trị: nơi thầy cô đăng nhập. */
 export const ADMIN_WEB_URL = read('VITE_ADMIN_WEB_URL', DEV_DEFAULTS.adminWeb);

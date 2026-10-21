@@ -45,6 +45,25 @@ export interface Localization {
   isMachineTranslated: boolean;
 }
 
+/** Một câu của thuyết minh tạo sẵn: chữ gốc để hiển thị và mốc bắt đầu, kết thúc (mili giây) trong tệp âm thanh. */
+export interface NarrationSentence {
+  text: string;
+  startMs: number;
+  endMs: number;
+}
+
+/**
+ * Thuyết minh tạo sẵn của bản tóm tắt ngắn: tệp MP3 đọc bằng giọng tự host (tạo trên máy dev, tải lên máy chủ) kèm mốc từng câu để tô sáng
+ * khớp âm thanh. `audioUrl` cùng dạng với đường dẫn tệp khác của API (ảnh, mô hình 3D): ghép bằng `resolveFileUrl` khi là `/files/...`.
+ */
+export interface PublicNarration {
+  audioUrl: string;
+  durationMs: number;
+  /** Giọng đã dùng, ví dụ `vieneu-mai-anh`, `melo-en-us`. */
+  voice: string;
+  sentences: NarrationSentence[];
+}
+
 /** Tóm tắt của một di sản: `shortText` để nghe thuyết minh, `detailedText` để đọc. Lấy từ bản đã lưu, không gọi AI khi xem. */
 export interface PublicSummary {
   heritageId: number;
@@ -53,6 +72,11 @@ export interface PublicSummary {
   localization: Localization;
   shortText: string;
   detailedText: string;
+  /**
+   * Thuyết minh tạo sẵn cho đúng ngôn ngữ của bản tóm tắt đang trả (khớp với `shortText` hiện tại); null hoặc thiếu (máy chủ cũ) thì nghe bằng
+   * giọng của thiết bị như trước.
+   */
+  narration?: PublicNarration | null;
 }
 
 /** Thời kỳ của bộ lọc: năm âm là trước Công nguyên; các khoảng cố định do máy chủ quyết định. */

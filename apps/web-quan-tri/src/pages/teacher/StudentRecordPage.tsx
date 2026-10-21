@@ -222,7 +222,7 @@ export default function StudentRecordPage() {
     return (
       <AreaPage>
         {crumbs}
-        <title>Hồ sơ học tập của học sinh · Vietnam Heritage</title>
+        <title>Hồ sơ học tập của học sinh · DiViet</title>
         {notFound ? (
           <EmptyState icon="info" title="Không tìm thấy học sinh." action={<Button variant="secondary" onClick={() => history.back()}>Quay lại</Button>}>
             Học sinh không tồn tại, đã bị xóa hoặc không thuộc lớp do thầy cô phụ trách.
@@ -237,7 +237,7 @@ export default function StudentRecordPage() {
   const data = query.data;
   return (
     <AreaPage>
-      <title>{`${data.fullName ?? 'Học sinh'} · Hồ sơ học tập · Vietnam Heritage`}</title>
+      <title>{`${data.fullName ?? 'Học sinh'} · Hồ sơ học tập · DiViet`}</title>
       {crumbs}
       <header className="flex flex-wrap items-center gap-4">
         <span aria-hidden="true" className="flex size-16 shrink-0 items-center justify-center rounded-full bg-primary-container type-h3 text-on-primary-container">
