@@ -120,10 +120,28 @@ function ListThree({ items }: { items: Suggestion[] }) {
 }
 
 function Praise({ text, level }: { text: string; level: Level }) {
+  let displayText = text;
+  if (level === 2 && text.includes('giỏi quá')) {
+    displayText = 'Em đã hoàn thành tốt các câu hỏi, không có phần cần ôn lại. Hãy tiếp tục làm bài mới nhé.';
+  } else if (level === 3 && text.includes('giỏi quá')) {
+    displayText = 'Đã nắm vững toàn bộ kiến thức di sản trong bài kiểm tra. Không có nội dung cần ôn tập thêm.';
+  }
+
   return (
-    <p className={cn('flex items-center gap-3 rounded-md bg-success-container p-4 text-on-success-container', level === 1 ? 'type-h4' : 'type-body-m')}>
-      <Icon name="star" size={level === 1 ? 28 : 20} />
-      {text}
+    <p
+      className={cn(
+        'flex items-center gap-3 rounded-lg border p-4',
+        level === 1
+          ? 'bg-success-container text-on-success-container border-transparent type-h4'
+          : 'bg-surface border-border text-on-surface type-body-m shadow-2xs'
+      )}
+    >
+      <Icon
+        name={level === 1 ? 'star' : 'check'}
+        size={level === 1 ? 28 : 20}
+        className={level === 1 ? 'text-amber-500' : 'text-emerald-600 shrink-0'}
+      />
+      <span>{displayText}</span>
     </p>
   );
 }
