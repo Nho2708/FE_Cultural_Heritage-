@@ -1,4 +1,4 @@
-# App mobile "Vietnam Heritage" (React Native + Expo)
+# App mobile "DiViet" (React Native + Expo)
 
 Một app, **hai chế độ**, dùng cùng API `/api/v1` với hai web:
 

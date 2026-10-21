@@ -22,7 +22,7 @@ describe('khung video giới thiệu', () => {
           captions={['ko']}
           defaultCaption="ko"
           title="소개 영상"
-          label="Vietnam Heritage 소개 영상"
+          label="DiViet 소개 영상"
           noSupport="이 브라우저에서는 영상을 재생할 수 없습니다."
           headingId="video"
         />
@@ -32,7 +32,7 @@ describe('khung video giới thiệu', () => {
     expect(screen.getByRole('heading', { level: 2, name: '소개 영상' })).toBeInTheDocument();
     const video = document.querySelector('video');
     if (!video) throw new Error('Không thấy video');
-    expect(video).toHaveAttribute('aria-label', 'Vietnam Heritage 소개 영상');
+    expect(video).toHaveAttribute('aria-label', 'DiViet 소개 영상');
     expect(video).toHaveAttribute('preload', 'none');
     expect(video).toHaveAttribute('controls');
     expect(video).not.toHaveAttribute('autoplay');

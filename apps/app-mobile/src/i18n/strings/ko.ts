@@ -1,7 +1,7 @@
 import type { Strings } from './vi';
 
 export const ko: Strings = {
-  appName: 'Vietnam Heritage',
+  appName: 'DiViet',
   common: {
     back: '뒤로',
     close: '닫기',

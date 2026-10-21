@@ -90,7 +90,7 @@ export function SchoolContactForm() {
         <SectionTitle
           id="lien-he-tieu-de"
           title="Liên hệ để được tạo tài khoản cho trường"
-          text="Gửi thông tin của trường, nhóm Vietnam Heritage sẽ liên hệ lại qua email. Trường mới nhận gói Miễn phí để dùng thử."
+          text="Gửi thông tin của trường, nhóm DiViet sẽ liên hệ lại qua email. Trường mới nhận gói Miễn phí để dùng thử."
         />
 
         <div className="max-w-[860px]">

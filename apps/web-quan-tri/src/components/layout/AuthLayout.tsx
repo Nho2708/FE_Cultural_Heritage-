@@ -17,7 +17,7 @@ interface AuthLayoutProps {
 export function AuthLayout({ photo, title, subtitle, children }: AuthLayoutProps) {
   return (
     <div className="dsvmd:grid dsvmd:min-h-[calc(100dvh-var(--dsv-topbar-height))] dsvmd:grid-cols-2">
-      <title>{`${title} · Vietnam Heritage`}</title>
+      <title>{`${title} · DiViet`}</title>
       <figure className="relative hidden overflow-hidden bg-(--dsv-card-placeholder-bg) dsvmd:block">
         {/* Chỉ tải ảnh từ 841px: dưới mốc này khung ảnh bị ẩn, <source> theo media query tránh tải thừa trên điện thoại. */}
         <picture>
@@ -39,7 +39,11 @@ export function AuthLayout({ photo, title, subtitle, children }: AuthLayoutProps
 
       <div className="flex justify-center px-4 py-10 dsvmd:items-center dsvmd:px-10 dsvmd:py-16">
         <div className="w-full max-w-[400px]">
-          <BrandLogo variant="badge" size={80} className="mb-6" />
+          {/* Huy hiệu không có chữ nên tên "DiViet" viết ngay cạnh; huy hiệu chỉ là hình trang trí. */}
+          <div className="mb-6 flex items-center gap-3">
+            <BrandLogo variant="badge" size={80} decorative />
+            <span className="type-h3 text-on-surface">DiViet</span>
+          </div>
           <h1 className="type-h2 text-on-surface dsvmd:type-display-l">{title}</h1>
           {subtitle && <p className="mt-2 type-body-m text-on-surface-variant">{subtitle}</p>}
           <div className="mt-8">{children}</div>

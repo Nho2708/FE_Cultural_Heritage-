@@ -285,7 +285,7 @@ function LevelTwoThreeProgress({ progress, rows, level }: { progress: StudentPro
   const go = (id: TabId) => setParams({ tab: id }, { replace: true });
 
   useEffect(() => {
-    document.title = 'Tiến độ của em · Vietnam Heritage';
+    document.title = 'Tiến độ của em · DiViet';
   }, []);
 
   return (
@@ -398,7 +398,7 @@ function LevelOneProgress({ progress, rows }: { progress: StudentProgress; rows:
   ] as const;
 
   useEffect(() => {
-    document.title = 'Sao của em · Vietnam Heritage';
+    document.title = 'Sao của em · DiViet';
   }, []);
 
   return (
