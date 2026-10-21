@@ -184,24 +184,33 @@ export function LevelTwo({ user, classroom }: { user: StudentProfile; classroom:
             </p>
             <Link
               to={pathOf('progress')}
-              className="flex items-center justify-between py-2 px-2.5 rounded-lg text-xs font-medium text-on-surface hover:bg-surface-container-low no-underline transition-colors"
+              className="flex items-center justify-between py-2 px-2.5 rounded-lg text-xs font-medium text-on-surface hover:bg-surface-container-low no-underline transition-colors group"
             >
-              <span>Xem tiến độ học tập</span>
-              <span>→</span>
+              <span className="flex items-center gap-2">
+                <Icon name="file-text" size={15} className="text-on-surface-variant group-hover:text-primary transition-colors" />
+                <span>Xem tiến độ học tập</span>
+              </span>
+              <Icon name="chevron-right" size={14} className="text-on-surface-muted group-hover:text-primary transition-colors" />
             </Link>
             <Link
               to={`${pathOf('progress')}?tab=huy-hieu`}
-              className="flex items-center justify-between py-2 px-2.5 rounded-lg text-xs font-medium text-on-surface hover:bg-surface-container-low no-underline transition-colors"
+              className="flex items-center justify-between py-2 px-2.5 rounded-lg text-xs font-medium text-on-surface hover:bg-surface-container-low no-underline transition-colors group"
             >
-              <span>Kho huy hiệu di sản</span>
-              <span>→</span>
+              <span className="flex items-center gap-2">
+                <Icon name="shield-check" size={15} className="text-on-surface-variant group-hover:text-primary transition-colors" />
+                <span>Kho huy hiệu di sản</span>
+              </span>
+              <Icon name="chevron-right" size={14} className="text-on-surface-muted group-hover:text-primary transition-colors" />
             </Link>
             <Link
               to={pathOf('changePassword')}
-              className="flex items-center justify-between py-2 px-2.5 rounded-lg text-xs font-medium text-on-surface hover:bg-surface-container-low no-underline transition-colors"
+              className="flex items-center justify-between py-2 px-2.5 rounded-lg text-xs font-medium text-on-surface hover:bg-surface-container-low no-underline transition-colors group"
             >
-              <span>Đổi mật khẩu tài khoản</span>
-              <span>→</span>
+              <span className="flex items-center gap-2">
+                <Icon name="key" size={15} className="text-on-surface-variant group-hover:text-primary transition-colors" />
+                <span>Đổi mật khẩu tài khoản</span>
+              </span>
+              <Icon name="chevron-right" size={14} className="text-on-surface-muted group-hover:text-primary transition-colors" />
             </Link>
           </div>
         </aside>
