@@ -84,7 +84,7 @@ export function LevelOneLesson({ lesson, initialPosition, onPositionChange }: Le
 
   return (
     <section className="dsv-content dsv-section" data-bo-cuc="cap-1" aria-labelledby="tieu-de-bai">
-      {!links.preview && <title>{`${lesson.title ?? 'Bài học'} · Vietnam Heritage`}</title>}
+      {!links.preview && <title>{`${lesson.title ?? 'Bài học'} · DiViet`}</title>}
       <div className="mx-auto flex max-w-[960px] flex-col gap-(--dsv-block-gap)">
         <div className="flex flex-wrap items-center gap-4">
           {links.home && (

@@ -8,7 +8,7 @@ import { SchoolContactForm } from '../intro/SchoolContactForm';
 import { revealItem } from '../intro/reveal';
 
 // Trang Dành cho nhà trường (công khai, chỉ tiếng Việt): cho ban giám hiệu, quản trị trường và giáo viên của trường chưa
-// dùng Vietnam Heritage. Bốn bước làm việc của giáo viên hiện lần lượt khi cuộn tới, ba cấp học, gói dịch vụ (bắt đầu với gói
+// dùng DiViet. Bốn bước làm việc của giáo viên hiện lần lượt khi cuộn tới, ba cấp học, gói dịch vụ (bắt đầu với gói
 // Miễn phí, không ghi giá), lối đăng nhập web quản trị cho người đã có tài khoản và cách để trường có tài khoản (quản trị
 // hệ thống tạo theo đề nghị của trường; trang không đăng email hay số điện thoại cá nhân). Khách đang chọn ngôn ngữ khác
 // tiếng Việt thấy một dòng ghi chú bằng ngôn ngữ của mình.
@@ -82,10 +82,10 @@ export function ForSchoolsPage() {
   const { language } = useI18n();
   return (
     <>
-      <title>Dành cho nhà trường · Vietnam Heritage</title>
+      <title>Dành cho nhà trường · DiViet</title>
       <meta
         name="description"
-        content="Vietnam Heritage cho nhà trường: giáo viên soạn bài học và bài kiểm tra về di sản Việt Nam, học sinh học theo cấp 1, 2, 3, thầy cô xem kết quả của lớp."
+        content="DiViet cho nhà trường: giáo viên soạn bài học và bài kiểm tra về di sản Việt Nam, học sinh học theo cấp 1, 2, 3, thầy cô xem kết quả của lớp."
       />
       <VietnameseOnlyNote />
       <div lang="vi">
@@ -168,7 +168,7 @@ export function ForSchoolsPage() {
           captions={['vi', 'en']}
           defaultCaption={language === 'vi' ? null : 'en'}
           title="Video giới thiệu cho nhà trường"
-          label="Video giới thiệu Vietnam Heritage cho nhà trường"
+          label="Video giới thiệu DiViet cho nhà trường"
           noSupport="Trình duyệt này không phát được video."
           headingId="nha-truong-video"
         />
@@ -181,7 +181,7 @@ export function ForSchoolsPage() {
                 Cách để trường bắt đầu
               </h2>
               <p className="type-body-m text-on-surface-variant">
-                Tài khoản của trường do quản trị hệ thống Vietnam Heritage tạo theo đề nghị của nhà trường. Người phụ trách được tạo tài khoản quản trị
+                Tài khoản của trường do quản trị hệ thống DiViet tạo theo đề nghị của nhà trường. Người phụ trách được tạo tài khoản quản trị
                 trường nhận email để đặt mật khẩu, rồi đăng nhập web quản trị để thêm giáo viên.
               </p>
               <p className="type-body-m text-on-surface-variant">

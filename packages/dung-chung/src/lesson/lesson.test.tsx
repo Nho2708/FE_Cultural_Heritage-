@@ -116,7 +116,7 @@ describe('bố cục theo cấp', () => {
 
   it('xem trước không đặt tiêu đề trang của khu học', () => {
     show(lessonOf(2), NO_LESSON_LINKS);
-    expect(document.title).not.toContain('Vietnam Heritage');
+    expect(document.title).not.toContain('DiViet');
   });
 });
 
