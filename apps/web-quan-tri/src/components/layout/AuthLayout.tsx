@@ -39,7 +39,7 @@ export function AuthLayout({ photo, title, subtitle, children }: AuthLayoutProps
 
       <div className="flex justify-center px-4 py-10 dsvmd:items-center dsvmd:px-10 dsvmd:py-16">
         <div className="w-full max-w-[400px]">
-          {/* Huy hiệu không có chữ nên tên "DiViet" viết ngay cạnh; huy hiệu chỉ là hình trang trí. */}
+          {/* Biểu tượng không có chữ nên tên "DiViet" viết ngay cạnh; biểu tượng chỉ là hình trang trí. */}
           <div className="mb-6 flex items-center gap-3">
             <BrandLogo variant="badge" size={80} decorative />
             <span className="type-h3 text-on-surface">DiViet</span>

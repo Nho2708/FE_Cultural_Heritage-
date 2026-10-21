@@ -7,6 +7,8 @@ export const EASING = {
   enter: Easing.bezier(0.19, 1, 0.22, 1),
   fade: Easing.bezier(0, 0, 0.25, 1),
   exit: Easing.bezier(0.4, 0, 1, 1),
+  /** Rơi xuống nhanh dần (mái và nóc của logo chuyển động). */
+  drop: Easing.bezier(0.4, 0, 0.7, 1),
 } as const;
 
 export const DURATION = {

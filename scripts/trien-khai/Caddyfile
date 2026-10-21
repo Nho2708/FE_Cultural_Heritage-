@@ -20,6 +20,8 @@
 	# Còn lại (index.html, đường dẫn của ứng dụng một trang, video, phụ đề) luôn hỏi lại bản mới để nhận bản triển khai mới ngay.
 	handle {
 		header Cache-Control "no-cache"
+		# Tệp kê khai ứng dụng web không có trong bảng kiểu nội dung có sẵn của Caddy: khai báo để trình duyệt nhận đúng kiểu.
+		header /site.webmanifest Content-Type "application/manifest+json"
 		try_files {path} /index.html
 		file_server
 	}

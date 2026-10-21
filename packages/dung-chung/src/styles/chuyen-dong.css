@@ -1,55 +1,43 @@
-/* Chuyển động giới thiệu dùng chung của hai web: huy hiệu chuyển động (AnimatedLogo) và khối hiện lên khi cuộn tới
+/* Chuyển động giới thiệu dùng chung của hai web: biểu tượng chuyển động (AnimatedLogo) và khối hiện lên khi cuộn tới
  * (useRevealOnce). Nạp sau tokens.css. Kiểu gốc của mọi phần tử là trạng thái cuối, chuyển động chỉ nằm trong
- * @keyframes với fill-mode both: tắt chuyển động (giảm chuyển động, trình duyệt cũ) thì vẫn thấy đủ huy hiệu và nội dung. */
+ * @keyframes với fill-mode both: tắt chuyển động (giảm chuyển động, trình duyệt cũ) thì vẫn thấy đủ biểu tượng và nội dung. */
 
+/* Biểu tượng mái đình che sách mở, bốn phần: hai trang sách mở ra từ gáy rồi mái và nóc rơi xuống (0–1050 ms).
+ * transform-box: fill-box để gốc quay tính theo khung bao của từng nét: trang sách phóng ra từ cạnh gáy, ở đáy trang. */
+.dsv-logo-motion path {
+  transform-box: fill-box;
+}
+
+/* Mái và nóc rơi từ phía trên khung cắt sát của biểu tượng: để phần ngoài khung vẫn hiện trong lúc rơi. */
 .dsv-logo-motion {
-  position: relative;
-  display: inline-block;
-  flex-shrink: 0;
-  isolation: isolate;
+  overflow: visible;
 }
 
-.dsv-logo-motion > * {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+.dsv-logo-motion__sach-trai,
+.dsv-logo-motion__sach-phai {
+  animation:
+    dsv-logo-page 450ms var(--dsv-ease-expo-out) both,
+    dsv-logo-fade 200ms linear both;
 }
 
-/* Ảnh lớp cổng chưa tải xong: giữ mọi chuyển động ở khung đầu. */
-.dsv-logo-motion[data-logo-motion='loading'] * {
-  animation-play-state: paused;
+.dsv-logo-motion__sach-trai {
+  transform-origin: 100% 100%;
 }
 
-.dsv-logo-motion__navy {
-  fill: var(--color-brand-navy);
-  animation: dsv-logo-fade var(--dsv-duration-image) var(--dsv-ease-fade) both;
+.dsv-logo-motion__sach-phai {
+  transform-origin: 0 100%;
 }
 
-.dsv-logo-motion__gold {
-  fill: none;
-  stroke: var(--color-brand-gold);
-  stroke-width: 2;
-  animation: dsv-logo-draw 400ms var(--dsv-ease-fade) both;
+.dsv-logo-motion__mai {
+  animation:
+    dsv-logo-drop-roof 600ms linear 250ms both,
+    dsv-logo-fade 240ms linear 250ms both;
 }
 
-.dsv-logo-motion > .dsv-logo-motion__disc {
-  inset: 6.7%;
-  width: auto;
-  height: auto;
-  border-radius: 50%;
-  background-color: var(--color-brand-cream);
-  animation: dsv-logo-disc var(--dsv-duration-slow) var(--dsv-ease-expo-out) 200ms both;
-}
-
-.dsv-logo-motion__tier {
-  animation: dsv-logo-rise 320ms var(--dsv-ease-expo-out) calc(500ms + var(--tier, 0) * var(--dsv-stagger-tier)) both;
-}
-
-/* Mái trên "đáp" nhẹ: vượt lên dưới 1% rồi về chỗ. */
-.dsv-logo-motion__tier--roof {
-  animation-name: dsv-logo-land;
-  animation-duration: 420ms;
+.dsv-logo-motion__noc {
+  animation:
+    dsv-logo-drop-ridge 500ms linear 550ms both,
+    dsv-logo-fade 200ms linear 550ms both;
 }
 
 @keyframes dsv-logo-fade {
@@ -58,41 +46,35 @@
   }
 }
 
-/* Vẽ bằng nét đứt dài đúng một vòng; xong thì bỏ nét đứt để chỗ nối ở đỉnh không còn vệt mảnh. */
-@keyframes dsv-logo-draw {
+@keyframes dsv-logo-page {
   from {
-    stroke-dasharray: 0 1;
-  }
-  99.9% {
-    stroke-dasharray: 1 0;
-  }
-  to {
-    stroke-dasharray: none;
+    transform: scaleX(0.15);
   }
 }
 
-@keyframes dsv-logo-disc {
-  from {
-    opacity: 0;
-    transform: scale(0.92);
-  }
-}
-
-@keyframes dsv-logo-rise {
-  from {
-    opacity: 0;
-    transform: translateY(8%);
-  }
-}
-
-@keyframes dsv-logo-land {
+/* Rơi xuống, vượt chỗ cũ chừng 2 đơn vị ở 60% rồi về chỗ. */
+@keyframes dsv-logo-drop-roof {
   0% {
-    opacity: 0;
-    transform: translateY(8%);
+    transform: translateY(-28px);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.7, 1);
   }
-  70% {
-    opacity: 1;
-    transform: translateY(-0.8%);
+  60% {
+    transform: translateY(2px);
+    animation-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes dsv-logo-drop-ridge {
+  0% {
+    transform: translateY(-20px);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.7, 1);
+  }
+  60% {
+    transform: translateY(1.5px);
+    animation-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
   }
   100% {
     transform: translateY(0);
@@ -145,7 +127,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dsv-logo-motion *,
+  .dsv-logo-motion path,
   .dsv-draw-x,
   [data-reveal] [data-reveal-item],
   [data-reveal] [data-reveal-line] {

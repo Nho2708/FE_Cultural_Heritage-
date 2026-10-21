@@ -1,8 +1,8 @@
-import { AccessibilityInfo } from 'react-native';
+import { AccessibilityInfo, Image } from 'react-native';
 import { act, create } from 'react-test-renderer';
 import { BrandSplash } from './BrandSplash';
 
-// Màn hình chờ trong app: không có thời gian chờ giả (nạp xong thì phần ra chạy ngay và gỡ sau 300 ms), và bật giảm chuyển động thì huy hiệu đứng yên
+// Màn hình chờ trong app: không có thời gian chờ giả (nạp xong thì phần ra chạy ngay và gỡ sau 300 ms), và bật giảm chuyển động thì biểu tượng đứng yên
 // và gỡ ngay khi nạp xong.
 
 jest.mock('expo-splash-screen', () => ({ preventAutoHideAsync: jest.fn(async () => true), hideAsync: jest.fn(async () => true), setOptions: jest.fn() }));
@@ -31,9 +31,10 @@ describe('BrandSplash', () => {
     jest.restoreAllMocks();
   });
 
-  it('shows the emblem and the name while loading and does not finish by itself', async () => {
+  it('shows the four logo layers and the name while loading and does not finish by itself', async () => {
     const onDone = jest.fn();
     const tree = await render(false, onDone);
+    expect(tree.root.findAllByType(Image)).toHaveLength(4);
     expect(tree.root.findAll((node) => node.props.children === 'DiViet').length).toBeGreaterThan(0);
     await act(async () => {
       jest.advanceTimersByTime(10_000);
@@ -56,7 +57,7 @@ describe('BrandSplash', () => {
     expect(onDone).toHaveBeenCalledTimes(1);
   });
 
-  it('keeps the emblem still and finishes at once when reduce motion is on', async () => {
+  it('keeps the logo still and finishes at once when reduce motion is on', async () => {
     jest.spyOn(AccessibilityInfo, 'isReduceMotionEnabled').mockResolvedValue(true);
     const onDone = jest.fn();
     const tree = await render(false, onDone);
