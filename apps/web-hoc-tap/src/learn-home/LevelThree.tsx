@@ -6,14 +6,14 @@ import { classFacts, whoAmI } from './classroom';
 import { LearningSections } from './LearningSections';
 import { useStudentHome } from './useStudentHome';
 
-// Trang học của em — bản cấp 3 (khối 10-12): Phong cách Học viện Nghiên cứu (Academic Scholar Dashboard).
-// Bố cục gọn gàng, mật độ thông tin cao, giao diện chuẩn học thuật, không linh vật.
+// Trang học của em — bản cấp 3 (khối 10-12): Phong cách Học viện Nghiên cứu Di sản (Academic Scholar Portal).
+// Bố cục tinh giản, mang tính học thuật cao, tuyệt đối không dùng hình tượng hoạt hình hoặc phong cách trẻ em.
 // Thanh bên Mục lục neo dính (sticky TOC); một cột nội dung rộng gồm Đầu trang học viện, Lớp của em, Việc cần làm và Gợi ý.
 
 const TOC = [
-  { id: 'lop-cua-em', label: 'Lớp của em', icon: 'school' as const },
-  { id: 'viec-can-lam', label: 'Việc cần làm', icon: 'clipboard-list' as const },
-  { id: 'goi-y', label: 'Gợi ý', icon: 'sparkles' as const },
+  { id: 'lop-cua-em', label: 'Lớp của em' },
+  { id: 'viec-can-lam', label: 'Việc cần làm' },
+  { id: 'goi-y', label: 'Gợi ý' },
 ];
 
 export function LevelThree({ user, classroom }: { user: StudentProfile; classroom: StudentClassDetail }) {
@@ -42,47 +42,40 @@ export function LevelThree({ user, classroom }: { user: StudentProfile; classroo
         {/* THANH BÊN MỤC LỤC HỌC THUẬT (Sticky Navigation) */}
         <nav
           aria-label="Mục lục"
-          className="h-fit rounded-xl border border-border bg-surface p-3 lg:sticky lg:top-20 shadow-2xs"
+          className="h-fit rounded-lg border border-border bg-surface p-2.5 lg:sticky lg:top-20 shadow-2xs"
         >
-          <div className="flex items-center gap-2 px-3 py-2 border-b border-border/70 mb-1">
-            <Icon name="menu" size={16} className="text-on-surface-variant" />
-            <span className="type-label text-on-surface font-bold text-xs uppercase tracking-wider">
-              Mục lục trang học
+          <div className="flex items-center gap-2 px-3 py-2 border-b border-border/80 mb-1">
+            <Icon name="list" size={16} className="text-on-surface-muted" />
+            <span className="type-label text-on-surface-variant font-bold text-xs uppercase tracking-wider">
+              Mục lục
             </span>
           </div>
 
-          <ul className="flex flex-col gap-1 mt-1">
+          <ul className="flex flex-col gap-0.5">
             {TOC.map((item) => (
               <li key={item.id}>
                 <a
                   href={'#' + item.id}
-                  className="flex items-center justify-between rounded-lg px-3 py-2 type-body-m text-on-surface hover:bg-surface-container-low hover:text-primary transition-colors no-underline font-medium"
+                  className="block rounded-md px-3 py-2 type-body-m text-on-surface hover:bg-surface-container-low hover:text-primary transition-colors no-underline font-medium text-sm"
                 >
-                  <span>{item.label}</span>
-                  <span aria-hidden="true" className="text-xs text-on-surface-muted opacity-60">→</span>
+                  {item.label}
                 </a>
               </li>
             ))}
           </ul>
-
-          <div className="mt-4 pt-3 border-t border-border/70 px-3">
-            <p className="text-[11px] text-on-surface-muted leading-relaxed italic">
-              «Học di sản để thấu hiểu cội nguồn và dựng xây tương lai.»
-            </p>
-          </div>
         </nav>
 
         {/* CỘT NỘI DUNG CHÍNH (Academic Main Stream) */}
         <div className="min-w-0">
           {/* Header học viện */}
-          <div className="pb-4 border-b border-border/80">
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-bold bg-surface-container-high text-on-surface border border-border">
-                🎓 CẤP 3 · KHỐI {classroom.grade} · LỚP {classroom.name}
+          <div className="border-b border-border pb-4">
+            <div className="flex flex-wrap items-center gap-2 mb-1.5">
+              <span className="rounded-xs bg-surface-container-high px-2 py-0.5 text-[11px] font-bold text-on-surface-variant border border-border uppercase tracking-wide">
+                THPT · KHỐI {classroom.grade} · LỚP {classroom.name}
               </span>
               {classroom.organization && (
-                <span className="text-xs text-on-surface-variant font-medium">
-                  🏫 {classroom.organization.name}
+                <span className="text-xs text-on-surface-muted font-medium">
+                  {classroom.organization.name}
                 </span>
               )}
             </div>
@@ -98,66 +91,60 @@ export function LevelThree({ user, classroom }: { user: StudentProfile; classroo
             </p>
           </div>
 
-          {/* Hộp hành động mở bài học bằng mã + Lối tắt */}
-          <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-border bg-surface-container-low p-4 shadow-2xs">
-            <div className="flex items-center gap-3">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-surface border border-border text-lg shadow-2xs" aria-hidden="true">
-                🔑
-              </span>
-              <div>
-                <p className="type-label text-on-surface font-bold">Mở bài học bằng mã</p>
-                <p className="text-xs text-on-surface-variant">
-                  Nhập mã bài học do thầy cô cấp để kích hoạt chuyên đề nghiên cứu di sản mới.
-                </p>
-              </div>
+          {/* Hộp hành động mở bài học bằng mã */}
+          <div className="mt-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-lg border border-border bg-surface-container-low p-4 shadow-2xs">
+            <div>
+              <span className="type-label text-on-surface font-bold">Mở bài học bằng mã</span>
+              <p className="text-xs text-on-surface-variant mt-0.5">
+                Nhập mã bài học do thầy cô cấp để kích hoạt chuyên đề nghiên cứu di sản mới.
+              </p>
             </div>
-            <div className="flex items-center gap-2.5 shrink-0">
-              <ButtonLink to={pathOf('enterCode')} variant="primary" size="md">
+            <div className="flex items-center gap-2">
+              <ButtonLink to={pathOf('enterCode')} variant="secondary" size="md">
                 <Icon name="key" size={16} />
                 Nhập mã bài học
               </ButtonLink>
-              <ButtonLink to={pathOf('profile')} variant="secondary" size="md">
-                <Icon name="user" size={16} />
+              <ButtonLink to={pathOf('profile')} variant="ghost" size="md">
                 Hồ sơ học sinh
               </ButtonLink>
             </div>
           </div>
 
-          {/* Dải chỉ số học thuật (Academic Metric Cards) */}
+          {/* Dải chỉ số học thuật (Academic Metric Tiles - Không dùng emoji hoạt hình) */}
           <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="p-3.5 rounded-xl border border-border bg-surface shadow-2xs">
-              <p className="text-xs font-semibold text-on-surface-variant">Ngày học thực tế</p>
-              <p className="text-lg font-black text-on-surface mt-1">{activeDays} ngày</p>
+            <div className="p-3.5 rounded-lg border border-border bg-surface shadow-2xs">
+              <dt className="text-xs font-medium text-on-surface-muted">Ngày học tích lũy</dt>
+              <dd className="text-lg font-bold text-on-surface mt-1 tabular-nums">{activeDays} ngày</dd>
             </div>
-            <div className="p-3.5 rounded-xl border border-border bg-surface shadow-2xs">
-              <p className="text-xs font-semibold text-on-surface-variant">Bài học đã mở</p>
-              <p className="text-lg font-black text-on-surface mt-1">{myLessons.length} chuyên đề</p>
+            <div className="p-3.5 rounded-lg border border-border bg-surface shadow-2xs">
+              <dt className="text-xs font-medium text-on-surface-muted">Chuyên đề đã mở</dt>
+              <dd className="text-lg font-bold text-on-surface mt-1 tabular-nums">{myLessons.length} chuyên đề</dd>
             </div>
-            <div className="p-3.5 rounded-xl border border-border bg-surface shadow-2xs">
-              <p className="text-xs font-semibold text-on-surface-variant">Huy hiệu đạt được</p>
-              <p className="text-lg font-black text-on-surface mt-1">{home?.recentBadges?.length ?? 0}</p>
+            <div className="p-3.5 rounded-lg border border-border bg-surface shadow-2xs">
+              <dt className="text-xs font-medium text-on-surface-muted">Bài kiểm tra mở</dt>
+              <dd className="text-lg font-bold text-on-surface mt-1 tabular-nums">{pendingCount} bài chờ</dd>
             </div>
-            <div className="p-3.5 rounded-xl border border-border bg-surface shadow-2xs">
-              <p className="text-xs font-semibold text-on-surface-variant">Bài kiểm tra mở</p>
-              <p className="text-lg font-black text-on-surface mt-1">{pendingCount} bài</p>
+            <div className="p-3.5 rounded-lg border border-border bg-surface shadow-2xs">
+              <dt className="text-xs font-medium text-on-surface-muted">Danh hiệu đạt được</dt>
+              <dd className="text-lg font-bold text-on-surface mt-1 tabular-nums">{home?.recentBadges?.length ?? 0}</dd>
             </div>
           </div>
 
           {/* PHẦN 1: Lớp của em */}
           <section id="lop-cua-em" aria-labelledby="lop-cua-em-tieu-de" className="mt-8 scroll-mt-20">
             <div className="flex items-center justify-between pb-2 border-b border-border">
-              <h2 id="lop-cua-em-tieu-de" className="type-h2 text-on-surface font-black">
+              <h2 id="lop-cua-em-tieu-de" className="type-h2 text-on-surface font-bold">
                 Lớp của em
               </h2>
               <span className="text-xs text-on-surface-muted font-mono">
                 {classroom.schoolYear ? `Năm học ${classroom.schoolYear}` : ''}
               </span>
             </div>
-            <dl className="mt-3 divide-y divide-border rounded-xl border border-border bg-surface overflow-hidden shadow-2xs type-body-m">
+            <dl className="mt-3 divide-y divide-border rounded-lg border border-border bg-surface overflow-hidden shadow-2xs type-body-m">
               {classFacts(classroom).map((fact) => (
-                <div key={fact.label} className="grid grid-cols-[160px_1fr] gap-4 px-4 py-3 hover:bg-surface-container-low transition-colors">
-                  <dt className="text-on-surface-variant font-medium">{fact.label}</dt>
-                  <dd className="text-on-surface font-bold">{fact.value}</dd>
+                <div key={fact.label} className="grid grid-cols-[180px_1fr] gap-4 px-4 py-3 hover:bg-surface-container-low transition-colors">
+                  <dt className="text-on-surface-variant font-medium text-sm">{fact.label}</dt>
+                  <dd className="text-on-surface font-semibold text-sm">{fact.value}</dd>
                 </div>
               ))}
             </dl>
@@ -166,14 +153,14 @@ export function LevelThree({ user, classroom }: { user: StudentProfile; classroo
           {/* PHẦN 2: Việc cần làm */}
           <section id="viec-can-lam" aria-labelledby="viec-can-lam-tieu-de" className="mt-8 scroll-mt-20">
             <div className="flex items-center justify-between pb-2 border-b border-border mb-4">
-              <h2 id="viec-can-lam-tieu-de" className="type-h2 text-on-surface font-black">
+              <h2 id="viec-can-lam-tieu-de" className="type-h2 text-on-surface font-bold">
                 Việc cần làm
               </h2>
               <Link
                 to={pathOf('progress')}
-                className="text-xs font-bold text-primary hover:underline"
+                className="text-xs font-semibold text-primary hover:underline"
               >
-                Xem tiến độ toàn diện →
+                Chi tiết tiến độ học tập →
               </Link>
             </div>
             <div className="mt-3">
