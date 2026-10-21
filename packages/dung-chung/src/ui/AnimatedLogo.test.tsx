@@ -35,18 +35,17 @@ afterEach(() => {
 });
 
 describe('huy hiệu chuyển động', () => {
-  it('có tên thương hiệu cho trình đọc màn hình, các lớp ảnh ẩn; chờ hai ảnh lớp tải xong mới chạy', () => {
+  it('có tên thương hiệu cho trình đọc màn hình, các lớp ảnh ẩn; chờ ảnh lớp cổng tải xong mới chạy', () => {
     render(<AnimatedLogo size={120} />);
-    const logo = screen.getByRole('img', { name: 'Vietnam Heritage' });
+    const logo = screen.getByRole('img', { name: 'DiViet' });
     expect(logo).toHaveStyle({ width: '120px', height: '120px' });
     expect(logo).toHaveAttribute('data-logo-motion', 'loading');
 
     const layers = logo.querySelectorAll('img');
-    expect(layers).toHaveLength(6);
+    expect(layers).toHaveLength(5);
     for (const layer of layers) expect(layer).toHaveAttribute('alt', '');
 
     fireEvent.load(layers[0] as HTMLImageElement);
-    fireEvent.load(layers[5] as HTMLImageElement);
     expect(logo).toHaveAttribute('data-logo-motion', 'ready');
   });
 
@@ -59,7 +58,7 @@ describe('huy hiệu chuyển động', () => {
   it('giảm chuyển động: ảnh huy hiệu tĩnh; đổi cài đặt lúc đang mở thì đổi theo', () => {
     const setReduce = prefersReducedMotion(true);
     const { container } = render(<AnimatedLogo size={96} />);
-    const still = screen.getByRole('img', { name: 'Vietnam Heritage' });
+    const still = screen.getByRole('img', { name: 'DiViet' });
     expect(still.tagName).toBe('IMG');
     expect(still).toHaveAttribute('width', '96');
     expect(container.querySelector('[data-logo-motion]')).toBeNull();

@@ -2,13 +2,6 @@
  * (useRevealOnce). Nạp sau tokens.css. Kiểu gốc của mọi phần tử là trạng thái cuối, chuyển động chỉ nằm trong
  * @keyframes với fill-mode both: tắt chuyển động (giảm chuyển động, trình duyệt cũ) thì vẫn thấy đủ huy hiệu và nội dung. */
 
-/* Góc quét của lớp chữ trên huy hiệu; giá trị gốc 360deg là hiện hết. */
-@property --dsv-logo-sweep {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 360deg;
-}
-
 .dsv-logo-motion {
   position: relative;
   display: inline-block;
@@ -23,7 +16,7 @@
   height: 100%;
 }
 
-/* Hai ảnh lớp chưa tải xong: giữ mọi chuyển động ở khung đầu. */
+/* Ảnh lớp cổng chưa tải xong: giữ mọi chuyển động ở khung đầu. */
 .dsv-logo-motion[data-logo-motion='loading'] * {
   animation-play-state: paused;
 }
@@ -57,11 +50,6 @@
 .dsv-logo-motion__tier--roof {
   animation-name: dsv-logo-land;
   animation-duration: 420ms;
-}
-
-.dsv-logo-motion__text {
-  mask-image: conic-gradient(from 240deg, #000 var(--dsv-logo-sweep), transparent calc(var(--dsv-logo-sweep) + 30deg));
-  animation: dsv-logo-text 600ms var(--dsv-ease-fade) 1500ms both;
 }
 
 @keyframes dsv-logo-fade {
@@ -108,13 +96,6 @@
   }
   100% {
     transform: translateY(0);
-  }
-}
-
-@keyframes dsv-logo-text {
-  from {
-    opacity: 0;
-    --dsv-logo-sweep: 0deg;
   }
 }
 

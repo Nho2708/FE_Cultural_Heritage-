@@ -124,7 +124,7 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
 
   return (
     <section className="dsv-content dsv-section" data-bo-cuc="cap-1">
-      <title>Trang học của em · Vietnam Heritage</title>
+      <title>Trang học của em · DiViet</title>
       <div className="mx-auto w-full max-w-[1040px]">
         {/* Banner chính: Gộp Lời chào + Chặng 1 — tông Xanh Ngọc Di Sản mịn màng, thanh lịch */}
         <div className="mb-6 rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 p-5 sm:p-7 text-white shadow-md border border-emerald-500/30">

@@ -1,7 +1,7 @@
 import type { Strings } from './vi';
 
 export const ja: Strings = {
-  appName: 'Vietnam Heritage',
+  appName: 'DiViet',
   common: {
     back: '戻る',
     close: '閉じる',

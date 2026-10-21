@@ -105,7 +105,7 @@ try {
   await page.getByRole('heading', { level: 1, name: 'Đăng nhập' }).waitFor();
   check('Khách mở /tai-khoan bị chuyển tới /dang-nhap', path() === '/dang-nhap');
   check('Đăng nhập không có liên kết "Đăng ký" (tài khoản do cấp trên tạo)', (await page.getByRole('link', { name: /Đăng ký/ }).count()) === 0);
-  check('Đăng nhập có dòng cố định chỉ học sinh sang web học tập', await page.getByText(/Học sinh đăng nhập ở trang Vietnam Heritage/).isVisible());
+  check('Đăng nhập có dòng cố định chỉ học sinh sang web học tập', await page.getByText(/Học sinh đăng nhập ở trang DiViet/).isVisible());
   await click('Đăng nhập');
   check('Để trống → báo bắt buộc nhập dưới 2 ô', (await fieldErrors()).length === 2, (await fieldErrors()).join(' | '));
   await shot('01-dang-nhap-loi');

@@ -352,7 +352,7 @@
   --dsv-duration-zoom: 1000ms;
   --dsv-duration-unlock: 600ms;
   --dsv-duration-logo-short: 1200ms;
-  --dsv-duration-logo: 2400ms;
+  --dsv-duration-logo: 1800ms;
   --dsv-ease-expo-out: cubic-bezier(0.19, 1, 0.22, 1);
   --dsv-ease-header: cubic-bezier(0.24, 1, 0.32, 1);
   --dsv-ease-header-bg: cubic-bezier(0.39, 0.575, 0.565, 1);
