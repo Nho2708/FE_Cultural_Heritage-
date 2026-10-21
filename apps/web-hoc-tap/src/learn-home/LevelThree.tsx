@@ -56,9 +56,10 @@ export function LevelThree({ user, classroom }: { user: StudentProfile; classroo
               <li key={item.id}>
                 <a
                   href={'#' + item.id}
-                  className="block rounded-md px-3 py-2 type-body-m text-on-surface hover:bg-surface-container-low hover:text-primary transition-colors no-underline font-medium text-sm"
+                  className="group flex items-center justify-between rounded-md px-3 py-2 text-on-surface hover:bg-surface-container-low hover:text-primary transition-colors no-underline font-medium text-xs"
                 >
-                  {item.label}
+                  <span>{item.label}</span>
+                  <Icon name="chevron-right" size={12} className="opacity-0 group-hover:opacity-100 text-primary transition-opacity" />
                 </a>
               </li>
             ))}
@@ -113,19 +114,31 @@ export function LevelThree({ user, classroom }: { user: StudentProfile; classroo
           {/* Dải chỉ số học thuật (Academic Metric Tiles - Không dùng emoji hoạt hình) */}
           <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="p-3.5 rounded-lg border border-border bg-surface shadow-2xs">
-              <dt className="text-xs font-medium text-on-surface-muted">Ngày học tích lũy</dt>
+              <dt className="text-xs font-medium text-on-surface-muted flex items-center justify-between">
+                <span>Ngày học tích lũy</span>
+                <Icon name="calendar" size={14} className="text-on-surface-muted" />
+              </dt>
               <dd className="text-lg font-bold text-on-surface mt-1 tabular-nums">{activeDays} ngày</dd>
             </div>
             <div className="p-3.5 rounded-lg border border-border bg-surface shadow-2xs">
-              <dt className="text-xs font-medium text-on-surface-muted">Bài học đã mở</dt>
+              <dt className="text-xs font-medium text-on-surface-muted flex items-center justify-between">
+                <span>Bài học đã mở</span>
+                <Icon name="book-open" size={14} className="text-on-surface-muted" />
+              </dt>
               <dd className="text-lg font-bold text-on-surface mt-1 tabular-nums">{myLessons.length} bài học</dd>
             </div>
             <div className="p-3.5 rounded-lg border border-border bg-surface shadow-2xs">
-              <dt className="text-xs font-medium text-on-surface-muted">Bài kiểm tra mở</dt>
+              <dt className="text-xs font-medium text-on-surface-muted flex items-center justify-between">
+                <span>Bài kiểm tra mở</span>
+                <Icon name="clock" size={14} className="text-on-surface-muted" />
+              </dt>
               <dd className="text-lg font-bold text-on-surface mt-1 tabular-nums">{pendingCount} bài chờ</dd>
             </div>
             <div className="p-3.5 rounded-lg border border-border bg-surface shadow-2xs">
-              <dt className="text-xs font-medium text-on-surface-muted">Danh hiệu đạt được</dt>
+              <dt className="text-xs font-medium text-on-surface-muted flex items-center justify-between">
+                <span>Danh hiệu đạt được</span>
+                <Icon name="shield-check" size={14} className="text-on-surface-muted" />
+              </dt>
               <dd className="text-lg font-bold text-on-surface mt-1 tabular-nums">{home?.recentBadges?.length ?? 0}</dd>
             </div>
           </div>
@@ -158,9 +171,10 @@ export function LevelThree({ user, classroom }: { user: StudentProfile; classroo
               </h2>
               <Link
                 to={pathOf('progress')}
-                className="text-xs font-semibold text-primary hover:underline"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
               >
-                Chi tiết tiến độ học tập →
+                <span>Chi tiết tiến độ học tập</span>
+                <Icon name="chevron-right" size={14} />
               </Link>
             </div>
             <div className="mt-3">
