@@ -3,11 +3,10 @@ import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import { APP_CHANNEL } from '../config/env';
-import { BRAND } from '../intro/palette';
 import { DURATION, EASING } from './tokens';
 import { useReducedMotion } from './useReducedMotion';
 
-// Màn hình chờ trong app: nối liền với màn hình chờ gốc (cùng nền kem, cùng biểu tượng rộng 180 dp ở giữa) rồi chạy bản logo ngắn, dựng từ bốn lớp ảnh
+// Màn hình chờ trong app: nối liền với màn hình chờ gốc (cùng nền xanh than, cùng biểu tượng bản nền tối rộng 180 dp ở giữa) rồi chạy bản logo ngắn, dựng từ bốn lớp ảnh
 // cùng khung (nóc, mái, hai trang sách) xếp chồng, cùng nhịp với logo chuyển động của web:
 //   0–450 ms     hai trang sách mở ra từ gáy (phóng ngang từ 15% lên 100%, gáy nằm đúng giữa ảnh), hiện dần trong 200 ms đầu;
 //   250–850 ms   mái đình rơi xuống, vượt nhẹ rồi về chỗ;
@@ -16,7 +15,10 @@ import { useReducedMotion } from './useReducedMotion';
 // Biểu tượng không có chữ nên tên "DiViet" viết dưới biểu tượng (đặt tuyệt đối, biểu tượng vẫn nằm đúng chỗ của màn hình chờ gốc).
 // Phủ lên toàn app (app dựng ngay bên dưới) và tự gỡ khi mờ xong.
 
-export const SPLASH_BACKGROUND = '#F4ECDD';
+// Nền xanh than ở cả giao diện sáng và tối của điện thoại: nền kem bị giao diện tối của MIUI tự làm sẫm thành nâu, quyển sách xanh than chìm vào nền.
+export const SPLASH_BACKGROUND = '#292B38';
+/** Kem của logo, màu sách trên nền tối. */
+const NAME_COLOR = '#F4ECDD';
 // Khung 180 dp phải khớp imageWidth của expo-splash-screen trong app.json; trong ảnh màn hình chờ gốc (1024 px) biểu tượng rộng 946 px.
 // Android 12 trở lên chỉ hiện biểu tượng màn hình chờ gốc trong vùng 192 dp, nên để 180 dp cho mái đao không bị cụt.
 const FRAME_SIZE = 180;
@@ -117,7 +119,7 @@ export function BrandSplash({ ready, onDone }: { ready: boolean; onDone: () => v
       importantForAccessibility={ready ? 'no-hide-descendants' : 'auto'}
       style={[styles.overlay, { opacity: leave.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }) }]}
     >
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <View style={styles.frame} onLayout={hideNativeSplash}>
         <View style={styles.mark}>
           <Animated.Image source={PAGE_LEFT} accessible={false} resizeMode="contain" style={[styles.layer, { opacity: pageFade, transform: [{ scaleX: pageGrow }] }]} />
@@ -136,5 +138,5 @@ const styles = StyleSheet.create({
   frame: { width: FRAME_SIZE, height: FRAME_SIZE, alignItems: 'center', justifyContent: 'center' },
   mark: { width: MARK_WIDTH, height: MARK_HEIGHT },
   layer: { position: 'absolute', top: 0, left: 0, width: MARK_WIDTH, height: MARK_HEIGHT },
-  name: { position: 'absolute', top: (FRAME_SIZE + MARK_HEIGHT) / 2 + 20, left: -60, width: FRAME_SIZE + 120, textAlign: 'center', color: BRAND.navy, fontSize: 28, lineHeight: 34, fontWeight: '700' },
+  name: { position: 'absolute', top: (FRAME_SIZE + MARK_HEIGHT) / 2 + 20, left: -60, width: FRAME_SIZE + 120, textAlign: 'center', color: NAME_COLOR, fontSize: 28, lineHeight: 34, fontWeight: '700' },
 });
