@@ -367,10 +367,10 @@ function ProfileLevelGeneral({
               <Link
                 to={pathOf('progress')}
                 className="p-3 rounded-lg bg-surface border border-border hover:border-primary/50 transition-colors no-underline flex flex-col justify-between"
-                title="Xem chuyên đề đã kích hoạt"
+                title="Xem bài học đã kích hoạt"
               >
                 <div className="flex items-center justify-between text-on-surface-muted">
-                  <span className="text-xs font-semibold">Chuyên đề</span>
+                  <span className="text-xs font-semibold">Bài học</span>
                   <Icon name="book-open" size={15} />
                 </div>
                 <p className="mt-2 text-lg font-bold text-on-surface tabular-nums">

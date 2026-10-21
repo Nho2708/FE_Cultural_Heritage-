@@ -9,7 +9,7 @@ import { useStudentHome } from './useStudentHome';
 
 // Trang học của em — bản cấp 2 (khối 6-9): Phong cách Cổng thông tin học tập Trung học cơ sở (EdTech Secondary Portal).
 // Bố cục chuẩn mực, năng động, thanh lịch, không dùng hình tượng hoạt hình trẻ em.
-// Cột chính: Thông tin tài khoản, Bảng chỉ số học tập chuyên cần, Các khối chuyên đề và Khối Lớp của em.
+// Cột chính: Thông tin tài khoản, Bảng chỉ số học tập chuyên cần, Các khối bài học và Khối Lớp của em.
 // Cột phụ: Nhiệm vụ kích hoạt bài học bằng mã và lối tắt quản lý học tập.
 
 export function LevelTwo({ user, classroom }: { user: StudentProfile; classroom: StudentClassDetail }) {
@@ -57,7 +57,7 @@ export function LevelTwo({ user, classroom }: { user: StudentProfile; classroom:
             Chào {user.fullName ?? 'em'}!
           </p>
           <p className="text-xs sm:text-sm text-on-surface-variant mt-1">
-            {home?.cheer ?? 'Theo dõi kế hoạch học tập, hoàn thành các bài kiểm tra chuyên đề và khám phá tư liệu di sản.'}
+            {home?.cheer ?? 'Theo dõi kế hoạch học tập, hoàn thành các bài kiểm tra bài học và khám phá tư liệu di sản.'}
           </p>
         </div>
         <div className="flex items-center gap-2.5 shrink-0">
@@ -97,7 +97,7 @@ export function LevelTwo({ user, classroom }: { user: StudentProfile; classroom:
             <Icon name="book-open" size={16} />
           </div>
           <p className="mt-2 text-xl font-black text-on-surface tabular-nums">
-            {myLessons.length} <span className="text-xs font-medium text-on-surface-variant">chuyên đề</span>
+            {myLessons.length} <span className="text-xs font-medium text-on-surface-variant">bài học</span>
           </p>
         </Link>
 

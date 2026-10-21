@@ -96,7 +96,7 @@ export function LevelThree({ user, classroom }: { user: StudentProfile; classroo
             <div>
               <span className="type-label text-on-surface font-bold">Mở bài học bằng mã</span>
               <p className="text-xs text-on-surface-variant mt-0.5">
-                Nhập mã bài học do thầy cô cấp để kích hoạt chuyên đề nghiên cứu di sản mới.
+                Nhập mã bài học do thầy cô cấp để kích hoạt bài học nghiên cứu di sản mới.
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -117,8 +117,8 @@ export function LevelThree({ user, classroom }: { user: StudentProfile; classroo
               <dd className="text-lg font-bold text-on-surface mt-1 tabular-nums">{activeDays} ngày</dd>
             </div>
             <div className="p-3.5 rounded-lg border border-border bg-surface shadow-2xs">
-              <dt className="text-xs font-medium text-on-surface-muted">Chuyên đề đã mở</dt>
-              <dd className="text-lg font-bold text-on-surface mt-1 tabular-nums">{myLessons.length} chuyên đề</dd>
+              <dt className="text-xs font-medium text-on-surface-muted">Bài học đã mở</dt>
+              <dd className="text-lg font-bold text-on-surface mt-1 tabular-nums">{myLessons.length} bài học</dd>
             </div>
             <div className="p-3.5 rounded-lg border border-border bg-surface shadow-2xs">
               <dt className="text-xs font-medium text-on-surface-muted">Bài kiểm tra mở</dt>
