@@ -78,9 +78,13 @@ export function LoginPage() {
 
   return (
     <section className="dsv-content dsv-section">
-      <title>Học sinh đăng nhập · Vietnam Heritage</title>
+      <title>Học sinh đăng nhập · DiViet</title>
       <div className="mx-auto flex w-full max-w-[440px] flex-col gap-(--dsv-block-gap)">
-        <BrandLogo variant="badge" size={96} className="self-center" />
+        {/* Huy hiệu không có chữ nên tên "DiViet" viết ngay dưới; huy hiệu chỉ là hình trang trí. */}
+        <div className="flex flex-col items-center gap-2">
+          <BrandLogo variant="badge" size={96} decorative />
+          <span className="type-h3 text-on-surface">DiViet</span>
+        </div>
         <div className="flex items-center gap-(--dsv-inline-gap)">
           <Illustration state="chao" className="size-20" />
           <div>

@@ -31,13 +31,14 @@ interface IntroHeroProps {
   actions: ReactNode;
 }
 
-/** Khối đầu trang: chữ bên trái, huy hiệu chuyển động bên phải (trên điện thoại huy hiệu nằm trên tiêu đề). */
+/** Khối đầu trang: chữ bên trái, huy hiệu chuyển động bên phải (trên điện thoại huy hiệu nằm trên tiêu đề). Huy hiệu không có chữ nên tên "DiViet" viết ngay dưới. */
 export function IntroHero({ headingId, kicker, title, text, actions }: IntroHeroProps) {
   return (
     <section aria-labelledby={headingId} className="bg-(--color-brand-navy) text-(--color-brand-cream)">
       <div className="dsv-content grid items-center gap-8 py-12 dsvmd:grid-cols-[minmax(0,1fr)_auto] dsvmd:gap-16 dsvmd:py-20">
-        <div className="flex justify-center dsvmd:order-2">
-          <AnimatedLogo className="size-[136px] dsvmd:size-[240px]" />
+        <div className="flex flex-col items-center gap-3 dsvmd:order-2">
+          <AnimatedLogo decorative className="size-[136px] dsvmd:size-[240px]" />
+          <p className="type-h3 text-white">DiViet</p>
         </div>
         <div className="flex min-w-0 flex-col items-start gap-4 dsvmd:order-1">
           <p className="type-label-kicker text-(--color-brand-gold)">{kicker}</p>

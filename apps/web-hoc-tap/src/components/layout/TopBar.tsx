@@ -26,7 +26,7 @@ export function Wordmark({ className }: { className?: string }) {
     <Link to="/" className={cn('flex min-w-0 items-center gap-2 rounded-xs px-2 py-1', className)}>
       <BrandLogo variant="emblem" size={32} decorative />
       <span className="flex min-w-0 flex-col justify-center">
-        {/* Dưới 481 px chỉ còn biểu tượng (tên vẫn đọc được bằng trình đọc màn hình): tên "Vietnam Heritage" cạnh nút "Học sinh đăng nhập" không đủ chỗ trên điện thoại. */}
+        {/* Dưới 481 px chỉ còn biểu tượng (tên vẫn đọc được bằng trình đọc màn hình): tên "DiViet" cạnh nút "Học sinh đăng nhập" không đủ chỗ trên điện thoại. */}
         <span className="type-h3 leading-5 whitespace-nowrap text-on-surface max-dsvsm:sr-only">{t.brandName}</span>
         <span className="hidden truncate type-label text-on-surface-muted dsvsm:block">{t.brandTagline}</span>
       </span>

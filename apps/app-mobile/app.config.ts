@@ -18,7 +18,7 @@ const withAdsAndroidBackend = (config: ExpoConfig): ExpoConfig =>
 export default ({ config }: ConfigContext): ExpoConfig =>
   withAdsAndroidBackend({
     ...config,
-    name: config.name ?? 'Vietnam Heritage',
+    name: config.name ?? 'DiViet',
     slug: config.slug ?? 'hoc-di-san',
     plugins: (config.plugins ?? []).map((plugin) => {
       if (!Array.isArray(plugin) || plugin[0] !== ADS_PLUGIN) return plugin;

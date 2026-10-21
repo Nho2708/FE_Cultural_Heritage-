@@ -2,7 +2,7 @@ import type { LanguageCode } from '../api/discovery';
 import { VIETNAM_TERRITORY_BOUNDS } from './seas';
 
 // Chỉ đường tới di sản: gọi thẳng máy chủ OSRM (mặc định máy chủ công cộng của FOSSGIS, dữ liệu OpenStreetMap) từ trình duyệt hoặc WebView,
-// KHÔNG đi qua backend của dự án nên vị trí của khách không tới máy chủ của Vietnam Heritage và không được lưu ở đâu. Chỉ gọi khi khách bấm "Chỉ đường",
+// KHÔNG đi qua backend của dự án nên vị trí của khách không tới máy chủ của DiViet và không được lưu ở đâu. Chỉ gọi khi khách bấm "Chỉ đường",
 // kết quả nhớ trong bộ nhớ của trang. Mô-đun này thuần TypeScript (không Leaflet, không React) để app mobile dùng chung; phần vẽ tuyến ở `routeLayer.ts`.
 
 export type TravelMode = 'driving' | 'walking';

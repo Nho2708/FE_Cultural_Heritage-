@@ -112,7 +112,7 @@ function ResultLevelOne({ result, automatic, lessonCode }: { result: StudentAtte
   const stars = clampStars(result.stars);
   return (
     <section data-bo-cuc="cap-1" className="dsv-content dsv-section">
-      <title>{`Kết quả: ${result.quizName ?? 'Bài kiểm tra'} · Vietnam Heritage`}</title>
+      <title>{`Kết quả: ${result.quizName ?? 'Bài kiểm tra'} · DiViet`}</title>
       <div className="mx-auto flex max-w-[860px] flex-col gap-(--dsv-block-gap)">
         <div className="flex flex-col items-center gap-5 rounded-lg bg-secondary-container p-6 text-center text-on-secondary-container dsvsm:p-8">
           <h1 className="type-h2">{result.quizName}</h1>
@@ -168,7 +168,7 @@ function ScoreTiles({ result }: { result: StudentAttemptResult }) {
 function ResultLevelTwo({ result, automatic, lessonCode }: { result: StudentAttemptResult; automatic: boolean; lessonCode: string | null }) {
   return (
     <section data-bo-cuc="cap-2" className="dsv-content dsv-section">
-      <title>{`Kết quả: ${result.quizName ?? 'Bài kiểm tra'} · Vietnam Heritage`}</title>
+      <title>{`Kết quả: ${result.quizName ?? 'Bài kiểm tra'} · DiViet`}</title>
       <div className="flex flex-col gap-(--dsv-block-gap)">
         <div className="rounded-lg bg-primary-container p-6 text-on-primary-container">
           <div className="flex flex-wrap items-center gap-3">
@@ -305,7 +305,7 @@ function Analysis({ analysis }: { analysis: StudentAnalysis }) {
 function ResultLevelThree({ result, automatic, lessonCode }: { result: StudentAttemptResult; automatic: boolean; lessonCode: string | null }) {
   return (
     <section data-bo-cuc="cap-3" className="dsv-content dsv-section">
-      <title>{`Kết quả: ${result.quizName ?? 'Bài kiểm tra'} · Vietnam Heritage`}</title>
+      <title>{`Kết quả: ${result.quizName ?? 'Bài kiểm tra'} · DiViet`}</title>
       <div className="flex flex-col gap-(--dsv-block-gap)">
         <div className="grid gap-5 rounded-md border border-border bg-surface p-5 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
@@ -344,7 +344,7 @@ export function ResultPage() {
   if (id === null) {
     return (
       <section className="dsv-content dsv-section">
-        <title>Không tìm thấy kết quả · Vietnam Heritage</title>
+        <title>Không tìm thấy kết quả · DiViet</title>
         <p className="type-h2">Không tìm thấy kết quả bài làm</p>
         <div className="mt-4">
           <ButtonLink to={pathOf('progress')}>Xem tiến độ của em</ButtonLink>
@@ -355,7 +355,7 @@ export function ResultPage() {
   if (query.isPending) {
     return (
       <section className="dsv-content dsv-section">
-        <title>Kết quả bài làm · Vietnam Heritage</title>
+        <title>Kết quả bài làm · DiViet</title>
         <LoadingState rows={4} />
       </section>
     );
@@ -363,7 +363,7 @@ export function ResultPage() {
   if (query.isError) {
     return (
       <section className="dsv-content dsv-section">
-        <title>Kết quả bài làm · Vietnam Heritage</title>
+        <title>Kết quả bài làm · DiViet</title>
         <ErrorState error={query.error} onRetry={() => void query.refetch()} />
       </section>
     );

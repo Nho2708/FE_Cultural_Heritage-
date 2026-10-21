@@ -11,7 +11,7 @@ export function PendingScreen({ screen }: { screen: Screen }) {
   const home = user ? roleHome(user.role) : null;
   return (
     <section className="px-4 py-6 dsvmd:px-8 dsvmd:py-8">
-      <title>{`${screen.name} · Vietnam Heritage`}</title>
+      <title>{`${screen.name} · DiViet`}</title>
       <div className="max-w-[760px] py-4">
         <p className="type-label-kicker text-on-surface-muted">ĐANG XÂY DỰNG</p>
         <h1 className="mt-2 type-h1 text-on-surface">{screen.name}</h1>

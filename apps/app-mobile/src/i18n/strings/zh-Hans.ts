@@ -1,7 +1,7 @@
 import type { Strings } from './vi';
 
 export const zhHans: Strings = {
-  appName: 'Vietnam Heritage',
+  appName: 'DiViet',
   common: {
     back: '返回',
     close: '关闭',

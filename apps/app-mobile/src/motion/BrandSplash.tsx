@@ -1,13 +1,15 @@
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, Image, StyleSheet } from 'react-native';
+import { Animated, Image, StyleSheet, Text } from 'react-native';
 import { APP_CHANNEL } from '../config/env';
+import { BRAND } from '../intro/palette';
 import { DURATION, EASING } from './tokens';
 import { useReducedMotion } from './useReducedMotion';
 
 // Màn hình chờ trong app: nối liền với màn hình chờ gốc (cùng nền xanh than, cùng huy hiệu rộng 180 dp ở giữa) rồi chạy bản logo ngắn: đĩa phóng từ 92% lên 100%
 // và mờ dần vào, huy hiệu nhích lên. Không có thời gian chờ giả: nạp xong sớm thì phần ra (mờ dần 300 ms) chạy ngay. Bật giảm chuyển động thì huy hiệu đứng yên.
+// Huy hiệu không còn chữ nên tên "DiViet" viết dưới huy hiệu (đặt tuyệt đối, huy hiệu vẫn nằm đúng chỗ của màn hình chờ gốc).
 // Phủ lên toàn app (app dựng ngay bên dưới) và tự gỡ khi mờ xong.
 
 export const SPLASH_BACKGROUND = '#292B38';
@@ -92,7 +94,8 @@ export function BrandSplash({ ready, onDone }: { ready: boolean; onDone: () => v
     >
       <StatusBar style="light" />
       <Animated.View style={{ opacity: fade, transform: [{ translateY: rise }, { scale }] }} onLayout={hideNativeSplash}>
-        <Image source={EMBLEM} accessible accessibilityRole="image" accessibilityLabel="Vietnam Heritage" style={styles.emblem} resizeMode="contain" />
+        <Image source={EMBLEM} accessible={false} style={styles.emblem} resizeMode="contain" />
+        <Text style={styles.name}>DiViet</Text>
       </Animated.View>
     </Animated.View>
   );
@@ -101,4 +104,5 @@ export function BrandSplash({ ready, onDone }: { ready: boolean; onDone: () => v
 const styles = StyleSheet.create({
   overlay: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center', backgroundColor: SPLASH_BACKGROUND },
   emblem: { width: EMBLEM_SIZE, height: EMBLEM_SIZE },
+  name: { position: 'absolute', top: EMBLEM_SIZE + 20, left: -60, width: EMBLEM_SIZE + 120, textAlign: 'center', color: BRAND.cream, fontSize: 28, lineHeight: 34, fontWeight: '700' },
 });

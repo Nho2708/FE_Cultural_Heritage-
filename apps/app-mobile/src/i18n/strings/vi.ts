@@ -201,7 +201,7 @@ export interface Strings {
 }
 
 export const vi: Strings = {
-  appName: 'Vietnam Heritage',
+  appName: 'DiViet',
   common: {
     back: 'Quay lại',
     close: 'Đóng',
