@@ -118,7 +118,8 @@ def ghi(ten, tron):
     print(ten, f"{tron.shape[1] / SR:.1f} s")
 
 
-ghi("du-khach-60s.wav", bai(60, 56, 7))
-ghi("du-khach-45s.wav", bai(45, 40, 7))
-ghi("nha-truong-90s.wav", bai(90, 83, 11))
-ghi("logo-3s.wav", bai(3, 1.25, 3))
+if __name__ == "__main__":
+    ghi("du-khach-60s.wav", bai(60, 56, 7))
+    ghi("du-khach-45s.wav", bai(45, 40, 7))
+    ghi("nha-truong-90s.wav", bai(90, 83, 11))
+    ghi("logo-3s.wav", bai(3, 1.25, 3))

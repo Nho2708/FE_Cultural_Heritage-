@@ -1,4 +1,4 @@
-# Video giới thiệu Vietnam Heritage
+# Video giới thiệu DiViet
 
 Dự án video dựng bằng [Remotion](https://www.remotion.dev) (React). Không triển khai, không nằm trong npm workspaces của kho; CI không cài gói này.
 Video xuất ra, ảnh chụp màn hình và nhạc đều sinh lại được bằng lệnh nên **không đưa vào git** (`ra/`, `public/man-hinh/`, `public/nhac/`).
@@ -10,15 +10,16 @@ Video xuất ra, ảnh chụp màn hình và nhạc đều sinh lại được b
 | Video cho khách du lịch, bản dọc 45 giây, 9:16 | `du-khach-45s-doc-<…>` | `du-khach-45s-doc.<ngôn ngữ>.1080.mp4`, `.720.mp4` |
 | Video cho nhà trường, 90 giây, 16:9 | `nha-truong-90s` | `nha-truong-90s.vi.1080.mp4`, `.720.mp4` |
 | Phụ đề WebVTT | — | `ra/phu-de/*.vtt` (bản ngang chép sang `apps/web-hoc-tap/public/video/`) |
-| Ảnh bìa không chữ (1280×720, 720×1280) | khung huy hiệu của `logo-16x9`, `logo-9x16` | `anh-bia.<cỡ>.jpeg` |
+| Ảnh bìa (1280×720, 720×1280), dùng chung mọi ngôn ngữ | khung cuối của `logo-16x9`, `logo-9x16` (biểu tượng và chữ DiViet) | `anh-bia.<cỡ>.jpeg` |
+| Video quảng cáo cho khách du lịch, bản dọc 30 giây, 9:16, không lời đọc | `quang-cao-30s-doc-en` | `quang-cao-30s-doc.en.1080.mp4` (H.264 8 Mbps, BT.709, âm thanh -14 LUFS) |
 
 Tên tệp 720p khớp với khung video của web học tập (`apps/web-hoc-tap/src/intro/IntroVideo.tsx`: `<tên>.<ngôn ngữ>.720.mp4`, phụ đề `/video/<tên>.<ngôn ngữ>.vtt`).
 
 ## Nguồn chữ, hình và âm thanh
 
 - Chữ trên hình và phụ đề lấy từ `kich-ban/du-khach.json` và `kich-ban/nha-truong.json`. Bản Hàn, Trung, Nhật là bản dịch máy, cần người biết tiếng đọc lại trước khi đăng rộng rãi.
-- Logo: hai lớp ảnh (`public/logo/lop-cong.png`, `lop-chu.png`) tách từ logo của nhóm (`doc/design/logo/` ngoài kho), cùng nhịp với huy hiệu chuyển động trên web.
-- Màn hình sản phẩm là **ảnh chụp thật** của bản demo (web học tập, web quản trị), chụp bằng Playwright theo kịch bản. Dữ liệu trường, lớp, học sinh là dữ liệu mẫu của CSDL demo.
+- Logo: mái đình che quyển sách mở, vẽ bằng SVG từ đường nét ở `src/logo-duong-net.ts` (chép từ `doc/design/logo/diviet/bo-logo/duong-net.json` ngoài kho, sinh bằng `dung_bo_logo.py`). Chuyển động cùng nhịp với logo trên web và màn hình chờ của app: hai trang sách mở từ gáy, mái hạ xuống, bờ nóc hạ sau cùng đúng tiếng mõ gỗ (1,25 giây); đoạn logo thêm chữ DiViet và hai chấm chữ i nảy lên.
+- Màn hình sản phẩm là **ảnh chụp thật** của bản đang chạy (web học tập `https://diviet.id.vn`, web quản trị `https://quantri.diviet.id.vn`), chụp bằng Playwright theo kịch bản, chỉ xem. Dữ liệu trường, lớp, học sinh là dữ liệu mẫu của trường demo.
 - Nhạc nền do nhóm tự tạo bằng code (`scripts/tao-nhac.py`, thang ngũ cung gảy như đàn tranh), không dùng nhạc của người khác.
 - Lời đọc tiếng Việt của video nhà trường là giọng tổng hợp, tạo trên máy bằng [Piper](https://github.com/rhasspy/piper) với giọng `vi_VN-vais1000-medium` (dữ liệu VAIS-1000, CC BY 4.0; ghi công ở thẻ kết). Câu đọc ở `loiDoc` của `kich-ban/nha-truong.json`, từ tiếng Anh viết theo cách đọc. Nhạc nền tự hạ xuống khi có lời. Muốn dùng giọng người thật: thu từng câu, lưu đè `public/giong/nha-truong/<id cảnh>.wav`, chạy `python scripts/tao-giong-doc.py --chi-do` rồi dựng lại.
 - Phông Be Vietnam Pro, Playfair Display, Noto Sans KR/SC/JP (giấy phép SIL OFL) nạp qua `@remotion/google-fonts`.
@@ -26,7 +27,7 @@ Tên tệp 720p khớp với khung video của web học tập (`apps/web-hoc-ta
 
 ## Dựng lại
 
-Cần Node 22+, Python 3 có Pillow và numpy, Microsoft Edge (để chụp màn hình), bản demo đang chạy (web học tập `http://localhost:8082`, web quản trị `http://localhost:8081`).
+Cần Node 22+, Python 3 có Pillow và numpy, Microsoft Edge (để chụp màn hình). Script chụp mặc định gọi máy demo (`http://localhost:8082`, `http://localhost:8081`); chụp từ bản đang chạy thì thêm `--base https://diviet.id.vn` (khách) và `--quan-tri https://quantri.diviet.id.vn --hoc-tap https://diviet.id.vn` (nhà trường).
 
 ```powershell
 cd apps/video-gioi-thieu
@@ -42,11 +43,31 @@ node scripts/dung-video.mjs               # dựng tất cả (khoảng 15 phút
 npx remotion studio src/index.ts          # xem và chỉnh trong trình duyệt
 ```
 
+## Video quảng cáo 30 giây
+
+Mã nguồn ở `src/quang-cao/`, kịch bản ở `kich-ban/quang-cao/`:
+
+- `canh.json`: thứ tự cảnh và độ dài theo phách (120 phách mỗi phút, mọi điểm cắt rơi đúng phách). `src/quang-cao/nhip.ts` (mốc chuyển động trong từng cảnh, hai đường cong dùng chung) và script nhạc cùng đọc tệp này, nên đổi độ dài cảnh thì chạy lại script nhạc.
+- `en.json`: toàn bộ chữ trên hình của bản tiếng Anh (câu theo cảnh, nhãn giao diện, chữ của trang chi tiết dựng lại giống trang thật của web, hai câu thuyết minh hiện chữ, thẻ kết, địa chỉ trong mã QR) và `moTaBaiDang` là phần ghi công đặt ở mô tả bài đăng (mô hình 3D, ảnh CC BY và CC BY-SA, OpenStreetMap, Natural Earth, nhạc). Làm bản ngôn ngữ khác: thêm tệp `<mã>.json` cùng cấu trúc, đăng ký trong `src/quang-cao/chuoi.ts` và thêm composition. Kiểm chữ: `node scripts/kiem-chu-quang-cao.mjs` (câu dẫn tối đa 7 từ, không dấu chấm cuối; câu dẫn cộng nhãn và thẻ kết dưới 45 từ; chữ trang chi tiết và lời thuyết minh in riêng).
+- `anh.json`: ảnh di tích trên Wikimedia Commons (nhà cổ treo đèn lồng ở phố cổ Hội An, rồng ở hội quán, Ngọ Môn Huế, cổng thành nhà Hồ, ảnh đại diện Hội An của app...), nhận CC0, phạm vi công cộng, CC BY, CC BY-SA.
+
+Tài nguyên không đưa vào git, tạo lại bằng:
+
+```powershell
+python scripts/tai-anh-di-tich.py         # ảnh di tích -> public/anh-di-tich/ (kiểm giấy phép khi tải)
+python scripts/tai-ban-do.py              # dữ liệu bản đồ OpenStreetMap quanh phố cổ -> public/ban-do/hoi-an.json
+python scripts/tai-ban-do-viet-nam.py     # bản đồ cả nước (Natural Earth, góc nhìn Việt Nam, có Hoàng Sa, Trường Sa) -> public/ban-do/viet-nam.json
+python scripts/tao-nhac-quang-cao.py      # nhạc 30 giây theo canh.json, chuẩn hóa -14 LUFS -> public/nhac/quang-cao-30s.wav
+node scripts/dung-video.mjs quang-cao-30s-doc-en
+```
+
+Mô hình 3D là hai tệp GLB mà bản demo đang dùng (bản nén cho web của mô hình trên Sketchfab, CC BY 4.0): nhà cổ Hội An ("Hoi An house", NGUYENNGHIAKK) chép vào `public/mo-hinh/nha-hoi-an.glb`, Cao Đỉnh ở Hoàng thành Huế ("Cao Đỉnh", vudn54) chép vào `public/mo-hinh/cao-dinh-hue.glb`. Mô hình vẽ bằng three.js qua `@remotion/three`; khi dựng phải bật WebGL bằng GPU (`--gl=angle`, script dựng đã đặt sẵn).
+
 ## Giới hạn hiện tại
 
-- CSDL demo chưa có bản dịch thật cho nội dung di sản (tên và mô tả ở tiếng Anh, Hàn, Trung, Nhật đang là chữ giữ chỗ dạng "[en] …"). Bản video tiếng Anh, Hàn, Trung, Nhật dùng ảnh chụp đúng ngôn ngữ cho các màn hình giao diện (chọn ngôn ngữ, Trang chủ, mở khóa tóm tắt, 3D, nguồn) và ảnh tiếng Việt cho các màn hình nặng nội dung (Gần bạn, bản đồ, chi tiết, dòng thời gian, lịch sử); thẻ kết ghi rõ điều này. Có bản dịch thật thì chụp lại và bỏ danh sách `NOI_DUNG_VI` trong `src/DuKhach.tsx`.
+- Nội dung di sản ở tiếng Hàn, Trung, Nhật là bản dịch máy (web và app có ghi chú); thẻ kết bản dọc ghi rõ điều này.
 - Lời đọc video nhà trường là giọng máy; nghe chưa tự nhiên bằng người đọc. Video vẫn xem hiểu được khi tắt tiếng nhờ chữ trên hình.
-- Phiếu đăng nhập trong video nhà trường là màn hình thật nhưng mật khẩu tạm là dữ liệu mẫu (script chặn yêu cầu đặt lại mật khẩu ở trình duyệt để không đổi dữ liệu demo).
+- Phiếu đăng nhập trong video nhà trường là màn hình thật nhưng mật khẩu tạm là dữ liệu mẫu (script chặn yêu cầu đặt lại mật khẩu ở trình duyệt để không đổi dữ liệu).
 - Chưa có vòng lặp 8 giây "app trong tay".
 
 ## Đưa video lên web

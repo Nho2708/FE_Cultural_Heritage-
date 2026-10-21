@@ -1,0 +1,62 @@
+{
+  "ngonNgu": "en",
+  "canh": {
+    "dung-truoc-di-tich": "You're standing right here",
+    "chi-tiet-bi-an": "What are you looking at?",
+    "ban-do-zoom": "It finds where you're standing",
+    "trang-chi-tiet": "Hear its story in your language",
+    "mo-hinh-xoay": "See it from every side",
+    "hieu-roi": "Now it makes sense"
+  },
+  "giaoDien": {
+    "tenDiTich": "Hoi An Ancient Town",
+    "khoangCach": "80 m",
+    "ngonNguNghe": [
+      {
+        "ma": "en",
+        "ten": "English"
+      },
+      {
+        "ma": "ko",
+        "ten": "한국어"
+      },
+      {
+        "ma": "zh-Hans",
+        "ten": "中文"
+      },
+      {
+        "ma": "ja",
+        "ten": "日本語"
+      }
+    ],
+    "trangChiTiet": {
+      "dangNhap": "Student sign-in",
+      "duongDan": "Explore",
+      "the": [
+        "Tangible",
+        "World Heritage (UNESCO)",
+        "Recognized in 1999",
+        "Da Nang City"
+      ],
+      "nut": [
+        "Summary",
+        "Listen",
+        "View in 3D"
+      ],
+      "nguonAnh": "Photo: Steffen Schmitz · CC BY-SA 4.0 · Wikimedia Commons",
+      "gioiThieu": "Introduction",
+      "doanGioiThieu": "Hoi An Ancient Town lies on the lower Thu Bon River near the sea, about 28 km south of central Da Nang."
+    },
+    "loiThuyetMinh": [
+      "A bustling trading port on the Thu Bon River in the 17th–18th centuries",
+      "World Heritage (UNESCO, 1999)"
+    ]
+  },
+  "theKet": {
+    "ten": "DiViet",
+    "phu": "Free · Web · Android",
+    "diaChiHien": "diviet.id.vn",
+    "lienKetQr": "https://diviet.id.vn"
+  },
+  "moTaBaiDang": "DiViet: free on the web and Android. Credits: 3D models \"Hoi An house - Nhà Hội An\" by NGUYENNGHIAKK and \"Cao Đỉnh\" by vudn54 on Sketchfab (CC BY 4.0, compressed for the web). Photos from Wikimedia Commons: Hội An old house with lanterns by Mig Gilbert (CC BY-SA 2.0); Meridian Gate, Huế by Chainwit (CC BY 4.0); Hội An Ancient Town street by Steffen Schmitz (CC BY-SA 4.0); Tây Đô (Hồ Dynasty) Citadel south gate by Silviculture (public domain); other photos CC0. Map data © OpenStreetMap contributors (openstreetmap.org/copyright); country outlines: Natural Earth. Heritage data: Vietnam's Department of Cultural Heritage (dsvh.gov.vn). Music: original, made by the project team."
+}

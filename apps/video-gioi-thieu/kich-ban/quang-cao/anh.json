@@ -1,0 +1,35 @@
+{
+  "ghiChu": "Ảnh di tích thật cho video quảng cáo, lấy từ Wikimedia Commons. Nhận CC0, phạm vi công cộng, CC BY và CC BY-SA (không nhận NC, ND); scripts/tai-anh-di-tich.py kiểm lại giấy phép khi tải và dừng nếu khác. Ảnh có giấy phép CC BY, CC BY-SA được ghi công ở mô tả bài đăng (moTaBaiDang trong tệp chữ); ảnh đầu trang chi tiết là ảnh thật của app nên dòng ghi nguồn hiện đúng như trên trang. Tránh ảnh có người nhận ra được mặt.",
+  "anh": [
+    {
+      "id": "pho-den-long",
+      "dung": "Cảnh mở đầu và cảnh hiểu rồi: nhà cổ tường vàng ở phố cổ Hội An lúc chập tối, treo đèn lồng nhiều màu (ảnh dọc)",
+      "tep": "File:Lanterns in Hoi An (40480642302).jpg"
+    },
+    {
+      "id": "rong-hoi-quan",
+      "dung": "Dải ảnh chi tiết: tượng rồng ở hội quán người Hoa",
+      "tep": "File:Dragons at the Chinese Assembly Hall of Hoi An.jpg"
+    },
+    {
+      "id": "ngo-mon-hue",
+      "dung": "Dải ảnh chi tiết: Ngọ Môn, Hoàng thành Huế (quần thể di tích Cố đô Huế)",
+      "tep": "File:Huế (2024) - Meridian Gate - Ngọ Môn (Hoàng thành Huế) - img 05.jpg"
+    },
+    {
+      "id": "thanh-nha-ho",
+      "dung": "Dải ảnh chi tiết: cổng Nam thành nhà Hồ, tường đá vôi",
+      "tep": "File:Tay Do castle South gate.JPG"
+    },
+    {
+      "id": "anh-dau-hoi-an",
+      "dung": "Thẻ di sản và ảnh đầu trang chi tiết: đúng ảnh đại diện của Đô thị cổ Hội An trong app",
+      "tep": "File:Hội An, Ancient Town, 2020-01 CN-06.jpg"
+    },
+    {
+      "id": "den-long-song-dem",
+      "dung": "Cảnh đổi ngôn ngữ: đèn lồng bên sông Hoài buổi tối",
+      "tep": "File:Hội An, Vietnam (Unsplash E ySzvSJRI).jpg"
+    }
+  ]
+}
