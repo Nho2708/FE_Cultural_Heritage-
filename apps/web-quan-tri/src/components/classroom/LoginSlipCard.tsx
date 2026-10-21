@@ -13,7 +13,7 @@ export function LoginSlipCard({ sheet, entry, schoolName }: { sheet: LoginSheet;
       className="dsv-slip flex flex-col gap-3 rounded-sm border border-dashed border-border-strong bg-surface p-5 text-on-surface"
     >
       <header className="flex items-baseline justify-between gap-3">
-        <span className="type-h4 text-primary">Vietnam Heritage</span>
+        <span className="type-h4 text-primary">DiViet</span>
         <span className="type-label-kicker text-on-surface-muted">PHIẾU ĐĂNG NHẬP</span>
       </header>
       <div>

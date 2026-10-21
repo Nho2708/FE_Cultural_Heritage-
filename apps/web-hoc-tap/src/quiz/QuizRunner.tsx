@@ -45,7 +45,7 @@ function RunnerLevelOne({ attempt, session }: LayoutProps) {
 
   return (
     <section data-bo-cuc="cap-1" className="min-h-dvh bg-background">
-      <title>{`${attempt.quizName ?? 'Bài kiểm tra'} · Vietnam Heritage`}</title>
+      <title>{`${attempt.quizName ?? 'Bài kiểm tra'} · DiViet`}</title>
       <header className="border-b-2 border-border bg-surface">
         <div className="mx-auto flex max-w-[960px] flex-wrap items-center gap-4 px-4 py-3">
           <ButtonLink to={pathOf('learnHome')} variant="secondary" size="lg" className="rounded-full">
@@ -109,7 +109,7 @@ function RunnerLevelTwo({ attempt, session }: LayoutProps) {
 
   return (
     <section data-bo-cuc="cap-2" className="min-h-dvh bg-background">
-      <title>{`${attempt.quizName ?? 'Bài kiểm tra'} · Vietnam Heritage`}</title>
+      <title>{`${attempt.quizName ?? 'Bài kiểm tra'} · DiViet`}</title>
       <header className="border-b border-border bg-surface">
         <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-4 px-4 py-3">
           <div className="min-w-0 flex-1">
@@ -224,7 +224,7 @@ function RunnerLevelThree({ attempt, session }: LayoutProps) {
 
   return (
     <section data-bo-cuc="cap-3" className="min-h-dvh bg-background">
-      <title>{`${attempt.quizName ?? 'Bài kiểm tra'} · Vietnam Heritage`}</title>
+      <title>{`${attempt.quizName ?? 'Bài kiểm tra'} · DiViet`}</title>
       <header className="border-b border-border bg-surface">
         <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-4 px-4 py-3">
           <div className="min-w-0 flex-1">

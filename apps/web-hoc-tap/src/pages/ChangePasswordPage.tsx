@@ -101,7 +101,7 @@ export function ChangePasswordPage() {
 
   return (
     <section className="dsv-content dsv-section">
-      <title>Đổi mật khẩu · Vietnam Heritage</title>
+      <title>Đổi mật khẩu · DiViet</title>
       <div className="mx-auto flex w-full max-w-[480px] flex-col gap-(--dsv-block-gap)">
         <div className="flex items-center gap-(--dsv-inline-gap)">
           <Illustration state="chao" className="size-20" />

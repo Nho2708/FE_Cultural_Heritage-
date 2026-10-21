@@ -36,10 +36,10 @@ describe('trang Giới thiệu', () => {
     renderApp('/gioi-thieu');
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Di sản Việt Nam, kể bằng ngôn ngữ của bạn' })).toBeInTheDocument();
-    expect(document.title).toBe('Giới thiệu · Vietnam Heritage');
+    expect(document.title).toBe('Giới thiệu · DiViet');
     expect(screen.getByRole('link', { name: 'Bắt đầu khám phá' })).toHaveAttribute('href', '/di-san');
 
-    const features = screen.getByRole('region', { name: 'Bạn làm được gì với Vietnam Heritage' });
+    const features = screen.getByRole('region', { name: 'Bạn làm được gì với DiViet' });
     expect(within(features).getAllByRole('listitem')).toHaveLength(3);
     expect(within(features).getByRole('heading', { level: 3, name: 'Tìm di sản gần bạn trên bản đồ' })).toBeInTheDocument();
     expect(within(features).getByRole('link', { name: 'Mở bản đồ di sản' })).toHaveAttribute('href', '/ban-do');
@@ -62,21 +62,24 @@ describe('trang Giới thiệu', () => {
     renderApp('/gioi-thieu');
 
     expect(await screen.findByRole('heading', { level: 1, name: "Viet Nam's heritage, told in your language" })).toBeInTheDocument();
-    expect(document.title).toBe('About · Vietnam Heritage');
+    expect(document.title).toBe('About · DiViet');
     expect(screen.getByRole('link', { name: 'Start exploring' })).toHaveAttribute('href', '/di-san');
     expect(screen.getByText(/unlock with one short ad and stay open for 24 hours/)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'See the page for schools' })).toHaveAttribute('href', '/nha-truong');
   });
 
-  it('huy hiệu chuyển động một lần, ẩn các lớp trang trí khỏi trình đọc màn hình', async () => {
+  it('huy hiệu chuyển động một lần, là hình trang trí; tên DiViet viết bằng chữ ngay dưới', async () => {
     mockApi();
     renderApp('/gioi-thieu');
     const hero = (await screen.findByRole('heading', { level: 1 })).closest('section');
     if (!hero) throw new Error('Không thấy khối đầu trang');
 
-    const logo = within(hero).getByRole('img', { name: 'Vietnam Heritage' });
-    expect(logo).toHaveAttribute('data-logo-motion');
-    expect(logo.querySelectorAll('img')).toHaveLength(6);
+    expect(within(hero).getByText('DiViet')).toBeInTheDocument();
+    expect(within(hero).queryByRole('img')).not.toBeInTheDocument();
+    const logo = hero.querySelector('[data-logo-motion]');
+    if (!logo) throw new Error('Không thấy huy hiệu chuyển động');
+    expect(logo).toHaveAttribute('aria-hidden', 'true');
+    expect(logo.querySelectorAll('img')).toHaveLength(5);
     for (const layer of logo.querySelectorAll('img')) expect(layer).toHaveAttribute('aria-hidden', 'true');
   });
 
@@ -87,8 +90,9 @@ describe('trang Giới thiệu', () => {
     const hero = (await screen.findByRole('heading', { level: 1 })).closest('section');
     if (!hero) throw new Error('Không thấy khối đầu trang');
 
-    const logo = within(hero).getByRole('img', { name: 'Vietnam Heritage' });
-    expect(logo.tagName).toBe('IMG');
+    expect(within(hero).getByText('DiViet')).toBeInTheDocument();
+    expect(within(hero).queryByRole('img')).not.toBeInTheDocument();
+    expect(hero.querySelector('img[alt=""]')).not.toBeNull();
     expect(hero.querySelector('[data-logo-motion]')).toBeNull();
     for (const group of document.querySelectorAll('[data-reveal]')) expect(group).toHaveAttribute('data-reveal', 'static');
   });
@@ -100,7 +104,7 @@ describe('trang Dành cho nhà trường', () => {
     renderApp('/nha-truong');
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Dạy di sản Việt Nam, soạn nhanh, học theo cấp' })).toBeInTheDocument();
-    expect(document.title).toBe('Dành cho nhà trường · Vietnam Heritage');
+    expect(document.title).toBe('Dành cho nhà trường · DiViet');
     expect(screen.queryByRole('note')).not.toBeInTheDocument();
 
     const steps = screen.getByRole('region', { name: 'Bốn bước làm việc của giáo viên' });
@@ -113,7 +117,7 @@ describe('trang Dành cho nhà trường', () => {
     expect(within(levels).getAllByRole('listitem')).toHaveLength(3);
 
     expect(screen.getByText(/Trường mới bắt đầu với gói Miễn phí/)).toBeInTheDocument();
-    expect(screen.getByText(/do quản trị hệ thống Vietnam Heritage tạo theo đề nghị của nhà trường/)).toBeInTheDocument();
+    expect(screen.getByText(/do quản trị hệ thống DiViet tạo theo đề nghị của nhà trường/)).toBeInTheDocument();
     for (const link of screen.getAllByRole('link', { name: /Đăng nhập web quản trị/ })) expect(link).toHaveAttribute('href', 'http://quantri.test');
 
     const main = screen.getByRole('main');
@@ -135,12 +139,12 @@ describe('trang Dành cho nhà trường', () => {
 });
 
 describe('chân trang', () => {
-  it('có cột Về Vietnam Heritage với Giới thiệu và Dành cho nhà trường, theo ngôn ngữ đang chọn', async () => {
+  it('có cột Về DiViet với Giới thiệu và Dành cho nhà trường, theo ngôn ngữ đang chọn', async () => {
     chooseLanguage('en');
     mockApi();
     renderApp('/gioi-thieu');
 
-    const column = await screen.findByRole('navigation', { name: 'About Vietnam Heritage' });
+    const column = await screen.findByRole('navigation', { name: 'About DiViet' });
     expect(within(column).getByRole('link', { name: 'About' })).toHaveAttribute('href', '/gioi-thieu');
     expect(within(column).getByRole('link', { name: 'For schools' })).toHaveAttribute('href', '/nha-truong');
   });

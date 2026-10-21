@@ -1,7 +1,7 @@
 import type { Strings } from './vi';
 
 export const ko: Strings = {
-  appName: 'Vietnam Heritage',
+  appName: 'DiViet',
   common: {
     back: '뒤로',
     close: '닫기',
@@ -176,6 +176,18 @@ export const ko: Strings = {
     open: '상세 보기',
     listInstead: '유산 목록 보기',
     withoutLocation: '좌표가 없는 유산 {{count}}곳',
+  },
+  directions: {
+    button: '길찾기',
+    title: '길찾기',
+    locating: '현재 위치를 확인하는 중…',
+    denied: '위치 사용이 허용되지 않아 길찾기를 할 수 없습니다. 휴대전화 설정에서 허용하거나 Google 지도에서 여세요.',
+    unavailable: '현재 위치를 확인할 수 없습니다. 다시 시도하거나 Google 지도에서 여세요.',
+    allow: '다시 시도',
+    openSettings: '설정 열기',
+    openGoogleMaps: 'Google 지도에서 열기',
+    pageUnavailable: '길찾기를 불러오지 못했습니다. Google 지도에서 대신 여세요.',
+    privacy: '위치는 경로 계산에만 사용되며 저장되지 않습니다.',
   },
   history: {
     title: '내 기록',

@@ -130,7 +130,7 @@ describe('Bài học của tôi', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Chiếu lên bảng' }));
     const board = await screen.findByRole('dialog', { name: 'Mã bài học BH7F3K2Q' });
     expect(within(board).getByTestId('ma-chieu-bang')).toHaveTextContent('BH 7F3 K2Q');
-    expect(within(board).getByText('Mở Vietnam Heritage → Nhập mã')).toBeInTheDocument();
+    expect(within(board).getByText('Mở DiViet → Nhập mã')).toBeInTheDocument();
     await user.click(within(board).getByRole('button', { name: /Thoát/ }));
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Mã bài học BH7F3K2Q' })).not.toBeInTheDocument());
   });

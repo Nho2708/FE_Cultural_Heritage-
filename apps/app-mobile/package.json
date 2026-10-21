@@ -2,7 +2,7 @@
   "name": "@dsvhvn/app-mobile",
   "private": true,
   "version": "0.1.0",
-  "description": "App mobile DSVHVN (tên hiển thị \"Vietnam Heritage\"): một app, hai chế độ (Khách tham quan, Học sinh), React Native + Expo. Không thuộc npm workspaces của thư mục gốc vì Expo SDK 57 cố định React 19.2.3 còn hai web dùng React 19.3; app cài phụ thuộc riêng và đọc mã dùng chung từ packages/dung-chung qua bí danh đường dẫn.",
+  "description": "App mobile DSVHVN (tên hiển thị \"DiViet\"): một app, hai chế độ (Khách tham quan, Học sinh), React Native + Expo. Không thuộc npm workspaces của thư mục gốc vì Expo SDK 57 cố định React 19.2.3 còn hai web dùng React 19.3; app cài phụ thuộc riêng và đọc mã dùng chung từ packages/dung-chung qua bí danh đường dẫn.",
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start --port 8083",
@@ -20,6 +20,7 @@
     "@react-native-async-storage/async-storage": "2.2.0",
     "@tanstack/react-query": "^5.103.2",
     "expo": "~57.0.27",
+    "expo-audio": "~57.0.5",
     "expo-constants": "~57.0.21",
     "expo-crypto": "~57.0.3",
     "expo-font": "~57.0.4",

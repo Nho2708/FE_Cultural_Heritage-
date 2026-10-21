@@ -31,10 +31,10 @@ describe('BrandSplash', () => {
     jest.restoreAllMocks();
   });
 
-  it('shows the emblem while loading and does not finish by itself', async () => {
+  it('shows the emblem and the name while loading and does not finish by itself', async () => {
     const onDone = jest.fn();
     const tree = await render(false, onDone);
-    expect(tree.root.findAll((node) => node.props.accessibilityLabel === 'Vietnam Heritage').length).toBeGreaterThan(0);
+    expect(tree.root.findAll((node) => node.props.children === 'DiViet').length).toBeGreaterThan(0);
     await act(async () => {
       jest.advanceTimersByTime(10_000);
     });

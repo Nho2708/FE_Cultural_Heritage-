@@ -59,6 +59,7 @@ export function HeritageMapScreen({ select }: { select?: string }) {
       if (message.type === 'ready') setReadyPage(page);
       else if (message.type === 'pin-selected') router.push({ pathname: '/di-san/[slug]', params: { slug: message.slug } });
       else if (message.type === 'timeline-selected') router.push({ pathname: '/di-san/[slug]/dong-thoi-gian', params: { slug: message.slug } });
+      else if (message.type === 'directions-selected') router.push({ pathname: '/di-san/[slug]/chi-duong', params: { slug: message.slug } });
     },
     [router, page],
   );

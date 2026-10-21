@@ -96,14 +96,14 @@ export function LoginPage() {
           Chưa có tài khoản? Quản trị trường của bạn sẽ tạo tài khoản và gửi email đặt mật khẩu.
         </p>
         <p className="text-center type-body-s text-on-surface-variant">
-          Trường bạn chưa dùng Vietnam Heritage?{' '}
+          Trường bạn chưa dùng DiViet?{' '}
           <LearningWebLink path="/nha-truong" className="text-link underline underline-offset-4">
             Xem giới thiệu cho nhà trường
           </LearningWebLink>
         </p>
         <p className="rounded-sm bg-surface-container-low px-4 py-3 text-center type-body-s text-on-surface-variant">
-          Học sinh đăng nhập ở trang Vietnam Heritage hoặc ứng dụng trên điện thoại.{' '}
-          <LearningWebLink className="text-link underline underline-offset-4">Mở trang Vietnam Heritage</LearningWebLink>
+          Học sinh đăng nhập ở trang DiViet hoặc ứng dụng trên điện thoại.{' '}
+          <LearningWebLink className="text-link underline underline-offset-4">Mở trang DiViet</LearningWebLink>
         </p>
       </form>
     </AuthLayout>

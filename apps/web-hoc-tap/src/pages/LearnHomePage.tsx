@@ -28,7 +28,7 @@ export function LearnHomePage() {
   if (classroom.isPending) {
     return (
       <section className="dsv-content dsv-section">
-        <title>Trang học của em · Vietnam Heritage</title>
+        <title>Trang học của em · DiViet</title>
         <LoadingState rows={3} />
       </section>
     );
@@ -36,7 +36,7 @@ export function LearnHomePage() {
   if (classroom.isError) {
     return (
       <section className="dsv-content dsv-section">
-        <title>Trang học của em · Vietnam Heritage</title>
+        <title>Trang học của em · DiViet</title>
         <ErrorState error={classroom.error} onRetry={() => void classroom.refetch()} />
       </section>
     );
