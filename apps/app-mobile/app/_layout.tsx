@@ -11,7 +11,7 @@ import { AppProvider, useApp } from '../src/state/AppProvider';
 import { ThemeProvider, useTheme } from '../src/theme/ThemeProvider';
 
 // Gốc của app: bộ nhớ đệm truy vấn, vùng an toàn, trạng thái toàn app (nạp từ máy), bộ giao diện theo cấp học. Trong lúc nạp hiện màn hình chờ
-// (huy hiệu trên nền xanh than, nối liền với màn hình chờ gốc); nạp xong thì màn hình chờ mờ dần 300 ms phía trên app.
+// (biểu tượng mái đình che sách mở trên nền kem, nối liền với màn hình chờ gốc); nạp xong thì màn hình chờ mờ dần 300 ms phía trên app.
 
 /** Báo cho gốc biết app đã nạp xong (nằm trong AppProvider nên chỉ được dựng sau khi trạng thái đã nạp). */
 function ReadySignal({ onReady }: { onReady: () => void }) {
