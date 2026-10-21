@@ -58,42 +58,77 @@ function ScoreChart({ rows }: { rows: StudentAttemptRow[] }) {
     .slice(0, 8)
     .reverse();
   if (points.length === 0) return <p className="type-body-m text-on-surface-variant">Chưa có bài làm nào có điểm để vẽ biểu đồ.</p>;
-  const W = 640;
-  const H = 240;
-  const left = 44;
-  const right = 20;
-  const top = 28;
-  const bottom = 48;
+  const W = 680;
+  const H = 250;
+  const left = 60;
+  const right = 50;
+  const top = 34;
+  const bottom = 52;
   const x = (i: number) => (points.length === 1 ? (left + W - right) / 2 : left + (i * (W - left - right)) / (points.length - 1));
   const y = (p: number) => top + ((100 - p) * (H - top - bottom)) / 100;
   const label = points.map((p) => `${p.quizName}: ${formatPercent(p.percent)}`).join('; ');
+
+  const anchorFor = (i: number) => {
+    if (points.length === 1) return 'middle';
+    if (i === 0) return 'start';
+    if (i === points.length - 1) return 'end';
+    return 'middle';
+  };
+
+  const textXFor = (i: number) => {
+    if (points.length === 1) return x(i);
+    if (i === 0) return x(i) - 4;
+    if (i === points.length - 1) return x(i) + 4;
+    return x(i);
+  };
+
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full">
-      <title>{`Điểm theo thời gian. ${label}`}</title>
-      {[0, 25, 50, 75, 100].map((tick) => (
-        <g key={tick}>
-          <line x1={left} x2={W - right} y1={y(tick)} y2={y(tick)} stroke="var(--dsv-color-border)" strokeWidth="1" />
-          <text x={left - 8} y={y(tick) + 4} textAnchor="end" fontSize="11" fill="var(--dsv-color-on-surface-variant)">
-            {tick}%
-          </text>
-        </g>
-      ))}
-      <polyline fill="none" stroke="var(--dsv-color-primary)" strokeWidth="2.5" points={points.map((p, i) => `${x(i)},${y(p.percent ?? 0)}`).join(' ')} />
-      {points.map((p, i) => (
-        <g key={p.attemptId}>
-          <circle cx={x(i)} cy={y(p.percent ?? 0)} r="5" fill="var(--dsv-color-surface)" stroke="var(--dsv-color-primary)" strokeWidth="2.5" />
-          <text x={x(i)} y={y(p.percent ?? 0) - 12} textAnchor="middle" fontSize="11" fill="var(--dsv-color-on-surface)">
-            {formatScore(p.score, p.totalPoint)} · {formatPercent(p.percent)}
-          </text>
-          <text x={x(i)} y={H - 24} textAnchor="middle" fontSize="11" fill="var(--dsv-color-on-surface-variant)">
-            {formatDate(p.submittedAt)}
-          </text>
-          <text x={x(i)} y={H - 10} textAnchor="middle" fontSize="10" fill="var(--dsv-color-on-surface-variant)">
-            {(p.quizName ?? '').slice(0, 22)}
-          </text>
-        </g>
-      ))}
-    </svg>
+    <div className="overflow-x-auto rounded-lg border border-border bg-surface p-2 shadow-2xs">
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full min-w-[500px]">
+        <title>{`Điểm theo thời gian. ${label}`}</title>
+        <defs>
+          <linearGradient id="scoreAreaGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--dsv-color-primary)" stopOpacity="0.16" />
+            <stop offset="100%" stopColor="var(--dsv-color-primary)" stopOpacity="0.0" />
+          </linearGradient>
+        </defs>
+        {[0, 25, 50, 75, 100].map((tick) => (
+          <g key={tick}>
+            <line x1={left} x2={W - right} y1={y(tick)} y2={y(tick)} stroke="var(--dsv-color-border)" strokeWidth="1" strokeDasharray={tick > 0 && tick < 100 ? '4 4' : undefined} />
+            <text x={left - 10} y={y(tick) + 4} textAnchor="end" fontSize="11" fill="var(--dsv-color-on-surface-variant)">
+              {tick}%
+            </text>
+          </g>
+        ))}
+        {points.length > 1 && (
+          <polygon
+            fill="url(#scoreAreaGradient)"
+            points={`${x(0)},${H - bottom} ${points.map((p, i) => `${x(i)},${y(p.percent ?? 0)}`).join(' ')} ${x(points.length - 1)},${H - bottom}`}
+          />
+        )}
+        <polyline fill="none" stroke="var(--dsv-color-primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points={points.map((p, i) => `${x(i)},${y(p.percent ?? 0)}`).join(' ')} />
+        {points.map((p, i) => {
+          const anchor = anchorFor(i);
+          const tx = textXFor(i);
+          const rawName = p.quizName ?? '';
+          const shortName = rawName.length > 20 ? `${rawName.slice(0, 19)}…` : rawName;
+          return (
+            <g key={p.attemptId}>
+              <circle cx={x(i)} cy={y(p.percent ?? 0)} r="5.5" fill="var(--dsv-color-surface)" stroke="var(--dsv-color-primary)" strokeWidth="2.5" />
+              <text x={tx} y={y(p.percent ?? 0) - 12} textAnchor={anchor} fontSize="11" fontWeight="600" fill="var(--dsv-color-on-surface)">
+                {formatScore(p.score, p.totalPoint)} · {formatPercent(p.percent)}
+              </text>
+              <text x={tx} y={H - 26} textAnchor={anchor} fontSize="11" fill="var(--dsv-color-on-surface-variant)">
+                {formatDate(p.submittedAt)}
+              </text>
+              <text x={tx} y={H - 11} textAnchor={anchor} fontSize="10.5" fill="var(--dsv-color-on-surface-muted)">
+                {shortName}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
   );
 }
 

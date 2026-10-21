@@ -10,7 +10,8 @@ import { useAuth } from '../lib/auth/context';
 // Hồ sơ của em (Trang hồ sơ học sinh).
 // Cấp 1: Giao diện Hộ chiếu Di sản Nhí (Heritage Passport), phong cách tươi sáng, bo tròn mềm mại,
 // không điểm số/%, tập trung vào Sao ⭐, Chuỗi ngày chăm chỉ 🔥, Huy hiệu 🏆 và nút loa đọc to.
-// Cấp 2 và 3: Thẻ học sinh điện tử (Digital Student ID Badge) chuẩn mực, hiện đại, tích hợp dải chỉ số thành tích và thông tin trường lớp.
+// Cấp 2 và 3: Thẻ học sinh điện tử (Digital Student ID Badge) chuẩn mực học đường THCS / THPT,
+// trang trọng, hiện đại, không dùng hình tượng hoạt hình hoặc emoji trẻ em.
 
 function ProfileLevelOne({
   user,
@@ -240,6 +241,7 @@ function ProfileLevelGeneral({
   const code = studentCodeOf(user);
   const facts = classFacts(classroom);
   const myLessons = home?.myLessons ?? [];
+  const pendingCount = (home?.inProgress.length ?? 0) + (home?.openQuizzes.length ?? 0);
 
   // Số ngày học thực tế
   const activeDays = (() => {
@@ -261,42 +263,48 @@ function ProfileLevelGeneral({
       <title>Hồ sơ học sinh · DiViet</title>
       <div className="mx-auto w-full max-w-[800px] flex flex-col gap-6">
 
-        {/* THẺ HỌC SINH ĐIỆN TỬ (Digital Student ID Badge) */}
-        <div className="relative overflow-hidden rounded-3xl bg-surface border-2 border-border shadow-md">
+        {/* THẺ HỌC SINH ĐIỆN TỬ (Digital Student ID Card — Chuẩn quy học đường, trang trọng, hiện đại) */}
+        <div className="rounded-2xl border border-border bg-surface shadow-xs overflow-hidden">
           {/* Dải đầu thẻ: Header trường & hệ thống DiViet */}
-          <div className="bg-gradient-to-r from-slate-800 via-indigo-950 to-slate-900 px-6 py-4 text-white flex items-center justify-between border-b border-white/10">
-            <div className="flex items-center gap-2.5">
-              <span className="text-2xl" aria-hidden="true">🇻🇳</span>
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-300">
-                  HỆ THỐNG GIÁO DỤC DI SẢN VIỆT NAM · DIVIET
-                </p>
-                <p className="text-xs font-black uppercase tracking-wider text-amber-300">
-                  THẺ HỌC SINH ĐIỆN TỬ
-                </p>
-              </div>
+          <div className="bg-slate-900 px-6 py-4 text-white flex items-center justify-between border-b border-slate-800">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                HỆ THỐNG GIÁO DỤC DI SẢN VIỆT NAM · DIVIET
+              </p>
+              <p className="text-sm font-black uppercase tracking-wider text-white mt-0.5">
+                THẺ HỌC SINH ĐIỆN TỬ
+              </p>
             </div>
 
-            <div className="hidden sm:flex items-center gap-2">
-              <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-bold text-white border border-white/20">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-md bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-300 border border-emerald-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Đang học
+              </span>
+              <span className="rounded-md bg-white/10 px-2.5 py-1 text-xs font-bold text-slate-200 border border-white/20">
                 {levelTitle}
               </span>
             </div>
           </div>
 
-          {/* Thân thẻ: Thông tin danh tính học sinh */}
-          <div className="p-6 sm:p-7 flex flex-col sm:flex-row items-center sm:items-start gap-6 border-b border-border/80 bg-surface">
-            {/* Ảnh đại diện / Monogram huy hiệu học sinh */}
-            <div className="relative shrink-0">
-              <div className="size-24 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-700 flex items-center justify-center text-white text-3xl font-black shadow-inner border-2 border-white">
-                {(user.fullName ?? 'H')[0]?.toUpperCase() ?? 'H'}
+          {/* Thân thẻ: Ảnh chân dung mô phỏng + Thông tin định danh học sinh */}
+          <div className="p-6 sm:p-7 flex flex-col sm:flex-row items-center sm:items-start gap-6 border-b border-border bg-surface">
+            {/* Khung ảnh thẻ 3x4 tiêu chuẩn học đường kèm mã vạch */}
+            <div className="flex flex-col items-center shrink-0">
+              <div className="w-24 h-32 rounded-lg bg-surface-container-high border-2 border-border flex flex-col items-center justify-center text-on-surface-muted shadow-2xs">
+                <Icon name="user" size={40} className="text-on-surface-variant" />
+                <span className="text-[10px] font-bold text-on-surface-muted mt-2 uppercase tracking-wider">
+                  Ảnh thẻ 3×4
+                </span>
               </div>
-              <span className="absolute -bottom-1 -right-1 flex size-7 items-center justify-center rounded-full bg-surface border border-border text-sm shadow-2xs" title="Học sinh DiViet">
-                {isHighSchool ? '🎓' : '🧭'}
-              </span>
+              <div className="mt-2.5 text-center" aria-hidden="true">
+                <span className="font-mono text-[10px] tracking-[0.25em] text-on-surface-muted select-none">
+                  ||| | |||| || | ||| ||
+                </span>
+              </div>
             </div>
 
-            {/* Thông tin chính */}
+            {/* Thông tin chính thức của học sinh */}
             <div className="min-w-0 flex-1 text-center sm:text-left">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
@@ -305,7 +313,7 @@ function ProfileLevelGeneral({
                   </h1>
                   <p className="type-mono-label text-on-surface-variant mt-1.5 flex items-center justify-center sm:justify-start gap-2">
                     <span className="text-xs font-medium">Mã học sinh:</span>
-                    <span className="font-mono font-black text-sm text-primary px-2.5 py-0.5 rounded-lg bg-primary-container/40 border border-primary/20">
+                    <span className="font-mono font-bold text-sm text-on-surface bg-surface-container-high px-2 py-0.5 rounded-md border border-border">
                       {code}
                     </span>
                   </p>
@@ -313,104 +321,106 @@ function ProfileLevelGeneral({
 
                 <div className="shrink-0 flex items-center justify-center sm:justify-end">
                   <ButtonLink to={pathOf('changePassword')} variant="secondary" size="md">
-                    <Icon name="key" size={18} />
+                    <Icon name="key" size={16} />
                     Đổi mật khẩu
                   </ButtonLink>
                 </div>
               </div>
 
-              {/* Thông tin bổ trợ trường lớp dạng tag */}
+              {/* Thông tin bổ trợ trường lớp dạng tag hiện đại */}
               <div className="mt-4 flex flex-wrap items-center justify-center sm:justify-start gap-2 text-xs">
-                <span className="rounded-md bg-surface-container-high px-2.5 py-1 font-bold text-on-surface border border-border">
+                <span className="rounded-md bg-surface-container px-2.5 py-1 font-bold text-on-surface border border-border">
                   Lớp {classroom.name}
                 </span>
-                <span className="rounded-md bg-surface-container-high px-2.5 py-1 font-bold text-on-surface border border-border">
+                <span className="rounded-md bg-surface-container px-2.5 py-1 font-bold text-on-surface border border-border">
                   Khối {classroom.grade}
                 </span>
+                {classroom.schoolYear && (
+                  <span className="rounded-md bg-surface-container px-2.5 py-1 font-medium text-on-surface-variant border border-border">
+                    Niên khóa: {classroom.schoolYear}
+                  </span>
+                )}
                 {classroom.organization && (
                   <span className="rounded-md bg-surface-container px-2.5 py-1 font-medium text-on-surface-variant border border-border">
-                    🏫 {classroom.organization.name}
+                    {classroom.organization.name}
                   </span>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Dải Thành tích học tập thực tế */}
-          <div className="p-5 bg-surface-container-low/60 border-b border-border/80">
-            <p className="text-[11px] font-black uppercase tracking-wider text-on-surface-muted mb-3 text-center sm:text-left">
-              THÀNH TÍCH HỌC TẬP TÍCH LŨY
+          {/* Dải Báo cáo chỉ số học tập tổng hợp (Academic Performance Overview — Không dùng emoji) */}
+          <div className="p-5 bg-surface-container-low border-b border-border">
+            <p className="type-label text-on-surface-muted font-bold text-xs uppercase tracking-wider mb-3">
+              Báo cáo tiến độ học tập tích lũy
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <Link
                 to={pathOf('progress')}
-                className="p-3 rounded-xl bg-surface border border-border hover:border-orange-400/60 shadow-2xs transition-all no-underline flex items-center gap-3 group"
-                title="Xem ngày chăm chỉ"
+                className="p-3 rounded-lg bg-surface border border-border hover:border-primary/50 transition-colors no-underline flex flex-col justify-between"
+                title="Xem ngày học chuyên cần"
               >
-                <span className="flex size-10 items-center justify-center rounded-lg bg-orange-50 text-xl border border-orange-200 group-hover:scale-105 transition-transform" aria-hidden="true">
-                  🔥
-                </span>
-                <div className="min-w-0">
-                  <p className="text-xs text-on-surface-variant font-bold truncate">Chăm chỉ</p>
-                  <p className="text-base font-black text-on-surface">{activeDays} ngày</p>
+                <div className="flex items-center justify-between text-on-surface-muted">
+                  <span className="text-xs font-semibold">Chuyên cần</span>
+                  <Icon name="calendar" size={15} />
                 </div>
+                <p className="mt-2 text-lg font-bold text-on-surface tabular-nums">
+                  {activeDays} <span className="text-xs font-normal text-on-surface-variant">ngày</span>
+                </p>
+              </Link>
+
+              <Link
+                to={pathOf('progress')}
+                className="p-3 rounded-lg bg-surface border border-border hover:border-primary/50 transition-colors no-underline flex flex-col justify-between"
+                title="Xem bài học đã kích hoạt"
+              >
+                <div className="flex items-center justify-between text-on-surface-muted">
+                  <span className="text-xs font-semibold">Bài học</span>
+                  <Icon name="book-open" size={15} />
+                </div>
+                <p className="mt-2 text-lg font-bold text-on-surface tabular-nums">
+                  {myLessons.length} <span className="text-xs font-normal text-on-surface-variant">bài học</span>
+                </p>
               </Link>
 
               <Link
                 to={`${pathOf('progress')}?tab=huy-hieu`}
-                className="p-3 rounded-xl bg-surface border border-border hover:border-purple-400/60 shadow-2xs transition-all no-underline flex items-center gap-3 group"
-                title="Xem bộ sưu tập huy hiệu"
+                className="p-3 rounded-lg bg-surface border border-border hover:border-primary/50 transition-colors no-underline flex flex-col justify-between"
+                title="Xem danh hiệu đạt được"
               >
-                <span className="flex size-10 items-center justify-center rounded-lg bg-purple-50 text-xl border border-purple-200 group-hover:scale-105 transition-transform" aria-hidden="true">
-                  🏆
-                </span>
-                <div className="min-w-0">
-                  <p className="text-xs text-on-surface-variant font-bold truncate">Huy hiệu</p>
-                  <p className="text-base font-black text-on-surface">{home?.recentBadges?.length ?? 0}</p>
+                <div className="flex items-center justify-between text-on-surface-muted">
+                  <span className="text-xs font-semibold">Danh hiệu</span>
+                  <Icon name="shield-check" size={15} />
                 </div>
+                <p className="mt-2 text-lg font-bold text-on-surface tabular-nums">
+                  {home?.recentBadges?.length ?? 0} <span className="text-xs font-normal text-on-surface-variant">huy hiệu</span>
+                </p>
               </Link>
 
               <Link
                 to={pathOf('progress')}
-                className="p-3 rounded-xl bg-surface border border-border hover:border-emerald-400/60 shadow-2xs transition-all no-underline flex items-center gap-3 group"
-                title="Xem bài học đã kích hoạt"
+                className="p-3 rounded-lg bg-surface border border-border hover:border-primary/50 transition-colors no-underline flex flex-col justify-between"
+                title="Xem bài kiểm tra chờ làm"
               >
-                <span className="flex size-10 items-center justify-center rounded-lg bg-emerald-50 text-xl border border-emerald-200 group-hover:scale-105 transition-transform" aria-hidden="true">
-                  📚
-                </span>
-                <div className="min-w-0">
-                  <p className="text-xs text-on-surface-variant font-bold truncate">Bài đã mở</p>
-                  <p className="text-base font-black text-on-surface">{myLessons.length}</p>
+                <div className="flex items-center justify-between text-on-surface-muted">
+                  <span className="text-xs font-semibold">Bài kiểm tra chờ</span>
+                  <Icon name="clock" size={15} />
                 </div>
-              </Link>
-
-              <Link
-                to={pathOf('progress')}
-                className="p-3 rounded-xl bg-surface border border-border hover:border-amber-400/60 shadow-2xs transition-all no-underline flex items-center gap-3 group"
-                title="Xem điểm sao tích lũy"
-              >
-                <span className="flex size-10 items-center justify-center rounded-lg bg-amber-50 text-xl border border-amber-200 group-hover:scale-105 transition-transform" aria-hidden="true">
-                  ⭐
-                </span>
-                <div className="min-w-0">
-                  <p className="text-xs text-on-surface-variant font-bold truncate">Sao tích lũy</p>
-                  <p className="text-base font-black text-on-surface">{home?.totalStars ?? 0}</p>
-                </div>
+                <p className="mt-2 text-lg font-bold text-on-surface tabular-nums">
+                  {pendingCount} <span className="text-xs font-normal text-on-surface-variant">bài</span>
+                </p>
               </Link>
             </div>
           </div>
         </div>
 
         {/* Khối Thông tin lớp học */}
-        <div className="rounded-2xl border border-border bg-surface p-6 shadow-xs">
-          <div className="flex items-center gap-2.5 mb-4 pb-3 border-b border-border/80">
-            <span className="text-xl" aria-hidden="true">🏫</span>
-            <h2 className="type-h3 text-on-surface font-black">Thông tin lớp học</h2>
-          </div>
+        <div className="rounded-xl border border-border bg-surface p-6 shadow-2xs">
+          <h2 className="type-h3 text-on-surface font-bold mb-4">Thông tin lớp học</h2>
           <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
             {facts.map((fact) => (
-              <div key={fact.label} className="p-3.5 rounded-xl bg-surface-container-low border border-border/70 flex flex-col justify-between">
-                <dt className="type-label text-on-surface-muted text-xs font-semibold">{fact.label}</dt>
+              <div key={fact.label} className="p-3.5 rounded-lg bg-surface-container-low border border-border/70 flex flex-col justify-between">
+                <dt className="type-label text-on-surface-muted text-xs">{fact.label}</dt>
                 <dd className="type-body-m font-bold text-on-surface mt-1">{fact.value}</dd>
               </div>
             ))}
@@ -418,17 +428,12 @@ function ProfileLevelGeneral({
         </div>
 
         {/* Khối Tiến độ và kết quả học tập */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-5 sm:p-6 rounded-2xl border border-border bg-surface shadow-xs">
-          <div className="flex items-center gap-3.5">
-            <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary-container/40 text-2xl text-primary border border-primary/20" aria-hidden="true">
-              📈
-            </span>
-            <div>
-              <p className="type-body-m font-bold text-on-surface">Tiến độ và kết quả học tập</p>
-              <p className="type-body-s text-on-surface-variant mt-0.5">
-                Xem chi tiết các bài kiểm tra đã làm và huy hiệu đạt được
-              </p>
-            </div>
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-5 sm:p-6 rounded-xl border border-border bg-surface shadow-2xs">
+          <div>
+            <p className="type-body-m font-bold text-on-surface">Tiến độ và kết quả học tập</p>
+            <p className="type-body-s text-on-surface-variant mt-0.5">
+              Xem chi tiết các bài kiểm tra đã làm và huy hiệu đạt được
+            </p>
           </div>
           <div className="shrink-0 w-full sm:w-auto">
             <ButtonLink to={pathOf('progress')} variant="primary" size="md" className="w-full sm:w-auto justify-center">
@@ -438,9 +443,9 @@ function ProfileLevelGeneral({
         </div>
 
         {/* Hàng nút hành động quay lại trang học */}
-        <div className="flex justify-center mt-2">
+        <div className="flex justify-center mt-1">
           <ButtonLink to={pathOf('learnHome')} variant="secondary" size="md" className="px-6">
-            🏠 Về trang học của em
+            Trang học của em
           </ButtonLink>
         </div>
 
