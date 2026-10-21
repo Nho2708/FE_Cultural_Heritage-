@@ -80,7 +80,7 @@ export function LoginPage() {
     <section className="dsv-content dsv-section">
       <title>Học sinh đăng nhập · DiViet</title>
       <div className="mx-auto flex w-full max-w-[440px] flex-col gap-(--dsv-block-gap)">
-        {/* Huy hiệu không có chữ nên tên "DiViet" viết ngay dưới; huy hiệu chỉ là hình trang trí. */}
+        {/* Biểu tượng không có chữ nên tên "DiViet" viết ngay dưới; biểu tượng chỉ là hình trang trí. */}
         <div className="flex flex-col items-center gap-2">
           <BrandLogo variant="badge" size={96} decorative />
           <span className="type-h3 text-on-surface">DiViet</span>
