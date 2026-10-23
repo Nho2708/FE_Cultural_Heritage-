@@ -6,6 +6,11 @@ import { parseTestDeviceIds } from './testDevices';
 // Quảng cáo có thưởng của Google (AdMob) qua `react-native-google-mobile-ads`. Mô-đun này là mã gốc nên KHÔNG có trong Expo Go: ở đó `require` thất bại và app
 // coi như không có quảng cáo (gửi `X-Ads-Unavailable` để máy chủ ở môi trường phát triển mở thẳng, hoặc hiện ghi chú cần bản dựng phát triển).
 // Chỉ dùng đơn vị quảng cáo do máy chủ trả ở `GET /public/ads/config` (khi phát triển là đơn vị thử của Google); app không chứa mã đơn vị nào.
+//
+// Học sinh và trẻ em cũng dùng app, còn khách không khai tuổi, nên theo chính sách Gia đình của Google Play mọi yêu cầu quảng cáo
+// đều được xử lý như cho trẻ em: quảng cáo không cá nhân hóa, nội dung mức G, Google không hỏi đồng ý quảng cáo cá nhân hóa (UMP)
+// và app không có quyền đọc mã quảng cáo của máy (app.json chặn quyền AD_ID).
+const CONSENT_OPTIONS = { tagForUnderAgeOfConsent: true };
 
 interface AdsModule {
   default: () => { initialize: () => Promise<unknown>; setRequestConfiguration: (config: Record<string, unknown>) => Promise<void> };
@@ -13,11 +18,12 @@ interface AdsModule {
   RewardedAdEventType: { LOADED: string; EARNED_REWARD: string };
   AdEventType: { CLOSED: string; ERROR: string };
   AdsConsent?: {
-    gatherConsent: () => Promise<unknown>;
-    requestInfoUpdate: () => Promise<{ privacyOptionsRequirementStatus?: string }>;
+    gatherConsent: (options?: typeof CONSENT_OPTIONS) => Promise<unknown>;
+    requestInfoUpdate: (options?: typeof CONSENT_OPTIONS) => Promise<{ privacyOptionsRequirementStatus?: string }>;
     showPrivacyOptionsForm: () => Promise<unknown>;
   };
   MaxAdContentRating: { G: string };
+  AgeRestrictedTreatment: { CHILD: string };
 }
 
 interface RewardedAdInstance {
@@ -59,7 +65,7 @@ export async function privacyOptionsState(): Promise<PrivacyOptionsState> {
   const consent = adsModule()?.AdsConsent;
   if (!consent) return 'unavailable';
   try {
-    return privacyOptionsStateOf((await consent.requestInfoUpdate()).privacyOptionsRequirementStatus);
+    return privacyOptionsStateOf((await consent.requestInfoUpdate(CONSENT_OPTIONS)).privacyOptionsRequirementStatus);
   } catch {
     return 'failed';
   }
@@ -87,11 +93,16 @@ export async function showRewardedAd(unitId: string, deviceKey: string, heritage
   const ads = adsModule();
   if (!ads) return 'unavailable';
   try {
-    // Hộp đồng ý của Google (UMP) cho khách ở EU và UK; nội dung quảng cáo giới hạn mức phù hợp mọi lứa tuổi.
-    await ads.AdsConsent?.gatherConsent().catch(() => undefined);
+    // Thông tin đồng ý của Google (UMP) gửi kèm cờ dưới tuổi đồng ý nên không hiện hộp hỏi; quảng cáo xử lý như cho trẻ em, mức G.
+    await ads.AdsConsent?.gatherConsent(CONSENT_OPTIONS).catch(() => undefined);
     // Máy thử khai lúc dựng (EXPO_PUBLIC_ADMOB_TEST_DEVICE_IDS): Google chỉ trả quảng cáo thử cho các máy này, kể cả với đơn vị quảng cáo thật.
     const testDeviceIdentifiers = parseTestDeviceIds(process.env.EXPO_PUBLIC_ADMOB_TEST_DEVICE_IDS);
     await ads.default().setRequestConfiguration({
+      ageRestrictedTreatment: ads.AgeRestrictedTreatment.CHILD,
+      // Bản 17.2 của thư viện gửi "child" nhưng mã Android chỉ nhận "CHILD", nên trên Android dòng trên không có tác dụng;
+      // hai cờ cũ dưới đây Android vẫn nhận, giữ tới khi thư viện sửa.
+      tagForChildDirectedTreatment: true,
+      tagForUnderAgeOfConsent: true,
       maxAdContentRating: ads.MaxAdContentRating.G,
       ...(testDeviceIdentifiers.length > 0 ? { testDeviceIdentifiers } : {}),
     });

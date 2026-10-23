@@ -2,7 +2,7 @@
   "expo": {
     "name": "DiViet",
     "slug": "hoc-di-san",
-    "scheme": "hocdisan",
+    "scheme": "diviet",
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
@@ -14,15 +14,14 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "DiViet dùng vị trí của bạn để gợi ý di sản gần bạn. Vị trí chỉ để tính khoảng cách trên máy này và không được lưu."
+          "locationWhenInUsePermission": "DiViet dùng vị trí của bạn để gợi ý di sản gần bạn. Vị trí được làm tròn, chỉ dùng để tính khoảng cách và không được lưu."
         }
       ],
       [
         "react-native-google-mobile-ads",
         {
           "androidAppId": "ca-app-pub-3940256099942544~3347511713",
-          "iosAppId": "ca-app-pub-3940256099942544~1458002511",
-          "userTrackingPermission": "DiViet dùng nhận dạng quảng cáo để hiện quảng cáo phù hợp mọi lứa tuổi."
+          "iosAppId": "ca-app-pub-3940256099942544~1458002511"
         }
       ],
       "expo-image",
@@ -38,14 +37,18 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "vn.dsvhvn.hocdisan"
+      "bundleIdentifier": "vn.id.diviet"
     },
     "android": {
-      "package": "vn.dsvhvn.hocdisan",
+      "package": "vn.id.diviet",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#F4ECDD"
-      }
+      },
+      "blockedPermissions": [
+        "com.google.android.gms.permission.AD_ID"
+      ]
     },
     "web": {
       "bundler": "metro",

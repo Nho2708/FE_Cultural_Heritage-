@@ -58,7 +58,7 @@ export const en: PrivacyPolicy = {
       body: [
         'Signed-in students never see ads. Visitors may choose to watch a short Google ad to unlock the summary and narration of one heritage site for 24 hours; everything else is free and needs no ad.',
         [
-          'In the Android app, ads are provided by Google AdMob. Google may use the device advertising ID and device information to deliver and measure ads and to prevent fraud. Ad content is limited to a rating suitable for all ages. Users in the European Union and the United Kingdom are asked for consent first. You can reset or delete the advertising ID in Android Settings.',
+          'In the Android app, ads are provided by Google AdMob. Because students and children also use the app, every ad request is marked as directed to children: Google shows only non-personalized ads with content suitable for all ages, and the app does not read the device advertising ID. Google may still use technical information about the device to deliver and measure ads and to prevent fraud.',
           'On the website, Google ad code (Google Ad Manager) is loaded only when you choose to watch an ad, and DiViet requests non-personalized ads.',
           'To unlock the right device, DiViet sends Google the anonymous device code and the heritage code; Google sends back a confirmation that you watched to the end. DiViet does not receive the device advertising ID and does not store ad content.',
         ],
@@ -93,7 +93,7 @@ export const en: PrivacyPolicy = {
           'Accounts, lessons and learning results: for as long as the school uses DiViet, or until deletion is requested (section 8).',
           'Password links sent by email: expire after 48 hours (new accounts) or 30 minutes (forgotten passwords) and are stored only as hashes.',
           'Database backups: made every night and deleted automatically after 30 days.',
-          'Server access logs: kept only as long as needed for operation and security.',
+          'Server access logs: deleted automatically after 30 days.',
           'Invoices and payment transactions: for the period required by accounting and tax law.',
         ],
       ],
