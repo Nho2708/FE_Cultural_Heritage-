@@ -18,7 +18,7 @@ export const ko: PrivacyPolicy = {
       heading: '1. 데이터에 대한 책임 주체',
       body: [
         'DiViet은 졸업 프로젝트를 수행하는 학생 그룹인 DiViet 개발팀이 만들고 운영합니다. 개발팀은 이 방침에 기재된 개인정보의 처리 목적과 방법을 결정하는 주체입니다.',
-        '개인정보에 관한 모든 문의나 요청은 vietnamheritage.id@gmail.com으로 보내 주시기 바랍니다.',
+        '개인정보에 관한 모든 문의나 요청은 support@diviet.id.vn으로 보내 주시기 바랍니다.',
       ],
     },
     {
@@ -115,7 +115,7 @@ export const ko: PrivacyPolicy = {
           '방문객: "내 기록"에서 기록을 삭제합니다. "내 주변" 또는 위치 권한을 끕니다. 웹사이트 데이터 또는 앱 데이터를 삭제하여 새 기기 코드로 다시 시작합니다.',
           '학생: "Hồ sơ của em"(내 프로필)에서 정보를 확인합니다. 정보 수정, 비밀번호 재설정 또는 계정 삭제는 교사에게 요청합니다.',
           '교사 및 학교 관리자: 관리 웹사이트에서 본인 프로필을 직접 수정합니다. 학교 관리자는 해당 학교의 교사 계정을 관리합니다.',
-          '모든 이용자: vietnamheritage.id@gmail.com으로 요청을 보내 주십시오. 이용자를 보호하기 위해 계정의 이메일 또는 학교를 통해 계정 소유자임을 확인해야 할 수 있습니다.',
+          '모든 이용자: support@diviet.id.vn으로 요청을 보내 주십시오. 이용자를 보호하기 위해 계정의 이메일 또는 학교를 통해 계정 소유자임을 확인해야 할 수 있습니다.',
         ],
         '요청에 따라 계정이 삭제되면 법령상 보관이 의무인 데이터를 제외하고 해당 계정에 딸린 개인정보를 삭제하거나 익명화합니다. 백업에 있는 사본은 30일 후 자동으로 사라집니다.',
       ],
@@ -143,7 +143,7 @@ export const ko: PrivacyPolicy = {
     {
       id: 'lien-he',
       heading: '11. 문의',
-      body: ['DiViet 개발팀. 이메일: vietnamheritage.id@gmail.com. 웹사이트: https://diviet.id.vn'],
+      body: ['DiViet 개발팀. 이메일: support@diviet.id.vn. 웹사이트: https://diviet.id.vn'],
     },
   ],
 };
