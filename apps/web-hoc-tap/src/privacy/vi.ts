@@ -19,7 +19,7 @@ export const vi: PrivacyPolicy = {
       heading: '1. Ai chịu trách nhiệm về dữ liệu',
       body: [
         'DiViet do nhóm phát triển DiViet, một nhóm sinh viên thực hiện đồ án tốt nghiệp, xây dựng và vận hành. Nhóm là bên quyết định mục đích và cách xử lý dữ liệu cá nhân nêu trong chính sách này.',
-        'Mọi câu hỏi hoặc yêu cầu về dữ liệu cá nhân, vui lòng gửi tới vietnamheritage.id@gmail.com.',
+        'Mọi câu hỏi hoặc yêu cầu về dữ liệu cá nhân, vui lòng gửi tới support@diviet.id.vn.',
       ],
     },
     {
@@ -116,7 +116,7 @@ export const vi: PrivacyPolicy = {
           'Khách tham quan: xóa lịch sử trong mục Lịch sử của tôi; tắt "Gần bạn" hoặc tắt quyền vị trí; xóa dữ liệu trang web hoặc dữ liệu ứng dụng để bắt đầu lại với một mã thiết bị mới.',
           'Học sinh: xem thông tin trong mục Hồ sơ của em; nhờ giáo viên sửa thông tin, đặt lại mật khẩu hoặc xóa tài khoản.',
           'Giáo viên và quản trị trường: tự sửa hồ sơ trong web quản trị; quản trị trường quản lý tài khoản giáo viên của trường.',
-          'Mọi người dùng: gửi yêu cầu tới vietnamheritage.id@gmail.com. Để bảo vệ bạn, chúng tôi có thể cần xác minh bạn là chủ tài khoản, ví dụ qua email của tài khoản hoặc qua nhà trường.',
+          'Mọi người dùng: gửi yêu cầu tới support@diviet.id.vn. Để bảo vệ bạn, chúng tôi có thể cần xác minh bạn là chủ tài khoản, ví dụ qua email của tài khoản hoặc qua nhà trường.',
         ],
         'Khi một tài khoản bị xóa theo yêu cầu, chúng tôi xóa hoặc ẩn danh dữ liệu cá nhân đi kèm, trừ dữ liệu mà pháp luật buộc phải giữ; bản sao trong các bản sao lưu tự mất sau 30 ngày.',
       ],
@@ -144,7 +144,7 @@ export const vi: PrivacyPolicy = {
     {
       id: 'lien-he',
       heading: '11. Liên hệ',
-      body: ['Nhóm phát triển DiViet. Email: vietnamheritage.id@gmail.com. Trang web: https://diviet.id.vn'],
+      body: ['Nhóm phát triển DiViet. Email: support@diviet.id.vn. Trang web: https://diviet.id.vn'],
     },
   ],
 };

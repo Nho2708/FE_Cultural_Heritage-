@@ -18,7 +18,7 @@ export const en: PrivacyPolicy = {
       heading: '1. Who is responsible for your data',
       body: [
         'DiViet is built and run by the DiViet development team, a group of students working on their graduation project. The team decides the purposes and means of processing the personal data described in this policy.',
-        'Please send any question or request about personal data to vietnamheritage.id@gmail.com.',
+        'Please send any question or request about personal data to support@diviet.id.vn.',
       ],
     },
     {
@@ -115,7 +115,7 @@ export const en: PrivacyPolicy = {
           'Visitors: delete your history under My history; turn off "Near you" or the location permission; clear the website data or the app data to start again with a new device code.',
           'Students: see your information under "Hồ sơ của em" (My profile); ask your teacher to correct it, reset your password or delete your account.',
           'Teachers and school administrators: edit your own profile in the administration website; school administrators manage the teacher accounts of their school.',
-          'Everyone: send a request to vietnamheritage.id@gmail.com. To protect you, we may need to verify that you own the account, for example through the account’s email address or through the school.',
+          'Everyone: send a request to support@diviet.id.vn. To protect you, we may need to verify that you own the account, for example through the account’s email address or through the school.',
         ],
         'When an account is deleted on request, we delete or anonymize the personal data attached to it, except data the law requires us to keep; copies in backups disappear automatically after 30 days.',
       ],
@@ -143,7 +143,7 @@ export const en: PrivacyPolicy = {
     {
       id: 'lien-he',
       heading: '11. Contact',
-      body: ['The DiViet development team. Email: vietnamheritage.id@gmail.com. Website: https://diviet.id.vn'],
+      body: ['The DiViet development team. Email: support@diviet.id.vn. Website: https://diviet.id.vn'],
     },
   ],
 };

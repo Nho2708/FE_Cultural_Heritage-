@@ -18,7 +18,7 @@ export const zhHans: PrivacyPolicy = {
       heading: '1. 谁对数据负责',
       body: [
         'DiViet 由 DiViet 开发团队（一个正在完成毕业设计的学生小组）开发和运营。该团队决定本政策所述个人数据的处理目的和处理方式。',
-        '有关个人数据的任何问题或请求，请发送至 vietnamheritage.id@gmail.com。',
+        '有关个人数据的任何问题或请求，请发送至 support@diviet.id.vn。',
       ],
     },
     {
@@ -115,7 +115,7 @@ export const zhHans: PrivacyPolicy = {
           '访客：在“我的历史”中删除历史记录；关闭“附近遗产”或位置权限；清除网站数据或应用数据，以使用新的设备码重新开始。',
           '学生：在“Hồ sơ của em”（我的个人资料）中查看信息；请教师修改信息、重置密码或删除账号。',
           '教师和学校管理员：在管理网站中自行修改个人资料；学校管理员管理本校的教师账号。',
-          '所有用户：将请求发送至 vietnamheritage.id@gmail.com。为保护您，我们可能需要核实您是账号的所有者，例如通过账号的电子邮件或通过学校。',
+          '所有用户：将请求发送至 support@diviet.id.vn。为保护您，我们可能需要核实您是账号的所有者，例如通过账号的电子邮件或通过学校。',
         ],
         '按请求删除账号时，我们会删除或匿名化与之相关的个人数据，但法律规定必须保留的数据除外；备份中的副本会在 30 天后自动消失。',
       ],
@@ -143,7 +143,7 @@ export const zhHans: PrivacyPolicy = {
     {
       id: 'lien-he',
       heading: '11. 联系方式',
-      body: ['DiViet 开发团队。电子邮件：vietnamheritage.id@gmail.com。网站：https://diviet.id.vn'],
+      body: ['DiViet 开发团队。电子邮件：support@diviet.id.vn。网站：https://diviet.id.vn'],
     },
   ],
 };

@@ -28,7 +28,7 @@ describe('trang Chính sách quyền riêng tư', () => {
     expect(within(contents).getByRole('link', { name: '4. Quảng cáo' })).toHaveAttribute('href', '#quang-cao');
     expect(screen.getByRole('heading', { level: 2, name: '9. Học sinh và trẻ em' }).closest('section')).toHaveAttribute('id', 'hoc-sinh-va-tre-em');
 
-    expect(screen.getAllByRole('link', { name: 'vietnamheritage.id@gmail.com' })[0]).toHaveAttribute('href', 'mailto:vietnamheritage.id@gmail.com');
+    expect(screen.getAllByRole('link', { name: 'support@diviet.id.vn' })[0]).toHaveAttribute('href', 'mailto:support@diviet.id.vn');
     expect(screen.getByRole('link', { name: 'https://policies.google.com/technologies/partner-sites' })).toHaveAttribute(
       'href',
       'https://policies.google.com/technologies/partner-sites',
