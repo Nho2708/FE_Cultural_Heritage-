@@ -81,8 +81,13 @@ khách xem hết quảng cáo thì app hỏi `GET /public/ads/unlock?slug=` mỗ
 - **Dựng APK tại máy** (không cần tài khoản Expo): đặt các biến trên cùng `EXPO_PUBLIC_API_BASE_URL` (địa chỉ HTTPS công khai của backend, vd đường hầm ngrok), chạy
   `npx expo prebuild --platform android --no-install` rồi trong `android/` chạy `gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a`; tệp ra ở `android/app/build/outputs/apk/release/`.
   Trên Windows phải bật đường dẫn dài (`LongPathsEnabled` = 1), vì đường dẫn biên dịch của reanimated dài tới 260 ký tự và ninja sẽ báo "build.ninja still dirty". `prebuild` sửa script
-  `android`, `ios` trong `package.json`: trả lại bằng `git checkout -- package.json`.
-- Để lượt xem mở khóa được, backend phải bật `Ads__GateEnabled=true` và địa chỉ `https://<máy chủ công khai>/api/v1/ads/admob/ssv` phải khai ở AdMob (dùng đường hầm khi chạy trên máy cá nhân); khách có hộp đồng ý UMP của Google ở EU và UK, nội dung giới hạn mức G.
+  `android`, `ios` trong `package.json`: trả lại bằng `git checkout -- package.json`. Script [`scripts/dung-apk.ps1`](../../scripts/dung-apk.ps1) ở thư mục gốc làm đủ các bước.
+- **Dựng cho Google Play**: mã gói `vn.id.diviet` (theo tên miền `diviet.id.vn`; không đổi được sau lần tải lên đầu). Tạo khóa tải lên một lần bằng
+  `scripts/tao-khoa-tai-len.ps1` (lưu ở `%APPDATA%\DSVHVN\google-play`, ngoài repo; cất thêm một bản ở nơi an toàn), rồi `scripts/dung-apk.ps1 -ChoGooglePlay`
+  ra tệp AAB đủ bốn kiến trúc ký bằng khóa đó ([`app.config.ts`](app.config.ts) thêm cấu hình ký đọc biến môi trường). Mỗi lần tải lên phải tăng `expo.android.versionCode` trong `app.json`.
+- **Chính sách Gia đình của Google Play**: học sinh (có cả học sinh tiểu học) dùng app nên đối tượng khai trên Play gồm trẻ em. Mọi yêu cầu quảng cáo đều xử lý như cho trẻ em
+  (không cá nhân hóa, mức G, cờ dưới tuổi đồng ý nên Google không hiện hộp đồng ý UMP) và `app.json` chặn quyền `com.google.android.gms.permission.AD_ID`, nên app không gửi mã quảng cáo của máy.
+- Để lượt xem mở khóa được, backend phải bật `Ads__GateEnabled=true` và địa chỉ `https://<máy chủ công khai>/api/v1/ads/admob/ssv` phải khai ở AdMob (dùng đường hầm khi chạy trên máy cá nhân).
 
 Bản APK dùng API `http://` (không `https://`) cần cho phép cleartext (plugin `expo-build-properties`, `android.usesCleartextTraffic`); Expo Go không cần.
 

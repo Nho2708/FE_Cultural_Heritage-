@@ -59,7 +59,7 @@ export const vi: PrivacyPolicy = {
       body: [
         'Học sinh đã đăng nhập không bao giờ thấy quảng cáo. Khách tham quan có thể tự chọn xem một quảng cáo ngắn của Google để mở tóm tắt và nghe thuyết minh của một di sản trong 24 giờ; mọi nội dung khác đều miễn phí, không cần xem quảng cáo.',
         [
-          'Trên ứng dụng Android, quảng cáo do Google AdMob cung cấp. Google có thể dùng mã quảng cáo và thông tin của thiết bị để phân phối, đo lường quảng cáo và chống gian lận. Nội dung quảng cáo được giới hạn ở mức phù hợp với mọi lứa tuổi. Người dùng ở Liên minh châu Âu và Vương quốc Anh được hỏi ý kiến đồng ý trước. Bạn có thể đặt lại hoặc xóa mã quảng cáo trong phần Cài đặt của Android.',
+          'Trên ứng dụng Android, quảng cáo do Google AdMob cung cấp. Vì học sinh và trẻ em cũng dùng ứng dụng, mọi yêu cầu quảng cáo đều được đánh dấu là dành cho trẻ em: Google chỉ hiện quảng cáo không cá nhân hóa, có nội dung phù hợp với mọi lứa tuổi, và ứng dụng không đọc mã quảng cáo (advertising ID) của thiết bị. Google vẫn có thể dùng thông tin kỹ thuật của thiết bị để phân phối, đo lường quảng cáo và chống gian lận.',
           'Trên web, mã quảng cáo của Google (Google Ad Manager) chỉ được tải khi bạn bấm xem quảng cáo, và DiViet yêu cầu quảng cáo không cá nhân hóa.',
           'Để mở khóa đúng thiết bị, DiViet gửi cho Google mã thiết bị ẩn danh và mã di sản; Google gửi lại xác nhận bạn đã xem hết. DiViet không nhận mã quảng cáo của thiết bị và không lưu nội dung quảng cáo.',
         ],
@@ -94,7 +94,7 @@ export const vi: PrivacyPolicy = {
           'Tài khoản, bài học và kết quả học tập: trong thời gian nhà trường còn dùng DiViet, hoặc tới khi có yêu cầu xóa (mục 8).',
           'Liên kết đặt mật khẩu gửi qua email: hết hạn sau 48 giờ (tài khoản mới) hoặc 30 phút (quên mật khẩu), chỉ lưu ở dạng đã băm.',
           'Bản sao lưu cơ sở dữ liệu: tạo hằng đêm và tự xóa sau 30 ngày.',
-          'Nhật ký truy cập của máy chủ: chỉ giữ trong thời gian cần cho vận hành và bảo mật.',
+          'Nhật ký truy cập của máy chủ: tự động xóa sau 30 ngày.',
           'Hóa đơn và giao dịch thanh toán: theo thời hạn mà pháp luật về kế toán, thuế yêu cầu.',
         ],
       ],

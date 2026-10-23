@@ -19,8 +19,8 @@ describe('trang Chính sách quyền riêng tư', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'Chính sách quyền riêng tư' })).toBeInTheDocument();
     expect(document.title).toBe('Chính sách quyền riêng tư · DiViet');
     const updated = document.querySelector('time');
-    expect(updated).toHaveAttribute('dateTime', '2026-10-23');
-    expect(updated?.parentElement).toHaveTextContent(/^Cập nhật lần cuối: 23 tháng 10, 2026$/);
+    expect(updated).toHaveAttribute('dateTime', '2026-10-24');
+    expect(updated?.parentElement).toHaveTextContent(/^Cập nhật lần cuối: 24 tháng 10, 2026$/);
     expect(screen.queryByRole('note')).not.toBeInTheDocument();
 
     const contents = screen.getByRole('navigation', { name: 'Nội dung' });

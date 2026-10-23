@@ -9,6 +9,6 @@ import { zhHans } from './zh-Hans';
 export type { PrivacyBlock, PrivacyPolicy, PrivacySection } from './types';
 
 /** Ngày cập nhật chính sách (giờ UTC); đổi nội dung bản tiếng Việt thì đổi ngày này. */
-export const PRIVACY_UPDATED_ON = '2026-10-23';
+export const PRIVACY_UPDATED_ON = '2026-10-24';
 
 export const PRIVACY_POLICIES: Record<LanguageCode, PrivacyPolicy> = { vi, en, ko, 'zh-Hans': zhHans, ja };
