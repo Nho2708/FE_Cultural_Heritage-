@@ -3,6 +3,7 @@ import { ERROR_CODES, type LoginResult, type StaffProfile, type StaffRole } from
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
+import { LEARNING_WEB_URL } from '../../config/env';
 import { sessionStore } from '../../lib/auth/session';
 import { envelope, mockApi, userOf } from '../../test/fixtures';
 import { renderApp } from '../../test/renderApp';
@@ -29,6 +30,16 @@ describe('màn hình Đăng nhập', () => {
     expect(await screen.findByText('Vui lòng nhập email hoặc tên đăng nhập.')).toBeInTheDocument();
     expect(screen.getByText('Vui lòng nhập mật khẩu.')).toBeInTheDocument();
     expect(calls).toHaveLength(0);
+  });
+
+  it('có lối tới trang Chính sách quyền riêng tư trên web học tập', async () => {
+    mockApi();
+    renderApp('/dang-nhap');
+
+    expect(await screen.findByRole('link', { name: 'Chính sách quyền riêng tư' })).toHaveAttribute(
+      'href',
+      `${LEARNING_WEB_URL}/chinh-sach-quyen-rieng-tu`,
+    );
   });
 
   it('đăng nhập bằng tên đăng nhập, lưu access token và vào trang mặc định của vai trò', async () => {

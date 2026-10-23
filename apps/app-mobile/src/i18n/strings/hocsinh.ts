@@ -133,6 +133,7 @@ export const studentVi = {
     school: 'Trường',
     level: 'Cấp học',
     changePassword: 'Đổi mật khẩu',
+    privacy: 'Chính sách quyền riêng tư',
     signOut: 'Đăng xuất',
     signOutConfirm: 'Em đăng xuất khỏi app trên máy này nhé?',
     switchToVisitor: 'Chuyển sang chế độ Khách tham quan',

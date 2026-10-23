@@ -61,6 +61,7 @@ export const vi = {
     aboutColumn: 'Về DiViet',
     intro: 'Giới thiệu',
     forSchools: 'Dành cho nhà trường',
+    privacy: 'Chính sách quyền riêng tư',
     copyright: '© 2026 DiViet',
   },
 

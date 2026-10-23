@@ -57,6 +57,7 @@ export const en: Strings = {
     aboutColumn: 'About DiViet',
     intro: 'About',
     forSchools: 'For schools',
+    privacy: 'Privacy policy',
     copyright: '© 2026 DiViet',
   },
 

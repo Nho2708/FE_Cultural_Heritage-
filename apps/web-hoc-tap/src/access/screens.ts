@@ -1,4 +1,4 @@
-// Bảng màn hình của web học tập (19 màn hình): khám phá di sản công khai (Khách và học sinh) và khu học của học sinh.
+// Bảng màn hình của web học tập (20 màn hình): khám phá di sản công khai (Khách và học sinh) và khu học của học sinh.
 // Nguồn duy nhất cho route guard và thanh điều hướng. Tên màn hình bằng lời, khóa đặt theo nghĩa. Giáo viên và quản trị
 // không đăng nhập ở đây; mở các trang khám phá thì họ là Khách.
 // Chặn ở giao diện chỉ để điều hướng đúng; backend kiểm vai trò, lớp và lượt làm của chính học sinh ở mọi endpoint.
@@ -40,6 +40,8 @@ export const SCREENS = [
   // Trang giới thiệu công khai: Giới thiệu (5 ngôn ngữ) và Dành cho nhà trường (chỉ tiếng Việt).
   { key: 'about', name: 'Giới thiệu', area: 'explore', actors: EVERYONE, path: '/gioi-thieu' },
   { key: 'forSchools', name: 'Dành cho nhà trường', area: 'explore', actors: EVERYONE, path: '/nha-truong' },
+  // Chính sách quyền riêng tư (5 ngôn ngữ): địa chỉ công khai cố định cho Google Play, AdMob, AdSense; app và web quản trị trỏ tới đây.
+  { key: 'privacy', name: 'Chính sách quyền riêng tư', area: 'explore', actors: EVERYONE, path: '/chinh-sach-quyen-rieng-tu' },
   {
     key: 'timeline',
     name: 'Dòng thời gian di sản',

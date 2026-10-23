@@ -218,5 +218,8 @@ export const zhHans: Strings = {
     adsNotNeeded: '你所在的地区无需 Google 广告同意窗口，因此没有可重新打开的选项。',
     adsUnavailable: '此版本没有 Google 广告，因此没有可打开的选项。',
     adsCheckFailed: '无法检查广告选项。请检查网络后重试。',
+    privacy: '隐私政策',
+    privacyText: '了解 DiViet 收集哪些数据、用于什么目的，以及您享有哪些权利。将在浏览器中打开。',
+    openPrivacy: '查看政策',
   },
 };

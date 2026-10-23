@@ -57,6 +57,7 @@ export const ja: Strings = {
     aboutColumn: 'DiViet について',
     intro: '紹介',
     forSchools: '学校の方へ',
+    privacy: 'プライバシーポリシー',
     copyright: '© 2026 DiViet',
   },
 

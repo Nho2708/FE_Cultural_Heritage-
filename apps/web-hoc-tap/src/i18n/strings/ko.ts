@@ -57,6 +57,7 @@ export const ko: Strings = {
     aboutColumn: 'DiViet 소개',
     intro: '소개',
     forSchools: '학교용 안내',
+    privacy: '개인정보 처리방침',
     copyright: '© 2026 DiViet',
   },
 

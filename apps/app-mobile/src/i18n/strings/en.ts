@@ -224,5 +224,8 @@ export const en: Strings = {
     adsNotNeeded: 'Google ad consent is not required where you are, so there are no choices to reopen.',
     adsUnavailable: 'This build has no Google ads yet, so there are no choices to open.',
     adsCheckFailed: 'Could not check ad choices. Check your connection and try again.',
+    privacy: 'Privacy policy',
+    privacyText: 'What data DiViet collects, what it is used for and what rights you have. Opens in your browser.',
+    openPrivacy: 'View policy',
   },
 };

@@ -6,7 +6,7 @@ import { useAuth } from '../../lib/auth/context';
 import { useI18n } from '../../i18n/context';
 
 // Chân trang của web học tập: liên kết khám phá, liên kết học sinh, liên kết về DiViet (Giới thiệu, Dành cho nhà
-// trường), dòng ghi nguồn nội dung di sản và ghi công ảnh.
+// trường, Chính sách quyền riêng tư), dòng ghi nguồn nội dung di sản và ghi công ảnh.
 // Chỉ đặt liên kết tới trang đã có; "Tải app cho Android" chỉ hiện khi đã cấu hình địa chỉ tệp cài đặt.
 
 const LINK = 'rounded-xs type-body-s text-inverse-on-surface hover:underline underline-offset-4';
@@ -66,6 +66,9 @@ export function SiteFooter() {
               </Link>
               <Link to={pathOf('forSchools')} className={LINK}>
                 {f.forSchools}
+              </Link>
+              <Link to={pathOf('privacy')} className={LINK}>
+                {f.privacy}
               </Link>
             </Column>
           </div>
