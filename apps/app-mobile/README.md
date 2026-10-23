@@ -87,6 +87,8 @@ khách xem hết quảng cáo thì app hỏi `GET /public/ads/unlock?slug=` mỗ
   ra tệp AAB đủ bốn kiến trúc ký bằng khóa đó ([`app.config.ts`](app.config.ts) thêm cấu hình ký đọc biến môi trường). Mỗi lần tải lên phải tăng `expo.android.versionCode` trong `app.json`.
 - **Chính sách Gia đình của Google Play**: học sinh (có cả học sinh tiểu học) dùng app nên đối tượng khai trên Play gồm trẻ em. Mọi yêu cầu quảng cáo đều xử lý như cho trẻ em
   (không cá nhân hóa, mức G, cờ dưới tuổi đồng ý nên Google không hiện hộp đồng ý UMP) và `app.json` chặn quyền `com.google.android.gms.permission.AD_ID`, nên app không gửi mã quảng cáo của máy.
+  `blockedPermissions` cũng bỏ các quyền thư viện tự thêm mà app không dùng: Privacy Sandbox của quảng cáo (`ACCESS_ADSERVICES_*`), hiện trên ứng dụng khác
+  (`SYSTEM_ALERT_WINDOW`, mẫu của Expo), bộ nhớ ngoài, vân tay (`expo-secure-store` không dùng xác thực sinh trắc học). Thêm thư viện mới thì xem lại quyền trong tệp kê khai đã gộp.
 - Để lượt xem mở khóa được, backend phải bật `Ads__GateEnabled=true` và địa chỉ `https://<máy chủ công khai>/api/v1/ads/admob/ssv` phải khai ở AdMob (dùng đường hầm khi chạy trên máy cá nhân).
 
 Bản APK dùng API `http://` (không `https://`) cần cho phép cleartext (plugin `expo-build-properties`, `android.usesCleartextTraffic`); Expo Go không cần.
