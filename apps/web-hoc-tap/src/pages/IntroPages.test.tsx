@@ -138,7 +138,7 @@ describe('trang Dành cho nhà trường', () => {
 });
 
 describe('chân trang', () => {
-  it('có cột Về DiViet với Giới thiệu và Dành cho nhà trường, theo ngôn ngữ đang chọn', async () => {
+  it('có cột Về DiViet với Giới thiệu, Dành cho nhà trường và Chính sách quyền riêng tư, theo ngôn ngữ đang chọn', async () => {
     chooseLanguage('en');
     mockApi();
     renderApp('/gioi-thieu');
@@ -146,5 +146,6 @@ describe('chân trang', () => {
     const column = await screen.findByRole('navigation', { name: 'About DiViet' });
     expect(within(column).getByRole('link', { name: 'About' })).toHaveAttribute('href', '/gioi-thieu');
     expect(within(column).getByRole('link', { name: 'For schools' })).toHaveAttribute('href', '/nha-truong');
+    expect(within(column).getByRole('link', { name: 'Privacy policy' })).toHaveAttribute('href', '/chinh-sach-quyen-rieng-tu');
   });
 });

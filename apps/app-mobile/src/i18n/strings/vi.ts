@@ -197,6 +197,9 @@ export interface Strings {
     adsNotNeeded: string;
     adsUnavailable: string;
     adsCheckFailed: string;
+    privacy: string;
+    privacyText: string;
+    openPrivacy: string;
   };
 }
 
@@ -424,5 +427,8 @@ export const vi: Strings = {
     adsNotNeeded: 'Khu vực của bạn không cần hộp đồng ý quảng cáo của Google, nên không có lựa chọn nào để mở lại.',
     adsUnavailable: 'Bản này chưa có quảng cáo của Google nên chưa có lựa chọn nào để mở.',
     adsCheckFailed: 'Không kiểm tra được lựa chọn quảng cáo. Bạn kiểm tra mạng rồi thử lại.',
+    privacy: 'Chính sách quyền riêng tư',
+    privacyText: 'DiViet thu thập dữ liệu nào, dùng để làm gì và bạn có những quyền gì. Mở bằng trình duyệt.',
+    openPrivacy: 'Xem chính sách',
   },
 };

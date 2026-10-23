@@ -218,5 +218,8 @@ export const ko: Strings = {
     adsNotNeeded: '현재 지역에서는 Google 광고 동의 창이 필요하지 않아 다시 열 선택 항목이 없습니다.',
     adsUnavailable: '이 빌드에는 Google 광고가 없어 열 선택 항목이 없습니다.',
     adsCheckFailed: '광고 선택 항목을 확인할 수 없습니다. 네트워크를 확인하고 다시 시도해 주세요.',
+    privacy: '개인정보 처리방침',
+    privacyText: 'DiViet이 어떤 데이터를 수집하고 어디에 쓰는지, 이용자에게 어떤 권리가 있는지 안내합니다. 브라우저에서 열립니다.',
+    openPrivacy: '처리방침 보기',
   },
 };

@@ -1,13 +1,13 @@
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { Linking, View } from 'react-native';
 import { SCHOOL_LEVEL_LABEL } from '@dsvhvn/dung-chung/theme';
 import { confirmAction } from '../../src/components/confirm';
 import { Button, Card, Divider, Screen, Txt } from '../../src/components/ui';
-import { APP_CHANNEL, APP_VERSION } from '../../src/config/env';
+import { APP_CHANNEL, APP_VERSION, PRIVACY_POLICY_URL } from '../../src/config/env';
 import { useApp, useAuth } from '../../src/state/AppProvider';
 
-// Của em: hồ sơ (mã học sinh, lớp, cấp học, trường), đổi mật khẩu, xem lại giới thiệu ứng dụng, đăng xuất, đổi sang chế độ Khách tham quan (cũng đăng xuất vì token không ở lại trên máy khi không còn dùng).
+// Của em: hồ sơ (mã học sinh, lớp, cấp học, trường), đổi mật khẩu, xem lại giới thiệu ứng dụng, mở Chính sách quyền riêng tư, đăng xuất, đổi sang chế độ Khách tham quan (cũng đăng xuất vì token không ở lại trên máy khi không còn dùng).
 
 export default function Account() {
   const { t } = useTranslation();
@@ -42,6 +42,7 @@ export default function Account() {
       </Card>
       <Button label={t('hs.account.changePassword')} variant="secondary" onPress={() => router.push('/doi-mat-khau')} full />
       <Button label={t('intro.title')} variant="secondary" onPress={() => router.push('/gioi-thieu')} full />
+      <Button label={t('hs.account.privacy')} variant="secondary" onPress={() => void Linking.openURL(PRIVACY_POLICY_URL)} full />
       <Button
         label={t('hs.account.signOut')}
         variant="secondary"

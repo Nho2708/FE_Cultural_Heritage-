@@ -2,11 +2,11 @@ import { LANGUAGES } from '@dsvhvn/dung-chung/i18n';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Switch, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, Switch, View } from 'react-native';
 import { AdChoices } from '../../src/components/AdChoices';
 import { confirmAction } from '../../src/components/confirm';
 import { Button, Card, Divider, Notice, Screen, Section, Txt, styles as ui } from '../../src/components/ui';
-import { API_BASE_URL, APP_CHANNEL, APP_VERSION } from '../../src/config/env';
+import { API_BASE_URL, APP_CHANNEL, APP_VERSION, PRIVACY_POLICY_URL } from '../../src/config/env';
 import { useHistory } from '../../src/guest/HistoryProvider';
 import type { HistoryEntry, HistoryKind } from '../../src/guest/historyCore';
 import { localeOf } from '../../src/i18n/dates';
@@ -124,6 +124,12 @@ export default function HistoryAndSettings() {
           <Divider />
           <View style={local.setting}>
             <AdChoices />
+          </View>
+          <Divider />
+          <View style={local.setting}>
+            <Txt variant="label">{t('settings.privacy')}</Txt>
+            <Txt variant="caption">{t('settings.privacyText')}</Txt>
+            <Button label={t('settings.openPrivacy')} variant="secondary" onPress={() => void Linking.openURL(PRIVACY_POLICY_URL)} />
           </View>
           <Divider />
           <View style={local.setting}>

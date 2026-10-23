@@ -57,6 +57,7 @@ export const zhHans: Strings = {
     aboutColumn: '关于 DiViet',
     intro: '介绍',
     forSchools: '学校专区',
+    privacy: '隐私政策',
     copyright: '© 2026 DiViet',
   },
 
