@@ -11,14 +11,13 @@ export interface TtsResponse {
 export function createTtsApi(client: ApiClient) {
   return {
     /**
-     * Chuyển văn bản thành giọng nói FPT.AI qua backend.
+     * Chuyển văn bản thành giọng nói FPT.AI qua backend (cần phiên đăng nhập; client dùng chung tự gửi token).
      * Trả về audioUrl nếu thành công, hoặc null nếu dịch vụ không khả dụng để client lùi về giọng trình duyệt.
      */
     synthesize: async (text: string, { signal }: { signal?: AbortSignal } = {}): Promise<string | null> => {
       try {
         const res = await client.request<TtsResponse>(TTS_ENDPOINTS.synthesize, {
           method: 'POST',
-          auth: false,
           body: { text },
           signal,
         });
