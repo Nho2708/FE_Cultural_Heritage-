@@ -2,10 +2,10 @@ import { Ionicons } from '@expo/vector-icons';
 import type { StudentAlbumCard } from '@dsvhvn/dung-chung/api';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Photo } from '../../components/Heritage';
 import { Txt } from '../../components/ui';
-import { useNarration, type Narration } from '../../speech/useNarration';
+import { useCloudNarration } from '../../speech/useCloudNarration';
 import { useTheme } from '../../theme/ThemeProvider';
 
 // Các mảnh giao diện dùng chung của khu học cấp 1: linh vật, nút loa tròn, nút biểu tượng tròn, hàng sao, ô số, thẻ di sản, khối "Về nhà hỏi
@@ -78,14 +78,18 @@ export function IconCircleButton({ icon, label, onPress, size = 56, style }: { i
   );
 }
 
-/** Nút loa tròn vẽ theo trạng thái đọc; `soft` là nút phụ (nền xanh nhạt) cho lời hướng dẫn. */
-export function SpeakCircle({ speaking, onPress, label, size = 56, soft = false }: { speaking: boolean; onPress: () => void; label: string; size?: number; soft?: boolean }) {
+/**
+ * Nút loa tròn vẽ theo trạng thái đọc; `soft` là nút phụ (nền xanh nhạt) cho lời hướng dẫn. `preparing`: đang chờ máy chủ tạo tiếng, nút hiện vòng xoay và
+ * nhãn "Đang chuẩn bị giọng đọc" (chạm vào là dừng).
+ */
+export function SpeakCircle({ speaking, preparing = false, onPress, label, size = 56, soft = false }: { speaking: boolean; preparing?: boolean; onPress: () => void; label: string; size?: number; soft?: boolean }) {
   const theme = useTheme();
   const { t } = useTranslation();
+  const color = soft ? theme.color.primary : theme.color.onPrimary;
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={speaking ? t('hs.one.stop') : label}
+      accessibilityLabel={preparing ? t('hs.one.preparing') : speaking ? t('hs.one.stop') : label}
       accessibilityState={{ busy: speaking }}
       onPress={onPress}
       style={({ pressed }) => [
@@ -93,26 +97,26 @@ export function SpeakCircle({ speaking, onPress, label, size = 56, soft = false 
         { width: size, height: size, borderRadius: size / 2, borderWidth: 0, backgroundColor: soft ? theme.color.primaryContainer : theme.color.primary, opacity: pressed ? 0.85 : 1 },
       ]}
     >
-      <Ionicons name={speaking ? 'stop' : 'volume-high'} size={Math.round(size * 0.48)} color={soft ? theme.color.primary : theme.color.onPrimary} />
+      {preparing ? <ActivityIndicator color={color} /> : <Ionicons name={speaking ? 'stop' : 'volume-high'} size={Math.round(size * 0.48)} color={color} />}
     </Pressable>
   );
 }
 
-/** Đọc to `narration` khi `auto` bật (đợi biết máy có giọng tiếng Việt). Khối dùng nút loa dựng lại theo `key` để mỗi câu chỉ tự đọc một lần. */
-export function useAutoSpeak(narration: Narration, auto: boolean) {
+/** Đọc to khi `auto` bật. Khối dùng nút loa dựng lại theo `key` để mỗi câu chỉ tự đọc một lần. */
+export function useAutoSpeak(narration: { playWhenReady: () => Promise<void> }, auto: boolean) {
   const { playWhenReady } = narration;
   useEffect(() => {
     if (auto) void playWhenReady();
   }, [auto, playWhenReady]);
 }
 
-/** Nút loa đọc một đoạn bằng giọng tiếng Việt của điện thoại; máy không đọc được thì ẩn. */
+/** Nút loa đọc một đoạn bằng giọng tiếng Việt của máy chủ (cả đoạn là một lời xin, để máy chủ nhớ tiếng cho lần sau). Chưa có tiếng thì đọc bằng giọng điện thoại nếu máy có giọng tiếng Việt, không thì báo ngắn. */
 export function SpeakButton({ text, label, size = 56, soft = false, auto = false }: { text: string; label: string; size?: number; soft?: boolean; auto?: boolean }) {
-  const narration = useNarration(text, 'vi-VN');
+  const narration = useCloudNarration(text, 'whole');
   useAutoSpeak(narration, auto);
-  if (narration.voiceState === 'unsupported' || narration.sentences.length === 0) return null;
+  if (narration.sentences.length === 0) return null;
   const speaking = narration.status === 'playing';
-  return <SpeakCircle speaking={speaking} onPress={() => (speaking ? narration.stop() : narration.play())} label={label} size={size} soft={soft} />;
+  return <SpeakCircle speaking={speaking} preparing={narration.preparing} onPress={() => (speaking ? narration.stop() : narration.play())} label={label} size={size} soft={soft} />;
 }
 
 /** Hàng sao: sao đầy màu vàng, sao chưa có chỉ có viền. */
@@ -171,6 +175,11 @@ export function HeritageCardTile({ card, note, onPress }: { card: Pick<StudentAl
   );
 }
 
+/** Lời đọc to của khối câu mang về nhà: lời nhắc rồi câu hỏi. */
+export function takeHomeSpeech(title: string, text: string): string {
+  return `${title}. ${text}`;
+}
+
 /** Khối "Về nhà hỏi bố mẹ nhé" và câu mang về nhà, có nút nghe. */
 export function TakeHome({ text }: { text: string }) {
   const theme = useTheme();
@@ -178,7 +187,7 @@ export function TakeHome({ text }: { text: string }) {
   const title = t('hs.one.takeHomeTitle');
   return (
     <View style={[local.takeHome, { backgroundColor: theme.color.surfaceContainerLow, borderColor: theme.color.border, borderRadius: theme.radius.card }]}>
-      <SpeakButton text={`${title}. ${text}`} label={t('hs.one.speakTakeHome')} soft />
+      <SpeakButton text={takeHomeSpeech(title, text)} label={t('hs.one.speakTakeHome')} soft />
       <View style={{ flex: 1, gap: 4 }}>
         <Txt variant="label">{title}</Txt>
         <Txt>{text}</Txt>

@@ -1,3 +1,4 @@
+import { SpeechNotice } from '@dsvhvn/dung-chung/lesson';
 import { ThemeProvider } from '@dsvhvn/dung-chung/theme';
 import { ToastProvider } from '@dsvhvn/dung-chung/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -18,6 +19,7 @@ export function App() {
           <AuthProvider>
             <LanguageProvider>
               <RouterProvider router={router} />
+              <SpeechNotice />
             </LanguageProvider>
           </AuthProvider>
         </ToastProvider>

@@ -17,7 +17,7 @@ beforeEach(() => {
   cancels = 0;
   window.localStorage.clear();
   window.scrollTo = vi.fn<() => void>();
-  vi.stubGlobal('speechSynthesis', { cancel: () => void (cancels += 1), speak: (utterance: { text: string }) => void spoken.push(utterance.text) });
+  vi.stubGlobal('speechSynthesis', { getVoices: () => [{ lang: 'vi-VN', name: 'Vi' }], cancel: () => void (cancels += 1), speak: (utterance: { text: string }) => void spoken.push(utterance.text) });
   vi.stubGlobal(
     'SpeechSynthesisUtterance',
     class {

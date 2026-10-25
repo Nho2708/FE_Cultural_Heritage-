@@ -78,4 +78,42 @@ describe('tts api', () => {
       globalThis.fetch = originalFetch;
     }
   });
+
+  it('prefetch gửi danh sách chữ và trả số chữ đã vào hàng đợi', async () => {
+    const client = createApiClient({ baseUrl: BASE, getAccessToken: () => 'token-hoc-sinh' });
+    let captured: string[] = [];
+    let capturedAuth: string | null = null;
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async (input, init) => {
+      if (String(input) === `${BASE}${TTS_ENDPOINTS.prefetch}`) {
+        captured = (JSON.parse(String(init?.body)) as { texts: string[] }).texts;
+        capturedAuth = new Headers(init?.headers).get('Authorization');
+        return new Response(JSON.stringify({ success: true, data: { queued: 2 } }), { status: 202, headers: { 'Content-Type': 'application/json' } });
+      }
+      return new Response(null, { status: 404 });
+    };
+    try {
+      expect(await createTtsApi(client).prefetch(['Một.', 'Hai.'])).toBe(2);
+      expect(captured).toEqual(['Một.', 'Hai.']);
+      expect(capturedAuth).toBe('Bearer token-hoc-sinh');
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it('prefetch trả null khi chưa đăng nhập (không gọi mạng) hoặc máy chủ lỗi', async () => {
+    const originalFetch = globalThis.fetch;
+    let called = false;
+    globalThis.fetch = async () => {
+      called = true;
+      return new Response(JSON.stringify({ success: false, message: 'Lỗi' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    };
+    try {
+      expect(await createTtsApi(createApiClient({ baseUrl: BASE, getAccessToken: () => null })).prefetch(['Một.'])).toBeNull();
+      expect(called).toBe(false);
+      expect(await createTtsApi(createApiClient({ baseUrl: BASE, getAccessToken: () => 'token' })).prefetch(['Một.'])).toBeNull();
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
 });

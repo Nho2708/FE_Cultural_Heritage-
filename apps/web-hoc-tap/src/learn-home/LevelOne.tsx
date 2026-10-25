@@ -1,6 +1,6 @@
-import { cn, daysLearnedText, levelOneResume, levelOneStations, nextLevelOneLesson, type LevelOneStation } from '@dsvhvn/dung-chung';
+import { cn, daysLearnedText, LEVEL_ONE_FIXED_PHRASES, levelOneGreetingSpeech, levelOneResume, levelOneStations, nextLevelOneLesson, type LevelOneStation } from '@dsvhvn/dung-chung';
 import { studentCodeOf, type StudentClassDetail, type StudentHome, type StudentProfile } from '@dsvhvn/dung-chung/api';
-import { Illustration, LevelOneButtonLink, LevelOneSpeak } from '@dsvhvn/dung-chung/lesson';
+import { Illustration, LevelOneButtonLink, LevelOneSpeak, usePrefetchSpeech } from '@dsvhvn/dung-chung/lesson';
 import { ErrorState, Icon, LoadingState, type IconName } from '@dsvhvn/dung-chung/ui';
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router';
@@ -28,6 +28,10 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
   const home = useStudentHome();
   const name = givenName(user.fullName);
   const greeting = `Chào ${name}!`;
+  // Lời chào đọc to không có tên em (tên học sinh không gửi sang dịch vụ giọng đọc).
+  const greetingSpeech = levelOneGreetingSpeech(home.data?.cheer);
+  // Vào trang học thì nhờ máy chủ tạo trước tiếng lời chào, lời cổ vũ và các câu cố định của cấp 1 (hướng dẫn, phản hồi, số sao).
+  usePrefetchSpeech([greetingSpeech, ...LEVEL_ONE_FIXED_PHRASES], true);
 
   return (
     <section className="dsv-content dsv-section" data-bo-cuc="cap-1">
@@ -38,7 +42,7 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
             <div className="flex items-center gap-3">
               <Illustration state="chao" className="size-16 rounded-full bg-surface-container-low sm:size-[72px]" />
               <h1 className="min-w-0 flex-1 text-[30px] leading-tight font-bold text-on-surface sm:text-[32px]">{greeting}</h1>
-              <LevelOneSpeak text={`${greeting} ${home.data?.cheer ?? ''}`} label="Nghe lời chào" size={56} />
+              <LevelOneSpeak text={greetingSpeech} label="Nghe lời chào" size={56} />
             </div>
             {home.data?.cheer && <p className="text-[20px] leading-snug text-on-surface">{home.data.cheer}</p>}
             {home.data && (

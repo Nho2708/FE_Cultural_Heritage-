@@ -1,11 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { practiceFeedback, type PracticeFeedback } from '@dsvhvn/dung-chung';
 import type { AnswerCheck, AttemptQuestion, RecallQuestion } from '@dsvhvn/dung-chung/api';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { Photo } from '../../components/Heritage';
 import { Button, Txt } from '../../components/ui';
+import { usePrefetchSpeech } from '../../speech/useCloudNarration';
 import { useTheme } from '../../theme/ThemeProvider';
 import { BIG, Mascot, SpeakButton } from './parts';
 
@@ -107,6 +108,8 @@ export function RecallStep({ questions, autoRead, onDone }: { questions: RecallQ
   const { t } = useTranslation();
   const [index, setIndex] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
+  // Nhờ máy chủ tạo trước tiếng các câu ôn của bước này.
+  usePrefetchSpeech(useMemo(() => questions.map((q) => q.content), [questions]));
   const question = questions[index];
   if (!question) return null;
   const last = index === questions.length - 1;

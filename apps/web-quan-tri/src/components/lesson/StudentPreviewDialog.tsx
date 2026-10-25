@@ -1,4 +1,4 @@
-import { LessonLinksProvider, LessonThemeScope, LessonView, NO_LESSON_LINKS } from '@dsvhvn/dung-chung/lesson';
+import { LessonLinksProvider, LessonThemeScope, LessonView, NO_LESSON_LINKS, SpeechNotice } from '@dsvhvn/dung-chung/lesson';
 import { ErrorState, InlineMessage, LoadingState, Modal } from '@dsvhvn/dung-chung/ui';
 import { useQuery } from '@tanstack/react-query';
 import { lessonsApi } from '../../lib/api/lessonEndpoints';
@@ -42,6 +42,7 @@ export function StudentPreviewDialog({ lessonId, open, onClose }: Props) {
           <LessonThemeScope level={lesson.schoolLevel}>
             <LessonLinksProvider links={NO_LESSON_LINKS}>
               <LessonView lesson={lesson} />
+              <SpeechNotice />
             </LessonLinksProvider>
           </LessonThemeScope>
         )}

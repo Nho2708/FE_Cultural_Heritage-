@@ -3,7 +3,9 @@ import { Link, type LinkProps } from 'react-router';
 import { cn } from '../cn';
 import type { QuestionPreviewOption, StudentAlbumCard, StudentHeritageCard } from '../api';
 import { Icon, type IconName } from '../ui';
+import { TAKE_HOME_HEADING, takeHomeSpeech } from './levelOneSpeech';
 import { speakVietnamese } from './speechVoice';
+import { useSpeechState } from './useSpeech';
 
 // Phần giao diện dùng chung của khu học cấp 1 (web học tập và xem trước của giáo viên): nút loa to, nút to, các phương án chạm to (Đúng/Sai,
 // chọn hình, chọn chữ), thẻ di sản, khối câu mang về nhà, ba sao lớn. Màu chỉ lấy từ token của bộ giao diện
@@ -27,7 +29,10 @@ const SPEAK_SIZE = {
 
 export type LevelOneSpeakSize = keyof typeof SPEAK_SIZE;
 
-/** Nút loa tròn của cấp 1: nền xanh (hoặc nhạt với `soft`), đọc to `text` bằng giọng tiếng Việt. Trình duyệt không đọc được thì không hiện. */
+/**
+ * Nút loa tròn của cấp 1: nền xanh (hoặc nhạt với `soft`), đọc to `text` bằng giọng tiếng Việt. Trình duyệt không đọc được thì không hiện. Đang chờ máy chủ
+ * tạo tiếng thì biểu tượng xoay, nhãn đọc thêm "Đang chuẩn bị giọng đọc" và một vùng báo (`aria-live`) nói cho trình đọc màn hình biết.
+ */
 export function LevelOneSpeak({
   text,
   label,
@@ -41,21 +46,28 @@ export function LevelOneSpeak({
   soft?: boolean;
   className?: string;
 }) {
+  const { preparing } = useSpeechState(text);
   if (!canSpeak() || text.trim() === '') return null;
   const s = SPEAK_SIZE[size];
   return (
     <button
       type="button"
-      onClick={() => void speakVietnamese(text)}
+      onClick={() => {
+        if (!preparing) void speakVietnamese(text);
+      }}
       aria-label={label}
+      aria-busy={preparing || undefined}
       className={cn(
-        'flex min-h-0 shrink-0 items-center justify-center rounded-full transition-transform motion-safe:active:scale-95',
+        'relative flex min-h-0 shrink-0 items-center justify-center rounded-full transition-transform motion-safe:active:scale-95',
         soft ? 'bg-primary-container text-on-primary-container' : 'bg-primary text-on-primary hover:bg-primary-hover',
         s.box,
         className,
       )}
     >
-      <Icon name="volume" size={s.icon} />
+      <Icon name={preparing ? 'refresh' : 'volume'} size={s.icon} className={preparing ? 'motion-safe:animate-spin' : undefined} />
+      <span className="sr-only" aria-live="polite">
+        {preparing ? 'Đang chuẩn bị giọng đọc' : ''}
+      </span>
     </button>
   );
 }
@@ -314,10 +326,10 @@ export function HeritageCardRow({
 /** Khối "Về nhà hỏi bố mẹ nhé": một câu em mang về nhà, có nút nghe. */
 export function TakeHomeBox({ text, className }: { text: string | null | undefined; className?: string }) {
   if (!text?.trim()) return null;
-  const heading = 'Về nhà hỏi bố mẹ nhé';
+  const heading = TAKE_HOME_HEADING;
   return (
     <div className={cn('flex items-start gap-3 rounded-[20px] bg-surface-container-low p-4 text-left', className)}>
-      <LevelOneSpeak text={`${heading}. ${text}`} label="Nghe câu hỏi mang về nhà" size={48} soft />
+      <LevelOneSpeak text={takeHomeSpeech(text)} label="Nghe câu hỏi mang về nhà" size={48} soft />
       <p className="min-w-0 flex-1 text-[18px] leading-snug text-on-surface">
         <span className="block font-bold">{heading}</span>
         {text}

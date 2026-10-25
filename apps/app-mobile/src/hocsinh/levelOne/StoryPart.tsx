@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Switch, Text, View } from 'react-native';
 import { Photo } from '../../components/Heritage';
-import { useNarration } from '../../speech/useNarration';
+import { useCloudNarration } from '../../speech/useCloudNarration';
 import { useTheme } from '../../theme/ThemeProvider';
 import { SpeakCircle, useAutoSpeak } from './parts';
 
@@ -15,10 +15,10 @@ export const STORY_LINE = 38;
 export function StoryPart({ text, imageUrl, index, total, autoRead, onAutoChange }: { text: string; imageUrl: string | null; index: number; total: number; autoRead: boolean | null; onAutoChange: (on: boolean) => void }) {
   const theme = useTheme();
   const { t } = useTranslation();
-  const narration = useNarration(text, 'vi-VN');
+  const narration = useCloudNarration(text, 'sentences');
   useAutoSpeak(narration, autoRead === true);
   const speaking = narration.status === 'playing';
-  const canSpeak = narration.voiceState !== 'unsupported' && narration.sentences.length > 0;
+  const canSpeak = narration.sentences.length > 0;
   const sentences = narration.sentences.length > 0 ? narration.sentences : [text];
 
   return (
@@ -36,9 +36,9 @@ export function StoryPart({ text, imageUrl, index, total, autoRead, onAutoChange
         })}
       </Text>
       <View style={local.controls}>
-        {canSpeak ? <SpeakCircle speaking={speaking} onPress={() => (speaking ? narration.stop() : narration.play())} label={t('hs.one.listenStory')} size={72} /> : null}
+        {canSpeak ? <SpeakCircle speaking={speaking} preparing={narration.preparing} onPress={() => (speaking ? narration.stop() : narration.play())} label={t('hs.one.listenStory')} size={72} /> : null}
         <View style={{ flex: 1, gap: 8 }}>
-          {canSpeak ? <Text style={{ fontSize: 20, lineHeight: 26, fontWeight: '800', color: theme.color.primary }}>{speaking ? t('hs.one.stop') : t('hs.one.listen')}</Text> : null}
+          {canSpeak ? <Text style={{ fontSize: 20, lineHeight: 26, fontWeight: '800', color: theme.color.primary }}>{narration.preparing ? t('hs.one.preparing') : speaking ? t('hs.one.stop') : t('hs.one.listen')}</Text> : null}
           {total > 1 ? (
             <View style={local.dots} accessible accessibilityLabel={t('hs.one.partOf', { index: index + 1, total })}>
               {Array.from({ length: total }, (_, dot) => (

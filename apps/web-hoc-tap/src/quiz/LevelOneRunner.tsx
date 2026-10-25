@@ -1,6 +1,6 @@
 import { checksOnTap, cn, levelOneInstruction, practiceFeedback, readyToCheck, retryAnswer, TAP_LOCK_MS, type PracticeFeedback } from '@dsvhvn/dung-chung';
 import type { AnswerCheck, AttemptQuestion, QuestionSubmission, StudentAttempt } from '@dsvhvn/dung-chung/api';
-import { AutoReadSwitch, Illustration, LevelOneButton, LevelOneIconLink, LevelOneSpeak, speakVietnamese, useAutoRead } from '@dsvhvn/dung-chung/lesson';
+import { AutoReadSwitch, Illustration, LevelOneButton, LevelOneIconLink, LevelOneSpeak, speakVietnamese, useAutoRead, usePrefetchSpeech } from '@dsvhvn/dung-chung/lesson';
 import type { IllustrationState } from '@dsvhvn/dung-chung/theme';
 import { useEffect, useRef, useState } from 'react';
 import { pathOf } from '../access/screens';
@@ -68,6 +68,13 @@ export function RunnerLevelOne({ attempt, session }: { attempt: StudentAttempt; 
       void submit();
     }
   }, [allChecked, submit]);
+
+  // Vào mỗi câu thì nhờ máy chủ tạo trước tiếng lời đọc của câu này (nội dung, phương án, hướng dẫn), lời hướng dẫn riêng và câu kế tiếp.
+  const upcoming = questions.slice(index, index + 2);
+  usePrefetchSpeech(
+    upcoming.flatMap((q) => [levelOneSpeech(q), levelOneInstruction(q.questionType)]),
+    !allChecked,
+  );
 
   // Câu hỏi tự đọc khi em sang câu; bảng phản hồi tự đọc khi hiện (khi bật "Tự đọc to").
   useEffect(() => {

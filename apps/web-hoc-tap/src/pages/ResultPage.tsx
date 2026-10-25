@@ -1,7 +1,7 @@
-import { cn, clampStars, formatDateTime, formatDuration, formatPercent, formatScore } from '@dsvhvn/dung-chung';
+import { cn, clampStars, formatDateTime, formatDuration, formatPercent, formatScore, levelOneStarsHeadline } from '@dsvhvn/dung-chung';
 import type { StudentAnalysis, StudentAttemptResult, StudentBadge, StudentTopic } from '@dsvhvn/dung-chung/api';
 import { Badge, Button, ButtonLink, ErrorState, Icon, InlineMessage, LoadingState } from '@dsvhvn/dung-chung/ui';
-import { HeritageCardRow, Illustration, LevelOneButtonLink, LevelOneSpeak, LevelOneStars, SpeakButton, TakeHomeBox, speakVietnamese, useAutoRead } from '@dsvhvn/dung-chung/lesson';
+import { HeritageCardRow, Illustration, LevelOneButtonLink, LevelOneSpeak, LevelOneStars, SpeakButton, TakeHomeBox, speakVietnamese, useAutoRead, usePrefetchSpeech } from '@dsvhvn/dung-chung/lesson';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router';
@@ -106,9 +106,11 @@ function meta(result: StudentAttemptResult): string {
 
 function ResultLevelOne({ result, automatic }: { result: StudentAttemptResult; automatic: boolean; lessonCode: string | null }) {
   const stars = clampStars(result.stars);
-  const headline = `Em được ${stars} sao!`;
+  const headline = levelOneStarsHeadline(stars);
   const praise = result.praise?.trim() ?? '';
   const [autoRead] = useAutoRead();
+  // Số sao và lời khen đọc cùng một lượt: nhờ máy chủ tạo trước tiếng ngay khi vào trang để nút nghe có ngay.
+  usePrefetchSpeech([`${headline} ${praise}`.trim()], true);
   // Trang kết quả tự đọc số sao và lời khen một lần (khi bật "Tự đọc to").
   useEffect(() => {
     if (autoRead) void speakVietnamese(`${headline} ${praise}`.trim());

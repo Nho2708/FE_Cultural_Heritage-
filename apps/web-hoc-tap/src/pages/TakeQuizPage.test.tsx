@@ -1,4 +1,5 @@
 import { ATTEMPT_ENDPOINTS, type AttemptQuestion, type SchoolLevel, type StudentAttempt, type StudentAttemptResult } from '@dsvhvn/dung-chung/api';
+import { setTtsAccessTokenProvider } from '@dsvhvn/dung-chung/lesson';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -378,7 +379,7 @@ describe('Làm bài kiểm tra — cấp 1 (bài chơi luyện tập)', () => {
 describe('Làm bài kiểm tra — cấp 1 tự đọc câu hỏi', () => {
   function stubSpeech() {
     const spoken: string[] = [];
-    vi.stubGlobal('speechSynthesis', { cancel: () => undefined, speak: (u: { text: string }) => spoken.push(u.text) });
+    vi.stubGlobal('speechSynthesis', { getVoices: () => [{ lang: 'vi-VN', name: 'Vi' }], cancel: () => undefined, speak: (u: { text: string }) => spoken.push(u.text) });
     vi.stubGlobal(
       'SpeechSynthesisUtterance',
       class {
@@ -412,6 +413,24 @@ describe('Làm bài kiểm tra — cấp 1 tự đọc câu hỏi', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'Câu hỏi số 2?' })).toBeInTheDocument();
     expect(spoken).toHaveLength(2);
     window.localStorage.clear();
+  });
+
+  it('vào câu hỏi thì nhờ máy chủ tạo trước tiếng lời đọc của câu, lời hướng dẫn và câu kế tiếp', async () => {
+    setTtsAccessTokenProvider(() => 'token-hoc-sinh');
+    try {
+      const calls = quizServer(1, { attempt: attemptOf(1, questions(3)) });
+      renderApp(PATH, OPEN.state);
+      expect(await screen.findByRole('heading', { level: 1, name: 'Câu hỏi số 1?' })).toBeInTheDocument();
+
+      const prefetched = () => calls.filter((c) => c.path === '/tts/prefetch').flatMap((c) => (c.body as { texts: string[] }).texts);
+      await waitFor(() => expect(prefetched()).toContain('Câu hỏi số 1? A: Vua Gia Long. B: Vua Minh Mạng. C: Vua Tự Đức. Em chọn câu trả lời nhé.'));
+      expect(prefetched()).toContain('Em chọn câu trả lời nhé.');
+      expect(prefetched().some((text) => text.startsWith('Câu hỏi số 2?'))).toBe(true);
+      // Câu thứ ba chưa tới lượt nên chưa nhờ tạo trước.
+      expect(prefetched().some((text) => text.startsWith('Câu hỏi số 3?'))).toBe(false);
+    } finally {
+      setTtsAccessTokenProvider(() => null);
+    }
   });
 });
 

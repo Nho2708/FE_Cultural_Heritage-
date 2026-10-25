@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Photo } from '../../components/Heritage';
 import { Button, Notice, Txt } from '../../components/ui';
 import { useReducedMotion } from '../../motion/useReducedMotion';
+import { usePrefetchSpeech } from '../../speech/useCloudNarration';
 import { useServices } from '../../state/AppProvider';
 import { useTheme } from '../../theme/ThemeProvider';
 import { useAutoRead } from '../autoRead';
@@ -105,6 +106,9 @@ function Body({ attempt, session, onPause }: { attempt: StudentAttempt; session:
   const tapType = checksOnTap(question.questionType);
   const instruction = levelOneInstruction(question.questionType);
   const sheetOpen = phase === 'feedback' || phase === 'offline';
+  // Vào mỗi câu thì nhờ máy chủ tạo trước tiếng nội dung câu, lời hướng dẫn của câu này và của câu kế tiếp.
+  const at = attempt.questions.findIndex((q) => q.questionId === question.questionId);
+  usePrefetchSpeech(attempt.questions.slice(Math.max(at, 0), Math.max(at, 0) + 2).flatMap((q) => [q.content, levelOneInstruction(q.questionType)]));
 
   return (
     <View style={[local.fill, { backgroundColor: theme.color.background }]}>

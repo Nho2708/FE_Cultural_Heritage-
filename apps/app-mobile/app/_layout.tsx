@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { VoiceNotice } from '../src/components/VoiceNotice';
 import { HistoryProvider } from '../src/guest/HistoryProvider';
 import { BrandSplash, SPLASH_BACKGROUND } from '../src/motion/BrandSplash';
 import { AppProvider, useApp } from '../src/state/AppProvider';
@@ -57,6 +58,7 @@ function Navigation() {
         <Stack.Screen name="ket-qua/[luot]" options={{ headerShown: false }} />
         <Stack.Screen name="album" options={{ headerShown: false }} />
       </Stack>
+      <VoiceNotice />
     </>
   );
 }

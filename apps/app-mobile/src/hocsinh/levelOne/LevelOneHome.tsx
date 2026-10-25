@@ -1,4 +1,4 @@
-import { daysLearnedText, levelOneResume, nextLevelOneLesson } from '@dsvhvn/dung-chung';
+import { daysLearnedText, LEVEL_ONE_FIXED_PHRASES, levelOneGreetingSpeech, levelOneResume, nextLevelOneLesson } from '@dsvhvn/dung-chung';
 import type { StudentHome } from '@dsvhvn/dung-chung/api';
 import { useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +6,7 @@ import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native
 import { Photo } from '../../components/Heritage';
 import { Button, Txt } from '../../components/ui';
 import { useReducedMotion } from '../../motion/useReducedMotion';
+import { usePrefetchSpeech } from '../../speech/useCloudNarration';
 import { useTheme } from '../../theme/ThemeProvider';
 import { LessonPath } from './LessonPath';
 import { BIG, GUTTER, Mascot, SpeakButton, StatPill } from './parts';
@@ -125,6 +126,10 @@ export function LevelOneHome(props: LevelOneHomeProps) {
   const cheer = home.cheer ?? '';
   const stars = home.totalStars ?? 0;
   const days = daysLearnedText(home.streakDays);
+  // Lời chào đọc to không có tên em (tên học sinh không gửi sang dịch vụ giọng đọc). Vào trang học thì nhờ máy chủ tạo trước tiếng lời chào, lời cổ vũ và các
+  // câu cố định của cấp 1 (hướng dẫn, phản hồi, số sao).
+  const greetingSpeech = levelOneGreetingSpeech(cheer);
+  usePrefetchSpeech([greetingSpeech, ...LEVEL_ONE_FIXED_PHRASES]);
 
   // Tự cuộn tới trạm hiện tại khi đã biết vị trí của con đường và của trạm (một lần mỗi lần vào trang).
   const maybeScroll = useCallback(() => {
@@ -152,7 +157,7 @@ export function LevelOneHome(props: LevelOneHomeProps) {
         {cheer ? (
           <View style={local.cheerRow}>
             <Txt style={local.grow}>{cheer}</Txt>
-            <SpeakButton text={`${t('hs.one.hello', { name: givenName(home.fullName) })} ${cheer}`} label={t('hs.one.speakCheer')} soft />
+            <SpeakButton text={greetingSpeech} label={t('hs.one.speakCheer')} soft />
           </View>
         ) : null}
         <View style={local.stats} accessible accessibilityLabel={t('hs.one.statsLabel', { stars, days })}>

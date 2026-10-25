@@ -7,7 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAutoRead } from './autoRead';
 import { AutoReadSwitch } from './AutoReadSwitch';
 import { Illustration } from './Illustration';
-import { canTakeQuiz, sectionsOf } from './lessonData';
+import { canTakeQuiz } from './lessonData';
 import { useLessonLinks } from './lessonLinks';
 import { LessonFigure, QuizList } from './LessonParts';
 import {
@@ -19,8 +19,9 @@ import {
   LevelOneSpeak,
   TakeHomeBox,
 } from './LevelOneParts';
+import { galleryOf, lessonSpeechTexts, storyPartsOf, takeHomeSpeech } from './levelOneSpeech';
 import { speakVietnamese } from './speechVoice';
-import { useSentenceReader } from './useSpeech';
+import { usePrefetchSpeech, useSentenceReader } from './useSpeech';
 
 // Bài học — bố cục cấp 1 (khối 1-5, một bố cục cho cả lớp 1 đến lớp 5): đi lần lượt Nhớ lại → Nghe chuyện → Xem hình → Chơi → Nhận thẻ.
 // Nhớ lại: vài câu ôn của bài trước, chạm là biết ngay đúng sai kèm giải thích, không tính sao. Nghe chuyện: hình lớn, chữ to, đọc từng
@@ -82,15 +83,14 @@ function useRecall(code: string, load: ((code: string) => Promise<{ questions: R
 export function LevelOneLesson({ lesson, initialPosition, onPositionChange }: LevelOneLessonProps) {
   const links = useLessonLinks();
   const steps = useMemo(() => lesson.layout.steps.map(normalizeStep), [lesson.layout.steps]);
-  const story = sectionsOf(lesson, 'STORY');
-  const gallery = [
-    ...story.filter((s) => s.imageUrl).map((s) => ({ url: s.imageUrl, caption: s.title, image: s.image })),
-    ...sectionsOf(lesson, 'IMAGE').map((s) => ({ url: s.imageUrl, caption: s.body, image: s.image })),
-  ];
-  const parts =
-    story.length > 0
-      ? story.map((s) => ({ text: s.body ?? '', url: s.imageUrl, caption: s.title }))
-      : [{ text: lesson.summary ?? '', url: lesson.heritages[0]?.thumbnailUrl ?? null, caption: null }];
+  const gallery = useMemo(() => galleryOf(lesson), [lesson]);
+  const parts = useMemo(() => storyPartsOf(lesson), [lesson]);
+
+  // Vào bài thì nhờ máy chủ tạo trước tiếng mọi thứ sắp đọc (các câu kể chuyện, chú thích hình, ý cần nhớ) để em bấm nghe là có ngay. Xem trước của giáo viên không gọi.
+  usePrefetchSpeech(
+    useMemo(() => lessonSpeechTexts(parts, gallery, lesson.keyPoints), [gallery, lesson.keyPoints, parts]),
+    !links.preview,
+  );
 
   const recall = useRecall(lesson.accessCode, links.recall, !links.preview && steps.some((s) => s.key === 'RECALL'));
   const visible = (index: number) => steps[index] !== undefined && (steps[index]!.key !== 'RECALL' || recall.status !== 'none');
@@ -329,17 +329,25 @@ function StoryStep({ part, index, total, readAloud, showSwitch, autoRead, onAuto
               type="button"
               onClick={() => (reader.speaking ? stop() : play())}
               aria-label={reader.speaking ? 'Dừng đọc' : 'Đọc to đoạn này'}
+              aria-busy={reader.preparing || undefined}
               className="flex size-18 min-h-0 shrink-0 items-center justify-center rounded-full bg-primary text-on-primary shadow-[0_4px_0_var(--dsv-color-primary-active)] hover:bg-primary-hover motion-safe:active:translate-y-0.5"
             >
-              <Icon name={reader.speaking ? 'pause' : 'volume'} size={36} />
+              <Icon
+                name={reader.preparing ? 'refresh' : reader.speaking ? 'pause' : 'volume'}
+                size={36}
+                className={reader.preparing ? 'motion-safe:animate-spin' : undefined}
+              />
             </button>
           )}
           <div className="flex min-w-0 flex-col gap-2">
             {reader.supported && (
               <span aria-hidden="true" className="text-[22px] font-bold text-on-surface">
-                {reader.speaking ? 'Dừng' : 'Nghe'}
+                {reader.preparing ? 'Đang chuẩn bị…' : reader.speaking ? 'Dừng' : 'Nghe'}
               </span>
             )}
+            <span className="sr-only" aria-live="polite">
+              {reader.preparing ? 'Đang chuẩn bị giọng đọc' : ''}
+            </span>
             {total > 1 && (
               <>
                 <span className="sr-only">{`Đoạn ${index + 1} trên ${total}`}</span>
@@ -424,6 +432,12 @@ function RecallStep({ questions, readAloud, onFinish }: { questions: RecallQuest
     };
     return practiceFeedback(asAttemptQuestion(question, index), check, { last });
   }, [index, last, picked, question, questions.length]);
+
+  // Nhờ máy chủ tạo trước tiếng các câu ôn (bước này chỉ có khi không phải xem trước).
+  usePrefetchSpeech(
+    useMemo(() => questions.map((q) => q.content), [questions]),
+    true,
+  );
 
   // Câu hỏi tự đọc khi em sang câu; phản hồi tự đọc khi em vừa chạm (khi bật "Tự đọc to").
   useEffect(() => {
@@ -528,6 +542,8 @@ function EarnCardStep({ lesson, onPlay, onRestart }: { lesson: StudentLesson; on
     thumbnailUrl: h.thumbnailUrl,
   }));
   const done = state.status === 'done' ? state.data : null;
+  // Câu mang về nhà chỉ có sau khi ghi bài đã học xong: nhờ máy chủ tạo trước tiếng ngay để em bấm nghe là có.
+  usePrefetchSpeech([done?.takeHome ? takeHomeSpeech(done.takeHome) : null], !sample);
   const cards = sample ? sampleCards : (done?.cards ?? []);
   const cardNote = sample || done?.firstTime ? 'Thẻ mới vào album' : 'Đã có trong album';
 

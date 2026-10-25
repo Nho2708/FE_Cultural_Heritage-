@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { LessonCompletion, StudentLesson, StudentRecall } from '../api';
 import { LessonLinksProvider } from './LessonLinksProvider';
+import { setTtsAccessTokenProvider, setTtsBaseUrl } from './speechVoice';
 import { NO_LESSON_LINKS, type LessonLinks } from './lessonLinks';
 import { LessonView } from './LessonView';
 import type { LessonPosition } from './LevelOneLesson';
@@ -23,7 +24,7 @@ beforeEach(() => {
   utterances.length = 0;
   window.localStorage.clear();
   window.scrollTo = vi.fn<() => void>();
-  vi.stubGlobal('speechSynthesis', { cancel: () => undefined, speak: (u: FakeUtterance) => void utterances.push(u) });
+  vi.stubGlobal('speechSynthesis', { getVoices: () => [{ lang: 'vi-VN', name: 'Vi' }], cancel: () => undefined, speak: (u: FakeUtterance) => void utterances.push(u) });
   vi.stubGlobal(
     'SpeechSynthesisUtterance',
     class {
@@ -255,5 +256,69 @@ describe('xem trước của giáo viên', () => {
     expect(screen.queryByRole('link', { name: 'Xem album' })).toBeNull();
     expect(screen.getByRole('button', { name: 'Xem lại từ đầu' })).toBeTruthy();
     expect(spoken()).toEqual([]);
+  });
+});
+
+describe('nhờ máy chủ tạo trước tiếng giọng đọc', () => {
+  const BASE = 'http://api.test/api/v1';
+  let prefetched: string[];
+
+  beforeEach(() => {
+    prefetched = [];
+    setTtsBaseUrl(BASE);
+    setTtsAccessTokenProvider(() => 'token-hoc-sinh');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const body = JSON.parse(String(init?.body ?? '{}')) as { texts?: string[] };
+        if (String(input) === `${BASE}/tts/prefetch`) prefetched.push(...(body.texts ?? []));
+        const data = String(input) === `${BASE}/tts/prefetch` ? { queued: body.texts?.length ?? 0 } : { audioUrl: null };
+        return new Response(JSON.stringify({ success: true, data }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+      }),
+    );
+  });
+
+  afterEach(() => {
+    setTtsAccessTokenProvider(() => null);
+  });
+
+  const imageSection = {
+    type: 'IMAGE',
+    title: null,
+    body: 'Hồ Gươm vào buổi sáng.',
+    imageUrl: 'ho-guom.jpg',
+    image: null,
+    milestoneYear: null,
+    milestoneLabel: null,
+    eventId: null,
+    sourceCitation: null,
+    sortOrder: 2,
+  } as StudentLesson['sections'][number];
+
+  it('vào bài: từng câu kể chuyện, chú thích hình và các ý cần nhớ', async () => {
+    show(lessonOf({ sections: [...lessonOf().sections, imageSection], keyPoints: ['Chùa có một cột', 'Chùa ở Hà Nội'] }), linksOf());
+    await waitFor(() => expect(prefetched.length).toBeGreaterThan(0));
+    expect(prefetched).toEqual(
+      expect.arrayContaining(['Giữa hồ nước có một ngôi chùa nhỏ.', 'Chùa đứng trên một cây cột đá.', 'Hồ Gươm vào buổi sáng.', 'Chùa có một cột. Chùa ở Hà Nội']),
+    );
+  });
+
+  it('xem trước của giáo viên không nhờ máy chủ tạo trước', async () => {
+    show(lessonOf(), NO_LESSON_LINKS);
+    await screen.findByRole('article', { name: 'Câu chuyện' });
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(prefetched).toEqual([]);
+  });
+
+  it('bước Nhớ lại: nội dung các câu ôn', async () => {
+    show(lessonOf(), linksOf({ recall: () => Promise.resolve(recallOf([trueFalse])) }));
+    await screen.findByText('Bánh chưng có hình vuông.');
+    await waitFor(() => expect(prefetched).toContain('Bánh chưng có hình vuông.'));
+  });
+
+  it('bước Nhận thẻ: câu mang về nhà, đúng chữ nút nghe sẽ đọc', async () => {
+    show(lessonOf(), linksOf(), { step: 4, part: 0 });
+    await screen.findByText('Thẻ mới vào album');
+    await waitFor(() => expect(prefetched).toContain(`Về nhà hỏi bố mẹ nhé. ${completion.takeHome}`));
   });
 });

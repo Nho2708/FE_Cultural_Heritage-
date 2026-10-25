@@ -16,6 +16,7 @@ export * from './lessonLinks';
 export * from './LessonLinksProvider';
 export * from './lessonScopeStyle';
 export * from './SpeakButton';
+export * from './SpeechNotice';
 export * from './speechVoice';
 export * from './themeContext';
 export * from './useSpeech';

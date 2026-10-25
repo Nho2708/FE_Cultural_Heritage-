@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest';
+import { isSpeakableText } from './speech';
 import type { AnswerCheck, AttemptQuestion, StudentClassLesson } from './api';
 import {
   albumGroups,
   checksOnTap,
   daysLearnedText,
+  LEVEL_ONE_FIXED_PHRASES,
+  levelOneGreetingSpeech,
+  levelOneStarsHeadline,
   isNewCard,
   levelOneInstruction,
   levelOneStations,
@@ -178,5 +182,41 @@ describe('con đường và album', () => {
   it('nhóm thẻ theo thứ tự xuất hiện và lời nhắc thẻ chưa có', () => {
     expect(albumGroups([{ groupName: 'A' }, { groupName: 'B' }, { groupName: 'A' }])).toEqual(['A', 'B']);
     expect(lockedCardHint({ lessonTitle: 'Chùa Một Cột' })).toBe('Học bài “Chùa Một Cột” để mở');
+  });
+});
+
+describe('câu cố định để máy chủ tạo trước tiếng', () => {
+  it('có lời hướng dẫn từng dạng, lời khen không giải thích, gợi ý thử lại và số sao, đều đọc được và không trùng', () => {
+    const phrases = [...LEVEL_ONE_FIXED_PHRASES];
+    expect(new Set(phrases).size).toBe(phrases.length);
+    for (const phrase of phrases) expect(isSpeakableText(phrase)).toBe(true);
+
+    for (const type of ['TRUE_FALSE', 'IMAGE_CHOICE', 'MATCHING', 'ORDERING', 'SINGLE_CHOICE'] as const) {
+      expect(phrases).toContain(levelOneInstruction(type));
+    }
+    expect(phrases).toContain('Em chạm Đúng hoặc Sai.');
+    expect(phrases).toContain('Đúng rồi! Em nhớ bài giỏi lắm!');
+    expect(phrases).toContain('Giỏi quá! Em nhớ bài giỏi lắm!');
+    expect(phrases).toContain('Chưa đúng rồi. Em nhớ lại câu chuyện rồi thử lại nhé!');
+    expect(phrases).toContain('Chưa phải hình này. Em nhớ lại câu chuyện rồi chọn hình khác nhé!');
+    expect(phrases).toContain('Chưa đúng rồi. Em thử nối lại các cặp nhé!');
+    expect(phrases).toContain('Chưa đúng rồi. Em thử xếp lại các bước nhé!');
+    expect(phrases).toContain('Em được 1 sao!');
+    expect(phrases).toContain('Em được 3 sao!');
+  });
+
+  it('lời phản hồi cố định là đúng chữ practiceFeedback đọc to', () => {
+    const q = question({ questionType: 'IMAGE_CHOICE', position: 2 });
+    const right = practiceFeedback(q, check({ isCorrect: true, explanation: null }), { last: false });
+    expect(LEVEL_ONE_FIXED_PHRASES).toContain(right.speech);
+    const wrong = practiceFeedback(q, check({ isCorrect: false, tryCount: 1, parts: [false] }), { last: false });
+    expect(LEVEL_ONE_FIXED_PHRASES).toContain(wrong.speech);
+  });
+
+  it('lời chào đọc to không có tên em', () => {
+    expect(levelOneGreetingSpeech('Hôm nay mình học bài “Chùa Một Cột” nhé!')).toBe('Chào em! Hôm nay mình học bài “Chùa Một Cột” nhé!');
+    expect(levelOneGreetingSpeech(null)).toBe('Chào em!');
+    expect(levelOneGreetingSpeech('  ')).toBe('Chào em!');
+    expect(levelOneStarsHeadline(2)).toBe('Em được 2 sao!');
   });
 });

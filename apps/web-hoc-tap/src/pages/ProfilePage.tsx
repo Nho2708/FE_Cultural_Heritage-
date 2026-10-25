@@ -56,7 +56,8 @@ function ProfileLevelOne({
   const teacher = classroom.teacherName ?? 'Đang cập nhật';
   const school = classroom.organization?.name ?? 'Trường Tiểu học';
 
-  const speechIntro = `Thẻ học sinh của em. Họ và tên: ${name}. Mã học sinh: ${code}. Học sinh lớp ${classroom.name}, trường ${classroom.organization?.name ?? 'Trường học'}. Thầy cô giáo: ${classroom.teacherName ?? 'đang cập nhật'}. Em đã đạt được ${stars} ngôi sao và ${daysLearnedText(days)}. Chúc em học thật vui!`;
+  // Lời đọc không có họ tên và mã học sinh: hai thứ này không gửi sang dịch vụ giọng đọc.
+  const speechIntro = `Thẻ học sinh của em. Học sinh lớp ${classroom.name}, trường ${classroom.organization?.name ?? 'Trường học'}. Thầy cô giáo: ${classroom.teacherName ?? 'đang cập nhật'}. Em đã đạt được ${stars} ngôi sao và ${daysLearnedText(days)}. Chúc em học thật vui!`;
 
   const classRows: Array<{ icon: IconName; label: string; value: string }> = [
     { icon: 'users', label: 'Lớp', value: classroom.name },

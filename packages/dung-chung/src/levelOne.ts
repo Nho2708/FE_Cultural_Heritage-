@@ -65,6 +65,9 @@ export interface PracticeFeedback {
 
 const CORRECT_TITLES = ['Đúng rồi!', 'Giỏi quá!', 'Chính xác!'] as const;
 
+/** Lời nhắc khi câu hỏi chưa có giải thích. */
+const CORRECT_TEXT = 'Em nhớ bài giỏi lắm!';
+
 function countTrue(parts: readonly boolean[]): number {
   return parts.filter(Boolean).length;
 }
@@ -97,7 +100,7 @@ export function practiceFeedback(question: AttemptQuestion, check: AnswerCheck, 
 
   if (check.isCorrect) {
     const title = CORRECT_TITLES[(question.position - 1 + CORRECT_TITLES.length) % CORRECT_TITLES.length]!;
-    const text = explanation ?? 'Em nhớ bài giỏi lắm!';
+    const text = explanation ?? CORRECT_TEXT;
     return { tone: 'correct', title, text, speech: `${title} ${text}`, action: next, done: true };
   }
 
@@ -124,6 +127,89 @@ export function practiceFeedback(question: AttemptQuestion, check: AnswerCheck, 
   const text = explanation ?? answerSentence(question, check.correctAnswer);
   return { tone: 'reveal', title, text, speech: `${title} ${text}`, action: next, done: true };
 }
+
+// ---- Câu cố định để máy chủ tạo trước tiếng ----
+
+/** Câu hỏi rỗng đủ dạng để dựng lời phản hồi cố định (chỉ `position` và `questionType` được dùng). */
+function phraseQuestion(questionType: QuestionType, position: number): AttemptQuestion {
+  return {
+    questionId: 0,
+    position,
+    point: null,
+    questionType,
+    typeName: '',
+    content: '',
+    imageUrl: null,
+    passage: null,
+    passageSource: null,
+    options: [],
+    leftItems: [],
+    rightItems: [],
+    items: [],
+    blankCount: 0,
+    wordBank: [],
+    statements: [],
+    partsTotal: 1,
+    answered: false,
+    answer: null,
+    checked: false,
+  };
+}
+
+function phraseCheck(isCorrect: boolean, tryCount: number): AnswerCheck {
+  return {
+    questionId: 0,
+    isCorrect,
+    firstTryCorrect: isCorrect,
+    tryCount,
+    parts: [isCorrect],
+    correctAnswer: {},
+    explanation: null,
+    answeredCount: 0,
+    questionCount: 1,
+  };
+}
+
+/** Lời phản hồi không phụ thuộc nội dung câu: lời khen khi câu chưa có giải thích, và gợi ý thử lại khi sai lần đầu mà chưa đúng phần nào. */
+function fixedFeedbackSpeeches(): string[] {
+  const types: QuestionType[] = ['SINGLE_CHOICE', 'IMAGE_CHOICE', 'MATCHING', 'ORDERING'];
+  const speeches: string[] = [];
+  CORRECT_TITLES.forEach((_, index) => speeches.push(practiceFeedback(phraseQuestion('SINGLE_CHOICE', index + 1), phraseCheck(true, 1), { last: false }).speech));
+  for (const type of types) speeches.push(practiceFeedback(phraseQuestion(type, 1), phraseCheck(false, 1), { last: false }).speech);
+  return speeches;
+}
+
+/** Lời chào đầu trang học khi đọc to: không có tên em (tên học sinh không gửi sang dịch vụ giọng đọc). */
+export const LEVEL_ONE_GREETING = 'Chào em!';
+
+/** Lời đọc to của đầu trang học: lời chào không tên rồi lời cổ vũ của máy chủ. */
+export function levelOneGreetingSpeech(cheer: string | null | undefined): string {
+  const text = cheer?.trim();
+  return text ? `${LEVEL_ONE_GREETING} ${text}` : LEVEL_ONE_GREETING;
+}
+
+/** "Em được 2 sao!": lời đầu trang kết quả (đọc to cùng lời khen của máy chủ). */
+export function levelOneStarsHeadline(stars: number): string {
+  return `Em được ${stars} sao!`;
+}
+
+/** Lời báo khi mạng chập chờn lúc kiểm câu (bảng phản hồi). */
+export const LEVEL_ONE_OFFLINE_SPEECH = 'Mạng đang chập chờn. Em bấm Thử lại nhé.';
+
+/**
+ * Các câu cố định mà giao diện cấp 1 đọc to đúng nguyên văn: lời hướng dẫn từng dạng câu, lời phản hồi không có giải thích, số sao ở trang kết quả, lời báo mạng.
+ * Vào trang học thì nhờ máy chủ tạo trước tiếng các câu này để lần nào em bấm nghe cũng có ngay. Câu có tên em hay nội dung bài thì không nằm đây.
+ */
+export const LEVEL_ONE_FIXED_PHRASES: readonly string[] = [
+  ...new Set([
+    ...(['TRUE_FALSE', 'IMAGE_CHOICE', 'MATCHING', 'ORDERING', 'SINGLE_CHOICE'] as const).map(levelOneInstruction),
+    ...fixedFeedbackSpeeches(),
+    levelOneStarsHeadline(1),
+    levelOneStarsHeadline(2),
+    levelOneStarsHeadline(3),
+    LEVEL_ONE_OFFLINE_SPEECH,
+  ]),
+];
 
 /**
  * Câu trả lời để em thử lại sau một lần sai: ghép cặp giữ các cặp đúng và gỡ cặp sai; sắp xếp giữ nguyên để em đổi chỗ; dạng chọn một phương

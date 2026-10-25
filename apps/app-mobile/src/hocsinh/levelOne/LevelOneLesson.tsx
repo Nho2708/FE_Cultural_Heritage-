@@ -2,10 +2,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { sectionsOf } from '@dsvhvn/dung-chung/lesson-data';
 import type { LessonCompletion, StudentLesson, StudentQuiz, StudentRecall, RecallQuestion } from '@dsvhvn/dung-chung/api';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button, EmptyState, Loading, Txt } from '../../components/ui';
+import { narrationSentences, usePrefetchSpeech } from '../../speech/useCloudNarration';
 import { useTheme } from '../../theme/ThemeProvider';
 import { useAutoRead } from '../autoRead';
 import { Figure } from '../LessonParts';
@@ -49,6 +50,18 @@ const STEP_ICON: Record<StepKind, keyof typeof Ionicons.glyphMap> = {
 };
 
 const clamp = (value: number, max: number) => Math.min(Math.max(value, 0), Math.max(max, 0));
+
+/** Mọi đoạn chữ của bài mà giao diện đọc to đúng nguyên văn: từng câu của các đoạn kể chuyện, tên hình, các ý cần nhớ đọc liền một lượt. */
+export function lessonSpeechTexts(lesson: StudentLesson): string[] {
+  const story = sectionsOf(lesson, 'STORY');
+  const storyTexts = story.length > 0 ? story.map((s) => s.body ?? '') : [lesson.summary ?? ''];
+  const captions = [...story.filter((s) => s.imageUrl).map((s) => s.title), ...sectionsOf(lesson, 'IMAGE').map((s) => s.body)];
+  return [
+    ...storyTexts.flatMap((text) => narrationSentences(text, 'sentences')),
+    ...captions.map((caption) => caption ?? ''),
+    lesson.keyPoints.length > 0 ? lesson.keyPoints.join('. ') : '',
+  ].filter((text) => text.trim() !== '');
+}
 
 function StepBar({ steps, current }: { steps: Array<{ key: string; label: string }>; current: number }) {
   const theme = useTheme();
@@ -144,6 +157,9 @@ function LessonBody({
     ...sectionsOf(lesson, 'IMAGE').map((s) => ({ url: s.imageUrl, caption: s.body, image: s.image })),
   ];
   const parts = story.length > 0 ? story.map((s) => ({ text: s.body ?? '', url: s.imageUrl })) : [{ text: lesson.summary ?? '', url: null }];
+
+  // Vào bài thì nhờ máy chủ tạo trước tiếng mọi thứ sắp đọc: từng câu kể chuyện, tên hình, các ý cần nhớ (đúng chữ các nút nghe sẽ gửi).
+  usePrefetchSpeech(useMemo(() => lessonSpeechTexts(lesson), [lesson]));
 
   const [position, setPosition] = useState<LessonPosition>(() => {
     const saved = initial ?? { step: 0, part: 0 };

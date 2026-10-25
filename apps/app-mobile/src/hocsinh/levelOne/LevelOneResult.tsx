@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Txt, styles as ui } from '../../components/ui';
+import { usePrefetchSpeech } from '../../speech/useCloudNarration';
 import { useTheme } from '../../theme/ThemeProvider';
 import { useAutoRead } from '../autoRead';
 import { answerLines, type ReviewWords } from '../reviewText';
@@ -54,6 +55,8 @@ export function LevelOneResult({ result }: { result: StudentAttemptResult }) {
   const stars = clampStars(result.stars);
   const title = t('hs.one.starsEarned', { count: stars });
   const praise = result.praise ?? '';
+  // Số sao và lời khen đọc cùng một lượt: nhờ máy chủ tạo trước tiếng ngay khi vào trang.
+  usePrefetchSpeech([praise ? `${title} ${praise}` : null]);
   const questions = result.answersShown ? (result.questions ?? []) : [];
 
   return (

@@ -3,8 +3,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { Button, Txt } from '../../components/ui';
+import { usePrefetchSpeech } from '../../speech/useCloudNarration';
 import { useTheme } from '../../theme/ThemeProvider';
-import { BIG, HeritageCardTile, Mascot, SpeakButton, TakeHome } from './parts';
+import { BIG, HeritageCardTile, Mascot, SpeakButton, TakeHome, takeHomeSpeech } from './parts';
 
 // Bước Nhận thẻ, bước cuối của bài cấp 1: vào bước là ghi em đã học xong bài (gọi máy chủ một lần), thẻ di sản của bài vào album. Hiện thẻ
 // ("Thẻ mới vào album" hoặc "Đã có trong album"), số thẻ của album, câu mang về nhà có nút nghe, ý chính "Em nhớ nhé", rồi hai nút "Về con
@@ -45,6 +46,8 @@ export function EarnCardStep({ complete, keyPoints, onCompleted, onBackToPath, o
   }, [run]);
 
   const data = state.kind === 'done' ? state.data : null;
+  // Câu mang về nhà chỉ có sau khi ghi bài đã học xong: nhờ máy chủ tạo trước tiếng ngay (đúng chữ của nút nghe: lời nhắc rồi câu hỏi).
+  usePrefetchSpeech([data?.takeHome ? takeHomeSpeech(t('hs.one.takeHomeTitle'), data.takeHome) : null]);
 
   return (
     <View style={{ gap: 18 }}>

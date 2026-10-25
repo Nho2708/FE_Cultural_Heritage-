@@ -318,6 +318,9 @@ export const studentVi = {
     aboutHeritage: 'Xem về di sản này',
     close: 'Đóng',
     speakCard: 'Nghe chuyện về {{name}}',
+    preparing: 'Đang chuẩn bị giọng đọc',
+    noVoice: 'Máy này chưa đọc được tiếng Việt',
+    noVoiceDismiss: 'Chạm để đóng',
   },
   common: {
     loading: 'Đang tải…',

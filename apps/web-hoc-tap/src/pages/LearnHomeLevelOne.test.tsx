@@ -1,7 +1,9 @@
+import { LEVEL_ONE_FIXED_PHRASES } from '@dsvhvn/dung-chung';
 import { ATTEMPT_ENDPOINTS, type StudentHome } from '@dsvhvn/dung-chung/api';
+import { resetSpeechNotice, setTtsAccessTokenProvider } from '@dsvhvn/dung-chung/lesson';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { envelope, mockApi, studentOf, studentServer } from '../test/fixtures';
 import { classLessonOf, homeOf } from '../test/quizFixtures';
 import { renderApp, signInAs } from '../test/renderApp';
@@ -87,5 +89,51 @@ describe('Trang học — cấp 1', () => {
     expect(within(classBlock).getByText('HS8K2QX7')).toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'Bài chơi đang chờ em' })).not.toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'Gợi ý cho em' })).not.toBeInTheDocument();
+  });
+
+  describe('giọng đọc của máy chủ', () => {
+    afterEach(() => {
+      setTtsAccessTokenProvider(() => null);
+      resetSpeechNotice();
+    });
+
+    function openSigned(home: StudentHome) {
+      setTtsAccessTokenProvider(() => 'token-hoc-sinh');
+      const student = studentOf(2, { fullName: 'Lê Minh An' });
+      signInAs(student);
+      return {
+        calls: mockApi(
+          (call) => {
+            if (call.path === ATTEMPT_ENDPOINTS.home) return envelope(200, { data: home });
+            if (call.path === '/tts/prefetch') return envelope(202, { data: { queued: 1 } });
+            if (call.path === '/tts') return envelope(200, { data: { audioUrl: null } });
+            return undefined;
+          },
+          studentServer(student),
+        ),
+        view: renderApp('/hoc'),
+      };
+    }
+
+    const cheer = 'Hôm nay mình học bài “Chùa Một Cột” nhé!';
+
+    it('vào trang học thì nhờ máy chủ tạo trước tiếng lời chào không tên, lời cổ vũ và các câu cố định của cấp 1', async () => {
+      const { calls } = openSigned(homeOf(1, { classLessons: lessons, cheer }));
+      expect(await screen.findByRole('heading', { level: 1, name: 'Chào An!' })).toBeInTheDocument();
+
+      const prefetched = () => calls.filter((c) => c.path === '/tts/prefetch').flatMap((c) => (c.body as { texts: string[] }).texts);
+      await waitFor(() => expect(prefetched()).toContain(`Chào em! ${cheer}`));
+      await waitFor(() => expect(prefetched()).toEqual(expect.arrayContaining([...LEVEL_ONE_FIXED_PHRASES])));
+      expect(prefetched().join(' ')).not.toMatch(/Minh|An/u);
+    });
+
+    it('nút nghe lời chào gửi lời chào không có tên em; máy không có giọng tiếng Việt thì báo một câu ngắn', async () => {
+      const { calls } = openSigned(homeOf(1, { classLessons: lessons, cheer }));
+      await userEvent.setup().click(await screen.findByRole('button', { name: 'Nghe lời chào' }));
+
+      await waitFor(() => expect(calls.some((c) => c.path === '/tts' && (c.body as { text: string }).text === `Chào em! ${cheer}`)).toBe(true));
+      expect(calls.filter((c) => c.path === '/tts').map((c) => (c.body as { text: string }).text)).toEqual([`Chào em! ${cheer}`]);
+      expect(await screen.findByText('Máy này chưa đọc được tiếng Việt')).toBeInTheDocument();
+    });
   });
 });
