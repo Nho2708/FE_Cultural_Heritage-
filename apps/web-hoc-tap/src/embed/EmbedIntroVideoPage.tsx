@@ -4,7 +4,7 @@ import { useI18n } from '../i18n/context';
 import { IntroVideoPlayer } from '../intro/IntroVideo';
 import { postToHost } from './hostMessages';
 
-// Trang video giới thiệu nhúng cho app mobile: chỉ có trình phát video khách 60 giây theo ngôn ngữ trên địa chỉ (`?lang=`), kín cả khung WebView.
+// Trang video giới thiệu nhúng cho app mobile: chỉ có trình phát video demo tính năng theo ngôn ngữ trên địa chỉ (`?lang=`), kín cả khung WebView.
 // Video nằm trên kho lưu tệp, không đóng gói vào app; chỉ tải khi khách bấm phát, không tự phát. Phụ đề bật sẵn khi không phải tiếng Việt.
 // Chưa cấu hình địa chỉ video thì hiện câu báo chưa có video.
 
@@ -29,7 +29,7 @@ export function EmbedIntroVideoPage() {
     <div className="flex size-full items-center justify-center bg-(--color-brand-navy)">
       <title>{t.documentTitle(t.about.videoTitle)}</title>
       <IntroVideoPlayer
-        name="du-khach-60s"
+        name="demo-tinh-nang"
         edition={language}
         captions={[language]}
         defaultCaption={language === 'vi' ? null : language}

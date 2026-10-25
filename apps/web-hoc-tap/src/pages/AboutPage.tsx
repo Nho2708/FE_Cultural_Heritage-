@@ -87,7 +87,7 @@ export function AboutPage() {
       </section>
 
       <IntroVideo
-        name="du-khach-60s"
+        name="demo-tinh-nang"
         edition={language}
         captions={[language]}
         defaultCaption={language === 'vi' ? null : language}

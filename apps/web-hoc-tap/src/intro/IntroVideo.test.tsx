@@ -17,7 +17,7 @@ describe('khung video giới thiệu', () => {
     render(
       <I18nContext value={{ language: 'ko', t: STRINGS.ko, canChoose: true, setLanguage: () => {} }}>
         <IntroVideo
-          name="du-khach-60s"
+          name="demo-tinh-nang"
           edition="ko"
           captions={['ko']}
           defaultCaption="ko"
@@ -38,11 +38,11 @@ describe('khung video giới thiệu', () => {
     expect(video).not.toHaveAttribute('autoplay');
     expect(video).not.toHaveAttribute('loop');
     expect([...video.querySelectorAll('source')].map((source) => source.getAttribute('src'))).toEqual([
-      'https://video.test/gioi-thieu/du-khach-60s.ko.720.webm',
-      'https://video.test/gioi-thieu/du-khach-60s.ko.720.mp4',
+      'https://video.test/gioi-thieu/demo-tinh-nang.ko.720.webm',
+      'https://video.test/gioi-thieu/demo-tinh-nang.ko.720.mp4',
     ]);
     const track = video.querySelector('track');
-    expect(track).toHaveAttribute('src', '/video/du-khach-60s.ko.vtt');
+    expect(track).toHaveAttribute('src', '/video/demo-tinh-nang.ko.vtt');
     expect(track).toHaveAttribute('srclang', 'ko');
     expect(track).toHaveAttribute('label', STRINGS.ko.language.names.ko);
     expect(track).toHaveAttribute('default');
