@@ -1,4 +1,5 @@
 import type { ApiClient } from './client';
+import type { HeritageType } from './heritage';
 import type { StudentQuizState } from './lessons';
 import type { QuestionPreviewOption, QuestionSubmission, QuestionType } from './questions';
 import type { Paged } from './types';
@@ -10,10 +11,12 @@ export const ATTEMPT_ENDPOINTS = {
   home: '/student/home',
   progress: '/student/progress',
   history: '/student/attempts',
+  album: '/student/album',
   quiz: (quizId: number) => `/student/quizzes/${quizId}`,
   start: (quizId: number) => `/student/quizzes/${quizId}/attempts`,
   attempt: (attemptId: number) => `/student/attempts/${attemptId}`,
   answer: (attemptId: number, questionId: number) => `/student/attempts/${attemptId}/answers/${questionId}`,
+  check: (attemptId: number, questionId: number) => `/student/attempts/${attemptId}/answers/${questionId}/check`,
   submit: (attemptId: number) => `/student/attempts/${attemptId}/submit`,
   result: (attemptId: number) => `/student/attempts/${attemptId}/result`,
 } as const;
@@ -49,6 +52,8 @@ export interface AttemptQuestion {
   partsTotal: number;
   answered: boolean;
   answer: QuestionSubmission | null;
+  /** Cấp 1: em đã kiểm câu này ít nhất một lần (lần đầu đã được chốt để chấm). Cấp khác luôn false. */
+  checked: boolean;
 }
 
 export interface StudentAttempt {
@@ -60,6 +65,8 @@ export interface StudentAttempt {
   level: 1 | 2 | 3;
   layout: string;
   readAloud: boolean;
+  /** Cấp 1: bài chơi dạng luyện tập, kiểm từng câu ngay khi em trả lời và cho thử lại; lần trả lời đầu tiên của mỗi câu được chấm. */
+  practiceMode: boolean;
   showsClock: boolean;
   status: AttemptStatus;
   startedAt: string;
@@ -104,6 +111,54 @@ export interface SavedAnswer {
   answeredCount: number;
   questionCount: number;
   remainingSeconds: number | null;
+}
+
+/**
+ * Kết quả kiểm một câu của bài chơi cấp 1. Lần kiểm đầu tiên của câu được lưu làm câu trả lời để chấm (không đổi được nữa); các lần sau
+ * chỉ cho biết đúng hay sai để em thử lại. Mọi vị trí tính theo thứ tự đang hiện trên màn hình của em.
+ */
+export interface AnswerCheck {
+  questionId: number;
+  /** Lần kiểm này đúng hết. */
+  isCorrect: boolean;
+  /** Lần trả lời đầu tiên (đã chốt để chấm) đúng hết. */
+  firstTryCorrect: boolean;
+  /** Số lần em đã kiểm câu này, tính cả lần này (1 là lần đầu). */
+  tryCount: number;
+  /**
+   * Đúng sai từng phần của lần kiểm này: một phần với Đúng/Sai và chọn hình; ghép cặp theo từng hình bên trái (`leftItems`);
+   * sắp xếp theo từng mục của `items` (mục đó đang ở đúng vị trí hay không).
+   */
+  parts: boolean[];
+  /** Đáp án đúng theo vị trí đang hiện. */
+  correctAnswer: QuestionSubmission;
+  explanation: string | null;
+  answeredCount: number;
+  questionCount: number;
+}
+
+/** Một thẻ trong album di sản của em: mỗi di sản của bài em học xong là một thẻ. */
+export interface StudentAlbumCard {
+  heritageId: number;
+  slug: string;
+  name: string;
+  /** Mẩu chuyện ngắn hiện khi em mở thẻ. */
+  shortDescription: string | null;
+  thumbnailUrl: string | null;
+  heritageType: HeritageType | null;
+  /** Tên nhóm dễ hiểu với học sinh nhỏ, ví dụ "Lễ hội, nghề và làn điệu". */
+  groupName: string;
+  collected: boolean;
+  collectedAt: string | null;
+  /** Bài học mở thẻ này (bài sớm nhất của lớp có di sản này). */
+  lessonId: number;
+  lessonTitle: string | null;
+}
+
+export interface StudentAlbum {
+  collected: number;
+  total: number;
+  cards: StudentAlbumCard[];
 }
 
 export interface StudentBadge {
@@ -170,6 +225,15 @@ export interface StudentAttemptResult {
   answersShown: boolean;
   questions: StudentQuestionReview[] | null;
   analysis: StudentAnalysis | null;
+  /** Cấp 1: số câu đúng ngay lần đầu. Cấp khác null. */
+  firstTryCorrect: number | null;
+  /** Cấp 1: thẻ di sản của bài (đã vào album của em). Cấp khác null. */
+  cards: StudentAlbumCard[] | null;
+  /** Cấp 1: số thẻ em đã có và tổng số thẻ của lớp. Cấp khác null. */
+  albumCollected: number | null;
+  albumTotal: number | null;
+  /** Cấp 1: một câu em mang về nhà hỏi bố mẹ. Cấp khác null. */
+  takeHome: string | null;
 }
 
 export interface StudentAttemptRow {
@@ -256,6 +320,26 @@ export interface StudentLessonRef {
   lastAttemptAt: string | null;
 }
 
+/**
+ * Cấp 1: một bài học thầy cô đã xuất bản cho lớp em, hiện thẳng trên con đường (em không phải gõ mã). Xếp theo thứ tự thầy cô tạo bài.
+ */
+export interface StudentClassLesson {
+  lessonId: number;
+  title: string | null;
+  accessCode: string;
+  createdAt: string | null;
+  /** Ảnh của di sản đầu tiên của bài. */
+  thumbnailUrl: string | null;
+  /** Tên các di sản của bài (tối đa 3). */
+  heritageNames: string[];
+  quizzesPublished: number;
+  quizzesDone: number;
+  /** Số sao cao nhất (0-3) trong các lượt em đã nộp của bài; null khi em chưa nộp lượt nào. */
+  stars: number | null;
+  /** Em đã tới bước Nhận thẻ của bài, hoặc đã làm hết các bài chơi đã phát hành của bài. */
+  completed: boolean;
+}
+
 export interface StudentRecentBadge {
   code: BadgeCode;
   name: string;
@@ -279,8 +363,14 @@ export interface StudentHome {
   openQuizzes: StudentOpenQuiz[];
   myLessons: StudentLessonRef[];
   recentBadges: StudentRecentBadge[];
+  /** Tổng số ngày em có nộp bài (nghỉ không bị mất), hiện là "Ngày đã học". */
   streakDays?: number | null;
   cheer?: string | null;
+  /** Cấp 1: mọi bài học đã xuất bản của lớp, theo thứ tự học. Cấp khác là danh sách rỗng. */
+  classLessons: StudentClassLesson[];
+  /** Cấp 1: số thẻ em đã có trong album và tổng số thẻ của lớp. Cấp khác null. */
+  albumCollected: number | null;
+  albumTotal: number | null;
 }
 
 export function createAttemptsApi(client: ApiClient) {
@@ -303,15 +393,25 @@ export function createAttemptsApi(client: ApiClient) {
     /** Lượt đang làm dở (vào tiếp sau khi tải lại). Lượt đã nộp là 409. */
     attempt: (attemptId: number) => client.request<StudentAttempt>(ATTEMPT_ENDPOINTS.attempt(attemptId)),
 
-    /** Lưu cả câu trả lời của một câu; thân `{}` là xóa. */
+    /** Lưu cả câu trả lời của một câu; thân `{}` là xóa. Cấp 1 dùng `checkAnswer`; câu cấp 1 đã kiểm thì máy chủ giữ nguyên lần đầu. */
     saveAnswer: (attemptId: number, questionId: number, answer: QuestionSubmission) =>
       client.request<SavedAnswer>(ATTEMPT_ENDPOINTS.answer(attemptId, questionId), { method: 'PUT', body: answer }),
+
+    /**
+     * Cấp 1: kiểm một câu ngay khi em trả lời. Lần đầu được lưu để chấm; các lần sau chỉ báo đúng sai. Câu trả lời trống hoặc ghép cặp chưa đủ
+     * là 400; lượt đã nộp là 409; lớp không phải cấp 1 là 422.
+     */
+    checkAnswer: (attemptId: number, questionId: number, answer: QuestionSubmission) =>
+      client.request<AnswerCheck>(ATTEMPT_ENDPOINTS.check(attemptId, questionId), { method: 'POST', body: answer }),
 
     /** Nộp bài. Nộp lần hai trả lại kết quả cũ. */
     submit: (attemptId: number) => client.request<StudentAttemptResult>(ATTEMPT_ENDPOINTS.submit(attemptId), { method: 'POST' }),
 
     /** Kết quả của lượt đã nộp theo cấp hiện tại của lớp. Lượt còn đang làm là 409. */
     result: (attemptId: number) => client.request<StudentAttemptResult>(ATTEMPT_ENDPOINTS.result(attemptId)),
+
+    /** Album di sản của em: thẻ đã có trước (mới nhất trước), rồi thẻ chưa có theo thứ tự bài học. */
+    album: () => client.request<StudentAlbum>(ATTEMPT_ENDPOINTS.album),
   };
 }
 

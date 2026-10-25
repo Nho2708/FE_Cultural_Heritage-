@@ -1,172 +1,18 @@
 import type { StudentLesson } from '@dsvhvn/dung-chung/api';
-import { canTakeQuiz, milestonesOf, sectionsOf } from '@dsvhvn/dung-chung/lesson-data';
-import { useRouter } from 'expo-router';
+import { milestonesOf, sectionsOf } from '@dsvhvn/dung-chung/lesson-data';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import { Photo } from '../components/Heritage';
-import { Button, Card, Chip, Divider, EmptyState, Notice, Section, Txt, styles as ui } from '../components/ui';
+import { Card, Chip, Divider, EmptyState, Section, Txt, styles as ui } from '../components/ui';
 import { useTheme } from '../theme/ThemeProvider';
-import { useAutoRead } from './autoRead';
-import { Figure, HeritageLinks, Paragraphs, QuizList, ReadAloud } from './LessonParts';
-import { stepSegments } from './format';
+import { Figure, HeritageLinks, Paragraphs, QuizList } from './LessonParts';
 
-// Ba bố cục bài học khác nhau thật sự theo cấp (cùng dữ liệu, khác luồng): cấp 1 kể chuyện từng bước với nút lớn và đọc to; cấp 2 ba bước chuyển qua lại tự do
-// bằng chip (Đọc bài, Dòng thời gian của bài, Bài kiểm tra); cấp 3 là trang tài liệu có đề mục, tư liệu gốc, câu hỏi gợi suy nghĩ và bài kiểm tra dạng dòng.
+// Ba bố cục bài học khác nhau thật sự theo cấp (cùng dữ liệu, khác luồng): cấp 1 kể chuyện từng bước với nút lớn và đọc to (ở levelOne/LevelOneLesson);
+// cấp 2 ba bước chuyển qua lại tự do bằng chip (Đọc bài, Dòng thời gian của bài, Bài kiểm tra); cấp 3 là trang tài liệu có đề mục, tư liệu gốc,
+// câu hỏi gợi suy nghĩ và bài kiểm tra dạng dòng.
 
-export interface LessonPosition {
-  step: number;
-  part: number;
-}
-
-const clamp = (value: number, max: number) => Math.min(Math.max(value, 0), Math.max(max, 0));
-
-export function LevelOneLesson({ lesson, initial, onPositionChange }: { lesson: StudentLesson; initial?: LessonPosition; onPositionChange?: (position: LessonPosition) => void }) {
-  const { t } = useTranslation();
-  const theme = useTheme();
-  const router = useRouter();
-  const steps = lesson.layout.steps;
-  const playStep = steps.findIndex((s) => s.key === 'PLAY');
-  const story = sectionsOf(lesson, 'STORY');
-  const gallery = [
-    ...story.filter((s) => s.imageUrl).map((s) => ({ url: s.imageUrl, caption: s.title, image: s.image })),
-    ...sectionsOf(lesson, 'IMAGE').map((s) => ({ url: s.imageUrl, caption: s.body, image: s.image })),
-  ];
-  const parts = story.length > 0 ? story.map((s) => ({ text: s.body ?? '', url: s.imageUrl, caption: s.title })) : [{ text: lesson.summary ?? '', url: null, caption: null }];
-
-  const [position, setPosition] = useState<LessonPosition>(() => {
-    const saved = initial ?? { step: 0, part: 0 };
-    const step = clamp(saved.step, steps.length - 1);
-    return { step, part: step === 0 ? clamp(saved.part, parts.length - 1) : 0 };
-  });
-  const { autoRead, setAutoRead } = useAutoRead();
-  const stepKey = steps[position.step]?.key ?? 'LISTEN_STORY';
-  const part = parts[position.part] ?? parts[0]!;
-  const go = (next: LessonPosition) => {
-    setPosition(next);
-    onPositionChange?.(next);
-  };
-  const next = () => {
-    if (stepKey === 'LISTEN_STORY' && position.part < parts.length - 1) go({ step: position.step, part: position.part + 1 });
-    else go({ step: Math.min(position.step + 1, steps.length - 1), part: 0 });
-  };
-  const back = () => (stepKey === 'LISTEN_STORY' && position.part > 0 ? go({ step: position.step, part: position.part - 1 }) : go({ step: position.step - 1, part: 0 }));
-  const big = { minHeight: 60 };
-
-  return (
-    <View style={{ gap: theme.spacing.block }}>
-      <Txt variant="heading" accessibilityRole="header">
-        {lesson.title}
-      </Txt>
-
-      <View
-        accessibilityRole="progressbar"
-        accessibilityLabel={t('hs.lesson.steps')}
-        accessibilityValue={{ min: 1, max: steps.length, now: position.step + 1, text: t('hs.lesson.stepOf', { index: position.step + 1, total: steps.length }) }}
-        style={{ gap: 8 }}
-      >
-        <View style={styles.progressBar}>
-          {stepSegments(position.step, steps.length).map((state, index) => (
-            <View
-              key={steps[index]?.key ?? index}
-              style={[styles.progressSegment, { backgroundColor: state === 'todo' ? theme.color.border : theme.color.primary, opacity: state === 'done' ? 0.55 : 1 }]}
-            />
-          ))}
-        </View>
-        <View style={ui.row}>
-          <Txt variant="label" color={theme.color.primary} style={ui.grow}>
-            {steps[position.step]?.label}
-          </Txt>
-          <Txt variant="caption">{t('hs.lesson.stepOf', { index: position.step + 1, total: steps.length })}</Txt>
-        </View>
-      </View>
-
-      {stepKey === 'LISTEN_STORY' ? (
-        <Card>
-          {part.url ? <Photo url={part.url} width={960} height={220} /> : null}
-          <View style={{ padding: theme.spacing.inline, gap: theme.spacing.inline }}>
-            <Chip label={t('hs.lesson.partOf', { index: position.part + 1, total: parts.length })} />
-            <Txt variant="question" style={{ fontWeight: '500' }}>
-              {part.text}
-            </Txt>
-            <ReadAloud key={`${position.step}-${position.part}`} text={part.text} big auto={autoRead === true} onAutoChange={setAutoRead} />
-            {lesson.heritages[0] ? (
-              <Button label={t('hs.lesson.heritageOpen')} variant="ghost" onPress={() => router.push({ pathname: '/di-san/[slug]', params: { slug: lesson.heritages[0]!.slug } })} />
-            ) : null}
-          </View>
-        </Card>
-      ) : null}
-
-      {stepKey === 'VIEW_IMAGES' ? (
-        gallery.length === 0 ? (
-          <EmptyState message={t('hs.lesson.noImages')} />
-        ) : (
-          <View style={{ gap: theme.spacing.inline }}>
-            {gallery.map((item, index) => (
-              <Card key={index}>
-                <View style={{ padding: 10, gap: 8 }}>
-                  <Figure url={item.url} caption={null} image={item.image} />
-                  {item.caption ? <Txt variant="title">{item.caption}</Txt> : null}
-                  {item.caption ? <ReadAloud text={item.caption} /> : null}
-                </View>
-              </Card>
-            ))}
-          </View>
-        )
-      ) : null}
-
-      {stepKey === 'PLAY' ? (
-        <Section title={t('hs.lesson.playTitle')}>{lesson.quizzes.length === 0 ? <EmptyState message={t('hs.lesson.noPlay')} /> : <QuizList quizzes={lesson.quizzes} large />}</Section>
-      ) : null}
-
-      {stepKey === 'EARN_STARS' ? (
-        <View style={{ gap: theme.spacing.inline }}>
-          <View style={[ui.row, { gap: 14, padding: 16, backgroundColor: theme.color.primaryContainer, borderRadius: theme.radius.card }]}>
-            <Text style={{ fontSize: 56 }}>🎉</Text>
-            <View style={ui.grow}>
-              <Txt variant="heading" color={theme.color.onPrimaryContainer}>
-                {t('hs.lesson.congrats')}
-              </Txt>
-              <Txt color={theme.color.onPrimaryContainer}>{t('hs.lesson.congratsText')}</Txt>
-            </View>
-          </View>
-          {playStep >= 0 && lesson.quizzes.some(canTakeQuiz) ? (
-            <Button label={t('hs.lesson.playForStars')} onPress={() => go({ step: playStep, part: 0 })} full style={big} />
-          ) : null}
-          {lesson.keyPoints.length > 0 ? (
-            <Card>
-              <View style={{ padding: 16, gap: 8 }}>
-                <Txt variant="heading" style={{ fontSize: theme.text.headingSize - 6 }}>
-                  {t('hs.lesson.remember')}
-                </Txt>
-                {lesson.keyPoints.map((point, index) => (
-                  <Txt key={index} variant="question" style={{ fontWeight: '500' }}>
-                    • {point}
-                  </Txt>
-                ))}
-                <ReadAloud text={lesson.keyPoints.join('. ')} />
-              </View>
-            </Card>
-          ) : null}
-          <HeritageLinks heritages={lesson.heritages} compact />
-        </View>
-      ) : null}
-
-      <View style={{ gap: 12 }}>
-        {stepKey === 'EARN_STARS' ? (
-          <>
-            <Button label={t('hs.lesson.backHome')} onPress={() => router.replace('/(hoc-sinh)/hoc')} full style={big} />
-            <Button label={t('hs.lesson.replay')} variant="secondary" onPress={() => go({ step: 0, part: 0 })} full style={big} />
-          </>
-        ) : (
-          <Button label={t('hs.lesson.next')} onPress={next} full style={big} />
-        )}
-        {position.part > 0 || position.step > 0 ? <Button label={t('hs.lesson.back')} variant="secondary" onPress={back} full style={big} /> : null}
-      </View>
-      <Notice text={t('hs.lesson.resume')} />
-    </View>
-  );
-}
+export { LevelOneLesson, type LessonPosition, type LevelOneLessonServices } from './levelOne/LevelOneLesson';
 
 type TabId = 'READ' | 'TIMELINE' | 'QUIZ';
 
@@ -377,7 +223,5 @@ export function LevelThreeLesson({ lesson }: { lesson: StudentLesson }) {
 }
 
 const styles = StyleSheet.create({
-  progressBar: { flexDirection: 'row', gap: 6 },
-  progressSegment: { flex: 1, height: 14, borderRadius: 7 },
   number: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
 });

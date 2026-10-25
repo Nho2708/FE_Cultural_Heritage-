@@ -30,6 +30,7 @@ function question(id: number, overrides: Partial<AttemptQuestion> = {}): Attempt
     partsTotal: 1,
     answered: false,
     answer: null,
+    checked: false,
     ...overrides,
   };
 }
@@ -44,6 +45,7 @@ function attemptOf(overrides: Partial<StudentAttempt> = {}): StudentAttempt {
     level: 2,
     layout: 'STANDARD',
     readAloud: false,
+    practiceMode: false,
     showsClock: true,
     status: 'IN_PROGRESS',
     startedAt: new Date().toISOString(),

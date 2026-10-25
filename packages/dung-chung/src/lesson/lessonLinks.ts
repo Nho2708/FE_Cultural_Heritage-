@@ -1,4 +1,5 @@
 import { createContext, useContext, type ComponentType } from 'react';
+import type { LessonCompletion, StudentRecall } from '../api';
 
 // Đường dẫn và hộp thoại mà bố cục bài học đặt vào các liên kết, nút. Web học tập cung cấp đường dẫn thật và hộp thoại bắt đầu
 // làm bài kiểm tra; khi giáo viên xem trước "như học sinh" thì mọi đường dẫn là null và không có hộp thoại: bố cục bỏ hẳn các
@@ -27,6 +28,12 @@ export interface LessonLinks {
   home: string | null;
   /** Đang xem trước: không ghi gì, không đặt tiêu đề trang. */
   preview: boolean;
+  /** Trang Album di sản của em (cấp 1); không có thì bỏ nút "Xem album". */
+  album?: string | null;
+  /** Cấp 1: lấy câu ôn của bước Nhớ lại; không có (xem trước) thì bỏ bước này, không gọi máy chủ. */
+  recall?: ((code: string) => Promise<StudentRecall>) | null;
+  /** Cấp 1: ghi em đã học xong bài khi tới bước Nhận thẻ; không có (xem trước) thì chỉ hiện thẻ mẫu. */
+  completeLesson?: ((code: string) => Promise<LessonCompletion>) | null;
 }
 
 export const NO_LESSON_LINKS: LessonLinks = {
@@ -36,6 +43,9 @@ export const NO_LESSON_LINKS: LessonLinks = {
   quizDialog: null,
   home: null,
   preview: true,
+  album: null,
+  recall: null,
+  completeLesson: null,
 };
 
 export const LessonLinksContext = createContext<LessonLinks>(NO_LESSON_LINKS);

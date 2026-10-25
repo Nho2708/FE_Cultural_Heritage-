@@ -17,7 +17,7 @@ beforeEach(() => {
   cancels = 0;
   window.localStorage.clear();
   window.scrollTo = vi.fn<() => void>();
-  vi.stubGlobal('speechSynthesis', { cancel: () => void (cancels += 1), speak: (utterance: { text: string }) => void spoken.push(utterance.text) });
+  vi.stubGlobal('speechSynthesis', { getVoices: () => [{ lang: 'vi-VN', name: 'Vi' }], cancel: () => void (cancels += 1), speak: (utterance: { text: string }) => void spoken.push(utterance.text) });
   vi.stubGlobal(
     'SpeechSynthesisUtterance',
     class {
@@ -95,13 +95,12 @@ describe('cấp 1 tự đọc to câu chuyện', () => {
     expect(spoken).toEqual(['Đoạn một của câu chuyện.', 'Đoạn hai của câu chuyện.']);
   });
 
-  it('nút loa dừng đoạn đang tự đọc và Nghe lại đọc lại đoạn đang xem', () => {
+  it('nút loa dừng đoạn đang tự đọc và bấm lần nữa thì đọc lại đoạn đang xem', () => {
     show(REAL_LINKS);
     const before = cancels;
     fireEvent.click(screen.getByRole('button', { name: 'Dừng đọc' }));
     expect(cancels).toBeGreaterThan(before);
-    expect(screen.getByRole('button', { name: 'Đọc to đoạn này' })).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Nghe lại' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Đọc to đoạn này' }));
     expect(spoken).toEqual(['Đoạn một của câu chuyện.', 'Đoạn một của câu chuyện.']);
   });
 

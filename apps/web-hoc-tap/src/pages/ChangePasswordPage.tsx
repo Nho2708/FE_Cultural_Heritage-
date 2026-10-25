@@ -1,13 +1,16 @@
 import {
   MESSAGES,
   PASSWORD_RULES,
+  SIMPLE_PASSWORD_HINT,
+  SIMPLE_PASSWORD_RULES,
   checkPassword,
   collectErrors,
   focusFirstInvalid,
+  isSimplePasswordValid,
   splitApiError,
-  validateNewPassword,
   validatePasswordConfirmation,
   validateRequired,
+  validateStudentNewPassword,
 } from '@dsvhvn/dung-chung';
 import { Button, ButtonLink, Icon, InlineMessage, PasswordField, useToast } from '@dsvhvn/dung-chung/ui';
 import { useRef, useState, type FormEvent } from 'react';
@@ -17,6 +20,7 @@ import { pathOf } from '../access/screens';
 import { studentApi } from '../lib/api/client';
 import { useAuth } from '../lib/auth/context';
 import { Illustration } from '@dsvhvn/dung-chung/lesson';
+import { schoolLevelOfGrade } from '@dsvhvn/dung-chung/theme';
 
 // Đổi mật khẩu của học sinh — hai chế độ trên cùng một màn hình:
 //   Bắt buộc (lần đầu đăng nhập, hoặc sau khi giáo viên đặt lại): lời chào và thanh báo đặt mật khẩu mới, mật khẩu mới
@@ -24,6 +28,7 @@ import { Illustration } from '@dsvhvn/dung-chung/lesson';
 //   thanh điều hướng, không có nút bỏ qua.
 //   Tự đổi (từ menu tài khoản): thêm ô mật khẩu hiện tại, có nút hủy.
 // Quy tắc mật khẩu hiện dạng danh sách đánh dấu khi đạt; mật khẩu mới phải khác mật khẩu cũ (máy chủ kiểm và báo dưới ô).
+// Học sinh lớp cấp 1 (khối 1-5) theo quy tắc đơn giản: chỉ cần dài 6-64 ký tự (thầy cô phát mật khẩu 6 chữ số, em dùng luôn).
 // Đổi xong máy chủ trả token mới trong cùng phản hồi, cờ buộc đổi tắt, học sinh vào thẳng trang học (hoặc bài đang chờ
 // mở), không phải đăng nhập lại.
 
@@ -31,12 +36,13 @@ type Field = 'currentPassword' | 'newPassword' | 'confirmNewPassword';
 
 const EMPTY: Record<Field, string> = { currentPassword: '', newPassword: '', confirmNewPassword: '' };
 
-function RuleChecklist({ password }: { password: string }) {
+function RuleChecklist({ password, simple }: { password: string; simple: boolean }) {
   const check = checkPassword(password);
+  const rules = simple ? SIMPLE_PASSWORD_RULES : PASSWORD_RULES;
   return (
     <ul aria-label="Quy tắc mật khẩu" className="flex flex-col gap-1 type-body-s">
-      {PASSWORD_RULES.map((rule) => {
-        const met = check[rule.key];
+      {rules.map((rule) => {
+        const met = simple ? isSimplePasswordValid(password) : check[rule.key];
         return (
           <li key={rule.key} className={met ? 'flex items-center gap-2 text-success' : 'flex items-center gap-2 text-on-surface-variant'}>
             <Icon name={met ? 'check' : 'info'} size={16} />
@@ -64,6 +70,9 @@ export function ChangePasswordPage() {
 
   if (!user) return null; // route guard đã chặn Khách
   const forced = user.mustChangePassword;
+  // Cấp của lớp em: máy chủ trả trong hồ sơ; phiên cũ chưa có thì suy từ khối lớp.
+  const level = user.schoolLevel ?? schoolLevelOfGrade(user.class?.grade);
+  const simple = level === 1;
   const next = safeReturnPath(params.get(RETURN_PARAM)) ?? pathOf('learnHome');
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -71,7 +80,7 @@ export function ChangePasswordPage() {
     setFormError(null);
     const found = collectErrors<Field>({
       currentPassword: forced ? null : validateRequired(values.currentPassword, 'mật khẩu hiện tại'),
-      newPassword: validateNewPassword(values.newPassword, 'mật khẩu mới'),
+      newPassword: validateStudentNewPassword(values.newPassword, level),
       confirmNewPassword: validatePasswordConfirmation(values.newPassword, values.confirmNewPassword),
     });
     setErrors(found);
@@ -111,7 +120,9 @@ export function ChangePasswordPage() {
           </div>
         </div>
 
-        {forced && <InlineMessage tone="info">{MESSAGES.studentMustChangePassword}</InlineMessage>}
+        {forced && (
+          <InlineMessage tone="info">{simple ? MESSAGES.studentMustChangeSimplePassword : MESSAGES.studentMustChangePassword}</InlineMessage>
+        )}
 
         <form ref={formRef} noValidate onSubmit={onSubmit} className="flex flex-col gap-(--dsv-inline-gap)">
           {formError && <InlineMessage tone="danger">{formError}</InlineMessage>}
@@ -132,8 +143,9 @@ export function ChangePasswordPage() {
             value={values.newPassword}
             onChange={set('newPassword')}
             error={errors.newPassword}
+            hint={simple ? SIMPLE_PASSWORD_HINT : undefined}
           />
-          <RuleChecklist password={values.newPassword} />
+          <RuleChecklist password={values.newPassword} simple={simple} />
           <PasswordField
             label="Nhập lại mật khẩu mới"
             name="confirmNewPassword"

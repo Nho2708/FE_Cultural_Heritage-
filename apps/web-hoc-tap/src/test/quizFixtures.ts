@@ -1,5 +1,9 @@
 import type {
+  AnswerCheck,
   AttemptQuestion,
+  StudentAlbum,
+  StudentAlbumCard,
+  StudentClassLesson,
   QuestionSubmission,
   SchoolLevel,
   StudentAttempt,
@@ -30,6 +34,9 @@ export function homeOf(level: SchoolLevel = 2, overrides: Partial<StudentHome> =
     openQuizzes: [],
     myLessons: [],
     recentBadges: [],
+    classLessons: [],
+    albumCollected: level === 1 ? 0 : null,
+    albumTotal: level === 1 ? 0 : null,
     ...overrides,
   };
 }
@@ -59,6 +66,7 @@ export function questionOf(overrides: Partial<AttemptQuestion> = {}): AttemptQue
     partsTotal: 1,
     answered: false,
     answer: null,
+    checked: false,
     ...overrides,
   };
 }
@@ -76,6 +84,7 @@ export function attemptOf(level: SchoolLevel, questions: AttemptQuestion[], over
     level,
     layout: level === 1 ? 'LARGE' : level === 2 ? 'BALANCED' : 'COMPACT',
     readAloud: level === 1,
+    practiceMode: level === 1,
     showsClock: timed,
     status: 'IN_PROGRESS',
     startedAt: SERVER_NOW,
@@ -113,7 +122,7 @@ export function introOf(level: SchoolLevel, overrides: Partial<StudentQuizIntro>
     actionLabel: 'Bắt đầu',
     attemptId: null,
     attemptStatus: null,
-    notice: null,
+    notice: level === 1 ? 'Em trả lời từng câu. Chưa đúng thì em được thử lại. Mỗi bài em chơi một lần.' : null,
     ...overrides,
   };
 }
@@ -151,6 +160,11 @@ export function resultOf(level: SchoolLevel, overrides: Partial<StudentAttemptRe
     answersShown: false,
     questions: null,
     analysis: null,
+    firstTryCorrect: one ? 8 : null,
+    cards: one ? [albumCardOf(11)] : null,
+    albumCollected: one ? 5 : null,
+    albumTotal: one ? 12 : null,
+    takeHome: one ? 'Nhà mình đã từng đi thăm Kinh thành Huế hay một di tích nào gần nhà chưa?' : null,
     ...overrides,
   };
 }
@@ -208,6 +222,61 @@ export function recommendationsOf(level: SchoolLevel = 2, overrides: Partial<Stu
     reviewPraise: null,
     message: null,
     relatedFromFallback: false,
+    ...overrides,
+  };
+}
+
+/** Một bài của lớp trên con đường cấp 1. */
+export function classLessonOf(id: number, overrides: Partial<StudentClassLesson> = {}): StudentClassLesson {
+  return {
+    lessonId: id,
+    title: `Bài học số ${id}`,
+    accessCode: `BH${String(id).padStart(6, '0')}`,
+    createdAt: `2026-10-0${Math.min(9, id)}T01:00:00Z`,
+    thumbnailUrl: null,
+    heritageNames: [],
+    quizzesPublished: 1,
+    quizzesDone: 0,
+    stars: null,
+    completed: false,
+    ...overrides,
+  };
+}
+
+/** Một thẻ trong album di sản của em. */
+export function albumCardOf(heritageId: number, overrides: Partial<StudentAlbumCard> = {}): StudentAlbumCard {
+  return {
+    heritageId,
+    slug: `di-san-${heritageId}`,
+    name: `Di sản số ${heritageId}`,
+    shortDescription: 'Một mẩu chuyện ngắn về di sản.',
+    thumbnailUrl: null,
+    heritageType: 'TANGIBLE',
+    groupName: 'Di tích và đồ vật xưa',
+    collected: true,
+    collectedAt: '2026-10-20T01:00:00Z',
+    lessonId: 5,
+    lessonTitle: 'Ngọ Môn và Kinh thành Huế',
+    ...overrides,
+  };
+}
+
+export function albumOf(cards: StudentAlbumCard[]): StudentAlbum {
+  return { collected: cards.filter((c) => c.collected).length, total: cards.length, cards };
+}
+
+/** Kết quả kiểm một câu của bài chơi cấp 1. */
+export function checkOf(question: AttemptQuestion, overrides: Partial<AnswerCheck> = {}): AnswerCheck {
+  return {
+    questionId: question.questionId,
+    isCorrect: true,
+    firstTryCorrect: true,
+    tryCount: 1,
+    parts: [true],
+    correctAnswer: { selectedIndex: 0 },
+    explanation: null,
+    answeredCount: 1,
+    questionCount: 3,
     ...overrides,
   };
 }

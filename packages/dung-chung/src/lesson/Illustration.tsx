@@ -39,9 +39,9 @@ function Mascot({ state }: { state: IllustrationState }) {
       {/* Cute Nose */}
       <ellipse cx="60" cy="61" rx="4" ry="3" fill="#D97706" />
 
-      {/* Cheerful Mouth */}
+      {/* Cheerful Mouth — động viên là nụ cười nhẹ, linh vật không bao giờ buồn hay giận khi em làm chưa đúng */}
       {state === 'dong-vien' ? (
-        <path d="M48 73 Q60 67 72 73" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
+        <path d="M48 70 Q60 79 72 70" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
       ) : (
         <path d="M46 67 Q60 85 74 67 Z" fill="#EF4444" stroke="currentColor" strokeWidth="3" strokeLinejoin="round" />
       )}
@@ -108,9 +108,16 @@ export function Illustration({ state, className }: { state: IllustrationState; c
       data-bo-hinh={theme.illustrationSet}
       data-trang-thai={state}
       title={`Hình minh họa ${LABEL[state]}`}
-      className={cn('flex size-28 shrink-0 items-center justify-center rounded-md bg-primary-container text-primary', className)}
+      className={cn(
+        'flex shrink-0 items-center justify-center text-primary',
+        // Lớp nơi dùng truyền vào thay hẳn cỡ, bo góc, nền mặc định (cn không gộp lớp trùng thuộc tính).
+        !/(^|\s)size-/.test(className ?? '') && 'size-28',
+        !/(^|\s)rounded-/.test(className ?? '') && 'rounded-md',
+        !/(^|\s)bg-/.test(className ?? '') && 'bg-primary-container',
+        className,
+      )}
     >
-      <svg viewBox="0 0 120 120" className="size-24">
+      <svg viewBox="0 0 120 120" className="size-[86%]">
         <Drawing set={theme.illustrationSet} state={state} />
       </svg>
     </figure>

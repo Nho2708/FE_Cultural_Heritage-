@@ -1,432 +1,347 @@
-import { cn } from '@dsvhvn/dung-chung';
-import { studentCodeOf, type StudentClassDetail, type StudentProfile } from '@dsvhvn/dung-chung/api';
-import { ButtonLink, Icon } from '@dsvhvn/dung-chung/ui';
-import { pathOf } from '../access/screens';
-import { Illustration, SpeakButton } from '@dsvhvn/dung-chung/lesson';
-import { classFacts } from './classroom';
-import { LearningSections } from './LearningSections';
-import { useStudentHome } from './useStudentHome';
-import { takeQuizPath } from '../quiz/quizData';
-import { lessonPath } from '../lessons/lessonData';
+import { cn, daysLearnedText, LEVEL_ONE_FIXED_PHRASES, levelOneGreetingSpeech, levelOneResume, levelOneStations, nextLevelOneLesson, type LevelOneStation } from '@dsvhvn/dung-chung';
+import { studentCodeOf, type StudentClassDetail, type StudentHome, type StudentProfile } from '@dsvhvn/dung-chung/api';
+import { Illustration, LevelOneButtonLink, LevelOneSpeak, usePrefetchSpeech } from '@dsvhvn/dung-chung/lesson';
+import { ErrorState, Icon, LoadingState, type IconName } from '@dsvhvn/dung-chung/ui';
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router';
+import { pathOf } from '../access/screens';
+import { lessonPath } from '../lessons/lessonData';
+import { takeQuizPath } from '../quiz/quizData';
+import { useStudentHome } from './useStudentHome';
 
-// Trang học của em — bản cấp 1 (khối 1-5): Thiết kế chuẩn gamification theo phong cách Duolingo:
-// 1. Cột chính: Con đường bài học uốn lượn ziczac (Winding Snake Path), Unit Banner xanh lá, các trạm nút tròn 3D có bóng đổ dày,
-//    nút đang làm có bong bóng "BẮT ĐẦU!" nảy nhịp nhàng, Rương kho báu Di Sản ở cuối chặng.
-// 2. Cột phụ: Bảng chỉ số Duolingo (🔥 Streak, ⭐ Sao, ❤️ Trái tim), Nhiệm vụ mở mã bài học, Hộ chiếu Lớp của em.
-// 3. Linh vật hoạt hình đứng cạnh đường đi cổ vũ bé bằng bong bóng thoại hoạt hình.
+// Trang học của em — bản cấp 1 (một bố cục cho cả khối 1-5). Đầu trang: linh vật, lời chào, lời cổ vũ của máy chủ có nút nghe, hai ô số
+// (sao và ngày đã học). Thẻ "Bài thầy cô giao": bài nên học bây giờ, hoặc lượt chơi đang dở để chơi tiếp, hoặc lời khen khi đã học hết.
+// Con đường: các bài thầy cô đã xuất bản cho lớp hiện thẳng theo thứ tự học (không phải gõ mã, không khóa bài nào), cuối đường là album
+// di sản. Nhập mã chỉ còn là lối phụ. Màn hình rộng thì lối nhập mã và Lớp của em sang cột phụ. Không emoji, màu lấy từ bộ giao diện cấp 1.
 
-const X_OFFSETS = [0, -48, -80, -48, 0, 48, 80, 48, 0];
+/** Tên gọi của em: chữ cuối của họ tên ("Nguyễn Minh An" → "An"). */
+function givenName(fullName: string | null | undefined): string {
+  return fullName?.trim().split(/\s+/u).at(-1) || 'em';
+}
+
+/** Mã bài học của một bài trên trang học: bài của lớp trước, rồi bài em đã mở. */
+function codeOfLesson(home: StudentHome, lessonId: number): string | null {
+  return home.classLessons.find((l) => l.lessonId === lessonId)?.accessCode ?? home.myLessons.find((l) => l.lessonId === lessonId)?.accessCode ?? null;
+}
 
 export function LevelOne({ user, classroom }: { user: StudentProfile; classroom: StudentClassDetail }) {
-  const name = user.fullName ?? 'em';
-  const { data: home } = useStudentHome();
-  // Xác định trạng thái các bài học của học sinh:
-  const openQuizzes = home?.openQuizzes ?? [];
-  const myLessons = [...(home?.myLessons ?? [])].sort((a, b) => a.lessonId - b.lessonId);
-  const inProgress = home?.inProgress ?? [];
-
-  const isLessonDone = (l: (typeof myLessons)[number]) =>
-    l.quizzesPublished > 0 && l.quizzesDone >= l.quizzesPublished;
-
-  const unfinishedLesson = myLessons.find((l) => !isLessonDone(l));
-  const allDone =
-    myLessons.length > 0 &&
-    myLessons.every(isLessonDone) &&
-    openQuizzes.length === 0 &&
-    inProgress.length === 0;
-
-  const cheer = home?.cheer ?? 'Cùng vượt qua các trạm trên con đường di sản để nhận Sao và mở Rương Kho Báu! 🌟';
-  const greeting = `Chào ${name}! Hôm nay mình cùng khám phá nhé!`;
-  const facts = classFacts(classroom).filter((f) => ['Lớp', 'Giáo viên', 'Trường'].includes(f.label));
-
-  // Số ngày chăm chỉ: lấy từ máy chủ, hoặc tính từ các ngày thực tế em đã hoàn thành bài học (không bị mất ngày khi nghỉ)
-  const activeDays = (() => {
-    if (home?.streakDays && home.streakDays > 0) return home.streakDays;
-    const dates = myLessons
-      .map((l) => l.lastAttemptAt)
-      .filter((d): d is string => Boolean(d))
-      .map((d) => d.slice(0, 10));
-    const unique = new Set(dates);
-    if (unique.size > 0) return unique.size;
-    return (home?.totalStars ?? 0) > 0 ? 1 : 0;
-  })();
-
-  // Tạo các trạm trên con đường học tập từ chính dữ liệu bài của học sinh:
-  const pathNodes = (() => {
-    const nodes: Array<{
-      id: string;
-      title: string;
-      type: 'active' | 'done' | 'lesson' | 'quiz' | 'locked' | 'chest';
-      icon: string;
-      bubble?: string | null;
-      to: string | null;
-    }> = [];
-
-    const focusProgress = inProgress[0];
-    const focusOpenQuiz = !focusProgress ? openQuizzes[0] : undefined;
-    const focusLesson = !focusProgress && !focusOpenQuiz ? unfinishedLesson : undefined;
-
-    // 1. Trạm đang làm dở (nếu có)
-    if (focusProgress) {
-      const code = myLessons.find((l) => l.lessonId === focusProgress.lessonId)?.accessCode;
-      nodes.push({
-        id: `doing-${focusProgress.attemptId}`,
-        title: focusProgress.quizName ?? 'Thử thách dở dang',
-        type: 'active',
-        icon: '⚡',
-        bubble: 'LÀM TIẾP! ▶',
-        to: code ? takeQuizPath(code, focusProgress.quizId) : pathOf('enterCode'),
-      });
-    }
-
-    // 2. Các bài kiểm tra mở chưa nộp
-    openQuizzes.forEach((q) => {
-      if (q.quizId === focusProgress?.quizId) return;
-      const isFocus = q === focusOpenQuiz;
-      const code = q.needsLessonCode ? null : myLessons.find((l) => l.lessonId === q.lessonId)?.accessCode;
-      nodes.push({
-        id: `quiz-${q.quizId}`,
-        title: q.name ?? 'Thử thách Đố vui',
-        type: isFocus ? 'active' : q.needsLessonCode ? 'locked' : 'quiz',
-        icon: isFocus ? '🎮' : q.needsLessonCode ? '🔒' : '🏛️',
-        bubble: isFocus ? 'BẮT ĐẦU! ▼' : null,
-        to: code ? takeQuizPath(code, q.quizId) : pathOf('enterCode'),
-      });
-    });
-
-    // 3. Các bài học thật của học sinh: bài đã hoàn thành chuyển thành ⭐, bài chưa xong đầu tiên nhận tiêu điểm BẮT ĐẦU!
-    myLessons.forEach((l) => {
-      const done = isLessonDone(l);
-      const isFocus = l === focusLesson;
-      nodes.push({
-        id: `lesson-${l.lessonId}`,
-        title: l.title ?? 'Bài học Di sản',
-        type: done ? 'done' : isFocus ? 'active' : 'lesson',
-        icon: done ? '⭐' : '📖',
-        bubble: isFocus ? 'BẮT ĐẦU! ▼' : null,
-        to: l.accessCode ? lessonPath(l.accessCode) : pathOf('enterCode'),
-      });
-    });
-
-    // 4. Nếu học sinh chưa có bài nào
-    if (nodes.length === 0) {
-      nodes.push({
-        id: 'start-empty',
-        title: 'Khởi hành: Nhập mã bài',
-        type: 'active',
-        icon: '🔑',
-        bubble: 'BẮT ĐẦU! ▼',
-        to: pathOf('enterCode'),
-      });
-    }
-
-    // 5. Trạm đích cuối cùng: Rương Kho Báu Di Sản (chỉ khi hoàn thành hết các bài mới mở quà)
-    nodes.push({
-      id: 'chest-end',
-      title: 'Rương Kho Báu Di Sản',
-      type: 'chest',
-      icon: '🎁',
-      bubble: allDone ? 'MỞ QUÀ! 🎁' : null,
-      to: pathOf('progress'),
-    });
-
-    return nodes;
-  })();
+  const home = useStudentHome();
+  const name = givenName(user.fullName);
+  const greeting = `Chào ${name}!`;
+  // Lời chào đọc to không có tên em (tên học sinh không gửi sang dịch vụ giọng đọc).
+  const greetingSpeech = levelOneGreetingSpeech(home.data?.cheer);
+  // Vào trang học thì nhờ máy chủ tạo trước tiếng lời chào, lời cổ vũ và các câu cố định của cấp 1 (hướng dẫn, phản hồi, số sao).
+  usePrefetchSpeech([greetingSpeech, ...LEVEL_ONE_FIXED_PHRASES], true);
 
   return (
     <section className="dsv-content dsv-section" data-bo-cuc="cap-1">
       <title>Trang học của em · DiViet</title>
-      <div className="mx-auto w-full max-w-[1040px]">
-        {/* Banner chính: Gộp Lời chào + Chặng 1 — tông Xanh Ngọc Di Sản mịn màng, thanh lịch */}
-        <div className="mb-6 rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 p-5 sm:p-7 text-white shadow-md border border-emerald-500/30">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-5">
-            <div className="flex items-center gap-4 sm:gap-5">
-              <div className="size-16 sm:size-20 shrink-0">
-                <Illustration state="chao" className="size-full text-white drop-shadow-md" />
-              </div>
-              <div className="min-w-0 flex-1 text-center sm:text-left">
-                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                  <span className="rounded-full bg-white/20 backdrop-blur-xs px-3 py-0.5 text-xs font-black uppercase tracking-wider text-emerald-50">
-                    CHẶNG 1 · LỚP {classroom.name}
-                  </span>
-                  {classroom.teacherName && (
-                    <span className="text-xs font-bold text-emerald-100">
-                      👩‍🏫 Thầy cô: {classroom.teacherName}
-                    </span>
-                  )}
-                </div>
-                <h1 className="type-h1 font-black text-white tracking-tight leading-tight mt-1.5">
-                  {greeting}
-                </h1>
-                <p className="text-emerald-100 font-medium text-xs sm:text-sm mt-1">
-                  {cheer}
-                </p>
-              </div>
+      <div className="mx-auto grid w-full max-w-[1040px] items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="flex min-w-0 flex-col gap-5">
+          <header className="flex flex-col gap-4">
+            <div className="flex items-center gap-3">
+              <Illustration state="chao" className="size-16 rounded-full bg-surface-container-low sm:size-[72px]" />
+              <h1 className="min-w-0 flex-1 text-[30px] leading-tight font-bold text-on-surface sm:text-[32px]">{greeting}</h1>
+              <LevelOneSpeak text={greetingSpeech} label="Nghe lời chào" size={56} />
             </div>
-            <SpeakButton
-              text={`${greeting} ${cheer}`}
-              label="Nghe lời chào và lời cổ vũ"
-              size="md"
-              className="dsv-speak-btn shrink-0 shadow-md"
-            />
-          </div>
+            {home.data?.cheer && <p className="text-[20px] leading-snug text-on-surface">{home.data.cheer}</p>}
+            {home.data && (
+              <div className="flex flex-wrap gap-3">
+                <StatChip to={pathOf('progress')} icon="star" label={`${home.data.totalStars ?? 0} sao`} filled>
+                  {home.data.totalStars ?? 0}
+                </StatChip>
+                <StatChip to={pathOf('progress')} icon="calendar" label={daysLearnedText(home.data.streakDays)}>
+                  {daysLearnedText(home.data.streakDays)}
+                </StatChip>
+              </div>
+            )}
+          </header>
+
+          {home.isPending ? (
+            <LoadingState rows={3} />
+          ) : home.isError ? (
+            <ErrorState error={home.error} onRetry={() => void home.refetch()} />
+          ) : (
+            <>
+              <TodayCard home={home.data} teacherName={home.data.teacherName ?? classroom.teacherName} />
+              {home.data.classLessons.length > 0 && <LessonPath home={home.data} />}
+            </>
+          )}
         </div>
 
-        {/* Bố cục 2 cột kiểu Duolingo trên máy tính — vừa vặn màn hình, không bị tràn thanh cuộn ngang */}
-        <div className="grid w-full grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-6 items-start">
-          
-          {/* CỘT CHÍNH: Con đường học tập Duolingo (The Winding Snake Path) */}
-          <div className="flex min-w-0 flex-col gap-6">
-            
-            {/* CON ĐƯỜNG UỐN LƯỢN (Đặt trong khung nền mịn màng, dịu mắt) */}
-            <div className="relative flex flex-col items-center py-8 px-4 sm:px-6 rounded-3xl bg-white/80 backdrop-blur-xs border border-emerald-100 shadow-xs">
-              
-              <div className="flex flex-col items-center w-full py-2">
-                {pathNodes.map((node, index) => {
-                  const xOffset = X_OFFSETS[index % X_OFFSETS.length] ?? 0;
-                  const isActive = node.type === 'active';
-                  const isDone = node.type === 'done';
-                  const isLesson = node.type === 'lesson';
-                  const isChest = node.type === 'chest';
-
-                  const nodeClass = isActive
-                    ? 'duo-node-active'
-                    : isDone
-                      ? 'duo-node-done'
-                      : isLesson
-                        ? 'duo-node-lesson'
-                        : isChest
-                          ? cn('duo-node-chest', allDone && 'animate-bounce')
-                          : 'duo-node-locked';
-
-                  return (
-                    <div key={node.id} className="flex flex-col items-center relative my-1">
-                      {/* Nút trạm tròn 3D Duolingo */}
-                      <div
-                        style={{ transform: `translateX(${xOffset}px)` }}
-                        className="transition-transform duration-300 relative flex flex-col items-center"
-                      >
-                        {/* Bong bóng dẫn đường chỉ trạm hiện tại hoặc chúc mừng Rương kho báu */}
-                        {node.bubble && (
-                          <div
-                            className={cn(
-                              'duo-start-bubble mb-2',
-                              isChest && 'border-amber-400 border-b-amber-500 text-amber-700 shadow-amber-200'
-                            )}
-                          >
-                            {node.bubble}
-                          </div>
-                        )}
-
-                        {node.to ? (
-                          <ButtonLink
-                            to={node.to}
-                            className={cn(nodeClass, 'no-underline')}
-                            title={node.title}
-                          >
-                            <span className="text-2xl sm:text-3xl select-none" aria-hidden="true">
-                              {node.icon}
-                            </span>
-                          </ButtonLink>
-                        ) : (
-                          <div className={nodeClass} title={node.title}>
-                            <span className="text-2xl sm:text-3xl select-none" aria-hidden="true">
-                              {node.icon}
-                            </span>
-                          </div>
-                        )}
-
-                        {/* Tên trạm hiển thị tự nhiên, không bị gò bó trong hộp hẹp */}
-                        <p className="mt-2 text-xs font-black text-emerald-950 text-center max-w-[150px] leading-tight">
-                          {node.title}
-                        </p>
-                      </div>
-
-                      {/* Các phiến đá nối giữa các trạm — uốn lượn liên tục theo hướng ziczac với màu xanh ngọc dịu mát */}
-                      {index < pathNodes.length - 1 && (() => {
-                        const nextX = X_OFFSETS[(index + 1) % X_OFFSETS.length] ?? 0;
-                        const p1 = Math.round(xOffset + (nextX - xOffset) * 0.28);
-                        const p2 = Math.round(xOffset + (nextX - xOffset) * 0.55);
-                        const p3 = Math.round(xOffset + (nextX - xOffset) * 0.82);
-
-                        return (
-                          <div
-                            className="flex flex-col items-center gap-2 my-2.5 relative w-full pointer-events-none select-none"
-                            aria-hidden="true"
-                          >
-                            <span
-                              style={{ transform: `translateX(${p1}px)` }}
-                              className="block w-4 h-3 rounded-full bg-emerald-100 border border-emerald-300 shadow-[0_2px_0_#A7F3D0]"
-                            />
-                            <span
-                              style={{ transform: `translateX(${p2}px)` }}
-                              className="block w-4 h-3 rounded-full bg-emerald-100 border border-emerald-300 shadow-[0_2px_0_#A7F3D0]"
-                            />
-                            <span
-                              style={{ transform: `translateX(${p3}px)` }}
-                              className="block w-4 h-3 rounded-full bg-emerald-100 border border-emerald-300 shadow-[0_2px_0_#A7F3D0]"
-                            />
-                          </div>
-                        );
-                      })()}
-                    </div>
-                  );
-                })}
-              </div>
-
-
-            </div>
-
-            {/* Chi tiết danh sách bài chơi, bài học & gợi ý */}
-            <div className="mt-4">
-              <LearningSections level={1} />
-            </div>
-
-          </div>
-
-          {/* CỘT PHỤ: Thanh chỉ số Duolingo, Thẻ học sinh & Nhiệm vụ mở mã (Sidebar) */}
-          <div className="flex min-w-0 flex-col gap-6 lg:sticky lg:top-20">
-            
-            {/* Thanh trạng thái Duolingo (Streak, Sao, Huy hiệu) */}
-            <div className="duo-card p-5">
-              <p className="text-xs font-black uppercase tracking-wider text-emerald-950/70 mb-3 text-center">
-                THÀNH TÍCH CỦA EM
-              </p>
-              <div className="grid grid-cols-3 gap-2">
-                <Link
-                  to={pathOf('progress')}
-                  className="flex flex-col items-center justify-between min-h-[100px] py-3 px-1.5 rounded-2xl bg-orange-50 border border-orange-200 border-b-3 border-b-orange-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 no-underline cursor-pointer group text-center min-w-0"
-                  title="Xem số ngày chăm chỉ trên trang tiến độ"
-                >
-                  <span className="text-2xl group-hover:scale-110 transition-transform leading-none" aria-hidden="true">🔥</span>
-                  <span className="text-lg font-black text-orange-600 leading-none my-1">
-                    {activeDays}
-                  </span>
-                  <span className="text-[10px] font-bold text-orange-950/70 uppercase tracking-wide leading-none">
-                    Chăm chỉ
-                  </span>
-                </Link>
-                <Link
-                  to={pathOf('progress')}
-                  className="flex flex-col items-center justify-between min-h-[100px] py-3 px-1.5 rounded-2xl bg-amber-50 border border-amber-200 border-b-3 border-b-amber-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 no-underline cursor-pointer group text-center min-w-0"
-                  title="Xem tổng số sao đạt được"
-                >
-                  <span className="text-2xl group-hover:scale-110 transition-transform leading-none" aria-hidden="true">⭐</span>
-                  <span className="text-lg font-black text-amber-700 leading-none my-1">
-                    {home?.totalStars ?? 0}
-                  </span>
-                  <span className="text-[10px] font-bold text-amber-950/70 uppercase tracking-wide leading-none">
-                    Sao vàng
-                  </span>
-                </Link>
-                <Link
-                  to={`${pathOf('progress')}?tab=huy-hieu`}
-                  className="flex flex-col items-center justify-between min-h-[100px] py-3 px-1.5 rounded-2xl bg-purple-50 border border-purple-200 border-b-3 border-b-purple-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 no-underline cursor-pointer group text-center min-w-0"
-                  title="Xem bộ sưu tập huy hiệu của em"
-                >
-                  <span className="text-2xl group-hover:scale-110 transition-transform leading-none" aria-hidden="true">🏆</span>
-                  <span className="text-lg font-black text-purple-700 leading-none my-1">
-                    {home?.recentBadges?.length ?? 0}
-                  </span>
-                  <span className="text-[10px] font-bold text-purple-950/70 uppercase tracking-wide leading-none">
-                    Huy hiệu
-                  </span>
-                </Link>
-              </div>
-            </div>
-
-            {/* Khối nhiệm vụ: Nhập mã bài học */}
-            <div className="relative overflow-hidden rounded-3xl border border-emerald-400/40 bg-gradient-to-br from-emerald-700 via-teal-800 to-emerald-900 p-5 text-white shadow-md">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="flex size-10 items-center justify-center rounded-xl bg-white/20 text-xl shadow-inner">
-                  🔑
-                </span>
-                <div>
-                  <span className="text-[11px] font-black uppercase tracking-wider text-amber-300">
-                    {myLessons.length === 0 ? 'MỞ KHÓA TRẠM MỚI' : 'BÀI HỌC MỚI TỪ THẦY CÔ?'}
-                  </span>
-                  <h3 className="text-lg font-black text-white leading-tight">
-                    {myLessons.length === 0 ? 'Em đã có mã bài học chưa?' : 'Nhập mã để mở thêm bài nhé!'}
-                  </h3>
-                </div>
-              </div>
-              <p className="text-xs text-emerald-100/90 font-medium mb-4">
-                {myLessons.length === 0
-                  ? 'Nhập mã thầy cô đưa để vào chặng khám phá và nhận sao thưởng nhé!'
-                  : 'Khi thầy cô giao bài mới, em nhập mã ở đây để mở thêm trạm học!'}
-              </p>
-              <ButtonLink
-                to={pathOf('enterCode')}
-                size="lg"
-                className="duo-btn-yellow w-full py-3.5 text-sm font-black shadow-md flex items-center justify-center gap-2"
-              >
-                <Icon name="key" size={18} />
-                Nhập mã bài học
-              </ButtonLink>
-            </div>
-
-            {/* Thẻ học sinh: Lớp của em (Hộ chiếu thám hiểm) */}
-            <section aria-labelledby="lop-cua-em" className="duo-card p-5">
-              <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
-                <div className="flex items-center gap-2.5">
-                  <span className="text-2xl" aria-hidden="true">🎒</span>
-                  <h2 id="lop-cua-em" className="type-h3 font-black text-emerald-950">
-                    Lớp của em
-                  </h2>
-                </div>
-                <SpeakButton
-                  text={`Em học lớp ${classroom.name}. ${classroom.teacherName ? `Thầy cô phụ trách là ${classroom.teacherName}.` : ''}`}
-                  label="Nghe thông tin lớp của em"
-                  size="sm"
-                  className="dsv-speak-btn"
-                />
-              </div>
-
-              <dl className="mt-4 flex flex-col gap-2.5">
-                {facts.map((fact) => {
-                  const isClass = fact.label === 'Lớp';
-                  const isTeacher = fact.label === 'Giáo viên';
-                  const icon = isClass ? '📚' : isTeacher ? '👩‍🏫' : '🏫';
-                  const cardClass = isClass
-                    ? 'border-emerald-200 bg-emerald-50/70 text-emerald-950'
-                    : isTeacher
-                      ? 'border-rose-200 bg-rose-50/70 text-rose-950'
-                      : 'border-amber-200 bg-amber-50/70 text-amber-950';
-
-                  return (
-                    <div key={fact.label} className={cn('rounded-2xl border-2 p-3 flex items-center justify-between', cardClass)}>
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg" aria-hidden="true">{icon}</span>
-                        <dt className="text-xs font-black uppercase tracking-wider opacity-80">{fact.label}</dt>
-                      </div>
-                      <dd className="text-sm font-black line-clamp-1">{fact.value}</dd>
-                    </div>
-                  );
-                })}
-              </dl>
-
-              <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50/50 p-3 text-center">
-                <p className="text-xs font-black text-emerald-950 mb-1.5">Mã học sinh của em:</p>
-                <span className="inline-block rounded-full border-2 border-emerald-500 bg-white px-4 py-1 font-mono font-black text-base text-emerald-800 shadow-xs">
-                  {studentCodeOf(user)}
-                </span>
-                <div className="mt-2.5 pt-2 border-t border-emerald-200/60">
-                  <Link
-                    to={pathOf('profile')}
-                    className="inline-flex items-center gap-1.5 text-xs font-black text-emerald-700 hover:text-emerald-800 hover:underline"
-                  >
-                    <Icon name="user" size={15} />
-                    Xem Thẻ học sinh của em ▶
-                  </Link>
-                </div>
-              </div>
-            </section>
-
-          </div>
-
-        </div>
+        <aside className="flex min-w-0 flex-col gap-4 lg:sticky lg:top-24">
+          <section aria-labelledby="nhap-ma-bai" className="flex flex-wrap items-center justify-between gap-3 rounded-[20px] border-2 border-dashed border-border p-4">
+            <h2 id="nhap-ma-bai" className="text-[18px] leading-snug font-medium text-on-surface-variant">
+              Thầy cô đưa mã bài?
+            </h2>
+            <LevelOneButtonLink to={pathOf('enterCode')} variant="secondary" size="md">
+              <Icon name="key" size={22} />
+              Nhập mã
+            </LevelOneButtonLink>
+          </section>
+          <ClassCard user={user} classroom={classroom} />
+        </aside>
       </div>
+    </section>
+  );
+}
+
+function StatChip({ to, icon, label, filled, children }: { to: string; icon: IconName; label: string; filled?: boolean; children: string | number }) {
+  return (
+    <Link
+      to={to}
+      aria-label={label}
+      className="inline-flex min-h-12 items-center gap-2 rounded-full border-2 border-secondary-container bg-surface-container-low px-4 text-[20px] font-bold text-on-surface no-underline hover:bg-surface"
+    >
+      <Icon name={icon} size={24} className={filled ? 'fill-current text-secondary-container stroke-on-secondary-container/40' : 'text-primary'} />
+      {children}
+    </Link>
+  );
+}
+
+// ---- Thẻ bài thầy cô giao ----
+
+function TodayCard({ home, teacherName }: { home: StudentHome; teacherName: string | null | undefined }) {
+  const resume = levelOneResume(home);
+  const lesson = nextLevelOneLesson(home);
+  const resumeCode = resume ? codeOfLesson(home, resume.lessonId) : null;
+  const shell = 'grid grid-cols-[96px_minmax(0,1fr)] items-center gap-x-4 gap-y-4 rounded-[24px] border-2 border-secondary-container bg-surface-container-low p-4 sm:grid-cols-[160px_minmax(0,1fr)] sm:p-5';
+
+  if (resume) {
+    const thumb = home.classLessons.find((l) => l.lessonId === resume.lessonId)?.thumbnailUrl ?? null;
+    return (
+      <section aria-labelledby="the-hom-nay" className={shell}>
+        <Thumb url={thumb} />
+        <div className="min-w-0">
+          <p className="text-[16px] font-bold text-on-surface-variant">Em đang chơi dở</p>
+          <h2 id="the-hom-nay" className="text-[24px] leading-tight font-bold text-on-surface">
+            {resume.quizName ?? resume.lessonTitle ?? 'Bài chơi'}
+          </h2>
+        </div>
+        <LevelOneButtonLink
+          to={resumeCode ? takeQuizPath(resumeCode, resume.quizId) : pathOf('enterCode')}
+          state={resumeCode ? { confirmed: true } : undefined}
+          className="col-span-2 w-full"
+        >
+          <Icon name="play" size={24} className="fill-current" />
+          Chơi tiếp
+        </LevelOneButtonLink>
+      </section>
+    );
+  }
+
+  if (lesson) {
+    return (
+      <section aria-labelledby="the-hom-nay" className={shell}>
+        <Thumb url={lesson.thumbnailUrl} />
+        <div className="min-w-0">
+          <p className="text-[16px] font-bold text-on-surface-variant">{teacherName ? `Bài ${teacherName} giao` : 'Bài thầy cô giao'}</p>
+          <h2 id="the-hom-nay" className="text-[24px] leading-tight font-bold text-on-surface">
+            {lesson.title ?? 'Bài học'}
+          </h2>
+        </div>
+        <LevelOneButtonLink to={lessonPath(lesson.accessCode)} className="col-span-2 w-full">
+          <Icon name="play" size={24} className="fill-current" />
+          Học bài này
+        </LevelOneButtonLink>
+      </section>
+    );
+  }
+
+  if (home.classLessons.length > 0) {
+    return (
+      <section aria-labelledby="the-hom-nay" className="flex flex-col items-center gap-4 rounded-[24px] border-2 border-secondary-container bg-surface-container-low p-5 text-center">
+        <Illustration state="chuc-mung" className="size-24 rounded-full bg-surface" />
+        <h2 id="the-hom-nay" className="text-[24px] leading-tight font-bold text-on-surface">
+          Em học hết các bài rồi!
+        </h2>
+        <LevelOneButtonLink to={pathOf('album')} className="w-full sm:w-auto">
+          <Icon name="cards" size={24} />
+          Xem album
+        </LevelOneButtonLink>
+      </section>
+    );
+  }
+
+  return (
+    <section aria-labelledby="the-hom-nay" className="flex items-center gap-4 rounded-[24px] border-2 border-dashed border-border bg-surface p-5">
+      <Illustration state="trong" className="size-20 rounded-full bg-surface-container-low" />
+      <h2 id="the-hom-nay" className="min-w-0 flex-1 text-[20px] leading-snug font-bold text-on-surface">
+        Chưa có bài nào trên con đường của em.
+      </h2>
+    </section>
+  );
+}
+
+function Thumb({ url }: { url: string | null }) {
+  return url ? (
+    <img src={url} alt="" className="aspect-[4/3] w-full rounded-[16px] border-2 border-surface object-cover" />
+  ) : (
+    <span className="flex aspect-[4/3] w-full items-center justify-center rounded-[16px] bg-surface text-primary">
+      <Icon name="book-open" size={36} />
+    </span>
+  );
+}
+
+// ---- Con đường ----
+
+const ROW = 152;
+const DOT = 84;
+
+/** Vị trí ngang (%) của trạm thứ `index`: lần lượt bên trái, bên phải; trạm album ở giữa. */
+const xOf = (index: number, album: boolean) => (album ? 50 : index % 2 === 0 ? 30 : 70);
+
+function stationLabel(station: LevelOneStation): string {
+  const title = station.lesson.title ?? 'Bài học';
+  if (station.state === 'done') return `${title}, đã học xong${station.lesson.stars !== null ? `, ${station.lesson.stars} sao` : ''}`;
+  if (station.state === 'current') return `${title}, học tiếp bài này`;
+  return title;
+}
+
+const STATION_DOT: Record<LevelOneStation['state'], string> = {
+  done: 'size-20 bg-primary-container text-on-primary-container shadow-[0_5px_0_var(--dsv-color-border)]',
+  current: 'size-[88px] bg-primary text-on-primary ring-[7px] ring-primary/25 shadow-[0_5px_0_var(--dsv-color-primary-active)]',
+  open: 'size-20 border-[3px] border-primary/30 bg-surface text-primary shadow-[0_5px_0_var(--dsv-color-border)]',
+};
+
+const STATION_ICON: Record<LevelOneStation['state'], IconName> = { done: 'check', current: 'play', open: 'book-open' };
+
+function LessonPath({ home }: { home: StudentHome }) {
+  const stations = levelOneStations(home);
+  const currentRef = useRef<HTMLAnchorElement>(null);
+  const count = stations.length + 1;
+  // Chừa chỗ cho bong bóng "Học tiếp" khi trạm nên học là trạm đầu.
+  const TOP = stations[0]?.state === 'current' ? 56 : 12;
+  const height = TOP + (count - 1) * ROW + 132;
+  const points = Array.from({ length: count }, (_, i) => ({ x: xOf(i, i === count - 1), y: TOP + i * ROW + DOT / 2 }));
+  const road = points
+    .map((p, i) => {
+      if (i === 0) return `M${p.x} ${p.y}`;
+      const prev = points[i - 1]!;
+      const mid = (prev.y + p.y) / 2;
+      return `C${prev.x} ${mid} ${p.x} ${mid} ${p.x} ${p.y}`;
+    })
+    .join(' ');
+
+  // Vào trang thì cuộn tới trạm nên học, nếu trạm đó đang nằm dưới mép màn hình. Trạm nên học là trạm đầu thì không cuộn: thẻ bài được giao
+  // ngay trên đã dẫn tới đúng bài đó, cuộn xuống chỉ làm mất lời chào.
+  const firstIsCurrent = stations[0]?.state === 'current';
+  useEffect(() => {
+    const element = currentRef.current;
+    if (firstIsCurrent || !element || typeof element.scrollIntoView !== 'function') return;
+    if (element.getBoundingClientRect().bottom <= window.innerHeight) return;
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    element.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+  }, [firstIsCurrent]);
+
+  const collected = home.albumCollected ?? 0;
+
+  return (
+    <section aria-labelledby="con-duong" className="flex flex-col gap-2">
+      <h2 id="con-duong" className="text-[22px] font-bold text-on-surface">
+        Con đường bài học
+      </h2>
+      <ol className="relative mx-auto w-full max-w-[520px]" style={{ height }}>
+        <svg aria-hidden="true" className="absolute inset-0 size-full" viewBox={`0 0 100 ${height}`} preserveAspectRatio="none">
+          <path d={road} fill="none" stroke="var(--dsv-color-border)" strokeOpacity="0.55" strokeWidth="22" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+          <path d={road} fill="none" stroke="var(--dsv-color-surface)" strokeWidth="3" strokeDasharray="2 12" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+        </svg>
+        {stations.map((station, index) => (
+          <li
+            key={station.lesson.lessonId}
+            className="absolute flex w-[46%] max-w-[190px] -translate-x-1/2 justify-center"
+            style={{ left: `${xOf(index, false)}%`, top: TOP + index * ROW - (station.state === 'current' ? 2 : 0) }}
+          >
+            <Link
+              ref={station.state === 'current' ? currentRef : undefined}
+              to={lessonPath(station.lesson.accessCode)}
+              aria-label={stationLabel(station)}
+              aria-current={station.state === 'current' ? 'step' : undefined}
+              className="group relative flex flex-col items-center gap-2 rounded-[20px] text-center no-underline"
+            >
+              {station.state === 'current' && (
+                <span aria-hidden="true" className="dsv-bob absolute bottom-full left-1/2 mb-3 rounded-[14px] border-2 border-secondary-container bg-surface px-4 py-1 text-[17px] font-bold whitespace-nowrap text-on-surface shadow-1">
+                  Học tiếp
+                </span>
+              )}
+              <span aria-hidden="true" className={cn('flex items-center justify-center rounded-full transition-transform motion-safe:group-active:translate-y-0.5', STATION_DOT[station.state])}>
+                <Icon name={STATION_ICON[station.state]} size={36} strokeWidth={station.state === 'done' ? 3 : 2.2} className={station.state === 'current' ? 'fill-current' : undefined} />
+              </span>
+              <span
+                aria-hidden="true"
+                className={cn(
+                  'line-clamp-2 rounded-[8px] bg-background px-1.5 text-[18px] leading-tight',
+                  station.state === 'open' ? 'font-medium text-on-surface-variant' : 'font-bold text-on-surface',
+                )}
+              >
+                {station.lesson.title ?? 'Bài học'}
+              </span>
+              {station.state === 'done' && station.lesson.stars !== null && (
+                <span aria-hidden="true" className="flex gap-0.5">
+                  {[0, 1, 2].map((i) => (
+                    <Icon
+                      key={i}
+                      name="star"
+                      size={20}
+                      className={i < (station.lesson.stars ?? 0) ? 'fill-current text-secondary-container stroke-on-secondary-container/40' : 'fill-current text-border stroke-border'}
+                    />
+                  ))}
+                </span>
+              )}
+            </Link>
+          </li>
+        ))}
+        <li className="absolute flex w-[80%] max-w-[260px] -translate-x-1/2 justify-center" style={{ left: '50%', top: TOP + (count - 1) * ROW }}>
+          <Link
+            to={pathOf('album')}
+            aria-label={`Album di sản, em có ${collected} thẻ`}
+            className="group flex flex-col items-center gap-2 rounded-[20px] text-center no-underline"
+          >
+            <span aria-hidden="true" className="flex size-20 items-center justify-center rounded-full border-[3px] border-dashed border-secondary-container bg-surface-container-low text-primary">
+              <Icon name="cards" size={36} />
+            </span>
+            <span aria-hidden="true" className="rounded-[8px] bg-background px-1.5 text-[18px] leading-tight font-bold whitespace-nowrap text-on-surface">
+              {`Album di sản · ${collected} thẻ`}
+            </span>
+          </Link>
+        </li>
+      </ol>
+    </section>
+  );
+}
+
+// ---- Lớp của em ----
+
+function ClassCard({ user, classroom }: { user: StudentProfile; classroom: StudentClassDetail }) {
+  const rows: Array<[string, string | null | undefined]> = [
+    ['Lớp', classroom.name],
+    ['Thầy cô', classroom.teacherName],
+    ['Trường', classroom.organization?.name],
+    ['Mã học sinh', studentCodeOf(user)],
+  ];
+  return (
+    <section aria-labelledby="lop-cua-em" className="rounded-[20px] border-2 border-border bg-surface p-4">
+      <div className="flex items-center gap-3">
+        <h2 id="lop-cua-em" className="min-w-0 flex-1 text-[20px] font-bold text-on-surface">
+          Lớp của em
+        </h2>
+        <LevelOneSpeak
+          text={`Em học lớp ${classroom.name}.${classroom.teacherName ? ` Thầy cô của em là ${classroom.teacherName}.` : ''}`}
+          label="Nghe thông tin lớp của em"
+          size={48}
+          soft
+        />
+      </div>
+      <dl className="mt-3 flex flex-col divide-y divide-border">
+        {rows
+          .filter((row): row is [string, string] => Boolean(row[1]))
+          .map(([label, value]) => (
+            <div key={label} className="flex items-baseline justify-between gap-3 py-2">
+              <dt className="text-[16px] text-on-surface-variant">{label}</dt>
+              <dd className={cn('min-w-0 text-right text-[18px] font-bold text-on-surface', label === 'Mã học sinh' && 'font-mono tracking-wider')}>{value}</dd>
+            </div>
+          ))}
+      </dl>
     </section>
   );
 }

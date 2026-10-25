@@ -1,4 +1,4 @@
-import { CLOCK_WARNING_SECONDS, clampStars, formatClock, hasAnswer, passageGroup } from '@dsvhvn/dung-chung';
+import { CLOCK_WARNING_SECONDS, formatClock, hasAnswer, passageGroup } from '@dsvhvn/dung-chung';
 import type { AttemptQuestion, QuestionSubmission, StudentAttempt, StudentAttemptResult } from '@dsvhvn/dung-chung/api';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,11 +11,13 @@ import { useServices } from '../state/AppProvider';
 import { useTheme } from '../theme/ThemeProvider';
 import { useAutoRead } from './autoRead';
 import { ReadAloud } from './LessonParts';
+import { PracticeRunner } from './levelOne/PracticeRunner';
 import { QuestionInput, type QuizLevel } from './QuestionInput';
 import { useQuizAttempt, type QuizAttemptSession, type SaveStatus } from './useQuizAttempt';
 
-// Màn hình làm bài toàn màn hình. Ba bố cục riêng theo cấp học của lớp, học sinh không chọn: cấp 1 từng câu một, nút lớn, hình lớn, loa đọc to, hàng sao tiến độ, không đồng hồ;
-// cấp 2 cân bằng, đồng hồ khi bài đặt giờ, bảng số câu ở đầu màn hình; cấp 3 gọn, luôn có đồng hồ, tư liệu ghim phía trên, đánh dấu câu cần xem lại. Lượt dùng chung với web.
+// Màn hình làm bài toàn màn hình. Ba bố cục riêng theo cấp học của lớp, học sinh không chọn: cấp 1 là bài chơi dạng luyện tập (kiểm từng câu, cho thử lại,
+// ở levelOne/PracticeRunner); cấp 2 cân bằng, đồng hồ khi bài đặt giờ, bảng số câu ở đầu màn hình; cấp 3 gọn, luôn có đồng hồ, tư liệu ghim phía trên,
+// đánh dấu câu cần xem lại. Lượt dùng chung với web. Máy chủ cũ chưa bật luyện tập cho cấp 1 thì cấp 1 làm từng câu một và lưu như cấp 2.
 
 interface RunnerProps {
   attempt: StudentAttempt;
@@ -29,7 +31,13 @@ interface LayoutProps {
   onPause: () => void;
 }
 
-export function QuizRunner({ attempt, onFinished, onPause }: RunnerProps) {
+export function QuizRunner(props: RunnerProps) {
+  if (props.attempt.level === 1 && props.attempt.practiceMode) return <PracticeRunner {...props} />;
+  return <SavingRunner {...props} />;
+}
+
+/** Bài làm lưu từng câu rồi nộp một lần (cấp 2, 3; cấp 1 khi máy chủ chưa bật luyện tập). */
+function SavingRunner({ attempt, onFinished, onPause }: RunnerProps) {
   const { studentApi } = useServices();
   const { t } = useTranslation();
   const session = useQuizAttempt(studentApi, attempt, { saveFailed: t('hs.quiz.saveFailed'), submitFailed: t('hs.quiz.submitFailed') }, onFinished);
@@ -68,18 +76,6 @@ function TimeUp({ session }: { session: QuizAttemptSession }) {
   const { t } = useTranslation();
   if (!session.timedOut) return null;
   return <Notice tone="error" text={t('hs.quiz.timeUp')} />;
-}
-
-function Stars({ total, count, size = 24 }: { total: number; count: number; size?: number }) {
-  const theme = useTheme();
-  const shown = Math.min(total, 10);
-  const filled = shown === total ? count : Math.round((count / total) * shown);
-  return (
-    <Text accessibilityLabel={`${count}/${total}`} style={{ fontSize: size, color: theme.color.primary }}>
-      {'★'.repeat(filled)}
-      {'☆'.repeat(shown - filled)}
-    </Text>
-  );
 }
 
 /** Bảng số câu: chạm số để chuyển tới câu đó; đã trả lời, đang xem, chưa trả lời, đánh dấu xem lại. */
@@ -232,7 +228,6 @@ function RunnerLevelOne({ attempt, session, onPause }: LayoutProps) {
             <Txt variant="title" numberOfLines={1}>
               {attempt.quizName}
             </Txt>
-            <Stars total={total} count={clampStars(session.answeredCount, total)} />
           </View>
           <Txt variant="label">{t('hs.quiz.questionShort', { n: index + 1, total })}</Txt>
         </View>
@@ -242,10 +237,6 @@ function RunnerLevelOne({ attempt, session, onPause }: LayoutProps) {
         <QuestionCard key={question.questionId} question={question} index={index} total={total} level={1} answer={session.answers[question.questionId] ?? null} onChange={(answer) => session.setAnswer(question, answer)} readAloud={attempt.readAloud} disabled={session.submitting} />
         <SaveNote status={session.saveStatus} />
         <Button label={last ? t('hs.quiz.finishOne') : t('hs.lesson.next')} onPress={goNext} loading={session.submitting && last} full style={{ minHeight: 64 }} />
-        {index > 0 ? <Button label={t('hs.quiz.prev')} variant="secondary" onPress={() => goTo(index - 1)} full style={{ minHeight: 56 }} /> : null}
-        <Txt muted style={{ textAlign: 'center' }}>
-          {t('hs.quiz.hintOne')}
-        </Txt>
       </ScrollView>
       <SubmitSheet open={confirming} level={1} unanswered={session.unanswered} submitting={session.submitting} error={session.submitError} onBack={() => setConfirming(false)} onSubmit={() => void session.submit()} />
     </View>

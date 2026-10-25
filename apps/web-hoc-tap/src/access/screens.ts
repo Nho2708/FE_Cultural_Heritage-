@@ -1,4 +1,4 @@
-// Bảng màn hình của web học tập (20 màn hình): khám phá di sản công khai (Khách và học sinh) và khu học của học sinh.
+// Bảng màn hình của web học tập (21 màn hình): khám phá di sản công khai (Khách và học sinh) và khu học của học sinh.
 // Nguồn duy nhất cho route guard và thanh điều hướng. Tên màn hình bằng lời, khóa đặt theo nghĩa. Giáo viên và quản trị
 // không đăng nhập ở đây; mở các trang khám phá thì họ là Khách.
 // Chặn ở giao diện chỉ để điều hướng đúng; backend kiểm vai trò, lớp và lượt làm của chính học sinh ở mọi endpoint.
@@ -55,6 +55,8 @@ export const SCREENS = [
   { key: 'login', name: 'Học sinh đăng nhập', area: 'learning', actors: GUEST_ONLY, path: '/dang-nhap' },
   { key: 'changePassword', name: 'Đổi mật khẩu', area: 'learning', actors: STUDENT, path: '/doi-mat-khau' },
   { key: 'learnHome', name: 'Trang học của em', area: 'learning', actors: STUDENT, path: '/hoc' },
+  // Cấp 1: thẻ di sản của các bài em học xong (mở từ cuối con đường, trang kết quả và bước Nhận thẻ).
+  { key: 'album', name: 'Album di sản', area: 'learning', actors: STUDENT, path: '/hoc/album' },
   { key: 'enterCode', name: 'Nhập mã bài học', area: 'learning', actors: STUDENT, path: '/nhap-ma' },
   { key: 'lesson', name: 'Bài học', area: 'learning', actors: STUDENT, path: '/bai-hoc/:maBaiHoc' },
   { key: 'startQuiz', name: 'Bắt đầu bài kiểm tra', area: 'learning', actors: STUDENT, path: null },

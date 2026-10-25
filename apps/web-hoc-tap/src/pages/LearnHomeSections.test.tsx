@@ -5,7 +5,7 @@ import { envelope, mockApi, studentOf, studentServer } from '../test/fixtures';
 import { homeOf } from '../test/quizFixtures';
 import { renderApp, signInAs } from '../test/renderApp';
 
-// Các khối học tập của trang học: lượt đang làm dở, bài kiểm tra còn mở (nhãn "Cần mã bài học"), bài học của em, huy hiệu gần đây.
+// Các khối học tập của trang học cấp 2 và 3: lượt đang làm dở, bài kiểm tra còn mở (nhãn "Cần mã bài học"), bài học của em, huy hiệu gần đây.
 
 function open(level: SchoolLevel, home: StudentHome) {
   const student = studentOf(level === 1 ? 4 : level === 3 ? 11 : 7);
@@ -46,13 +46,14 @@ describe('Trang học — các khối học tập', () => {
     expect(within(badges).getByText('Xuất sắc')).toBeInTheDocument();
   });
 
-  it('cấp 1: thẻ lớn "Bài chơi đang chờ em" có nút Làm bài; cấp 3: danh sách dạng dòng', async () => {
-    const first = open(1, full(1));
-    const waiting = await screen.findByRole('region', { name: 'Bài chơi đang chờ em' });
-    expect(within(waiting).getByRole('link', { name: 'Làm bài' })).toBeInTheDocument();
+  it('cấp 1: trang học có bố cục riêng, không có khối "Bài chơi đang chờ em"', async () => {
+    open(1, full(1));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Chào An!' })).toBeInTheDocument();
     expect(document.querySelector('[data-bo-cuc]')).toHaveAttribute('data-bo-cuc', 'cap-1');
-    first.unmount();
+    expect(screen.queryByRole('region', { name: 'Bài chơi đang chờ em' })).not.toBeInTheDocument();
+  });
 
+  it('cấp 3: danh sách dạng dòng', async () => {
     open(3, full(3));
     const rows = await screen.findByRole('region', { name: 'Bài kiểm tra đang chờ em' });
     expect(within(rows).getAllByRole('listitem')).toHaveLength(2);

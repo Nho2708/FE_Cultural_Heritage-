@@ -7,6 +7,7 @@ import {
   createDiscoveryApi,
   createGuestApi,
   createStudentApi,
+  createTtsApi,
   sessionEndNotice,
   type AdsApi,
   type ApiClient,
@@ -18,6 +19,7 @@ import {
 } from '@dsvhvn/dung-chung/api';
 import { isProfileLike, SessionStore } from '@dsvhvn/dung-chung/auth';
 import { adsAvailable } from '../ads/rewarded';
+import { configureCloudVoice, createVoiceSource } from '../speech/cloudVoice';
 import { API_BASE_URL, APP_CHANNEL, APP_VERSION } from '../config/env';
 import { KEYS, prefs, secure } from '../storage/keyValue';
 import { PersistentStorage } from '../storage/persistentStorage';
@@ -83,6 +85,9 @@ export async function createServices(getMode: () => AppMode | null): Promise<Ser
       return headers;
     },
   });
+
+  // Giọng đọc tiếng Việt do máy chủ tạo (cấp 1): dùng chung lớp gọi API nên tự gửi token của học sinh đang đăng nhập.
+  configureCloudVoice(createVoiceSource(createTtsApi(apiClient), API_BASE_URL));
 
   return { apiClient, discoveryApi: createDiscoveryApi(apiClient), guestApi: createGuestApi(apiClient), adsApi: createAdsApi(apiClient), studentApi: createStudentApi(apiClient), sessionStore, deviceId, platform };
 }

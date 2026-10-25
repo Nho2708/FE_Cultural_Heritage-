@@ -1,17 +1,19 @@
 import { useEffect, useRef, type KeyboardEvent } from 'react';
-import { averagePercent, badgeBoard, clampStars, cn, formatDate, formatDateTime, formatPercent, formatScore, MESSAGES } from '@dsvhvn/dung-chung';
+import { averagePercent, badgeBoard, clampStars, cn, daysLearnedText, formatDate, formatDateTime, formatPercent, formatScore, MESSAGES } from '@dsvhvn/dung-chung';
 import type { StudentAttemptRow, StudentProgress } from '@dsvhvn/dung-chung/api';
-import { Badge, ButtonLink, ErrorState, Icon, LoadingState, Pagination, TabPanel, Tabs } from '@dsvhvn/dung-chung/ui';
-import { Illustration } from '@dsvhvn/dung-chung/lesson';
+import { Badge, ButtonLink, ErrorState, Icon, LoadingState, Pagination, TabPanel, Tabs, type IconName } from '@dsvhvn/dung-chung/ui';
+import { Illustration, LevelOneButtonLink, LevelOneStars } from '@dsvhvn/dung-chung/lesson';
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router';
 import { pathOf } from '../access/screens';
 import { classFacts, useClassroom, whoAmI } from '../learn-home/classroom';
+import { useStudentHome } from '../learn-home/useStudentHome';
 import { useAuth } from '../lib/auth/context';
 import { historyQueryFn, historyQueryKey, progressQueryFn, progressQueryKey, resultPath } from '../quiz/quizData';
-import { Bar, Stars as StarRow } from '../quiz/Meters';
+import { Bar } from '../quiz/Meters';
 
-// Tiến độ của em. Cấp 1 là "Sao của em": tổng số sao, sao từng bài, huy hiệu, danh sách bài đã học, không điểm hay phần trăm. Cấp 2 và 3 có
+// Tiến độ của em. Cấp 1 là "Sao của em": tổng số sao, số ngày đã học, sao từng bài, huy hiệu, danh sách bài đã học, không điểm hay phần trăm,
+// một bộ màu cấp 1, không emoji. Cấp 2 và 3 có
 // bốn tab: Lịch sử bài làm, Tiến độ (số bài đã làm, bài học hoàn thành, điểm trung bình, biểu đồ điểm theo thời gian), Thành thạo theo di sản
 // và Huy hiệu. Số liệu do máy chủ tính; ở đây chỉ trình bày.
 
@@ -21,19 +23,16 @@ const HISTORY_FETCH = 100;
 function EmptyHistory({ level }: { level: 1 | 2 | 3 }) {
   if (level === 1) {
     return (
-      <div className="dsv-empty-box mx-auto flex max-w-lg flex-col items-center gap-5 p-8 text-center">
-        <div className="dsv-mascot-avatar flex size-24 items-center justify-center p-2">
-          <Illustration state="trong" className="size-20" />
+      <div className="mx-auto flex max-w-lg flex-col items-center gap-5 rounded-[24px] border-2 border-dashed border-border bg-surface p-8 text-center">
+        <Illustration state="trong" className="size-24 rounded-full bg-surface-container-low" />
+        <div className="flex flex-col gap-2">
+          <h2 className="text-[24px] leading-tight font-bold text-on-surface">Chưa có bài học nào!</h2>
+          <p className="text-[20px] leading-snug text-on-surface-variant">Em hãy nhập mã bài học thầy cô đưa để cùng bắt đầu khám phá nhé!</p>
         </div>
-        <div className="space-y-2">
-          <h3 className="type-h2 font-black text-amber-950">Chưa có bài học nào!</h3>
-          <p className="type-body-m font-medium text-amber-900/80 max-w-sm">
-            Em hãy nhập mã bài học cô giáo đưa để cùng bắt đầu khám phá nhé!
-          </p>
-        </div>
-        <ButtonLink to={pathOf('enterCode')} className="duo-btn-yellow px-8 py-3.5 text-base font-extrabold shadow-md">
-          <span aria-hidden="true">🔑 </span>Nhập mã bài học
-        </ButtonLink>
+        <LevelOneButtonLink to={pathOf('enterCode')}>
+          <Icon name="key" size={24} />
+          Nhập mã bài học
+        </LevelOneButtonLink>
       </div>
     );
   }
@@ -344,10 +343,27 @@ function LevelTwoThreeProgress({ progress, rows, level }: { progress: StudentPro
 
 // ---- Cấp 1: Sao của em ----
 
+/** Hàng sao nhỏ của cấp 1: sao vàng token, sao chưa có màu viền; chữ đọc được nằm trong sr-only. */
+function SmallStars({ count, size = 24 }: { count: number; size?: number }) {
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span className="sr-only">{`${count} trên 3 sao`}</span>
+      {[0, 1, 2].map((i) => (
+        <Icon
+          key={i}
+          name="star"
+          size={size}
+          className={i < count ? 'fill-current text-secondary-container stroke-on-secondary-container/40' : 'fill-current text-border stroke-border'}
+        />
+      ))}
+    </span>
+  );
+}
+
 interface LevelOneTabItem<T extends string> {
   id: T;
   label: string;
-  icon?: string;
+  icon?: IconName;
 }
 
 function LevelOneTabs<T extends string>({
@@ -382,11 +398,7 @@ function LevelOneTabs<T extends string>({
   };
 
   return (
-    <div
-      role="tablist"
-      aria-label={label}
-      className="inline-flex max-w-full flex-wrap gap-2.5 rounded-full border-2 border-amber-200/80 bg-amber-100/50 p-1.5 shadow-inner"
-    >
+    <div role="tablist" aria-label={label} className="inline-flex max-w-full flex-wrap gap-2 rounded-full border-2 border-secondary-container bg-surface-container-low p-1.5">
       {items.map((item) => {
         const selected = item.id === value;
         return (
@@ -405,13 +417,11 @@ function LevelOneTabs<T extends string>({
             onClick={() => onChange(item.id)}
             onKeyDown={onKeyDown}
             className={cn(
-              'flex items-center gap-2 rounded-full px-5 py-2.5 font-black text-sm transition-all duration-150',
-              selected
-                ? 'duo-btn-yellow scale-100 shadow-md text-amber-950'
-                : 'text-amber-900/70 hover:text-amber-950 hover:bg-amber-200/50',
+              'flex min-h-14 items-center gap-2 rounded-full px-5 py-2 text-[18px] leading-tight font-bold transition-colors',
+              selected ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:bg-surface',
             )}
           >
-            {item.icon && <span aria-hidden="true">{item.icon}</span>}
+            {item.icon && <Icon name={item.icon} size={24} className={selected && item.icon === 'star' ? 'fill-current' : undefined} />}
             <span>{item.label}</span>
           </button>
         );
@@ -420,16 +430,26 @@ function LevelOneTabs<T extends string>({
   );
 }
 
+function SectionTitle({ id, icon, children }: { id: string; icon: IconName; children: string }) {
+  return (
+    <h2 id={id} className="flex items-center gap-2 text-[22px] leading-tight font-bold text-on-surface">
+      <Icon name={icon} size={26} className="text-primary" />
+      {children}
+    </h2>
+  );
+}
+
 function LevelOneProgress({ progress, rows }: { progress: StudentProgress; rows: StudentAttemptRow[] }) {
   const [params, setParams] = useSearchParams();
   const rawTab = params.get('tab');
   const tab = rawTab === 'bai-da-hoc' || rawTab === 'bai-da-choi' ? 'bai-da-hoc' : 'sao';
   const { user } = useAuth();
+  const home = useStudentHome();
   const latest = rows[0];
   const earned = progress.badges;
   const items = [
-    { id: 'sao', label: 'Sao & Huy hiệu', icon: '⭐' },
-    { id: 'bai-da-hoc', label: 'Bài đã học', icon: '📖' },
+    { id: 'sao', label: 'Sao & Huy hiệu', icon: 'star' },
+    { id: 'bai-da-hoc', label: 'Bài đã học', icon: 'book-open' },
   ] as const;
 
   useEffect(() => {
@@ -439,15 +459,21 @@ function LevelOneProgress({ progress, rows }: { progress: StudentProgress; rows:
   return (
     <section data-bo-cuc="cap-1" className="dsv-content dsv-section">
       <div className="mx-auto flex max-w-[960px] flex-col gap-(--dsv-block-gap)">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-100 px-3.5 py-1 text-xs font-black text-amber-900 shadow-xs">
-              <span aria-hidden="true">🏆</span> BẢNG VÀNG THÀNH TÍCH
+        <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <Illustration state="chao" className="size-16 shrink-0 rounded-full bg-surface-container-low" />
+            <div className="min-w-0">
+              <h1 className="text-[30px] leading-tight font-bold text-on-surface">Sao của em</h1>
+              {user && <p className="mt-1 text-[18px] leading-snug text-on-surface-variant">{whoAmI(user)}</p>}
             </div>
-            <h1 className="type-h1 font-black tracking-tight text-slate-800">Sao của em</h1>
-            {user && <p className="mt-1 type-body-m font-medium text-slate-600">{whoAmI(user)}</p>}
           </div>
-        </div>
+          {home.data && (
+            <p className="inline-flex min-h-12 items-center gap-2 self-start rounded-full border-2 border-secondary-container bg-surface-container-low px-4 text-[20px] font-bold text-on-surface sm:self-auto">
+              <Icon name="calendar" size={24} className="text-primary" />
+              {daysLearnedText(home.data.streakDays)}
+            </p>
+          )}
+        </header>
 
         <LevelOneTabs idPrefix="sao" label="Các mục sao" items={items} value={tab} onChange={(id) => setParams({ tab: id }, { replace: true })} />
 
@@ -457,47 +483,43 @@ function LevelOneProgress({ progress, rows }: { progress: StudentProgress; rows:
               <EmptyHistory level={1} />
             ) : (
               <div className="flex flex-col gap-(--dsv-block-gap)">
-                <div className="grid gap-5 sm:grid-cols-[260px_1fr]">
-                  <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-3xl border-3 border-amber-300 bg-gradient-to-br from-amber-300 via-amber-400 to-yellow-400 p-6 text-center text-amber-950 shadow-md">
-                    <div className="mb-3 flex size-20 items-center justify-center rounded-full bg-white/80 text-4xl shadow-inner">
-                      ⭐
-                    </div>
-                    <p className="type-h1 font-black text-amber-950 drop-shadow-xs">{progress.totalStars ?? 0} sao</p>
-                    <p className="mt-1 text-base font-bold text-amber-900">Em đã hoàn thành {progress.finishedAttempts} bài</p>
+                <div className="grid gap-4 sm:grid-cols-[260px_1fr]">
+                  <div className="flex flex-col items-center justify-center gap-2 rounded-[24px] border-2 border-secondary-container bg-surface-container-low p-6 text-center">
+                    <span className="flex size-20 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container">
+                      <Icon name="star" size={44} className="fill-current" />
+                    </span>
+                    <p className="text-[36px] leading-tight font-bold text-on-surface">{progress.totalStars ?? 0} sao</p>
+                    <p className="text-[18px] leading-snug text-on-surface-variant">Em đã hoàn thành {progress.finishedAttempts} bài</p>
                   </div>
                   {latest && (
-                    <div className="duo-card flex flex-col justify-between p-6">
+                    <div className="flex flex-col justify-between gap-3 rounded-[24px] border-2 border-border bg-surface p-5">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-black text-blue-800">
-                          ✨ Vừa hoàn thành
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-container px-3 py-1 text-[16px] font-bold text-on-primary-container">
+                          <Icon name="check" size={18} strokeWidth={3} />
+                          Vừa hoàn thành
                         </span>
-                        <span className="text-xs font-bold text-slate-500">{formatDate(latest.submittedAt)}</span>
+                        <span className="text-[16px] text-on-surface-variant">{formatDate(latest.submittedAt)}</span>
                       </div>
-                      <p className="mt-3 type-h3 font-black text-slate-800">
-                        Bài gần nhất: {latest.quizName}
-                      </p>
-                      <div className="mt-4 flex flex-col items-center gap-2 rounded-2xl border-2 border-amber-200/60 bg-amber-50/80 p-4 text-center">
-                        <StarRow count={clampStars(latest.stars)} size={44} />
-                        <p className="type-h3 font-black text-amber-900">Em được {clampStars(latest.stars)} sao!</p>
+                      <p className="text-[22px] leading-tight font-bold text-on-surface">Bài gần nhất: {latest.quizName}</p>
+                      <div className="flex flex-col items-center gap-2 rounded-[20px] bg-surface-container-low p-4 text-center">
+                        <LevelOneStars count={clampStars(latest.stars)} />
+                        <p className="text-[22px] leading-tight font-bold text-on-surface">Em được {clampStars(latest.stars)} sao!</p>
                       </div>
                     </div>
                   )}
                 </div>
 
                 {rows.length > 0 && (
-                  <section aria-labelledby="sao-tung-bai">
-                    <h2 id="sao-tung-bai" className="type-h2 flex items-center gap-2 font-black text-slate-800">
-                      <span aria-hidden="true">⭐</span> Sao của từng bài
-                    </h2>
-                    <ul className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+                  <section aria-labelledby="sao-tung-bai" className="flex flex-col gap-3">
+                    <SectionTitle id="sao-tung-bai" icon="star">
+                      Sao của từng bài
+                    </SectionTitle>
+                    <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                       {rows.slice(0, 8).map((row) => (
-                        <li
-                          key={row.attemptId}
-                          className="duo-card flex flex-col justify-between p-4 transition-all hover:-translate-y-1 hover:shadow-md"
-                        >
-                          <p className="type-h4 line-clamp-2 font-bold text-slate-800">{row.quizName}</p>
-                          <div className="mt-3 flex items-center justify-center">
-                            <StarRow count={clampStars(row.stars)} size={24} />
+                        <li key={row.attemptId} className="flex flex-col justify-between gap-3 rounded-[20px] border-2 border-border bg-surface p-4">
+                          <p className="line-clamp-2 text-[18px] leading-tight font-bold text-on-surface">{row.quizName}</p>
+                          <div className="flex items-center justify-center">
+                            <SmallStars count={clampStars(row.stars)} size={26} />
                           </div>
                         </li>
                       ))}
@@ -506,52 +528,44 @@ function LevelOneProgress({ progress, rows }: { progress: StudentProgress; rows:
                 )}
 
                 {progress.mastery.length > 0 && (
-                  <section aria-labelledby="di-san-em-kham-pha">
-                    <h2 id="di-san-em-kham-pha" className="type-h2 flex items-center gap-2 font-black text-slate-800">
-                      <span aria-hidden="true">🏛️</span> Di sản em đã khám phá
-                    </h2>
-                    <ul className="mt-4 flex flex-col gap-3">
+                  <section aria-labelledby="di-san-em-kham-pha" className="flex flex-col gap-3">
+                    <SectionTitle id="di-san-em-kham-pha" icon="building">
+                      Di sản em đã khám phá
+                    </SectionTitle>
+                    <ul className="flex flex-col gap-3">
                       {progress.mastery.map((m) => (
-                        <li
-                          key={m.heritageId}
-                          className="duo-card flex items-center justify-between gap-4 p-4 transition-all hover:-translate-y-0.5"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="flex size-11 items-center justify-center rounded-2xl border border-amber-200 bg-amber-100 text-xl">
-                              📍
-                            </div>
-                            <span className="type-h4 font-black text-slate-800">{m.name}</span>
+                        <li key={m.heritageId} className="flex items-center justify-between gap-4 rounded-[20px] border-2 border-border bg-surface p-4">
+                          <div className="flex min-w-0 items-center gap-3">
+                            <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary-container text-on-primary-container">
+                              <Icon name="map-pin" size={26} />
+                            </span>
+                            <span className="min-w-0 text-[20px] leading-tight font-bold text-on-surface">{m.name}</span>
                           </div>
-                          <StarRow count={clampStars(m.stars)} size={26} />
+                          <SmallStars count={clampStars(m.stars)} size={26} />
                         </li>
                       ))}
                     </ul>
                   </section>
                 )}
 
-                <section aria-labelledby="huy-hieu-cua-em">
-                  <h2 id="huy-hieu-cua-em" className="type-h2 flex items-center gap-2 font-black text-slate-800">
-                    <span aria-hidden="true">🎖️</span> Huy hiệu của em
-                  </h2>
+                <section aria-labelledby="huy-hieu-cua-em" className="flex flex-col gap-3">
+                  <SectionTitle id="huy-hieu-cua-em" icon="shield-check">
+                    Huy hiệu của em
+                  </SectionTitle>
                   {earned.length === 0 ? (
-                    <div className="mt-4 rounded-3xl border-2 border-dashed border-amber-200 bg-amber-50/50 p-6 text-center">
-                      <p className="type-h4 font-bold text-amber-900/80">
-                        Em hoàn thành thêm bài để nhận huy hiệu nhé!
-                      </p>
+                    <div className="rounded-[24px] border-2 border-dashed border-border bg-surface-container-low p-6 text-center">
+                      <p className="text-[20px] leading-snug font-bold text-on-surface">Em hoàn thành thêm bài để nhận huy hiệu nhé!</p>
                     </div>
                   ) : (
-                    <ul className="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+                    <ul className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
                       {earned.map((badge) => (
-                        <li
-                          key={badge.code}
-                          className="duo-card flex flex-col items-center gap-3 p-5 text-center transition-all hover:-translate-y-1 hover:shadow-md"
-                        >
-                          <div className="flex size-20 items-center justify-center rounded-full border-3 border-amber-400 bg-gradient-to-br from-amber-200 to-yellow-300 text-3xl text-amber-900 shadow-sm">
-                            🎖️
-                          </div>
+                        <li key={badge.code} className="flex flex-col items-center gap-3 rounded-[20px] border-2 border-secondary-container bg-surface-container-low p-5 text-center">
+                          <span className="flex size-16 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container">
+                            <Icon name="star" size={34} className="fill-current" />
+                          </span>
                           <div>
-                            <p className="type-h4 font-black text-slate-800">{badge.name}</p>
-                            <p className="mt-1 type-body-s font-medium text-slate-600">{badge.description}</p>
+                            <p className="text-[20px] leading-tight font-bold text-on-surface">{badge.name}</p>
+                            <p className="mt-1 text-[16px] leading-snug text-on-surface-variant">{badge.description}</p>
                           </div>
                         </li>
                       ))}
@@ -563,26 +577,21 @@ function LevelOneProgress({ progress, rows }: { progress: StudentProgress; rows:
           ) : rows.length === 0 ? (
             <EmptyHistory level={1} />
           ) : (
-            <ul className="flex flex-col gap-4">
+            <ul className="flex flex-col gap-3">
               {rows.map((row) => (
-                <li
-                  key={row.attemptId}
-                  className="duo-card flex flex-wrap items-center justify-between gap-4 p-5 transition-all hover:-translate-y-0.5"
-                >
+                <li key={row.attemptId} className="flex flex-wrap items-center justify-between gap-4 rounded-[20px] border-2 border-border bg-surface p-4 sm:p-5">
                   <div className="min-w-0 flex-1">
-                    <p className="type-h3 font-black text-slate-800">{row.quizName}</p>
-                    <p className="mt-1 type-body-m font-medium text-slate-500">
-                      <span aria-hidden="true">📅 </span>{formatDate(row.submittedAt)}
+                    <p className="text-[22px] leading-tight font-bold text-on-surface">{row.quizName}</p>
+                    <p className="mt-1 flex items-center gap-1.5 text-[16px] text-on-surface-variant">
+                      <Icon name="calendar" size={18} />
+                      {formatDate(row.submittedAt)}
                     </p>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <StarRow count={clampStars(row.stars)} size={28} />
-                    <ButtonLink
-                      to={resultPath(row.attemptId)}
-                      className="duo-btn-blue px-6 py-2.5 text-sm font-extrabold shadow-sm"
-                    >
-                      Xem kết quả ⭐
-                    </ButtonLink>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <SmallStars count={clampStars(row.stars)} size={28} />
+                    <LevelOneButtonLink to={resultPath(row.attemptId)} variant="secondary" size="md" aria-label={`Xem kết quả: ${row.quizName}`}>
+                      Xem kết quả
+                    </LevelOneButtonLink>
                   </div>
                 </li>
               ))}

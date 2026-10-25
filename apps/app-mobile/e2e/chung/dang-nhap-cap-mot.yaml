@@ -1,0 +1,30 @@
+# Học sinh cấp 1 đăng nhập bằng mã học sinh và mật khẩu 6 chữ số trên phiếu (không bị buộc đổi), tới trang học có con đường các bài.
+# Tài khoản cấp 1 cũ còn bị buộc đổi mật khẩu thì đặt NEW_PASSWORD rồi đi tiếp. Cần STUDENT_CODE, STUDENT_PASSWORD, NEW_PASSWORD.
+# Tiền tố của ảnh chụp là biến SHOT_PREFIX.
+appId: host.exp.exponent
+---
+- takeScreenshot: ${SHOT_PREFIX}-01-dang-nhap
+- runFlow: dang-nhap-hoc-sinh.yaml
+- extendedWaitUntil:
+    visible: "Chào .*"
+    timeout: 30000
+- runFlow:
+    when:
+      visible: "Đặt mật khẩu và bắt đầu học"
+    commands:
+      - takeScreenshot: ${SHOT_PREFIX}-02-doi-mat-khau-bat-buoc
+      - tapOn:
+          text: "Mật khẩu mới"
+          index: 1
+      - inputText: ${NEW_PASSWORD}
+      - hideKeyboard
+      - tapOn:
+          text: "Nhập lại mật khẩu mới"
+          index: 1
+      - inputText: ${NEW_PASSWORD}
+      - hideKeyboard
+      - tapOn: "Đặt mật khẩu và bắt đầu học"
+- extendedWaitUntil:
+    visible: "Thầy cô đưa mã bài?"
+    timeout: 30000
+- takeScreenshot: ${SHOT_PREFIX}-03-trang-hoc

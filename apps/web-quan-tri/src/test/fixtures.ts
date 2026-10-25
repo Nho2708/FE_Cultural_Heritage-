@@ -237,7 +237,7 @@ export function classStudentOf(id: number, overrides: Partial<ClassStudent> = {}
   };
 }
 
-/** Phiếu đăng nhập như máy chủ trả sau khi tạo tài khoản hoặc đặt lại mật khẩu. */
+/** Phiếu đăng nhập như máy chủ trả sau khi tạo tài khoản hoặc đặt lại mật khẩu (lớp cấp 2, 3: mật khẩu tạm phải đổi ở lần đầu). */
 export function sheetOf(students: ReadonlyArray<{ id: number; name: string; code: string; password: string }>, className = '7A1'): LoginSheet {
   return {
     className,
@@ -250,6 +250,7 @@ export function sheetOf(students: ReadonlyArray<{ id: number; name: string; code
     ],
     firstLoginReminder: 'Em sẽ phải đổi mật khẩu ở lần đăng nhập đầu tiên.',
     notice: 'Mật khẩu tạm chỉ hiện một lần. Hãy in hoặc tải phiếu đăng nhập trước khi rời trang; nếu mất phiếu, dùng "Đặt lại mật khẩu".',
+    passwordIsTemporary: true,
     entries: students.map((s) => ({
       studentId: s.id,
       fullName: s.name,
@@ -257,6 +258,18 @@ export function sheetOf(students: ReadonlyArray<{ id: number; name: string; code
       studentCode: s.code,
       temporaryPassword: s.password,
     })),
+  };
+}
+
+/** Phiếu đăng nhập của lớp cấp 1: mật khẩu 6 chữ số em dùng luôn, không phải đổi (câu chữ như máy chủ trả). */
+export function primarySheetOf(students: ReadonlyArray<{ id: number; name: string; code: string; password: string }>, className = '3A1'): LoginSheet {
+  const base = sheetOf(students, className);
+  return {
+    ...base,
+    instructions: [...base.instructions.slice(0, 2), 'Đăng nhập bằng mã học sinh và mật khẩu ghi trên phiếu.'],
+    firstLoginReminder: 'Em dùng mật khẩu này mỗi lần đăng nhập. Quên mật khẩu thì em nhờ thầy cô đặt lại.',
+    notice: 'Mật khẩu chỉ hiện một lần. Hãy in hoặc tải phiếu đăng nhập trước khi rời trang; nếu mất phiếu, dùng "Đặt lại mật khẩu".',
+    passwordIsTemporary: false,
   };
 }
 

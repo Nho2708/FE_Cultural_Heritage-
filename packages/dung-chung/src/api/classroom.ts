@@ -55,12 +55,13 @@ export interface ClassStudentList {
   maxStudents: number;
 }
 
-/** Một phiếu đăng nhập: mật khẩu tạm chỉ có ở đây, chỉ hiện đúng một lần. */
+/** Một phiếu đăng nhập: mật khẩu chỉ có ở đây, chỉ hiện đúng một lần. */
 export interface LoginSheetEntry {
   studentId: number;
   fullName: string;
   className: string;
   studentCode: string;
+  /** Mật khẩu ghi trên phiếu: mật khẩu tạm (cấp 2, 3) hoặc mật khẩu dùng luôn gồm 6 chữ số (cấp 1). */
   temporaryPassword: string;
 }
 
@@ -72,6 +73,11 @@ export interface LoginSheet {
   instructions: string[];
   firstLoginReminder: string;
   notice: string;
+  /**
+   * true: mật khẩu tạm, em phải đổi ở lần đăng nhập đầu (lớp cấp 2, 3). false: lớp cấp 1, mật khẩu đơn giản em dùng luôn, không phải đổi;
+   * giao diện gọi là "Mật khẩu" thay cho "Mật khẩu tạm".
+   */
+  passwordIsTemporary: boolean;
   entries: LoginSheetEntry[];
 }
 
