@@ -2,12 +2,15 @@ import {
   MESSAGES,
   PASSWORD_HINT,
   PASSWORD_RULES,
+  SIMPLE_PASSWORD_HINT,
+  SIMPLE_PASSWORD_RULES,
   checkPassword,
   collectErrors,
+  isSimplePasswordValid,
   splitApiError,
-  validateNewPassword,
   validatePasswordConfirmation,
   validateRequired,
+  validateStudentNewPassword,
 } from '@dsvhvn/dung-chung';
 import { sessionFromLogin } from '@dsvhvn/dung-chung/auth';
 import { Redirect, useRouter } from 'expo-router';
@@ -21,7 +24,8 @@ import { useApp, useAuth } from '../src/state/AppProvider';
 import { useTheme } from '../src/theme/ThemeProvider';
 
 // Đổi mật khẩu của học sinh. Lần đầu đăng nhập và sau khi thầy cô đặt lại là chế độ bắt buộc: token chỉ cho đổi mật khẩu, không hỏi mật khẩu hiện tại, em không đi sang
-// màn hình khác được. Đổi xong máy chủ trả token mới. Quy tắc: 8-64 ký tự, có chữ hoa, chữ thường và chữ số.
+// màn hình khác được. Đổi xong máy chủ trả token mới. Quy tắc theo cấp lớp của em: cấp 1 (khối 1-5) chỉ cần dài 6-64 ký tự (thầy cô phát mật khẩu 6 chữ số dễ nhớ);
+// cấp 2, 3 dài 8-64 ký tự, có chữ hoa, chữ thường và chữ số.
 
 type FieldName = 'currentPassword' | 'newPassword' | 'confirmNewPassword';
 
@@ -40,14 +44,19 @@ export default function ChangePassword() {
   if (mode !== 'student' || !session) return <Redirect href="/" />;
   const user = session.user;
   const forced = user.mustChangePassword;
+  const simple = user.schoolLevel === 1;
   const check = checkPassword(values.newPassword);
+  // Danh sách điều kiện hiện dưới ô mật khẩu mới, tích dần khi em gõ đúng.
+  const rules: Array<{ key: string; label: string; met: boolean }> = simple
+    ? SIMPLE_PASSWORD_RULES.map((rule) => ({ key: rule.key, label: rule.label, met: isSimplePasswordValid(values.newPassword) }))
+    : PASSWORD_RULES.map((rule) => ({ key: rule.key, label: rule.label, met: check[rule.key] }));
   const set = (field: FieldName) => (value: string) => setValues((current) => ({ ...current, [field]: value }));
 
   const submit = async () => {
     setFormError(null);
     const found = collectErrors<FieldName>({
       currentPassword: forced ? null : validateRequired(values.currentPassword, 'mật khẩu hiện tại'),
-      newPassword: validateNewPassword(values.newPassword, 'mật khẩu mới'),
+      newPassword: validateStudentNewPassword(values.newPassword, user.schoolLevel, 'mật khẩu mới'),
       confirmNewPassword: validatePasswordConfirmation(values.newPassword, values.confirmNewPassword),
     });
     setErrors(found);
@@ -105,11 +114,11 @@ export default function ChangePassword() {
       />
       <View style={{ gap: 2 }}>
         <Txt variant="caption" muted>
-          {PASSWORD_HINT}
+          {simple ? SIMPLE_PASSWORD_HINT : PASSWORD_HINT}
         </Txt>
-        {PASSWORD_RULES.map((rule) => (
-          <Txt key={rule.key} variant="caption" color={check[rule.key] ? theme.color.correct : theme.color.onSurfaceVariant}>
-            {check[rule.key] ? '✓ ' : '○ '}
+        {rules.map((rule) => (
+          <Txt key={rule.key} variant="caption" color={rule.met ? theme.color.correct : theme.color.onSurfaceVariant}>
+            {rule.met ? '✓ ' : '○ '}
             {rule.label}
           </Txt>
         ))}

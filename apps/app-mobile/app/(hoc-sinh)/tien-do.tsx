@@ -1,12 +1,15 @@
+import { daysLearnedText } from '@dsvhvn/dung-chung';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { Badge, Card, EmptyState, ErrorState, Loading, Screen, Section, Txt, styles as ui } from '../../src/components/ui';
 import { percentText, starsText } from '../../src/hocsinh/format';
-import { useStudentHistory, useStudentProgress } from '../../src/hocsinh/queries';
+import { StatPill } from '../../src/hocsinh/levelOne/parts';
+import { useStudentHistory, useStudentHome, useStudentProgress } from '../../src/hocsinh/queries';
 import { useTheme } from '../../src/theme/ThemeProvider';
 
-// Tiến độ của em: bài kiểm tra đã nộp, bài học hoàn thành, sao, mức thành thạo theo di sản, huy hiệu và các lượt đã nộp. Cấp 1 chỉ hiện sao và huy hiệu (không hiện phần trăm).
+// Tiến độ của em: bài kiểm tra đã nộp, bài học hoàn thành, sao, mức thành thạo theo di sản, huy hiệu và các lượt đã nộp. Cấp 1 chỉ hiện sao và huy hiệu (không hiện phần trăm),
+// thêm ô "Ngày đã học" (tổng số ngày em có nộp bài, nghỉ không bị mất; lấy từ trang học).
 
 export default function Progress() {
   const { t } = useTranslation();
@@ -14,6 +17,7 @@ export default function Progress() {
   const router = useRouter();
   const progress = useStudentProgress();
   const history = useStudentHistory(1);
+  const home = useStudentHome();
   const level = theme.level ?? 2;
 
   if (progress.isLoading) return <Loading label={t('hs.common.loading')} />;
@@ -25,11 +29,19 @@ export default function Progress() {
       <Txt variant="heading" accessibilityRole="header">
         {t('hs.progress.title')}
       </Txt>
-      <View style={ui.wrap}>
-        <Badge label={`${t('hs.progress.quizzes')}: ${data.quizzesSubmitted}/${data.quizzesPublished}`} />
-        <Badge label={`${t('hs.progress.lessons')}: ${data.lessonsCompleted}/${data.lessonsWithQuiz}`} />
-        {data.totalStars !== null ? <Badge label={`${t('hs.progress.stars')}: ${data.totalStars}`} tone="success" /> : null}
-      </View>
+      {level === 1 ? (
+        <View style={[ui.wrap, { gap: 12 }]}>
+          <StatPill icon="star" text={t('hs.one.starsStat', { count: data.totalStars ?? 0 })} />
+          <StatPill icon="calendar" text={daysLearnedText(home.data?.streakDays)} />
+          <StatPill icon="book" text={`${t('hs.progress.lessons')}: ${data.lessonsCompleted}/${data.lessonsWithQuiz}`} />
+        </View>
+      ) : (
+        <View style={ui.wrap}>
+          <Badge label={`${t('hs.progress.quizzes')}: ${data.quizzesSubmitted}/${data.quizzesPublished}`} />
+          <Badge label={`${t('hs.progress.lessons')}: ${data.lessonsCompleted}/${data.lessonsWithQuiz}`} />
+          {data.totalStars !== null ? <Badge label={`${t('hs.progress.stars')}: ${data.totalStars}`} tone="success" /> : null}
+        </View>
+      )}
 
       <Section title={t('hs.progress.mastery')}>
         {data.mastery.length === 0 ? (
