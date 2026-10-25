@@ -71,6 +71,8 @@ export const MESSAGES = {
   /** Màn hình đổi mật khẩu bắt buộc: lần đầu đăng nhập hoặc sau khi giáo viên đặt lại. */
   studentMustChangePassword:
     'Em hãy đặt mật khẩu mới của riêng em để bắt đầu học. Mật khẩu cần 8-64 ký tự, có chữ hoa, chữ thường và chữ số.',
+  /** Cùng màn hình đó với học sinh cấp 1: quy tắc đơn giản, chỉ cần dài 6-64 ký tự. */
+  studentMustChangeSimplePassword: 'Em hãy đặt mật khẩu mới của riêng em để bắt đầu học. Mật khẩu cần 6-64 ký tự, ví dụ 6 chữ số dễ nhớ.',
   /** Mở đường dẫn bài học khi chưa đăng nhập. */
   studentSignInToOpenLesson: 'Em hãy đăng nhập để mở bài học. Đăng nhập xong, bài học sẽ tự mở.',
   /** Trang học, tiến độ khi em chưa có lượt làm bài nào. */

@@ -53,7 +53,7 @@ describe('Học sinh đăng nhập', () => {
   it('lần đầu đăng nhập bằng mật khẩu tạm: sang Đổi mật khẩu, không có thanh điều hướng', async () => {
     mockApi((call) =>
       call.path === STUDENT_ENDPOINTS.login
-        ? envelope(200, { data: sessionWireOf(studentOf(3, { mustChangePassword: true })) })
+        ? envelope(200, { data: sessionWireOf(studentOf(7, { mustChangePassword: true })) })
         : undefined,
     );
     const user = userEvent.setup();

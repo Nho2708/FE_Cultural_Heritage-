@@ -50,6 +50,9 @@ describe('Đổi mật khẩu — bắt buộc', () => {
     const user = userEvent.setup();
     const { router } = renderApp('/doi-mat-khau?sau=%2Ftien-do');
 
+    // Tài khoản cấp 1 cũ còn bị buộc đổi: câu nhắc nói quy tắc đơn giản, không phải 8-64 ký tự có chữ hoa.
+    expect(await screen.findByText(MESSAGES.studentMustChangeSimplePassword)).toBeInTheDocument();
+    expect(screen.queryByText(MESSAGES.studentMustChangePassword)).not.toBeInTheDocument();
     await user.type(await screen.findByLabelText('Mật khẩu mới'), 'MatKhauMoi9');
     await user.type(screen.getByLabelText('Nhập lại mật khẩu mới'), 'MatKhauMoi9');
     await user.click(screen.getByRole('button', { name: 'Đặt mật khẩu và bắt đầu học' }));

@@ -120,7 +120,9 @@ export function ChangePasswordPage() {
           </div>
         </div>
 
-        {forced && <InlineMessage tone="info">{MESSAGES.studentMustChangePassword}</InlineMessage>}
+        {forced && (
+          <InlineMessage tone="info">{simple ? MESSAGES.studentMustChangeSimplePassword : MESSAGES.studentMustChangePassword}</InlineMessage>
+        )}
 
         <form ref={formRef} noValidate onSubmit={onSubmit} className="flex flex-col gap-(--dsv-inline-gap)">
           {formError && <InlineMessage tone="danger">{formError}</InlineMessage>}

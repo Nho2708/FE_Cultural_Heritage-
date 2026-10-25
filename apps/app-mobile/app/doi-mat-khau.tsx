@@ -88,7 +88,7 @@ export default function ChangePassword() {
         </Txt>
         {forced ? <Txt muted>{t('hs.changePassword.hintForced')}</Txt> : null}
       </View>
-      {forced ? <Notice text={MESSAGES.studentMustChangePassword} /> : null}
+      {forced ? <Notice text={simple ? MESSAGES.studentMustChangeSimplePassword : MESSAGES.studentMustChangePassword} /> : null}
       {formError ? <Notice tone="error" text={formError} /> : null}
       {!forced ? (
         <Field
