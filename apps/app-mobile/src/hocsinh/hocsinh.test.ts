@@ -31,6 +31,7 @@ function question(overrides: Partial<AttemptQuestion>): AttemptQuestion {
     partsTotal: 1,
     answered: false,
     answer: null,
+    checked: false,
     ...overrides,
   };
 }

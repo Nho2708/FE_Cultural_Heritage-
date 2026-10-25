@@ -1,18 +1,22 @@
 import { ApiError } from '@dsvhvn/dung-chung/api';
+import { useQueryClient } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Loading, Txt, styles as ui } from '../../../src/components/ui';
 import { useLessonByCode } from '../../../src/hocsinh/queries';
 import { rememberLesson } from '../../../src/hocsinh/recentLessons';
 import { serverErrorText } from '../../../src/hocsinh/serverErrorText';
-import { LevelOneLesson, LevelThreeLesson, LevelTwoLesson, type LessonPosition } from '../../../src/hocsinh/LevelLessons';
-import { useAuth } from '../../../src/state/AppProvider';
+import { LevelOneLesson, LevelThreeLesson, LevelTwoLesson, type LessonPosition, type LevelOneLessonServices } from '../../../src/hocsinh/LevelLessons';
+import { GUTTER } from '../../../src/hocsinh/levelOne/parts';
+import { useAuth, useServices } from '../../../src/state/AppProvider';
 import { KEYS, prefs } from '../../../src/storage/keyValue';
 import { useTheme } from '../../../src/theme/ThemeProvider';
 
-// Bài học theo cấp: mở bằng mã bài học (cùng API với web học tập). Bố cục, luồng học và cách đọc khác nhau ở ba cấp; cấp 1 nhớ bước em đang dừng trên máy này.
+// Bài học theo cấp: mở bằng mã bài học (cùng API với web học tập). Bố cục, luồng học và cách đọc khác nhau ở ba cấp; cấp 1 nhớ bước em đang dừng trên máy này,
+// có đầu trang riêng (nút quay về hình mũi tên), tải câu ôn của bước Nhớ lại và ghi bài đã học xong ở bước Nhận thẻ.
 
 function positionKey(code: string) {
   return `${KEYS.lessonPosition}.${code}`;
@@ -23,6 +27,9 @@ export default function LessonScreen() {
   const { t } = useTranslation();
   const theme = useTheme();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const queryClient = useQueryClient();
+  const { studentApi } = useServices();
   const lesson = useLessonByCode(ma);
   const userId = useAuth().session?.user.id;
   const openedCode = lesson.data?.accessCode;
@@ -39,7 +46,11 @@ export default function LessonScreen() {
       try {
         const value: unknown = raw ? JSON.parse(raw) : null;
         const position = value as Partial<LessonPosition> | null;
-        setSaved(position && typeof position.step === 'number' && typeof position.part === 'number' ? { step: position.step, part: position.part } : null);
+        setSaved(
+          position && typeof position.step === 'number' && typeof position.part === 'number'
+            ? { step: position.step, part: position.part, ...(typeof position.key === 'string' ? { key: position.key } : {}) }
+            : null,
+        );
       } catch {
         setSaved(null);
       }
@@ -48,6 +59,11 @@ export default function LessonScreen() {
       cancelled = true;
     };
   }, [ma, level]);
+
+  const services = useMemo<LevelOneLessonServices | undefined>(
+    () => (openedCode ? { recall: async () => (await studentApi.lessonRecall(openedCode)).data, complete: async () => (await studentApi.completeLesson(openedCode)).data } : undefined),
+    [openedCode, studentApi],
+  );
 
   // Bài mở được thì nhớ mã trên máy để lần sau mở lại từ màn hình Nhập mã (mỗi học sinh một danh sách).
   useEffect(() => {
@@ -67,12 +83,28 @@ export default function LessonScreen() {
   }
   const data = lesson.data;
 
+  if (level === 1) {
+    return (
+      <ScrollView style={{ backgroundColor: theme.color.background }} contentContainerStyle={{ paddingHorizontal: GUTTER, paddingTop: insets.top + 12, paddingBottom: 48 + insets.bottom }}>
+        <Stack.Screen options={{ headerShown: false }} />
+        <LevelOneLesson
+          lesson={data}
+          initial={saved ?? undefined}
+          services={services}
+          onPositionChange={(position) => void prefs.set(positionKey(data.accessCode), JSON.stringify(position))}
+          // Bài đã xong và thẻ mới vào album: trang học, album và tiến độ phải lấy lại.
+          onCompleted={() => {
+            for (const part of ['home', 'album', 'progress']) void queryClient.invalidateQueries({ queryKey: ['student', userId ?? null, part] });
+          }}
+        />
+      </ScrollView>
+    );
+  }
+
   return (
     <ScrollView style={{ backgroundColor: theme.color.background }} contentContainerStyle={{ padding: theme.spacing.inline, paddingBottom: 48 }}>
       <Stack.Screen options={{ title: t('hs.lesson.title') }} />
-      {level === 1 ? (
-        <LevelOneLesson lesson={data} initial={saved ?? undefined} onPositionChange={(position) => void prefs.set(positionKey(data.accessCode), JSON.stringify(position))} />
-      ) : level === 2 ? (
+      {level === 2 ? (
         <LevelTwoLesson lesson={data} />
       ) : (
         <LevelThreeLesson lesson={data} />

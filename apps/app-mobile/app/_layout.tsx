@@ -55,6 +55,7 @@ function Navigation() {
         <Stack.Screen name="bai-hoc/[ma]/index" options={{ title: mode === 'student' ? t('hs.lesson.title') : '' }} />
         <Stack.Screen name="kiem-tra/[quizId]" options={{ headerShown: false, gestureEnabled: false }} />
         <Stack.Screen name="ket-qua/[luot]" options={{ headerShown: false }} />
+        <Stack.Screen name="album" options={{ headerShown: false }} />
       </Stack>
     </>
   );

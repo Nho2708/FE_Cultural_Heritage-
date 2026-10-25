@@ -1,5 +1,6 @@
-# Cấp 1 (khối 3): học từng bước (Nghe chuyện, Xem hình), làm bài chơi bốn dạng câu (đúng/sai, chọn hình, ghép cặp, sắp xếp), nộp bài, xem sao.
-# Bắt đầu từ màn hình bài học vừa mở.
+# Cấp 1 (khối 3): học từng bước (Nghe chuyện, Xem hình; tài khoản mới chưa nộp bài nào nên không có bước Nhớ lại), bài chơi luyện tập bốn
+# dạng câu (đúng/sai, chọn hình, ghép cặp, sắp xếp): chạm là kiểm, bảng phản hồi trượt lên với nút "Câu tiếp" hoặc "Thử lại"; nộp ở câu cuối,
+# xem sao, thẻ di sản và câu mang về nhà, mở album, về trang học và tiến độ. Bắt đầu từ màn hình bài học vừa mở.
 appId: host.exp.exponent
 ---
 - takeScreenshot: khoi3-05-bai-hoc
@@ -16,21 +17,35 @@ appId: host.exp.exponent
       - tapOn: "Tiếp nhé"
 - takeScreenshot: khoi3-06-bai-choi
 - tapOn: "Bắt đầu chơi"
+- extendedWaitUntil:
+    visible: "Bắt đầu chơi"
+    timeout: 30000
 - takeScreenshot: khoi3-07-gioi-thieu-bai
-- tapOn: "Bắt đầu"
-# Câu 1: đúng/sai kèm hình
+- tapOn: "Bắt đầu chơi"
+# Câu 1: đúng/sai kèm hình. Đúng/Sai chỉ có một lần chọn: chưa đúng thì bảng chỉ luôn đáp án, nút vẫn là "Câu tiếp".
 - tapOn: "Đúng"
+- extendedWaitUntil:
+    visible: "Câu tiếp"
+    timeout: 15000
 - takeScreenshot: khoi3-08-cau-dung-sai
-- scrollUntilVisible:
-    element: "Tiếp nhé"
-- tapOn: "Tiếp nhé"
-# Câu 2: chọn hình theo tên (chạm đúng ô hình, không phải câu hỏi)
+- tapOn: "Câu tiếp"
+# Câu 2: chọn hình theo tên (chạm đúng thẻ hình, không phải câu hỏi). Chạm là kiểm.
 - tapOn: "Cổng Đoan Môn"
+- extendedWaitUntil:
+    visible: "(Câu tiếp|Thử lại)"
+    timeout: 15000
 - takeScreenshot: khoi3-09-cau-chon-hinh
-- scrollUntilVisible:
-    element: "Tiếp nhé"
-- tapOn: "Tiếp nhé"
-# Câu 3: ghép ba hình với ba tên
+- runFlow:
+    when:
+      visible: "Thử lại"
+    commands:
+      - tapOn: "Thử lại"
+- runFlow:
+    when:
+      visible: "Câu tiếp"
+    commands:
+      - tapOn: "Câu tiếp"
+# Câu 3: ghép ba hình với ba tên rồi bấm Kiểm tra.
 - scrollUntilVisible:
     element: "Hình 1.*"
     direction: UP
@@ -52,10 +67,18 @@ appId: host.exp.exponent
 - scrollUntilVisible:
     element: "Khu khảo cổ"
 - tapOn: "Khu khảo cổ"
-- takeScreenshot: khoi3-10-cau-ghep-cap
 - scrollUntilVisible:
-    element: "Tiếp nhé"
-- tapOn: "Tiếp nhé"
+    element: "Kiểm tra"
+- takeScreenshot: khoi3-10-cau-ghep-cap
+- tapOn: "Kiểm tra"
+- extendedWaitUntil:
+    visible: "(Câu tiếp|Thử lại)"
+    timeout: 15000
+- runFlow:
+    when:
+      visible: "Câu tiếp"
+    commands:
+      - tapOn: "Câu tiếp"
 # Câu 4: sắp xếp bốn sự kiện theo thời gian (mỗi mục cuộn tới rồi mới chạm, vì danh sách có thể dài hơn một màn hình).
 - scrollUntilVisible:
     element: "Năm 1010: dời đô"
@@ -69,31 +92,50 @@ appId: host.exp.exponent
 - scrollUntilVisible:
     element: "Năm 2010: UNESCO ghi danh"
 - tapOn: "Năm 2010: UNESCO ghi danh"
-- takeScreenshot: khoi3-11-cau-sap-xep
 - scrollUntilVisible:
-    element: "Xong rồi!"
-- tapOn: "Xong rồi!"
-# Đã trả lời hết thì nộp luôn; còn câu bỏ trống thì có hộp xác nhận.
+    element: "Kiểm tra"
+- takeScreenshot: khoi3-11-cau-sap-xep
+- tapOn: "Kiểm tra"
+- extendedWaitUntil:
+    visible: "(Xong rồi!|Thử lại)"
+    timeout: 15000
+# Chưa đúng lần đầu thì thử lại với cùng thứ tự: lần hai bảng chỉ đáp án đúng rồi cho nộp.
 - runFlow:
     when:
-      visible: "Em làm xong rồi chứ?"
+      visible: "Thử lại"
     commands:
-      - tapOn: "Nộp bài"
+      - tapOn: "Thử lại"
+      - tapOn: "Kiểm tra"
+- tapOn: "Xong rồi!"
 - extendedWaitUntil:
-    visible: "(Hoan hô.*|Em cố gắng.*)"
+    visible: "Em được .* sao!"
     timeout: 30000
 - takeScreenshot: khoi3-12-ket-qua-sao
-- assertVisible: "Xem lại bài"
+- assertVisible: "Về nhà hỏi bố mẹ nhé"
+- runFlow:
+    when:
+      visible: "Xem lại các câu"
+    commands:
+      - scrollUntilVisible:
+          element: "Xem lại các câu"
+      - tapOn: "Xem lại các câu"
+      - takeScreenshot: khoi3-13-xem-lai-cac-cau
 - scrollUntilVisible:
-    element: "Về trang học"
-- takeScreenshot: khoi3-13-xem-lai-bai
-- tapOn: "Về trang học"
+    element: "Xem album"
+    direction: UP
+- tapOn: "Xem album"
 - extendedWaitUntil:
-    visible: "Mở bài"
+    visible: ".* / .* thẻ"
     timeout: 30000
-- takeScreenshot: khoi3-14-trang-hoc-sau-bai
+- takeScreenshot: khoi3-14-album
+- tapOn: "Về trang học"
+- tapOn: "Về con đường"
+- extendedWaitUntil:
+    visible: "Thầy cô đưa mã bài?"
+    timeout: 30000
+- takeScreenshot: khoi3-15-trang-hoc-sau-bai
 - tapOn: "Tiến độ"
 - extendedWaitUntil:
     visible: "Tiến độ của em"
     timeout: 30000
-- takeScreenshot: khoi3-15-tien-do
+- takeScreenshot: khoi3-16-tien-do

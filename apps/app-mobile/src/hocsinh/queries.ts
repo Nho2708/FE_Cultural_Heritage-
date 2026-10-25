@@ -25,10 +25,17 @@ export function useStudentHistory(page = 1) {
   return useQuery({ queryKey: ['student', user, 'history', page], enabled: user !== null, queryFn: async () => (await studentApi.history(page, 10)).data });
 }
 
-export function useStudentRecommendations() {
+export function useStudentRecommendations(enabled = true) {
   const { studentApi } = useServices();
   const user = useStudentKey();
-  return useQuery({ queryKey: ['student', user, 'recommendations'], enabled: user !== null, queryFn: async () => (await studentApi.recommendations()).data });
+  return useQuery({ queryKey: ['student', user, 'recommendations'], enabled: enabled && user !== null, queryFn: async () => (await studentApi.recommendations()).data });
+}
+
+/** Cấp 1: album di sản của em (thẻ đã có trước, rồi thẻ chưa có theo thứ tự bài học). */
+export function useStudentAlbum() {
+  const { studentApi } = useServices();
+  const user = useStudentKey();
+  return useQuery({ queryKey: ['student', user, 'album'], enabled: user !== null, staleTime: 0, queryFn: async () => (await studentApi.album()).data });
 }
 
 /** Mở bài học bằng mã. Mã sai tính vào giới hạn nhập sai của máy chủ nên không tự thử lại. */

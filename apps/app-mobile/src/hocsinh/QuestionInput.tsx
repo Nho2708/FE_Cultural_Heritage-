@@ -1,8 +1,9 @@
 import { clearMatch, fillNextBlank, moveOrderItem, optionLetter, setBlank, setMatch, setStatement, splitBlanks, toggleOrderItem } from '@dsvhvn/dung-chung';
+import { Ionicons } from '@expo/vector-icons';
 import type { AttemptQuestion, QuestionSubmission } from '@dsvhvn/dung-chung/api';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View, useWindowDimensions } from 'react-native';
 import { Photo } from '../components/Heritage';
 import { Button, Txt, styles as ui } from '../components/ui';
 import { useTheme } from '../theme/ThemeProvider';
@@ -10,6 +11,9 @@ import { useTheme } from '../theme/ThemeProvider';
 // Ô trả lời của tám dạng câu trên điện thoại (chạm, không kéo thả). Một bộ thành phần, ba cách trình bày theo cấp học của lớp em: cấp 1 nút to và hình lớn, cấp 2 cân bằng,
 // cấp 3 gọn. Mọi vị trí trong câu trả lời tính theo thứ tự đang hiện trên màn hình (máy chủ đã xáo cố định theo lượt). Mỗi thao tác trả về cả câu trả lời mới;
 // việc lưu do hook làm bài đảm nhiệm.
+// Bài chơi cấp 1 dạng luyện tập (`practice`): lời hướng dẫn do màn hình làm bài hiện nên ô trả lời bỏ dòng gợi ý; Đúng/Sai là hai nút to có biểu
+// tượng; phương án vừa chọn sai bị làm mờ và khóa (`wrong`); câu đã xong thì câu trả lời đang hiện là đáp án đúng, sáng viền xanh kèm dấu tích
+// (`solved`); sau một lần thử chưa đúng, `marks` cho biết cặp nào, bước nào đã đúng.
 
 export type QuizLevel = 1 | 2 | 3;
 
@@ -19,20 +23,34 @@ export interface QuestionInputProps {
   onChange: (next: QuestionSubmission) => void;
   level: QuizLevel;
   disabled?: boolean;
+  /** Bài chơi cấp 1 dạng luyện tập. */
+  practice?: boolean;
+  /** Các phương án đã chọn sai ở câu này (dạng chọn): làm mờ, không chạm được. */
+  wrong?: ReadonlySet<number>;
+  /** Câu đã xong: câu trả lời đang hiện là đáp án đúng. */
+  solved?: boolean;
+  /** Đúng sai từng phần sau lần thử gần nhất (ghép cặp theo hình bên trái, sắp xếp theo mục). */
+  marks?: readonly boolean[] | null;
 }
 
 const OPTION_PADDING: Record<QuizLevel, number> = { 1: 20, 2: 16, 3: 12 };
 
-function useChoiceStyle(level: QuizLevel) {
+function useChoiceStyle(level: QuizLevel, solved = false) {
   const theme = useTheme();
   return (selected: boolean) => ({
     minHeight: level === 1 ? 64 : theme.touchTarget + 8,
     padding: OPTION_PADDING[level],
     borderRadius: theme.radius.option,
-    borderWidth: 2,
-    borderColor: selected ? theme.color.primary : theme.color.border,
-    backgroundColor: selected ? theme.color.primaryContainer : theme.color.surface,
+    borderWidth: selected && solved ? 4 : 2,
+    borderColor: selected ? (solved ? theme.color.correct : theme.color.primary) : theme.color.border,
+    backgroundColor: selected ? (solved ? theme.color.correctContainer : theme.color.primaryContainer) : theme.color.surface,
   });
+}
+
+/** Dấu tích của đáp án đúng khi câu đã xong. */
+function RightMark({ size = 28 }: { size?: number }) {
+  const theme = useTheme();
+  return <Ionicons name="checkmark-circle" size={size} color={theme.color.correct} accessibilityElementsHidden importantForAccessibility="no" />;
 }
 
 function Letter({ index, selected, level }: { index: number; selected: boolean; level: QuizLevel }) {
@@ -47,58 +65,118 @@ function Letter({ index, selected, level }: { index: number; selected: boolean; 
 
 // ---- Chọn một phương án: Một đáp án đúng, Đúng/Sai, Đọc tư liệu ----
 
-function OptionsInput({ question, answer, onChange, level, disabled }: QuestionInputProps) {
+/** Đúng/Sai của cấp 1: hai nút to cạnh nhau, mỗi nút một biểu tượng (dấu tích, dấu nhân) và chữ. */
+function TrueFalseBig({ question, answer, onChange, disabled, wrong, solved }: QuestionInputProps) {
   const theme = useTheme();
-  const choice = useChoiceStyle(level);
   const selected = answer?.selectedIndex ?? null;
   return (
+    <View accessibilityRole="radiogroup" style={local.tfRow}>
+      {question.options.map((option, index) => {
+        const on = selected === index;
+        const dim = wrong?.has(index) ?? false;
+        const right = on && solved;
+        return (
+          <Pressable
+            key={index}
+            accessibilityRole="radio"
+            accessibilityState={{ selected: on, disabled: disabled || dim }}
+            accessibilityLabel={option.content ?? ''}
+            disabled={disabled || dim}
+            onPress={() => onChange({ selectedIndex: index })}
+            style={[
+              local.tfBig,
+              {
+                borderRadius: theme.radius.option,
+                borderWidth: right ? 4 : 2,
+                borderColor: right ? theme.color.correct : on ? theme.color.primary : theme.color.border,
+                backgroundColor: right ? theme.color.correctContainer : on ? theme.color.primaryContainer : theme.color.surface,
+                opacity: dim ? 0.4 : 1,
+              },
+            ]}
+          >
+            <Ionicons name={index === 0 ? 'checkmark-circle' : 'close-circle'} size={44} color={theme.color.primary} />
+            <Text style={{ fontSize: 24, lineHeight: 30, fontWeight: '800', color: theme.color.onBackground }}>{option.content}</Text>
+            {right ? <RightMark /> : null}
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+function OptionsInput(props: QuestionInputProps) {
+  const { question, answer, onChange, level, disabled, wrong, solved } = props;
+  const theme = useTheme();
+  const choice = useChoiceStyle(level, solved);
+  const selected = answer?.selectedIndex ?? null;
+  if (level === 1 && question.questionType === 'TRUE_FALSE' && question.options.length === 2) return <TrueFalseBig {...props} />;
+  return (
     <View accessibilityRole="radiogroup" style={{ gap: 12 }}>
-      {question.options.map((option, index) => (
-        <Pressable
-          key={index}
-          accessibilityRole="radio"
-          accessibilityState={{ selected: selected === index, disabled }}
-          accessibilityLabel={`${optionLetter(index)}. ${option.content ?? ''}`}
-          disabled={disabled}
-          onPress={() => onChange({ selectedIndex: index })}
-          style={[local.optionRow, choice(selected === index)]}
-        >
-          <Letter index={index} selected={selected === index} level={level} />
-          <Txt variant={level === 1 ? 'title' : 'body'} style={[ui.grow, { color: selected === index ? theme.color.onPrimaryContainer : theme.color.onBackground }]}>
-            {option.content}
-          </Txt>
-        </Pressable>
-      ))}
+      {question.options.map((option, index) => {
+        const dim = wrong?.has(index) ?? false;
+        return (
+          <Pressable
+            key={index}
+            accessibilityRole="radio"
+            accessibilityState={{ selected: selected === index, disabled: disabled || dim }}
+            accessibilityLabel={`${optionLetter(index)}. ${option.content ?? ''}`}
+            disabled={disabled || dim}
+            onPress={() => onChange({ selectedIndex: index })}
+            style={[local.optionRow, choice(selected === index), dim ? { opacity: 0.4 } : null]}
+          >
+            <Letter index={index} selected={selected === index} level={level} />
+            <Txt variant={level === 1 ? 'title' : 'body'} style={[ui.grow, { color: selected === index && !solved ? theme.color.onPrimaryContainer : theme.color.onBackground }]}>
+              {option.content}
+            </Txt>
+            {solved && selected === index ? <RightMark /> : null}
+          </Pressable>
+        );
+      })}
     </View>
   );
 }
 
 // ---- Chọn hình đúng (cấp 1) ----
 
-function ImageChoiceInput({ question, answer, onChange, level, disabled }: QuestionInputProps) {
+function ImageChoiceInput({ question, answer, onChange, level, disabled, wrong, solved }: QuestionInputProps) {
   const theme = useTheme();
   const { t } = useTranslation();
+  const { width } = useWindowDimensions();
   const selected = answer?.selectedIndex ?? null;
+  // Cấp 1: thẻ hình to (ảnh 140 px), tối đa 3 cột; điện thoại hai cột để mỗi thẻ rộng hơn 140 px.
+  const cardWidth = level === 1 && width >= 600 ? '31.5%' : '47.5%';
   return (
     <View accessibilityRole="radiogroup" style={local.grid}>
       {question.options.map((option, index) => {
         const on = selected === index;
+        const right = on && solved;
+        const dim = wrong?.has(index) ?? false;
         return (
           <Pressable
             key={index}
             accessibilityRole="radio"
-            accessibilityState={{ selected: on, disabled }}
+            accessibilityState={{ selected: on, disabled: disabled || dim }}
             accessibilityLabel={option.content ?? t('hs.quiz.imageN', { letter: optionLetter(index) })}
-            disabled={disabled}
+            disabled={disabled || dim}
             onPress={() => onChange({ selectedIndex: index })}
-            style={[local.imageCard, { borderRadius: theme.radius.option, borderColor: on ? theme.color.primary : theme.color.border, backgroundColor: on ? theme.color.primaryContainer : theme.color.surface }]}
+            style={[
+              local.imageCard,
+              {
+                width: cardWidth,
+                borderRadius: theme.radius.option,
+                borderWidth: right ? 4 : 2,
+                borderColor: right ? theme.color.correct : on ? theme.color.primary : theme.color.border,
+                backgroundColor: right ? theme.color.correctContainer : on ? theme.color.primaryContainer : theme.color.surface,
+                opacity: dim ? 0.4 : 1,
+              },
+            ]}
           >
-            <Photo url={option.imageUrl} width={500} height={level === 1 ? 130 : 110} />
-            <View style={[ui.row, { padding: 8 }]}>
-              <Txt variant={level === 1 ? 'title' : 'label'} style={ui.grow}>
+            <Photo url={option.imageUrl} width={500} height={level === 1 ? 140 : 110} />
+            <View style={[ui.row, { padding: level === 1 ? 10 : 8, minHeight: level === 1 ? 52 : undefined }]}>
+              <Txt variant={level === 1 ? 'title' : 'label'} style={[ui.grow, level === 1 ? { fontSize: 18, lineHeight: 24 } : null]}>
                 {option.content ?? t('hs.quiz.imageN', { letter: optionLetter(index) })}
               </Txt>
-              {on ? <Text style={{ color: theme.color.primary, fontSize: 22, fontWeight: '700' }}>✓</Text> : null}
+              {right ? <RightMark /> : on && !solved ? <Ionicons name="ellipse" size={14} color={theme.color.primary} /> : null}
             </View>
           </Pressable>
         );
@@ -111,7 +189,7 @@ function ImageChoiceInput({ question, answer, onChange, level, disabled }: Quest
 
 type PickState = { side: 'left' | 'right'; index: number } | null;
 
-function MatchingInput({ question, answer, onChange, level, disabled }: QuestionInputProps) {
+function MatchingInput({ question, answer, onChange, level, disabled, practice, solved, marks }: QuestionInputProps) {
   const theme = useTheme();
   const { t } = useTranslation();
   const count = question.leftItems.length;
@@ -134,15 +212,18 @@ function MatchingInput({ question, answer, onChange, level, disabled }: Question
 
   return (
     <View style={{ gap: 16 }}>
-      <Txt variant="caption">{level === 1 ? t('hs.quiz.matchHintOne') : t('hs.quiz.matchHint')}</Txt>
+      {!practice ? <Txt variant="caption">{level === 1 ? t('hs.quiz.matchHintOne') : t('hs.quiz.matchHint')}</Txt> : null}
       <View style={{ gap: 12 }}>
         {question.leftItems.map((item, left) => {
           const right = matches?.[left] ?? null;
           const picked = pick?.side === 'left' && pick.index === left;
+          // Luyện tập: chỉ tô màu "đúng" khi đã biết cặp đó đúng (câu đã xong, hoặc cặp còn giữ sau lần thử chưa đúng).
+          const known = !practice || solved || (marks?.[left] ?? false);
+          const pairColor = known ? theme.color.correct : theme.color.primary;
           return (
             <View
               key={left}
-              style={[local.matchCard, { borderRadius: theme.radius.option, borderColor: picked ? theme.color.primary : right !== null ? theme.color.correct : theme.color.border, backgroundColor: picked ? theme.color.primaryContainer : theme.color.surface }]}
+              style={[local.matchCard, { borderRadius: theme.radius.option, borderColor: picked ? theme.color.primary : right !== null ? pairColor : theme.color.border, backgroundColor: picked ? theme.color.primaryContainer : solved ? theme.color.correctContainer : theme.color.surface }]}
             >
               <Pressable
                 accessibilityRole="button"
@@ -161,10 +242,11 @@ function MatchingInput({ question, answer, onChange, level, disabled }: Question
               <View style={[ui.row, { minHeight: 44, paddingHorizontal: 10, paddingBottom: 8 }]}>
                 {right !== null ? (
                   <>
-                    <Txt variant={level === 1 ? 'title' : 'label'} color={theme.color.correct} style={ui.grow}>
-                      ✓ {question.rightItems[right]}
+                    <Txt variant={level === 1 ? 'title' : 'label'} color={pairColor} style={ui.grow}>
+                      {known ? '✓ ' : ''}
+                      {question.rightItems[right]}
                     </Txt>
-                    <Button label="✕" variant="ghost" accessibilityLabel={t('hs.quiz.unmatch', { n: left + 1 })} disabled={disabled} onPress={() => onChange({ matches: clearMatch(matches, count, left) })} />
+                    {!solved ? <Button label="✕" variant="ghost" accessibilityLabel={t('hs.quiz.unmatch', { n: left + 1 })} disabled={disabled} onPress={() => onChange({ matches: clearMatch(matches, count, left) })} /> : null}
                   </>
                 ) : (
                   <Txt variant="caption">{t('hs.quiz.notMatched')}</Txt>
@@ -185,7 +267,7 @@ function MatchingInput({ question, answer, onChange, level, disabled }: Question
               accessibilityState={{ selected: picked, disabled: disabled || used }}
               disabled={disabled || used}
               onPress={() => onRight(right)}
-              style={[local.pill, { minHeight: level === 1 ? 56 : 44, opacity: used ? 0.4 : 1, borderColor: picked ? theme.color.primary : theme.color.border, backgroundColor: picked ? theme.color.primary : theme.color.surface }]}
+              style={[local.pill, { minHeight: level === 1 ? 64 : 44, opacity: used ? 0.4 : 1, borderColor: picked ? theme.color.primary : theme.color.border, backgroundColor: picked ? theme.color.primary : theme.color.surface }]}
             >
               <Txt variant={level === 1 ? 'title' : 'label'} color={picked ? theme.color.onPrimary : theme.color.onBackground}>
                 {name}
@@ -200,10 +282,10 @@ function MatchingInput({ question, answer, onChange, level, disabled }: Question
 
 // ---- Sắp xếp ----
 
-function OrderingInput({ question, answer, onChange, level, disabled }: QuestionInputProps) {
+function OrderingInput({ question, answer, onChange, level, disabled, practice, solved, marks }: QuestionInputProps) {
   const theme = useTheme();
   const { t } = useTranslation();
-  const choice = useChoiceStyle(level);
+  const choice = useChoiceStyle(level, solved);
   const order = answer?.order ?? [];
   const total = question.items.length;
   const rank = new Map(order.map((item, position) => [item, position]));
@@ -211,10 +293,14 @@ function OrderingInput({ question, answer, onChange, level, disabled }: Question
 
   return (
     <View style={{ gap: 14 }}>
-      <Txt variant="caption">{t('hs.quiz.orderHint')}</Txt>
-      {question.items.map((text, item) => {
+      {!practice ? <Txt variant="caption">{t('hs.quiz.orderHint')}</Txt> : null}
+      {/* Câu đã xong thì xếp các mục theo đúng thứ tự để em nhìn thấy thứ tự đúng. */}
+      {(solved && complete ? order : question.items.map((_, item) => item)).map((item) => {
+        const text = question.items[item] ?? '';
         const position = rank.get(item);
         const placed = position !== undefined;
+        // Sau lần thử chưa đúng: mục chưa ở đúng chỗ có viền vàng đứt để em biết cần đổi.
+        const misplaced = marks ? marks[item] === false && placed : false;
         return (
           <View key={item} style={[ui.row, { gap: 8 }]}>
             <Pressable
@@ -223,7 +309,7 @@ function OrderingInput({ question, answer, onChange, level, disabled }: Question
               accessibilityLabel={placed ? t('hs.quiz.orderPlaced', { text, n: position + 1 }) : t('hs.quiz.orderNotPlaced', { text })}
               disabled={disabled}
               onPress={() => onChange({ order: toggleOrderItem(order, item) })}
-              style={[local.optionRow, choice(placed), ui.grow]}
+              style={[local.optionRow, choice(placed), misplaced ? { borderColor: theme.color.accent, borderStyle: 'dashed', borderWidth: 3 } : null, ui.grow]}
             >
               <View style={[local.rank, { borderColor: placed ? theme.color.primary : theme.color.border, backgroundColor: placed ? theme.color.primary : 'transparent', borderStyle: placed ? 'solid' : 'dashed' }]}>
                 <Text style={{ color: placed ? theme.color.onPrimary : 'transparent', fontWeight: '700' }}>{placed ? position + 1 : '·'}</Text>
@@ -231,6 +317,7 @@ function OrderingInput({ question, answer, onChange, level, disabled }: Question
               <Txt variant={level === 1 ? 'title' : 'body'} style={ui.grow}>
                 {text}
               </Txt>
+              {solved ? <RightMark /> : marks?.[item] && placed ? <Ionicons name="checkmark" size={24} color={theme.color.correct} /> : null}
             </Pressable>
             {placed && level !== 1 ? (
               <View>
@@ -245,7 +332,7 @@ function OrderingInput({ question, answer, onChange, level, disabled }: Question
         <Txt variant="caption" style={ui.grow}>
           {complete ? t('hs.quiz.orderComplete') : t('hs.quiz.orderProgress', { done: order.length, total })}
         </Txt>
-        {order.length > 0 ? <Button label={t('hs.quiz.orderReset')} variant="ghost" disabled={disabled} onPress={() => onChange({ order: [] })} /> : null}
+        {order.length > 0 && !solved ? <Button label={t('hs.quiz.orderReset')} variant="ghost" disabled={disabled} onPress={() => onChange({ order: [] })} /> : null}
       </View>
     </View>
   );
@@ -398,6 +485,8 @@ const local = StyleSheet.create({
   blankInput: { minWidth: 120, minHeight: 44, borderWidth: 2, borderRadius: 6, paddingHorizontal: 10 },
   statement: { borderWidth: 2, padding: 12, gap: 10 },
   tf: { flex: 1, borderWidth: 2, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  tfRow: { flexDirection: 'row', gap: 12 },
+  tfBig: { flex: 1, minHeight: 120, alignItems: 'center', justifyContent: 'center', gap: 6, padding: 12 },
 });
 
 const styles2 = StyleSheet.create({

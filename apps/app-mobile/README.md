@@ -175,7 +175,7 @@ Các luồng nằm ở [`e2e/`](e2e/) (YAML, mở app qua `exp://10.0.2.2:8083`)
 | `hoc-sinh-dang-nhap-sai` | bỏ trống và nhập sai mật khẩu |
 | `hoc-sinh-kham-pha` | học sinh khối 8: tab Khám phá (không có lịch sử, gợi ý, Gần bạn), bản đồ và dòng thời gian mở riêng, tìm kiếm, chi tiết không có khối gợi ý |
 | `hoc-sinh-ma-gan-day` | học sinh khối 3: bài cấp 1 có thanh tiến độ theo bước, công tắc Tự đọc to tắt bật; mã vừa mở hiện ở "Mã em đã mở gần đây", chạm để mở lại |
-| `hoc-sinh-khoi-3` | cấp 1: đăng nhập mật khẩu tạm, đổi mật khẩu bắt buộc, nhập mã bài học, học từng bước, bài chơi bốn dạng câu, kết quả bằng sao |
+| `hoc-sinh-khoi-3` | cấp 1: đăng nhập bằng mật khẩu trên phiếu (không bị buộc đổi; tài khoản cũ còn bị buộc thì đổi), nhập mã bài học, học từng bước, bài chơi luyện tập bốn dạng câu (kiểm từng câu, bảng phản hồi), kết quả bằng sao và thẻ di sản, album |
 | `hoc-sinh-khoi-11` | cấp 3: bài dạng tài liệu, bài kiểm tra có giờ ba dạng câu, điểm và phân tích |
 | `khach-gan-ban-tu-choi` | (không chạy mặc định) khách từ chối quyền vị trí: app báo và vẫn cho thử lại; cần Expo Go chưa có quyền vị trí (máy ảo mới hoặc đã `pm revoke`, cấp lại sau) |
 
