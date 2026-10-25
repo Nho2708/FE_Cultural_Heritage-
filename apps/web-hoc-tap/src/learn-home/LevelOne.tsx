@@ -219,14 +219,16 @@ function LessonPath({ home }: { home: StudentHome }) {
     })
     .join(' ');
 
-  // Vào trang thì cuộn tới trạm nên học, nếu trạm đó đang nằm dưới mép màn hình.
+  // Vào trang thì cuộn tới trạm nên học, nếu trạm đó đang nằm dưới mép màn hình. Trạm nên học là trạm đầu thì không cuộn: thẻ bài được giao
+  // ngay trên đã dẫn tới đúng bài đó, cuộn xuống chỉ làm mất lời chào.
+  const firstIsCurrent = stations[0]?.state === 'current';
   useEffect(() => {
     const element = currentRef.current;
-    if (!element || typeof element.scrollIntoView !== 'function') return;
+    if (firstIsCurrent || !element || typeof element.scrollIntoView !== 'function') return;
     if (element.getBoundingClientRect().bottom <= window.innerHeight) return;
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
     element.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
-  }, []);
+  }, [firstIsCurrent]);
 
   const collected = home.albumCollected ?? 0;
 

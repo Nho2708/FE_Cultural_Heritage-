@@ -39,9 +39,9 @@ function Mascot({ state }: { state: IllustrationState }) {
       {/* Cute Nose */}
       <ellipse cx="60" cy="61" rx="4" ry="3" fill="#D97706" />
 
-      {/* Cheerful Mouth */}
+      {/* Cheerful Mouth — động viên là nụ cười nhẹ, linh vật không bao giờ buồn hay giận khi em làm chưa đúng */}
       {state === 'dong-vien' ? (
-        <path d="M48 73 Q60 67 72 73" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
+        <path d="M48 70 Q60 79 72 70" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
       ) : (
         <path d="M46 67 Q60 85 74 67 Z" fill="#EF4444" stroke="currentColor" strokeWidth="3" strokeLinejoin="round" />
       )}
