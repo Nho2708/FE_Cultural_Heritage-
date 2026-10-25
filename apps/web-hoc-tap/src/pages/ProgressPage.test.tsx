@@ -3,7 +3,7 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { envelope, mockApi, studentOf, studentServer } from '../test/fixtures';
-import { progressOf, rowOf } from '../test/quizFixtures';
+import { homeOf, progressOf, rowOf } from '../test/quizFixtures';
 import { renderApp, signInAs } from '../test/renderApp';
 
 // Tiến độ của em: cấp 1 là "Sao của em"; cấp 2 và 3 có bốn tab (Lịch sử bài làm, Tiến độ, Thành thạo, Huy hiệu).
@@ -108,6 +108,7 @@ describe('Sao của em — cấp 1', () => {
     open(1, progress, rows);
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Sao của em' })).toBeInTheDocument();
+    expect(document.querySelector('[data-bo-cuc="cap-1"]')!.textContent).not.toMatch(/\p{Extended_Pictographic}/u);
     expect(document.querySelector('[data-bo-cuc]')).toHaveAttribute('data-bo-cuc', 'cap-1');
     expect(screen.getByText('24 sao')).toBeInTheDocument();
     expect(screen.getByText('Em đã hoàn thành 9 bài')).toBeInTheDocument();
@@ -119,7 +120,29 @@ describe('Sao của em — cấp 1', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('tab', { name: 'Bài đã học' }));
-    expect(screen.getAllByRole('link', { name: 'Xem kết quả ⭐' })).toHaveLength(2);
-    expect(screen.getAllByRole('link', { name: 'Xem kết quả ⭐' })[0]).toHaveAttribute('href', '/ket-qua/3');
+    expect(screen.getAllByRole('link', { name: /^Xem kết quả/ })).toHaveLength(2);
+    expect(screen.getByRole('link', { name: 'Xem kết quả: Đố vui: Văn Miếu' })).toHaveAttribute('href', '/ket-qua/3');
+  });
+
+  it('hiện số ngày đã học của em ngay đầu trang', async () => {
+    const student = studentOf(4);
+    signInAs(student);
+    mockApi(
+      (call) => (call.path === ATTEMPT_ENDPOINTS.progress ? envelope(200, { data: progressOf(1, { totalStars: 5, finishedAttempts: 2 }) }) : undefined),
+      (call) =>
+        call.path.startsWith(ATTEMPT_ENDPOINTS.history)
+          ? envelope(200, { data: { items: [rowOf(1, { stars: 2, score: null, totalPoint: null, percent: null })], page: 1, pageSize: 100, totalItems: 1, totalPages: 1 } })
+          : undefined,
+      (call) => (call.path === ATTEMPT_ENDPOINTS.home ? envelope(200, { data: homeOf(1, { streakDays: 12 }) }) : undefined),
+      studentServer(student),
+    );
+    renderApp('/tien-do');
+    expect(await screen.findByText('12 ngày đã học')).toBeInTheDocument();
+  });
+
+  it('chưa có bài nào: mời nhập mã bằng nút to', async () => {
+    open(1, progressOf(1, { totalStars: 0, finishedAttempts: 0, badges: [] }), []);
+    expect(await screen.findByRole('heading', { name: 'Chưa có bài học nào!' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Nhập mã bài học' })).toHaveAttribute('href', '/nhap-ma');
   });
 });

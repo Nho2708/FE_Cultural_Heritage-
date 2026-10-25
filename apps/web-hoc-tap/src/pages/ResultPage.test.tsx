@@ -3,7 +3,7 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { envelope, mockApi, studentOf, studentServer } from '../test/fixtures';
-import { homeOf, questionOf, resultOf, reviewOf } from '../test/quizFixtures';
+import { albumCardOf, homeOf, questionOf, resultOf, reviewOf } from '../test/quizFixtures';
 import { renderApp, signInAs } from '../test/renderApp';
 
 // Kết quả bài làm: ba bản trình bày theo cấp, phần xem lại đáp án (chỉ khi bài cho xem), phân tích của cấp 3.
@@ -26,33 +26,49 @@ const single = questionOf({ questionId: 11, answer: { selectedIndex: 1 }, answer
 const ordering = questionOf({ questionId: 12, questionType: 'ORDERING', typeName: 'Sắp xếp', content: 'Xếp các sự kiện.', options: [], items: ['Khởi công', 'Hoàn thành', 'UNESCO'], answer: { order: [1, 0, 2] }, answered: true });
 
 describe('Kết quả bài làm — cấp 1 (sao, không điểm)', () => {
-  it('sao, lời khen, huy hiệu, đáp án đúng không có dấu sai, không có điểm hay phần trăm', async () => {
+  it('sao lớn, lời khen của máy chủ, thẻ di sản vào album, câu mang về nhà, huy hiệu dạng chip; không điểm hay phần trăm', async () => {
     const result = resultOf(1, {
       badges: [{ code: 'ON_TIME', name: 'Nộp đúng hạn', description: 'Em tự nộp bài trước khi hết giờ.' }],
+      cards: [albumCardOf(11, { name: 'Quần thể di tích Cố đô Huế' })],
       answersShown: true,
       questions: [reviewOf(single, { selectedIndex: 0 }, { isCorrect: null, partsCorrect: null, partsTotal: null, pointEarned: null })],
     });
     open(1, result);
 
-    expect(await screen.findByRole('heading', { level: 1, name: 'Kiểm tra 15 phút: Kinh thành Huế' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Em được 3 sao!' })).toBeInTheDocument();
     expect(document.querySelector('[data-bo-cuc]')).toHaveAttribute('data-bo-cuc', 'cap-1');
+    expect(screen.getByText('Kiểm tra 15 phút: Kinh thành Huế')).toBeInTheDocument();
     expect(screen.getByText('3 trên 3 sao')).toBeInTheDocument();
     expect(screen.getByText('Giỏi quá! Em được 3 sao, em thật xuất sắc!')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Nghe lời khen' })).toBeInTheDocument();
+    const cards = screen.getByRole('list', { name: 'Thẻ di sản của bài' });
+    expect(within(cards).getByText('Quần thể di tích Cố đô Huế')).toBeInTheDocument();
+    expect(within(cards).getByText('Đã vào album của em · 5 thẻ')).toBeInTheDocument();
+    expect(screen.getByText('Về nhà hỏi bố mẹ nhé')).toBeInTheDocument();
+    expect(screen.getByText('Nhà mình đã từng đi thăm Kinh thành Huế hay một di tích nào gần nhà chưa?')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Em nhận huy hiệu mới!' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Cùng xem đáp án nhé' })).toBeInTheDocument();
-    expect(screen.getByText('Đáp án đúng')).toBeInTheDocument();
-    expect(screen.queryByText(/chưa đúng/)).not.toBeInTheDocument();
+    expect(screen.getByText('Nộp đúng hạn')).toBeInTheDocument();
     expect(screen.queryByText(/điểm/i)).not.toBeInTheDocument();
     expect(screen.queryByText('%')).not.toBeInTheDocument();
-    expect(await screen.findByRole('link', { name: 'Xem lại bài học' })).toHaveAttribute('href', '/bai-hoc/BH7F3K2Q');
-    expect(screen.getByRole('link', { name: 'Xem sao của em' })).toHaveAttribute('href', '/tien-do');
+    expect(screen.getByRole('link', { name: 'Về con đường' })).toHaveAttribute('href', '/hoc');
+    expect(screen.getByRole('link', { name: 'Xem album' })).toHaveAttribute('href', '/hoc/album');
+
+    // Phần xem lại câu thu gọn; mở ra thấy đáp án đúng, không có dấu sai.
+    const review = screen.getByText('Xem lại các câu');
+    expect(review.closest('details')).not.toHaveAttribute('open');
+    await userEvent.setup().click(review);
+    expect(review.closest('details')).toHaveAttribute('open');
+    expect(screen.getByText('Đáp án đúng')).toBeInTheDocument();
+    expect(screen.queryByText(/chưa đúng/)).not.toBeInTheDocument();
   });
 
-  it('bài không cho xem đáp án thì không có phần xem lại', async () => {
-    open(1, resultOf(1, { stars: 1, praise: 'Em đã hoàn thành bài rồi!' }));
+  it('bài không cho xem đáp án thì không có phần xem lại; chưa có câu mang về nhà thì không có khối đó', async () => {
+    open(1, resultOf(1, { stars: 1, praise: 'Em đã hoàn thành bài rồi!', takeHome: null, cards: [] }));
     expect(await screen.findByText('Em đã hoàn thành bài rồi!')).toBeInTheDocument();
     expect(screen.getByText('1 trên 3 sao')).toBeInTheDocument();
-    expect(screen.queryByRole('heading', { name: 'Cùng xem đáp án nhé' })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Em được 1 sao!' })).toBeInTheDocument();
+    expect(screen.queryByText('Xem lại các câu')).not.toBeInTheDocument();
+    expect(screen.queryByText('Về nhà hỏi bố mẹ nhé')).not.toBeInTheDocument();
   });
 });
 

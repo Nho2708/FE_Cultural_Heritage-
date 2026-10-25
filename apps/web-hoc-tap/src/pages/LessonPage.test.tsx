@@ -1,9 +1,10 @@
-import { ERROR_CODES } from '@dsvhvn/dung-chung/api';
+import { ERROR_CODES, STUDENT_ENDPOINTS, type LessonCompletion, type StudentRecall } from '@dsvhvn/dung-chung/api';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { readPosition } from '../lessons/recent';
-import { envelope, mockApi, studentOf, studentServer } from '../test/fixtures';
+import { envelope, mockApi, studentOf, studentServer, type FetchCall } from '../test/fixtures';
+import { albumCardOf } from '../test/quizFixtures';
 import { heritageCardOf, quizOf, studentLessonOf, studentSectionOf } from '../test/lessonFixtures';
 import { renderApp, signInAs } from '../test/renderApp';
 
@@ -24,29 +25,82 @@ describe('Bài học — cấp 1 (kể chuyện từng bước)', () => {
     sections: [story(1), story(2), story(3), studentSectionOf({ type: 'IMAGE', body: 'Ngọ Môn nhìn từ phía nam.', imageUrl: 'https://anh.test/i.jpg', sortOrder: 4 })],
     quizzes: [quizOf(1, { name: 'Chơi cùng bạn Na' })],
   });
+  const completion: LessonCompletion = {
+    lessonId: 5,
+    firstTime: true,
+    cards: [albumCardOf(11, { name: 'Quần thể di tích Cố đô Huế' })],
+    albumCollected: 5,
+    albumTotal: 12,
+    takeHome: 'Nhà mình đã từng đi thăm Quần thể di tích Cố đô Huế hay một di tích nào gần nhà chưa?',
+  };
+  const server = (recall: StudentRecall) => (call: FetchCall) => {
+    if (call.path === STUDENT_ENDPOINTS.lessonRecall('BH7F3K2Q')) return envelope(200, { data: recall });
+    if (call.path === STUDENT_ENDPOINTS.lessonComplete('BH7F3K2Q') && call.method === 'POST') return envelope(200, { data: completion });
+    return undefined;
+  };
+  const openLevelOne = (recall: StudentRecall = { questions: [] }) => {
+    const student = studentOf(4);
+    signInAs(student);
+    const calls = mockApi(studentServer(student), server(recall), (call) => (call.path === '/student/lessons/BH7F3K2Q' ? envelope(200, { data: lesson }) : undefined));
+    return { student, calls, ...renderApp('/bai-hoc/BH7F3K2Q') };
+  };
 
-  it('bố cục cấp 1: luồng Nghe chuyện, Xem hình, Chơi, Nhận sao; mỗi lần một đoạn có hình lớn; nút Tiếp nhé', async () => {
-    const { student } = open(4, lesson);
+  it('chưa có câu ôn: bỏ bước Nhớ lại; bốn bước, mỗi lần một đoạn có hình lớn, chấm tròn cho các đoạn, nút Tiếp nhé', async () => {
+    const { student } = openLevelOne();
     const user = userEvent.setup();
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Ngọ Môn và Kinh thành Huế' })).toBeInTheDocument();
     expect(document.querySelector('[data-bo-cuc]')).toHaveAttribute('data-bo-cuc', 'cap-1');
-    const steps = screen.getByRole('list', { name: 'Các bước của bài' });
-    expect(within(steps).getAllByRole('listitem').map((li) => li.textContent)).toEqual(['Nghe chuyện', 'Xem hình', 'Chơi', 'Nhận sao']);
-    expect(screen.getByText('Đoạn 1 / 3')).toBeInTheDocument();
+    expect(await screen.findByText('· bước 1 trên 4')).toBeInTheDocument();
+    const steps = screen.getByRole('navigation', { name: 'Các bước của bài' });
+    expect(within(steps).getAllByRole('button').map((b) => b.getAttribute('aria-label'))).toEqual(['Nghe chuyện, đang học', 'Xem hình', 'Chơi', 'Nhận thẻ']);
+    expect(screen.getByRole('link', { name: 'Về trang học' })).toHaveAttribute('href', '/hoc');
+    expect(screen.getByText('Đoạn 1 trên 3')).toBeInTheDocument();
     expect(screen.getByText('Đoạn truyện số 1.')).toBeInTheDocument();
     expect(screen.queryByText('Đoạn truyện số 2.')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Em ra ngoài giữa chừng/)).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Tiếp nhé' }));
-    expect(screen.getByText('Đoạn 2 / 3')).toBeInTheDocument();
+    expect(screen.getByText('Đoạn 2 trên 3')).toBeInTheDocument();
     expect(screen.getByText('Đoạn truyện số 2.')).toBeInTheDocument();
-    expect(readPosition(student.id, 'BH7F3K2Q')).toEqual({ step: 0, part: 1 });
+    expect(readPosition(student.id, 'BH7F3K2Q')).toEqual({ step: 1, part: 1 });
   });
 
-  it('đi hết câu chuyện sang Xem hình, Chơi (bài kiểm tra kèm trạng thái) rồi Nhận sao; ra giữa chừng thì lần sau mở đúng bước', async () => {
-    const { student, unmount } = open(4, lesson);
+  it('có câu ôn của bài trước: bắt đầu bằng Nhớ lại, chạm là biết ngay rồi sang Nghe chuyện', async () => {
+    const recall: StudentRecall = {
+      questions: [
+        {
+          questionId: 70,
+          questionType: 'TRUE_FALSE',
+          content: 'Bánh chưng có hình vuông.',
+          imageUrl: null,
+          options: [
+            { content: 'Đúng', imageUrl: null },
+            { content: 'Sai', imageUrl: null },
+          ],
+          correctIndex: 0,
+          explanation: 'Bánh chưng hình vuông, gói bằng lá dong.',
+          heritageName: 'Bánh chưng',
+          lessonTitle: 'Bánh chưng ngày Tết',
+        },
+      ],
+    };
+    const { calls } = openLevelOne(recall);
     const user = userEvent.setup();
-    await screen.findByText('Đoạn 1 / 3');
+    expect(await screen.findByText('Bánh chưng có hình vuông.')).toBeInTheDocument();
+    expect(calls.some((c) => c.path === STUDENT_ENDPOINTS.lessonRecall('BH7F3K2Q'))).toBe(true);
+    expect(screen.getByText('· bước 1 trên 5')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Đúng' }));
+    expect(screen.getByText('Đúng rồi!')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Nghe chuyện mới' }));
+    expect(screen.getByText('Đoạn truyện số 1.')).toBeInTheDocument();
+    expect(screen.getByText('· bước 2 trên 5')).toBeInTheDocument();
+  });
+
+  it('đi hết câu chuyện sang Xem hình, Chơi rồi Nhận thẻ; ra giữa chừng thì lần sau mở đúng bước; nhận thẻ ghi bài đã học xong một lần', async () => {
+    const { student, unmount } = openLevelOne();
+    const user = userEvent.setup();
+    await screen.findByText('Đoạn 1 trên 3');
     for (let i = 0; i < 3; i += 1) await user.click(screen.getByRole('button', { name: 'Tiếp nhé' }));
     expect(screen.getByText('Ngọ Môn nhìn từ phía nam.')).toBeInTheDocument();
 
@@ -54,20 +108,24 @@ describe('Bài học — cấp 1 (kể chuyện từng bước)', () => {
     expect(screen.getByRole('heading', { name: 'Bài chơi của em' })).toBeInTheDocument();
     expect(screen.getByText('Chơi cùng bạn Na')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^Bắt đầu chơi/ })).toBeInTheDocument();
-    expect(readPosition(student.id, 'BH7F3K2Q').step).toBe(2);
+    expect(readPosition(student.id, 'BH7F3K2Q').step).toBe(3);
 
     unmount();
-    mockApi(studentServer(student), (call) => (call.path === '/student/lessons/BH7F3K2Q' ? envelope(200, { data: lesson }) : undefined));
-    renderApp('/bai-hoc/BH7F3K2Q');
+    const { calls } = openLevelOne();
     expect(await screen.findByRole('heading', { name: 'Bài chơi của em' })).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Tiếp nhé' }));
-    expect(screen.getByRole('heading', { name: 'Em học xong rồi! Giỏi quá!' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Em học xong bài rồi!' })).toBeInTheDocument();
+    expect(await screen.findByText('Thẻ mới vào album')).toBeInTheDocument();
+    expect(screen.getByText('Album của em có 5 thẻ')).toBeInTheDocument();
+    expect(screen.getByText(completion.takeHome!)).toBeInTheDocument();
     expect(screen.getByText('Ngọ Môn là cổng chính.')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Về trang học' })).toHaveAttribute('href', '/hoc');
+    expect(screen.getByRole('link', { name: 'Về con đường' })).toHaveAttribute('href', '/hoc');
+    expect(screen.getByRole('link', { name: 'Xem album' })).toHaveAttribute('href', '/hoc/album');
+    expect(calls.filter((c) => c.path === STUDENT_ENDPOINTS.lessonComplete('BH7F3K2Q'))).toHaveLength(1);
 
-    // Màn nhận sao có lối quay về bài chơi khi còn bài làm được.
-    await user.click(screen.getByRole('button', { name: 'Chơi để nhận sao' }));
+    // Còn bài chơi làm được thì có lối quay về bài chơi.
+    await user.click(screen.getByRole('button', { name: 'Chơi ngay' }));
     expect(screen.getByRole('heading', { name: 'Bài chơi của em' })).toBeInTheDocument();
   });
 });

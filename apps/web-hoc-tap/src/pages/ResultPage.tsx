@@ -1,9 +1,9 @@
 import { cn, clampStars, formatDateTime, formatDuration, formatPercent, formatScore } from '@dsvhvn/dung-chung';
 import type { StudentAnalysis, StudentAttemptResult, StudentBadge, StudentTopic } from '@dsvhvn/dung-chung/api';
 import { Badge, Button, ButtonLink, ErrorState, Icon, InlineMessage, LoadingState } from '@dsvhvn/dung-chung/ui';
-import { Illustration, SpeakButton } from '@dsvhvn/dung-chung/lesson';
+import { HeritageCardRow, Illustration, LevelOneButtonLink, LevelOneSpeak, LevelOneStars, SpeakButton, TakeHomeBox, speakVietnamese, useAutoRead } from '@dsvhvn/dung-chung/lesson';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router';
 import { pathOf } from '../access/screens';
 import { lessonPath } from '../lessons/lessonData';
@@ -11,17 +11,13 @@ import { AttemptRecommendations } from '../learn-home/Recommendations';
 import { QuestionReview } from '../quiz/QuestionReview';
 import { parseQuizId, resultQueryFn, resultQueryKey } from '../quiz/quizData';
 import { useLessonCode } from '../quiz/useLessonCode';
-import { Bar, Stars as StarRow } from '../quiz/Meters';
+import { Bar } from '../quiz/Meters';
 
-// Kết quả bài làm, ba bản trình bày theo cấp học hiện tại của lớp (do máy chủ chọn, học sinh không chọn): cấp 1 sao, lời khen và huy hiệu
-// (không điểm, không đúng sai); cấp 2 điểm, số câu đúng, sai, bỏ trống, đáp án và giải thích; cấp 3 thêm phân tích theo di sản và dạng câu.
+// Kết quả bài làm, ba bản trình bày theo cấp học hiện tại của lớp (do máy chủ chọn, học sinh không chọn): cấp 1 sao, lời khen nói đúng
+// điều em nhớ, thẻ di sản vào album, một câu mang về nhà và huy hiệu (không điểm, không đúng sai; phần xem lại câu thu gọn); cấp 2 điểm, số câu đúng, sai, bỏ trống, đáp án và giải thích; cấp 3 thêm phân tích theo di sản và dạng câu.
 // Phần xem lại từng câu chỉ có khi bài kiểm tra cho xem đáp án sau khi nộp.
 
 const REVIEW_PREVIEW = 5;
-
-function Stars({ count, size = 56 }: { count: number; size?: number }) {
-  return <StarRow count={count} size={size} className="justify-center gap-2" />;
-}
 
 function BadgeList({ badges, level }: { badges: StudentBadge[]; level: 1 | 2 | 3 }) {
   if (badges.length === 0) return null;
@@ -108,36 +104,90 @@ function meta(result: StudentAttemptResult): string {
 
 // ---- Cấp 1 ----
 
-function ResultLevelOne({ result, automatic, lessonCode }: { result: StudentAttemptResult; automatic: boolean; lessonCode: string | null }) {
+function ResultLevelOne({ result, automatic }: { result: StudentAttemptResult; automatic: boolean; lessonCode: string | null }) {
   const stars = clampStars(result.stars);
+  const headline = `Em được ${stars} sao!`;
+  const praise = result.praise?.trim() ?? '';
+  const [autoRead] = useAutoRead();
+  // Trang kết quả tự đọc số sao và lời khen một lần (khi bật "Tự đọc to").
+  useEffect(() => {
+    if (autoRead) void speakVietnamese(`${headline} ${praise}`.trim());
+  }, [autoRead, headline, praise]);
+  const cards = result.cards ?? [];
+
   return (
-    <section data-bo-cuc="cap-1" className="dsv-content dsv-section">
-      <title>{`Kết quả: ${result.quizName ?? 'Bài kiểm tra'} · DiViet`}</title>
-      <div className="mx-auto flex max-w-[860px] flex-col gap-(--dsv-block-gap)">
-        <div className="flex flex-col items-center gap-5 rounded-lg bg-secondary-container p-6 text-center text-on-secondary-container dsvsm:p-8">
-          <h1 className="type-h2">{result.quizName}</h1>
-          <div className="w-full rounded-lg bg-surface p-6 text-on-surface">
-            <Stars count={stars} />
-            <p className="mt-4 type-h2">{result.praise}</p>
+    <section data-bo-cuc="cap-1" className="dsv-content dsv-section" aria-labelledby="ket-qua-tieu-de">
+      <title>{`Kết quả: ${result.quizName ?? 'Bài chơi'} · DiViet`}</title>
+      <div className="mx-auto flex w-full max-w-[640px] flex-col items-center gap-5 text-center">
+        <p className="text-[18px] font-bold text-on-surface-variant">{result.quizName}</p>
+        <Illustration state={stars >= 2 ? 'chuc-mung' : 'dong-vien'} className="size-[104px] rounded-full bg-surface-container-low" />
+        <LevelOneStars count={stars} />
+        <h1 id="ket-qua-tieu-de" className="text-[32px] leading-tight font-bold text-on-surface">
+          {headline}
+        </h1>
+        {praise && (
+          <div className="flex w-full items-center gap-3 rounded-[20px] border-2 border-border bg-surface p-4 text-left">
+            <p className="min-w-0 flex-1 text-[20px] leading-snug font-bold text-on-surface">{praise}</p>
+            <LevelOneSpeak text={`${headline} ${praise}`} label="Nghe lời khen" size={56} />
           </div>
-          <div className="flex items-center gap-4 rounded-lg bg-primary-container p-4 text-on-primary-container">
-            <Illustration state={stars >= 2 ? 'chuc-mung' : 'dong-vien'} className="size-20 bg-surface" />
-            <p className="type-h4">{stars === 3 ? 'Hoan hô! Em giỏi lắm!' : 'Em cố gắng lắm! Mình chơi tiếp nhé!'}</p>
-            <SpeakButton text={result.praise ?? ''} label="Nghe lời khen" />
-          </div>
+        )}
+        <div className="w-full">
+          <Notice result={result} automatic={automatic} />
         </div>
-        <Notice result={result} automatic={automatic} />
-        <BadgeList badges={result.badges} level={1} />
-        <Review result={result} title="Cùng xem đáp án nhé" />
-        <AttemptRecommendations level={1} attemptId={result.attemptId} id="goi-y" />
-        <div className="grid gap-4 sm:grid-cols-2">
-          <ButtonLink to={lessonCode ? lessonPath(lessonCode) : pathOf('learnHome')} variant="secondary" size="lg" className="rounded-full">
-            {lessonCode ? 'Xem lại bài học' : 'Về trang học'}
-          </ButtonLink>
-          <ButtonLink to={pathOf('progress')} size="lg" className="rounded-full">
-            Xem sao của em
-          </ButtonLink>
+        {cards.length > 0 && (
+          <ul aria-label="Thẻ di sản của bài" className="flex w-full flex-col gap-3 text-left">
+            {cards.map((card) => (
+              <li key={card.heritageId}>
+                <HeritageCardRow
+                  card={card}
+                  note={result.albumCollected !== null ? `Đã vào album của em · ${result.albumCollected} thẻ` : 'Đã vào album của em'}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+        <TakeHomeBox text={result.takeHome} className="w-full" />
+        {result.badges.length > 0 && (
+          <section aria-labelledby="huy-hieu-moi" className="flex w-full flex-col items-center gap-3">
+            <h2 id="huy-hieu-moi" className="text-[20px] font-bold text-on-surface">
+              Em nhận huy hiệu mới!
+            </h2>
+            <ul className="flex flex-wrap justify-center gap-2">
+              {result.badges.map((badge) => (
+                <li
+                  key={badge.code}
+                  title={badge.description}
+                  className="inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-border bg-surface-container-low px-4 text-[16px] font-bold text-on-surface"
+                >
+                  <Icon name="star" size={18} className="fill-current text-secondary-container stroke-on-secondary-container/40" />
+                  {badge.name}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        <div className="flex w-full flex-col gap-3 sm:flex-row">
+          <LevelOneButtonLink to={pathOf('learnHome')} className="flex-1">
+            Về con đường
+          </LevelOneButtonLink>
+          <LevelOneButtonLink to={pathOf('album')} variant="secondary" className="flex-1">
+            <Icon name="cards" size={24} />
+            Xem album
+          </LevelOneButtonLink>
         </div>
+        {result.answersShown && (result.questions?.length ?? 0) > 0 && (
+          <details className="group w-full rounded-[20px] border-2 border-border bg-surface text-left">
+            <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-3 px-5 text-[20px] font-bold text-primary [&::-webkit-details-marker]:hidden">
+              Xem lại các câu
+              <Icon name="chevron-down" size={24} className="transition-transform group-open:rotate-180" />
+            </summary>
+            <div className="flex flex-col gap-4 border-t-2 border-border p-4">
+              {result.questions!.map((review, index) => (
+                <QuestionReview key={review.question.questionId} review={review} index={index} total={result.questions!.length} level={1} />
+              ))}
+            </div>
+          </details>
+        )}
       </div>
     </section>
   );
@@ -172,7 +222,7 @@ function ResultLevelTwo({ result, automatic, lessonCode }: { result: StudentAtte
       <div className="flex flex-col gap-(--dsv-block-gap)">
         <div className="rounded-lg bg-primary-container p-6 text-on-primary-container">
           <div className="flex flex-wrap items-center gap-3">
-            <Illustration state="chuc-mung" className="size-14 bg-surface" />
+            <Illustration state="chuc-mung" className="size-14 rounded-full bg-surface" />
             <p className="type-h4">Tuyệt vời! Em đã hoàn thành bài kiểm tra.</p>
           </div>
           <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">

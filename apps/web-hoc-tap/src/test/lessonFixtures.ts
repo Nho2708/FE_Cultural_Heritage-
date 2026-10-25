@@ -7,10 +7,11 @@ const FLOW: Record<SchoolLevel, StudentLesson['layout']> = {
     layout: 'STEP_BY_STEP',
     sequentialFlow: true,
     steps: [
+      { key: 'RECALL', label: 'Nhớ lại' },
       { key: 'LISTEN_STORY', label: 'Nghe chuyện' },
       { key: 'VIEW_IMAGES', label: 'Xem hình' },
       { key: 'PLAY', label: 'Chơi' },
-      { key: 'EARN_STARS', label: 'Nhận sao' },
+      { key: 'EARN_CARD', label: 'Nhận thẻ' },
     ],
   },
   2: {

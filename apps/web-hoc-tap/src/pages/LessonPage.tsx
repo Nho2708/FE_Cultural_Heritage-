@@ -2,15 +2,17 @@ import { isWellFormedLessonCode, normalizeLessonCode } from '@dsvhvn/dung-chung'
 import { ApiError, errorMessage } from '@dsvhvn/dung-chung/api';
 import { LessonLinksProvider, LessonView, type LessonLinks, type LessonPosition } from '@dsvhvn/dung-chung/lesson';
 import { ButtonLink, ErrorState, LoadingState } from '@dsvhvn/dung-chung/ui';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router';
 import { pathOf } from '../access/screens';
 import { heritagePath, mapPathOf, timelinePath } from '../discovery/paths';
+import { studentApi } from '../lib/api/client';
 import { useAuth } from '../lib/auth/context';
 import { lessonQueryFn, lessonQueryKey } from '../lessons/lessonData';
 import { readPosition, rememberLesson, writePosition } from '../lessons/recent';
 import { StartQuizDialog } from '../quiz/QuizIntro';
+import { albumQueryKey, homeQueryKey } from '../quiz/quizData';
 
 // Bài học (mở bằng mã trên đường dẫn /bai-hoc/<mã>): lấy bài từ máy chủ rồi chọn bố cục theo cấp của lớp em (cấp 1 kể chuyện từng
 // bước, cấp 2 bài đọc và dòng thời gian, cấp 3 tài liệu). Học sinh không chọn bố cục. Mã sai, bài chưa xuất bản hoặc không thuộc
@@ -35,18 +37,36 @@ function CodeProblem({ message }: { message: string }) {
   );
 }
 
-/** Đường dẫn thật của khu học: mở di sản, bản đồ, dòng thời gian, về trang học; hộp thoại bắt đầu làm bài kiểm tra. */
-const STUDENT_LINKS: LessonLinks = {
-  heritage: heritagePath,
-  map: mapPathOf,
-  timeline: timelinePath,
-  quizDialog: StartQuizDialog,
-  home: pathOf('learnHome'),
-  preview: false,
-};
+/**
+ * Đường dẫn thật của khu học: mở di sản, bản đồ, dòng thời gian, về trang học, album; hộp thoại bắt đầu làm bài kiểm tra; cấp 1 lấy câu
+ * ôn của bước Nhớ lại và ghi bài đã học xong ở bước Nhận thẻ (xong thì con đường và album trên trang học đổi theo).
+ */
+function useStudentLinks(): LessonLinks {
+  const queryClient = useQueryClient();
+  return useMemo(
+    () => ({
+      heritage: heritagePath,
+      map: mapPathOf,
+      timeline: timelinePath,
+      quizDialog: StartQuizDialog,
+      home: pathOf('learnHome'),
+      album: pathOf('album'),
+      preview: false,
+      recall: (code: string) => studentApi.lessonRecall(code).then((r) => r.data),
+      completeLesson: (code: string) =>
+        studentApi.completeLesson(code).then((r) => {
+          void queryClient.invalidateQueries({ queryKey: homeQueryKey });
+          void queryClient.invalidateQueries({ queryKey: albumQueryKey });
+          return r.data;
+        }),
+    }),
+    [queryClient],
+  );
+}
 
 export function LessonPage() {
   const { user } = useAuth();
+  const links = useStudentLinks();
   const code = normalizeLessonCode(useParams().maBaiHoc ?? '');
   const valid = isWellFormedLessonCode(code);
   const query = useQuery({ queryKey: lessonQueryKey(code), queryFn: lessonQueryFn(code), enabled: valid, staleTime: 0 });
@@ -89,7 +109,7 @@ export function LessonPage() {
   }
 
   return (
-    <LessonLinksProvider links={STUDENT_LINKS}>
+    <LessonLinksProvider links={links}>
       <LessonView lesson={lesson} initialPosition={initialPosition} onPositionChange={savePosition} />
     </LessonLinksProvider>
   );

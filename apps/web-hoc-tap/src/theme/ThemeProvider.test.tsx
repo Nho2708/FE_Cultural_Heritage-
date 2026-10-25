@@ -23,7 +23,7 @@ describe('bộ giao diện theo cấp học', () => {
   });
 
   it.each([
-    [5, 'cap-1', '19px', '48px', 'linh-vat'],
+    [5, 'cap-1', '20px', '64px', 'linh-vat'],
     [6, 'cap-2', '17px', '44px', 'bieu-tuong-net'],
     [12, 'cap-3', '16px', '44px', 'toi-gian'],
   ] as const)('khối %i → %s: cỡ chữ %s, vùng bấm %s, bộ hình %s ở khu học', async (grade, key, body, touch, set) => {
@@ -70,7 +70,7 @@ describe('bộ giao diện theo cấp học', () => {
     const user = userEvent.setup();
     const { router } = renderApp('/hoc');
 
-    expect(await screen.findByRole('heading', { level: 1, name: /^Chào Nguyễn Minh An/ })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Chào An!' })).toBeInTheDocument();
     expect(root()).toHaveAttribute('data-bo-giao-dien', 'cap-1');
     await user.click(screen.getByRole('button', { name: /^Tài khoản:/ }));
     await user.click(screen.getByRole('button', { name: 'Đăng xuất' }));

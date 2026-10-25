@@ -7,6 +7,7 @@ export * from './Illustration';
 export * from './LessonParts';
 export * from './LessonThemeScope';
 export * from './LevelOneLesson';
+export * from './LevelOneParts';
 export * from './LevelThreeLesson';
 export * from './LevelTwoLesson';
 export * from './LessonView';

@@ -1,6 +1,7 @@
-import { studentCodeOf, type StudentClassDetail, type StudentProfile } from '@dsvhvn/dung-chung/api';
-import { Illustration, SpeakButton } from '@dsvhvn/dung-chung/lesson';
-import { ButtonLink, ErrorState, Icon, LoadingState } from '@dsvhvn/dung-chung/ui';
+import { daysLearnedText } from '@dsvhvn/dung-chung';
+import { studentCodeOf, type StudentClassDetail, type StudentHome, type StudentProfile } from '@dsvhvn/dung-chung/api';
+import { Illustration, LevelOneButtonLink, LevelOneSpeak } from '@dsvhvn/dung-chung/lesson';
+import { ButtonLink, ErrorState, Icon, LoadingState, type IconName } from '@dsvhvn/dung-chung/ui';
 import { Link } from 'react-router';
 import { pathOf } from '../access/screens';
 import { classFacts, useClassroom } from '../learn-home/classroom';
@@ -8,10 +9,36 @@ import { useStudentHome } from '../learn-home/useStudentHome';
 import { useAuth } from '../lib/auth/context';
 
 // Hồ sơ của em (Trang hồ sơ học sinh).
-// Cấp 1: Giao diện Hộ chiếu Di sản Nhí (Heritage Passport), phong cách tươi sáng, bo tròn mềm mại,
-// không điểm số/%, tập trung vào Sao ⭐, Chuỗi ngày chăm chỉ 🔥, Huy hiệu 🏆 và nút loa đọc to.
+// Cấp 1: thẻ học sinh của em dùng một bộ màu cấp 1 như trang học (xanh chính, nền kem, khối vàng nhạt), không emoji, chữ từ 14px trở lên,
+// không điểm số hay phần trăm: tên và mã học sinh, nút loa đọc to, trường lớp, ba ô thành tích (sao, ngày đã học, huy hiệu), huy hiệu gần đây.
 // Cấp 2 và 3: Thẻ học sinh điện tử (Digital Student ID Badge) chuẩn mực học đường THCS / THPT,
 // trang trọng, hiện đại, không dùng hình tượng hoạt hình hoặc emoji trẻ em.
+
+/** Số ngày đã học: lấy từ máy chủ, hoặc tính từ các ngày thực tế em đã nộp bài (nghỉ không bị mất ngày). */
+function daysLearnedOf(home: StudentHome | undefined): number {
+  if (home?.streakDays && home.streakDays > 0) return home.streakDays;
+  const dates = (home?.myLessons ?? [])
+    .map((l) => l.lastAttemptAt)
+    .filter((d): d is string => Boolean(d))
+    .map((d) => d.slice(0, 10));
+  const unique = new Set(dates);
+  if (unique.size > 0) return unique.size;
+  return (home?.totalStars ?? 0) > 0 ? 1 : 0;
+}
+
+function AchievementTile({ to, icon, value, label, title, filled }: { to: string; icon: IconName; value: number; label: string; title: string; filled?: boolean }) {
+  return (
+    <Link
+      to={to}
+      title={title}
+      className="flex min-h-28 min-w-0 flex-col items-center justify-center gap-1 rounded-[20px] border-2 border-secondary-container bg-surface-container-low px-2 py-3 text-center no-underline hover:bg-surface"
+    >
+      <Icon name={icon} size={28} className={filled ? 'fill-current text-secondary-container stroke-on-secondary-container/40' : 'text-primary'} />
+      <span className="text-[28px] leading-none font-bold text-on-surface tabular-nums">{value}</span>
+      <span className="text-[16px] leading-tight font-medium text-on-surface-variant">{label}</span>
+    </Link>
+  );
+}
 
 function ProfileLevelOne({
   user,
@@ -23,208 +50,105 @@ function ProfileLevelOne({
   const { data: home } = useStudentHome();
   const name = user.fullName ?? 'Em';
   const code = studentCodeOf(user);
+  const days = daysLearnedOf(home);
+  const stars = home?.totalStars ?? 0;
+  const badges = home?.recentBadges ?? [];
+  const teacher = classroom.teacherName ?? 'Đang cập nhật';
+  const school = classroom.organization?.name ?? 'Trường Tiểu học';
 
-  // Số ngày chăm chỉ: lấy từ máy chủ, hoặc tính từ các ngày thực tế em đã hoàn thành bài học (không bị mất ngày khi nghỉ)
-  const activeDays = (() => {
-    if (home?.streakDays && home.streakDays > 0) return home.streakDays;
-    const dates = (home?.myLessons ?? [])
-      .map((l) => l.lastAttemptAt)
-      .filter((d): d is string => Boolean(d))
-      .map((d) => d.slice(0, 10));
-    const unique = new Set(dates);
-    if (unique.size > 0) return unique.size;
-    return (home?.totalStars ?? 0) > 0 ? 1 : 0;
-  })();
+  const speechIntro = `Thẻ học sinh của em. Họ và tên: ${name}. Mã học sinh: ${code}. Học sinh lớp ${classroom.name}, trường ${classroom.organization?.name ?? 'Trường học'}. Thầy cô giáo: ${classroom.teacherName ?? 'đang cập nhật'}. Em đã đạt được ${stars} ngôi sao và ${daysLearnedText(days)}. Chúc em học thật vui!`;
 
-  const speechIntro = `Thẻ học sinh của em. Họ và tên: ${name}. Mã học sinh: ${code}. Học sinh lớp ${classroom.name}, trường ${classroom.organization?.name ?? 'Trường học'}. Thầy cô giáo: ${classroom.teacherName ?? 'đang cập nhật'}. Em đã đạt được ${home?.totalStars ?? 0} ngôi sao và ${activeDays} ngày chăm chỉ. Chúc em học thật vui!`;
+  const classRows: Array<{ icon: IconName; label: string; value: string }> = [
+    { icon: 'users', label: 'Lớp', value: classroom.name },
+    { icon: 'user', label: 'Thầy cô', value: teacher },
+    { icon: 'building', label: 'Trường', value: school },
+  ];
 
   return (
     <section className="dsv-content dsv-section" data-bo-cuc="cap-1">
       <title>Thẻ học sinh của em · DiViet</title>
-      <div className="mx-auto w-full max-w-[640px] flex flex-col gap-6">
-
-        {/* THẺ HỌC SINH CỦA EM (Thiết kế dạng Thẻ học sinh thông minh, tinh gọn, thân thiện lứa tuổi tiểu học) */}
-        <div className="relative overflow-hidden rounded-3xl bg-white shadow-xl border-2 border-emerald-300">
-          
-          {/* Header thẻ: Tông Xanh Ngọc Di Sản có logo / dải băng */}
-          <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 px-6 py-4 text-white flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <span className="text-2xl" aria-hidden="true">🇻🇳</span>
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-emerald-100">
-                  DI SẢN VIỆT NAM
-                </p>
-                <h2 className="text-sm font-black uppercase tracking-wider text-amber-300">
-                  THẺ HỌC SINH CỦA EM
-                </h2>
-              </div>
-            </div>
-
-            <SpeakButton
-              text={speechIntro}
-              label="Nghe thông tin hồ sơ của em"
-              size="sm"
-              className="dsv-speak-btn bg-white/20 hover:bg-white/30 text-white border-white/30"
-            />
-          </div>
-
-          {/* Thân thẻ: Ảnh đại diện + Tên + Mã số + Thông tin trường lớp */}
-          <div className="p-6 sm:p-8 flex flex-col items-center text-center">
-            
-            {/* Ảnh đại diện em học sinh */}
-            <div className="relative mb-3">
-              <div className="size-24 rounded-full bg-emerald-50 p-2 shadow-inner border-4 border-amber-300 flex items-center justify-center">
-                <Illustration state="chao" className="size-full text-emerald-800 drop-shadow-xs" />
-              </div>
-              <span className="absolute -bottom-1 -right-1 flex size-7 items-center justify-center rounded-full bg-amber-400 text-sm shadow-md border-2 border-white" title="Thám hiểm nhí">
-                🎒
-              </span>
-            </div>
-
-            {/* Họ và tên học sinh */}
-            <h1 className="text-2xl sm:text-3xl font-black text-emerald-950 tracking-tight">
-              {name}
-            </h1>
-
-            {/* Mã học sinh */}
-            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-emerald-50/80 px-4 py-1 border border-emerald-200">
-              <span className="text-xs font-bold text-emerald-800">Mã học sinh:</span>
-              <span className="font-mono font-black text-sm text-emerald-950 tracking-wider">
-                {code}
-              </span>
-            </div>
-
-            {/* Thông tin trường & lớp — gọn gàng, tự nhiên, không rườm rà hành chính */}
-            <section aria-label="Trường & Lớp của em" className="mt-5 w-full rounded-2xl bg-slate-50/80 border border-slate-200/80 p-3.5 flex flex-col sm:flex-row items-center justify-around gap-2 text-xs font-bold text-slate-700">
-              <div className="flex items-center gap-1.5">
-                <span className="text-base" aria-hidden="true">🏫</span>
-                <span>Lớp: <strong className="text-emerald-900 font-black">{classroom.name}</strong></span>
-              </div>
-              <span className="hidden sm:inline text-slate-300">|</span>
-              <div className="flex items-center gap-1.5">
-                <span className="text-base" aria-hidden="true">👩‍🏫</span>
-                <span>Giáo viên: <strong className="text-emerald-900 font-black">{classroom.teacherName ?? 'Đang cập nhật'}</strong></span>
-              </div>
-              <span className="hidden sm:inline text-slate-300">|</span>
-              <div className="flex items-center gap-1.5 truncate max-w-[200px]" title={classroom.organization?.name}>
-                <span className="text-base" aria-hidden="true">📍</span>
-                <span className="truncate">{classroom.organization?.name ?? 'Trường Tiểu học'}</span>
-              </div>
-            </section>
-
-          </div>
-
-          {/* Dải chân thẻ: 3 Chỉ số thành tích khích lệ */}
-          <div className="border-t border-emerald-100 bg-gradient-to-b from-emerald-50/60 to-emerald-50/30 p-4 sm:p-5">
-            <p className="text-[11px] font-black uppercase tracking-wider text-emerald-900/60 mb-2.5 text-center">
-              THÀNH TÍCH HỌC TẬP CỦA EM
+      <div className="mx-auto flex w-full max-w-[640px] flex-col gap-5">
+        {/* Thẻ học sinh: linh vật, tên, mã học sinh và nút nghe */}
+        <header className="flex items-center gap-4 rounded-[24px] border-2 border-secondary-container bg-surface-container-low p-4 sm:p-5">
+          <Illustration state="chao" className="size-16 shrink-0 rounded-full bg-surface sm:size-[72px]" />
+          <div className="min-w-0 flex-1">
+            <p className="text-[16px] font-bold text-on-surface-variant">Thẻ học sinh của em</p>
+            <h1 className="text-[30px] leading-tight font-bold break-words text-on-surface">{name}</h1>
+            <p className="mt-1 flex flex-wrap items-baseline gap-x-2 text-[16px] text-on-surface-variant">
+              Mã học sinh
+              <span className="font-mono text-[18px] font-bold text-on-surface">{code}</span>
             </p>
-            <div className="grid grid-cols-3 gap-2 sm:gap-3">
-              <Link
-                to={pathOf('progress')}
-                className="flex flex-col items-center justify-between min-h-[104px] py-3.5 px-2 rounded-2xl bg-orange-50 border border-orange-200 border-b-3 border-b-orange-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 no-underline cursor-pointer group text-center min-w-0"
-                title="Xem ngày chăm chỉ"
-              >
-                <span className="text-2xl sm:text-3xl group-hover:scale-110 transition-transform leading-none" aria-hidden="true">🔥</span>
-                <span className="text-xl sm:text-2xl font-black text-orange-600 leading-tight my-1">
-                  {activeDays}
-                </span>
-                <span className="text-[11px] font-bold text-orange-950/70 uppercase tracking-wide leading-none">
-                  Chăm chỉ
-                </span>
-              </Link>
-
-              <Link
-                to={pathOf('progress')}
-                className="flex flex-col items-center justify-between min-h-[104px] py-3.5 px-2 rounded-2xl bg-amber-50 border border-amber-200 border-b-3 border-b-amber-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 no-underline cursor-pointer group text-center min-w-0"
-                title="Xem tổng sao đạt được"
-              >
-                <span className="text-2xl sm:text-3xl group-hover:scale-110 transition-transform leading-none" aria-hidden="true">⭐</span>
-                <span className="text-xl sm:text-2xl font-black text-amber-700 leading-tight my-1">
-                  {home?.totalStars ?? 0}
-                </span>
-                <span className="text-[11px] font-bold text-amber-950/70 uppercase tracking-wide leading-none">
-                  Sao tích lũy
-                </span>
-              </Link>
-
-              <Link
-                to={`${pathOf('progress')}?tab=huy-hieu`}
-                className="flex flex-col items-center justify-between min-h-[104px] py-3.5 px-2 rounded-2xl bg-purple-50 border border-purple-200 border-b-3 border-b-purple-400 transition-all hover:-translate-y-0.5 active:translate-y-0.5 no-underline cursor-pointer group text-center min-w-0"
-                title="Xem bộ sưu tập huy hiệu"
-              >
-                <span className="text-2xl sm:text-3xl group-hover:scale-110 transition-transform leading-none" aria-hidden="true">🏆</span>
-                <span className="text-xl sm:text-2xl font-black text-purple-700 leading-tight my-1">
-                  {home?.recentBadges?.length ?? 0}
-                </span>
-                <span className="text-[11px] font-bold text-purple-950/70 uppercase tracking-wide leading-none">
-                  Huy hiệu
-                </span>
-              </Link>
-            </div>
           </div>
+          <LevelOneSpeak text={speechIntro} label="Nghe thông tin hồ sơ của em" size={56} />
+        </header>
 
-        </div>
+        {/* Trường và lớp của em */}
+        <section aria-labelledby="truong-lop-cua-em" className="rounded-[20px] border-2 border-border bg-surface p-4">
+          <h2 id="truong-lop-cua-em" className="text-[20px] font-bold text-on-surface">
+            Trường &amp; Lớp của em
+          </h2>
+          <dl className="mt-2 flex flex-col divide-y divide-border">
+            {classRows.map((row) => (
+              <div key={row.label} className="flex items-center gap-3 py-2.5">
+                <Icon name={row.icon} size={24} className="shrink-0 text-primary" />
+                <dt className="w-24 shrink-0 text-[16px] text-on-surface-variant">{row.label}</dt>
+                <dd className="min-w-0 flex-1 text-right text-[18px] font-bold break-words text-on-surface">{row.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
 
-        {/* Khối Huy hiệu em đã đạt */}
-        <div className="w-full duo-card p-5">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3.5">
-            <div className="flex items-center gap-2">
-              <span className="text-xl" aria-hidden="true">🏆</span>
-              <h3 className="text-sm font-black text-emerald-950">
-                Huy hiệu em đã đạt
-              </h3>
-            </div>
-            <Link
-              to={`${pathOf('progress')}?tab=huy-hieu`}
-              className="text-xs font-black text-emerald-700 hover:underline"
-            >
-              Xem tất cả ▶
+        {/* Thành tích: ba ô dẫn sang trang Sao của em */}
+        <section aria-labelledby="thanh-tich-cua-em" className="flex flex-col gap-3">
+          <h2 id="thanh-tich-cua-em" className="text-[22px] font-bold text-on-surface">
+            Thành tích của em
+          </h2>
+          <div className="grid grid-cols-3 gap-3">
+            <AchievementTile to={pathOf('progress')} icon="star" value={stars} label="Sao tích lũy" title="Xem tổng sao đạt được" filled />
+            <AchievementTile to={pathOf('progress')} icon="calendar" value={days} label="Ngày đã học" title="Xem những ngày em đã học" />
+            <AchievementTile to={`${pathOf('progress')}?tab=sao`} icon="shield-check" value={badges.length} label="Huy hiệu" title="Xem bộ sưu tập huy hiệu" />
+          </div>
+        </section>
+
+        {/* Huy hiệu em đã đạt */}
+        <section aria-labelledby="huy-hieu-em-da-dat" className="rounded-[20px] border-2 border-border bg-surface p-4">
+          <div className="flex items-center justify-between gap-3">
+            <h2 id="huy-hieu-em-da-dat" className="text-[20px] font-bold text-on-surface">
+              Huy hiệu em đã đạt
+            </h2>
+            <Link to={`${pathOf('progress')}?tab=sao`} className="inline-flex min-h-12 items-center gap-1 text-[16px] font-bold text-primary no-underline hover:underline">
+              Xem tất cả
+              <Icon name="chevron-right" size={20} />
             </Link>
           </div>
-
-          {home?.recentBadges && home.recentBadges.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-              {home.recentBadges.slice(0, 4).map((badge) => (
-                <div
-                  key={`${badge.code}-${badge.attemptId}`}
-                  className="rounded-2xl border border-purple-200 bg-purple-50/60 p-2.5 flex flex-col items-center text-center gap-1"
-                >
-                  <span className="text-2xl" aria-hidden="true">🎖️</span>
-                  <p className="text-xs font-black text-purple-950 line-clamp-1">{badge.name}</p>
-                  <span className="text-[10px] font-bold text-purple-700/80 line-clamp-1">
-                    {badge.quizName}
+          {badges.length > 0 ? (
+            <ul className="mt-3 grid grid-cols-2 gap-3">
+              {badges.slice(0, 4).map((badge) => (
+                <li key={`${badge.code}-${badge.attemptId}`} className="flex flex-col items-center gap-1 rounded-[16px] bg-surface-container-low p-3 text-center">
+                  <span className="flex size-12 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container">
+                    <Icon name="star" size={26} className="fill-current" />
                   </span>
-                </div>
+                  <p className="line-clamp-2 text-[18px] leading-tight font-bold text-on-surface">{badge.name}</p>
+                  <p className="line-clamp-2 text-[14px] leading-tight text-on-surface-variant">{badge.quizName}</p>
+                </li>
               ))}
-            </div>
+            </ul>
           ) : (
-            <div className="flex flex-col items-center text-center p-3 rounded-2xl bg-emerald-50/50 border border-emerald-100 gap-1.5">
-              <span className="text-2xl" aria-hidden="true">🌟</span>
-              <p className="text-xs font-bold text-emerald-900">
-                Em hãy vượt qua các bài thử thách để thu thập thật nhiều huy hiệu di sản xinh xắn nhé!
-              </p>
-            </div>
+            <p className="mt-3 rounded-[16px] bg-surface-container-low p-4 text-center text-[18px] leading-snug text-on-surface">Em làm bài để nhận thật nhiều huy hiệu nhé!</p>
           )}
-        </div>
+        </section>
 
-        {/* Hàng nút hành động: Về trang học + Đổi mật khẩu */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full">
-          <ButtonLink
-            to={pathOf('learnHome')}
-            className="duo-btn-green w-full sm:w-auto px-8 py-3 text-sm font-black no-underline flex items-center justify-center gap-2 shadow-md"
-          >
-            🏠 Về trang học
-          </ButtonLink>
-          <ButtonLink
-            to={pathOf('changePassword')}
-            className="w-full sm:w-auto rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 px-6 py-3 text-xs font-bold no-underline flex items-center justify-center gap-1.5 shadow-xs transition-colors"
-          >
-            <Icon name="key" size={16} />
+        {/* Về trang học và đổi mật khẩu */}
+        <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
+          <LevelOneButtonLink to={pathOf('learnHome')}>
+            <Icon name="home" size={24} />
+            Về trang học
+          </LevelOneButtonLink>
+          <LevelOneButtonLink to={pathOf('changePassword')} variant="secondary" size="md">
+            <Icon name="key" size={22} />
             Đổi mật khẩu
-          </ButtonLink>
+          </LevelOneButtonLink>
         </div>
-
       </div>
     </section>
   );

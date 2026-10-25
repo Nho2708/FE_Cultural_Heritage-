@@ -427,7 +427,7 @@ describe('Soạn bài học — xem như học sinh', () => {
     expect(within(dialog).getByText(/chưa có mã bài học/)).toBeInTheDocument();
     expect(dialog.querySelector('[data-bo-cuc="cap-1"]')).not.toBeNull();
     expect(dialog.querySelector('[data-bo-giao-dien="cap-1"]')).not.toBeNull();
-    expect(within(dialog).getByRole('list', { name: 'Các bước của bài' })).toBeInTheDocument();
+    expect(within(dialog).getByRole('navigation', { name: 'Các bước của bài' })).toBeInTheDocument();
     expect(within(dialog).getByText('Hôm nay Na đến Ngọ Môn.')).toBeInTheDocument();
     // Không mở trang công khai của di sản: không có liên kết nào trong hộp thoại.
     expect(within(dialog).queryAllByRole('link')).toHaveLength(0);

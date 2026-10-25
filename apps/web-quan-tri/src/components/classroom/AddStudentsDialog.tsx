@@ -6,8 +6,9 @@ import { studentsApi } from '../../lib/api/classroomEndpoints';
 import { ImportPanel } from './ImportPanel';
 
 // Thêm học sinh và tạo tài khoản (hộp thoại) — hai chế độ: thêm từng em (một hoặc vài dòng họ tên) hoặc nhập danh sách từ
-// tệp Excel / CSV hoặc dán họ tên. Thêm học sinh là tạo tài khoản: máy chủ sinh mã học sinh và mật khẩu tạm cho từng em
-// rồi trả phiếu đăng nhập, màn hình cha mở hộp thoại Phiếu đăng nhập ngay sau đó (mật khẩu tạm chỉ hiện một lần).
+// tệp Excel / CSV hoặc dán họ tên. Thêm học sinh là tạo tài khoản: máy chủ sinh mã học sinh và mật khẩu cho từng em
+// (lớp cấp 1: mật khẩu 6 chữ số dùng luôn; lớp cấp 2, 3: mật khẩu tạm) rồi trả phiếu đăng nhập, màn hình cha mở hộp thoại
+// Phiếu đăng nhập ngay sau đó (mật khẩu chỉ hiện một lần).
 
 export type AddMode = 'tung-em' | 'nhap-danh-sach';
 
@@ -146,7 +147,7 @@ export function AddStudentsDialog({ classRoom, initialMode, onAdded, onClose }: 
       open
       size="panel"
       title={`Thêm học sinh vào lớp ${classRoom.name}`}
-      description={`Lớp đang có ${classRoom.activeStudentCount} học sinh, sĩ số tối đa ${classRoom.maxStudents}. Hệ thống tạo tài khoản gồm mã học sinh và mật khẩu tạm cho từng em.`}
+      description={`Lớp đang có ${classRoom.activeStudentCount} học sinh, sĩ số tối đa ${classRoom.maxStudents}. Hệ thống tạo tài khoản gồm mã học sinh và ${classRoom.schoolLevel === 1 ? 'mật khẩu 6 chữ số' : 'mật khẩu tạm'} cho từng em.`}
       onClose={onClose}
     >
       <Tabs idPrefix={PREFIX} label="Cách thêm học sinh" items={TABS} value={mode} onChange={setMode} />

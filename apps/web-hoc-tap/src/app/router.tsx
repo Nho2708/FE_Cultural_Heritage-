@@ -26,12 +26,12 @@ import { ResultPage } from '../pages/ResultPage';
 import { SearchPage } from '../pages/SearchPage';
 import { TakeQuizPage } from '../pages/TakeQuizPage';
 import { TimelinePage } from '../pages/TimelinePage';
-import { LazyAboutPage, LazyForSchoolsPage, LazyPrivacyPage } from './lazyPages';
+import { LazyAboutPage, LazyAlbumPage, LazyForSchoolsPage, LazyPrivacyPage } from './lazyPages';
 import type { RouteHandle } from './routeHandle';
 
 // Khung route của web học tập: khám phá công khai (`/`, `/di-san`, `/ban-do`, `/dong-thoi-gian`, `/gioi-thieu`,
 // `/nha-truong`, `/chinh-sach-quyen-rieng-tu`) và khu học của học
-// sinh (`/dang-nhap`, `/doi-mat-khau`, `/hoc`, `/nhap-ma`, `/bai-hoc/...`, `/ket-qua/...`, `/tien-do`, `/ho-so`). Mỗi route lấy
+// sinh (`/dang-nhap`, `/doi-mat-khau`, `/hoc`, `/hoc/album`, `/nhap-ma`, `/bai-hoc/...`, `/ket-qua/...`, `/tien-do`, `/ho-so`). Mỗi route lấy
 // đường dẫn và quyền từ SCREENS; màn hình chưa dựng hiện PendingScreen với đúng guard.
 
 /** Màn hình đã dựng trong bản khung. */
@@ -49,6 +49,7 @@ const BUILT: Partial<Record<ScreenKey, ReactNode>> = {
   login: <LoginPage />,
   changePassword: <ChangePasswordPage />,
   learnHome: <LearnHomePage />,
+  album: <LazyAlbumPage />,
   enterCode: <EnterCodePage />,
   lesson: <LessonPage />,
   takeQuiz: <TakeQuizPage />,

@@ -108,9 +108,16 @@ export function Illustration({ state, className }: { state: IllustrationState; c
       data-bo-hinh={theme.illustrationSet}
       data-trang-thai={state}
       title={`Hình minh họa ${LABEL[state]}`}
-      className={cn('flex size-28 shrink-0 items-center justify-center rounded-md bg-primary-container text-primary', className)}
+      className={cn(
+        'flex shrink-0 items-center justify-center text-primary',
+        // Lớp nơi dùng truyền vào thay hẳn cỡ, bo góc, nền mặc định (cn không gộp lớp trùng thuộc tính).
+        !/(^|\s)size-/.test(className ?? '') && 'size-28',
+        !/(^|\s)rounded-/.test(className ?? '') && 'rounded-md',
+        !/(^|\s)bg-/.test(className ?? '') && 'bg-primary-container',
+        className,
+      )}
     >
-      <svg viewBox="0 0 120 120" className="size-24">
+      <svg viewBox="0 0 120 120" className="size-[86%]">
         <Drawing set={theme.illustrationSet} state={state} />
       </svg>
     </figure>

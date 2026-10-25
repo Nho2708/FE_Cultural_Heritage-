@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { sessionStore } from '../lib/auth/session';
 import { envelope, mockApi, sessionOf, studentOf, studentServer, type FetchCall } from '../test/fixtures';
-import { attemptOf, introOf, questionOf, resultOf, SERVER_NOW } from '../test/quizFixtures';
+import { attemptOf, checkOf, introOf, questionOf, resultOf, SERVER_NOW } from '../test/quizFixtures';
 import { renderApp } from '../test/renderApp';
 
 // Làm bài kiểm tra: trang giới thiệu, bắt đầu, ba bố cục theo cấp, lưu từng câu, nộp, hết giờ tự nộp, mất kết nối, lượt đã nộp.
@@ -25,6 +25,8 @@ interface ServerOptions {
   start?: (call: FetchCall) => Response | undefined;
   save?: (call: FetchCall) => Response | Promise<Response> | undefined;
   submit?: (call: FetchCall) => Response | undefined;
+  /** Bài chơi cấp 1: máy chủ kiểm một câu; mặc định là đúng. */
+  check?: (call: FetchCall) => Response | undefined;
 }
 
 function quizServer(level: SchoolLevel, options: ServerOptions) {
@@ -39,6 +41,10 @@ function quizServer(level: SchoolLevel, options: ServerOptions) {
       if (call.path === ATTEMPT_ENDPOINTS.start(9) && call.method === 'POST') return options.start?.(call) ?? envelope(201, { data: options.attempt });
       if (call.path.startsWith(`/student/attempts/31/answers/`) && call.method === 'PUT') {
         return options.save?.(call) ?? envelope(200, { data: { questionId: 11, answered: true, savedAt: SERVER_NOW, answeredCount: 1, questionCount: 3, remainingSeconds: null } });
+      }
+      if (call.path.endsWith('/check') && call.method === 'POST') {
+        const questionId = Number(call.path.split('/')[5]);
+        return options.check?.(call) ?? envelope(200, { data: checkOf(questionOf({ questionId }), { questionId }) });
       }
       if (call.path === ATTEMPT_ENDPOINTS.submit(31) && call.method === 'POST') return options.submit?.(call) ?? envelope(200, { data: result });
       if (call.path === ATTEMPT_ENDPOINTS.result(31)) return envelope(200, { data: result });
@@ -211,47 +217,161 @@ describe('Làm bài kiểm tra — cấp 2 (cân bằng)', () => {
   });
 });
 
-describe('Làm bài kiểm tra — cấp 1 (từng câu, nút lớn)', () => {
-  it('không đồng hồ, hàng sao tiến độ, nút Tiếp nhé và Xong rồi!, câu cuối còn câu trống thì hỏi làm tiếp hay nộp', async () => {
-    const spoken: string[] = [];
-    vi.stubGlobal('speechSynthesis', { cancel: () => undefined, speak: (u: { text: string }) => spoken.push(u.text) });
-    vi.stubGlobal(
-      'SpeechSynthesisUtterance',
-      class {
-        text: string;
-        constructor(text: string) {
-          this.text = text;
-        }
-      },
-    );
-    const calls = quizServer(1, { attempt: attemptOf(1, questions(2)) });
+describe('Làm bài kiểm tra — cấp 1 (bài chơi luyện tập)', () => {
+  /** Máy chủ kiểm câu: lần lượt trả các kết quả trong `answers`, hết thì coi là đúng. */
+  function checks(...answers: Array<(call: FetchCall) => Response>) {
+    let n = 0;
+    return (call: FetchCall) => {
+      const next = answers[n];
+      n += 1;
+      if (next) return next(call);
+      const questionId = Number(call.path.split('/')[5]);
+      return envelope(200, { data: checkOf(questionOf({ questionId }), { questionId }) });
+    };
+  }
+  const checkCalls = (calls: FetchCall[]) => calls.filter((c) => c.path.endsWith('/check') && c.method === 'POST');
+
+  it('chạm là kiểm: đúng thì khen kèm giải thích; không sao, không đồng hồ, không số câu, không lưu nháp; câu cuối "Xong rồi!" thì nộp', async () => {
+    const qs = questions(2);
+    const calls = quizServer(1, {
+      attempt: attemptOf(1, qs),
+      check: checks(() => envelope(200, { data: checkOf(qs[0]!, { explanation: 'Vua Gia Long cho khởi công Kinh thành năm 1805.' }) })),
+    });
     const user = userEvent.setup();
     const { router } = renderApp(PATH, OPEN.state);
 
-    expect(await screen.findByRole('heading', { level: 2, name: 'Câu hỏi số 1?' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Câu hỏi số 1?' })).toBeInTheDocument();
     expect(document.querySelector('[data-bo-cuc]')).toHaveAttribute('data-bo-cuc', 'cap-1');
-    expect(screen.queryByRole('timer')).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Tạm dừng' })).toHaveAttribute('href', '/hoc');
-    expect(screen.getByText('0 trên 2 sao')).toBeInTheDocument();
-    expect(screen.getAllByText('Câu 1 / 2')).toHaveLength(2);
-    await user.click(screen.getByRole('button', { name: 'Nghe đọc câu hỏi' }));
-    expect(spoken[0]).toMatch(/^Câu hỏi số 1\?\. Đáp án A: Vua Gia Long\. Đáp án B: Vua Minh Mạng/);
+    expect(screen.getByText('Câu 1 trên 2')).toBeInTheDocument();
+    expect(screen.getByText('Em chọn câu trả lời nhé')).toBeInTheDocument();
+    expect(screen.queryByRole('timer')).not.toBeInTheDocument();
+    expect(screen.queryByText(/sao/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Câu 1 \/ 2/)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Câu trước' })).not.toBeInTheDocument();
+    expect(screen.queryByText(/lưu/)).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('radio', { name: 'Vua Gia Long' }));
-    expect(await screen.findByText('1 trên 2 sao')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Tiếp nhé' }));
-    expect(screen.getAllByText('Câu 2 / 2')).toHaveLength(2);
+    await user.click(screen.getByRole('button', { name: 'Vua Gia Long' }));
+    const sheet = await screen.findByRole('region', { name: 'Đúng rồi!' });
+    expect(within(sheet).getByText('Vua Gia Long cho khởi công Kinh thành năm 1805.')).toBeInTheDocument();
+    expect(checkCalls(calls)[0]).toMatchObject({ path: ATTEMPT_ENDPOINTS.check(31, 11), body: { selectedIndex: 0 } });
+    expect(screen.getByRole('button', { name: 'Vua Gia Long, đáp án đúng' })).toBeDisabled();
 
-    await user.click(screen.getByRole('button', { name: 'Xong rồi!' }));
-    const dialog = await screen.findByRole('dialog', { name: 'Em muốn làm tiếp hay nộp?' });
-    expect(within(dialog).getByText('Em còn 1 câu chưa làm.')).toBeInTheDocument();
-    await user.click(within(dialog).getByRole('button', { name: 'Làm tiếp' }));
+    await user.click(within(sheet).getByRole('button', { name: 'Câu tiếp' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Câu hỏi số 2?' })).toBeInTheDocument();
+    expect(screen.getByText('Câu 2 trên 2')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('radio', { name: 'Vua Tự Đức' }));
-    await user.click(screen.getByRole('button', { name: 'Xong rồi!' }));
+    // Chạm ngay sau khi đổi câu bị bỏ qua (trẻ hay chạm lặp); chờ qua khoảng khóa rồi chạm.
+    await new Promise((resolve) => setTimeout(resolve, 450));
+    await user.click(screen.getByRole('button', { name: 'Vua Tự Đức' }));
+    const last = await screen.findByRole('region', { name: 'Giỏi quá!' });
+    await user.click(within(last).getByRole('button', { name: 'Xong rồi!' }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/ket-qua/31'));
     expect(calls.filter((c) => c.path === ATTEMPT_ENDPOINTS.submit(31))).toHaveLength(1);
-    expect(await screen.findByText('Giỏi quá! Em được 3 sao, em thật xuất sắc!')).toBeInTheDocument();
+    expect(calls.filter((c) => c.method === 'PUT')).toHaveLength(0);
+  });
+
+  it('sai lần đầu: gợi ý, Thử lại làm mờ hình vừa chọn; sai lần hai: chỉ đáp án đúng kèm giải thích, không có chữ "Sai"', async () => {
+    const image = questionOf({
+      questionId: 21,
+      questionType: 'IMAGE_CHOICE',
+      typeName: 'Chọn hình đúng',
+      content: 'Đâu là Chùa Một Cột?',
+      options: [
+        { content: null, imageUrl: 'https://anh.test/1.jpg' },
+        { content: null, imageUrl: 'https://anh.test/2.jpg' },
+        { content: null, imageUrl: 'https://anh.test/3.jpg' },
+      ],
+    });
+    const wrong = (tryCount: number, explanation: string | null = null) => () =>
+      envelope(200, { data: checkOf(image, { isCorrect: false, firstTryCorrect: false, tryCount, parts: [false], correctAnswer: { selectedIndex: 2 }, explanation }) });
+    const calls = quizServer(1, { attempt: attemptOf(1, [image]), check: checks(wrong(1), wrong(2, 'Chùa đứng trên một cây cột giữa hồ.')) });
+    const user = userEvent.setup();
+    renderApp(PATH, OPEN.state);
+
+    expect(await screen.findByText('Em chạm vào hình đúng')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Hình thứ nhất' }));
+    const hint = await screen.findByRole('region', { name: 'Chưa phải hình này.' });
+    expect(within(hint).getByText('Em nhớ lại câu chuyện rồi chọn hình khác nhé!')).toBeInTheDocument();
+    await user.click(within(hint).getByRole('button', { name: 'Thử lại' }));
+    expect(screen.getByRole('button', { name: 'Hình thứ nhất, em đã chọn, chưa đúng' })).toBeDisabled();
+
+    await new Promise((resolve) => setTimeout(resolve, 450));
+    await user.click(screen.getByRole('button', { name: 'Hình thứ hai' }));
+    const shown = await screen.findByRole('region', { name: 'Đáp án đúng ở đây nè!' });
+    expect(within(shown).getByText('Chùa đứng trên một cây cột giữa hồ.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Hình thứ ba, đáp án đúng' })).toBeInTheDocument();
+    expect(screen.queryByText(/^Sai/)).not.toBeInTheDocument();
+    expect(checkCalls(calls).map((c) => c.body)).toEqual([{ selectedIndex: 0 }, { selectedIndex: 1 }]);
+    expect(within(shown).getByRole('button', { name: 'Xong rồi!' })).toBeInTheDocument();
+  });
+
+  it('ghép cặp chỉ chạm: nút Kiểm tra bật khi nối đủ; gần đúng thì gỡ cặp sai để em nối lại', async () => {
+    const matching = questionOf({
+      questionId: 31,
+      questionType: 'MATCHING',
+      typeName: 'Ghép cặp',
+      content: 'Nối hình với tên.',
+      options: [],
+      leftItems: [
+        { content: null, imageUrl: 'https://anh.test/1.jpg' },
+        { content: null, imageUrl: 'https://anh.test/2.jpg' },
+      ],
+      rightItems: ['Ngọ Môn', 'Văn Miếu'],
+    });
+    quizServer(1, {
+      attempt: attemptOf(1, [matching]),
+      check: checks(() => envelope(200, { data: checkOf(matching, { isCorrect: false, firstTryCorrect: false, parts: [true, false], correctAnswer: { matches: [0, 1] } }) })),
+    });
+    const user = userEvent.setup();
+    renderApp(PATH, OPEN.state);
+
+    const check = await screen.findByRole('button', { name: 'Kiểm tra' });
+    expect(check).toBeDisabled();
+    await user.click(screen.getByRole('button', { name: /^Hình 1/ }));
+    await user.click(screen.getByRole('button', { name: 'Ngọ Môn' }));
+    await user.click(screen.getByRole('button', { name: /^Hình 2/ }));
+    await user.click(screen.getByRole('button', { name: 'Văn Miếu' }));
+    expect(check).toBeEnabled();
+    await user.click(check);
+    const hint = await screen.findByRole('region', { name: 'Gần đúng rồi!' });
+    expect(within(hint).getByText(/Em nối đúng 1 trên 2 cặp/)).toBeInTheDocument();
+    await user.click(within(hint).getByRole('button', { name: 'Thử lại' }));
+    expect(screen.getByRole('button', { name: 'Hình 1, đã nối với Ngọ Môn' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Hình 2, chưa nối' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Kiểm tra' })).toBeDisabled();
+  });
+
+  it('mất mạng khi kiểm: bảng "Mạng đang chập chờn", Thử lại gửi lại đúng câu trả lời đó', async () => {
+    const qs = questions(1);
+    const calls = quizServer(1, {
+      attempt: attemptOf(1, qs),
+      check: checks(() => envelope(503, { errorCode: 'SYSTEM_ERROR', message: 'Hệ thống đang bận.' })),
+    });
+    const user = userEvent.setup();
+    renderApp(PATH, OPEN.state);
+
+    await user.click(await screen.findByRole('button', { name: 'Vua Minh Mạng' }));
+    const offline = await screen.findByRole('region', { name: 'Mạng đang chập chờn.' });
+    await user.click(within(offline).getByRole('button', { name: 'Thử lại' }));
+    expect(await screen.findByRole('region', { name: 'Đúng rồi!' })).toBeInTheDocument();
+    expect(checkCalls(calls).map((c) => c.body)).toEqual([{ selectedIndex: 1 }, { selectedIndex: 1 }]);
+  });
+
+  it('vào tiếp lượt: bắt đầu ở câu đầu tiên chưa kiểm; đã kiểm hết thì nộp luôn', async () => {
+    const qs = questions(3).map((q, i) => (i === 0 ? { ...q, checked: true, answered: true, answer: { selectedIndex: 0 } } : q));
+    const first = quizServer(1, { attempt: attemptOf(1, qs) });
+    const view = renderApp(PATH, OPEN.state);
+    expect(await screen.findByRole('heading', { level: 1, name: 'Câu hỏi số 2?' })).toBeInTheDocument();
+    expect(screen.getByText('Câu 2 trên 3')).toBeInTheDocument();
+    expect(first.filter((c) => c.path === ATTEMPT_ENDPOINTS.submit(31))).toHaveLength(0);
+    view.unmount();
+
+    const done = qs.map((q) => ({ ...q, checked: true }));
+    const second = quizServer(1, { attempt: attemptOf(1, done) });
+    const { router } = renderApp(PATH, OPEN.state);
+    await waitFor(() => expect(router.state.location.pathname).toBe('/ket-qua/31'));
+    expect(second.filter((c) => c.path === ATTEMPT_ENDPOINTS.submit(31))).toHaveLength(1);
   });
 });
 
@@ -271,26 +391,25 @@ describe('Làm bài kiểm tra — cấp 1 tự đọc câu hỏi', () => {
     return spoken;
   }
 
-  it('câu hỏi tự đọc to khi em vào câu, sang câu khác thì đọc câu đó, tắt được và nhớ lựa chọn', async () => {
+  it('câu hỏi tự đọc kèm các phương án và lời hướng dẫn, bảng phản hồi tự đọc; tắt được và nhớ lựa chọn', async () => {
     window.localStorage.clear();
     const spoken = stubSpeech();
     quizServer(1, { attempt: attemptOf(1, questions(2)) });
     const user = userEvent.setup();
     renderApp(PATH, OPEN.state);
 
-    expect(await screen.findByRole('heading', { level: 2, name: 'Câu hỏi số 1?' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Câu hỏi số 1?' })).toBeInTheDocument();
     await waitFor(() => expect(spoken).toHaveLength(1));
-    expect(spoken[0]).toMatch(/^Câu hỏi số 1\?/);
+    expect(spoken[0]).toBe('Câu hỏi số 1? A: Vua Gia Long. B: Vua Minh Mạng. C: Vua Tự Đức. Em chọn câu trả lời nhé.');
 
-    await user.click(screen.getByRole('radio', { name: 'Vua Gia Long' }));
-    await user.click(screen.getByRole('button', { name: 'Tiếp nhé' }));
+    await user.click(screen.getByRole('button', { name: 'Vua Gia Long' }));
     await waitFor(() => expect(spoken).toHaveLength(2));
-    expect(spoken[1]).toMatch(/^Câu hỏi số 2\?/);
+    expect(spoken[1]).toBe('Đúng rồi! Em nhớ bài giỏi lắm!');
 
     await user.click(screen.getByRole('switch', { name: 'Tự đọc to' }));
     expect(window.localStorage.getItem('dsvhvn.hoc-tap.tu-doc')).toBe('0');
-    await user.click(screen.getByRole('button', { name: 'Câu trước' }));
-    expect(await screen.findByRole('heading', { level: 2, name: 'Câu hỏi số 1?' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Câu tiếp' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Câu hỏi số 2?' })).toBeInTheDocument();
     expect(spoken).toHaveLength(2);
     window.localStorage.clear();
   });

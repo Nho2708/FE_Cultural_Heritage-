@@ -35,9 +35,18 @@ describe('ô trả lời theo dạng câu', () => {
 
   it('Đúng/Sai và đọc tư liệu dùng cùng cách chọn một phương án', async () => {
     const user = userEvent.setup();
-    render(<Harness question={questionOf({ questionType: 'TRUE_FALSE', options: [option('Đúng'), option('Sai')] })} level={1} />);
+    render(<Harness question={questionOf({ questionType: 'TRUE_FALSE', options: [option('Đúng'), option('Sai')] })} level={2} />);
     await user.click(screen.getByRole('radio', { name: 'Sai' }));
     expect(current()).toEqual({ selectedIndex: 1 });
+  });
+
+  it('cấp 1 Đúng/Sai: hai nút to (không phải nút radio, phím mũi tên không chọn thay em)', async () => {
+    const user = userEvent.setup();
+    render(<Harness question={questionOf({ questionType: 'TRUE_FALSE', options: [option('Đúng'), option('Sai')] })} level={1} />);
+    expect(screen.queryByRole('radio')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Sai' }));
+    expect(current()).toEqual({ selectedIndex: 1 });
+    expect(screen.getByRole('button', { name: 'Sai' })).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('chọn hình đúng (cấp 1): thẻ hình lớn, chọn một hình', async () => {
@@ -50,8 +59,24 @@ describe('ô trả lời theo dạng câu', () => {
       ],
     });
     render(<Harness question={question} level={1} />);
-    await user.click(screen.getByRole('radio', { name: 'Hình B' }));
+    await user.click(screen.getByRole('button', { name: 'Hình B' }));
     expect(current()).toEqual({ selectedIndex: 1 });
+  });
+
+  it('chọn hình cấp 1 khi luyện tập: hình đã chọn chưa đúng mờ và khóa, đáp án đúng sáng kèm dấu tích', () => {
+    const question = questionOf({
+      questionType: 'IMAGE_CHOICE',
+      options: [
+        { content: null, imageUrl: 'https://anh.test/a.jpg' },
+        { content: null, imageUrl: 'https://anh.test/b.jpg' },
+        { content: null, imageUrl: 'https://anh.test/c.jpg' },
+      ],
+    });
+    const { rerender } = render(<QuestionInput question={question} answer={null} onChange={() => {}} level={1} marks={{ tried: new Set([0]) }} />);
+    expect(screen.getByRole('button', { name: 'Hình thứ nhất, em đã chọn, chưa đúng' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Hình thứ hai' })).toBeEnabled();
+    rerender(<QuestionInput question={question} answer={{ selectedIndex: 1 }} onChange={() => {}} level={1} marks={{ tried: new Set([0, 1]), reveal: { selectedIndex: 2 } }} />);
+    expect(screen.getByRole('button', { name: 'Hình thứ ba, đáp án đúng' })).toBeDisabled();
   });
 
   describe('ghép cặp', () => {
@@ -80,8 +105,17 @@ describe('ô trả lời theo dạng câu', () => {
       expect(current()).toEqual({ matches: [null, 0] });
     });
 
+    it('cấp 1 chỉ chạm, không kéo thả; khi chỉ đáp án thì hiện đủ các cặp đúng', () => {
+      const { rerender } = render(<QuestionInput question={matching} answer={null} onChange={() => {}} level={1} />);
+      expect(screen.getByRole('button', { name: 'Văn Miếu' })).not.toHaveAttribute('draggable');
+      rerender(<QuestionInput question={matching} answer={{ matches: [1, 0] }} onChange={() => {}} level={1} marks={{ reveal: { matches: [0, 1] } }} />);
+      expect(screen.getByRole('button', { name: 'Hình 1, đã nối với Ngọ Môn' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Hình 2, đã nối với Văn Miếu' })).toBeDisabled();
+      expect(screen.queryByRole('list', { name: 'Các tên để nối' })).not.toBeInTheDocument();
+    });
+
     it('kéo tên thả vào hình', () => {
-      render(<Harness question={matching} level={1} />);
+      render(<Harness question={matching} level={2} />);
       const data = new Map<string, string>();
       const dataTransfer = {
         types: ['application/x-dsvhvn-bai-kiem-tra'],

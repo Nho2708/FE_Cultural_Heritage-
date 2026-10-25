@@ -22,7 +22,7 @@ describe('Đổi mật khẩu — bắt buộc', () => {
   });
 
   it('không hỏi mật khẩu hiện tại; danh sách quy tắc đánh dấu khi đạt; hai lần nhập phải giống nhau', async () => {
-    signInAs(studentOf(4, { mustChangePassword: true }));
+    signInAs(studentOf(7, { mustChangePassword: true }));
     const calls = mockApi();
     const user = userEvent.setup();
     renderApp('/doi-mat-khau');
@@ -105,6 +105,38 @@ describe('Đổi mật khẩu — tự đổi', () => {
       currentPassword: 'MatKhau2026',
       newPassword: 'MatKhau2027',
       confirmNewPassword: 'MatKhau2027',
+    });
+  });
+});
+
+describe('Đổi mật khẩu — học sinh cấp 1', () => {
+  it('chỉ cần dài 6-64 ký tự: 6 chữ số là đủ, không đòi chữ hoa, chữ thường', async () => {
+    signInAs(studentOf(2));
+    const calls = mockApi((call) => (call.path === STUDENT_ENDPOINTS.password ? envelope(200, { data: newToken(studentOf(2)) }) : undefined));
+    const user = userEvent.setup();
+    const { router } = renderApp('/doi-mat-khau');
+
+    expect(await screen.findByText('6-64 ký tự, ví dụ 6 chữ số dễ nhớ')).toBeInTheDocument();
+    const rules = screen.getByRole('list', { name: 'Quy tắc mật khẩu' });
+    expect(rules).toHaveTextContent('Dài 6-64 ký tự (chưa đạt)');
+    expect(rules).not.toHaveTextContent('Có chữ hoa');
+
+    await user.type(screen.getByLabelText('Mật khẩu hiện tại'), '482915');
+    await user.type(screen.getByLabelText('Mật khẩu mới'), '12345');
+    await user.type(screen.getByLabelText('Nhập lại mật khẩu mới'), '12345');
+    await user.click(screen.getByRole('button', { name: 'Đổi mật khẩu' }));
+    expect(await screen.findByText('Mật khẩu dài 6-64 ký tự.')).toBeInTheDocument();
+    expect(calls.filter((c) => c.path === STUDENT_ENDPOINTS.password)).toHaveLength(0);
+
+    await user.type(screen.getByLabelText('Mật khẩu mới'), '6');
+    await user.type(screen.getByLabelText('Nhập lại mật khẩu mới'), '6');
+    expect(rules).toHaveTextContent('Dài 6-64 ký tự (đã đạt)');
+    await user.click(screen.getByRole('button', { name: 'Đổi mật khẩu' }));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/hoc'));
+    expect(calls.find((c) => c.path === STUDENT_ENDPOINTS.password)?.body).toEqual({
+      currentPassword: '482915',
+      newPassword: '123456',
+      confirmNewPassword: '123456',
     });
   });
 });
