@@ -61,11 +61,11 @@ describe('bốn bộ giao diện', () => {
     }
   });
 
-  it('cấp 1: chữ thân ≥ 18px, câu hỏi ≥ 22px, vùng bấm ≥ 48px; cấp 2, 3 và mặc định: ≥ 16px, ≥ 18px, ≥ 44px', () => {
+  it('cấp 1: chữ thân ≥ 20px, câu hỏi ≥ 28px, vùng bấm ≥ 64px; cấp 2, 3 và mặc định: ≥ 16px, ≥ 18px, ≥ 44px', () => {
     const level1 = LEARNING_THEMES['cap-1'];
-    expect(level1.text.bodySize).toBeGreaterThanOrEqual(18);
-    expect(level1.text.questionSize).toBeGreaterThanOrEqual(22);
-    expect(level1.touchTarget).toBeGreaterThanOrEqual(48);
+    expect(level1.text.bodySize).toBeGreaterThanOrEqual(20);
+    expect(level1.text.questionSize).toBeGreaterThanOrEqual(28);
+    expect(level1.touchTarget).toBeGreaterThanOrEqual(64);
     for (const theme of [LEARNING_THEMES['cap-2'], LEARNING_THEMES['cap-3'], LEARNING_THEMES['mac-dinh']]) {
       expect(theme.text.bodySize).toBeGreaterThanOrEqual(16);
       expect(theme.text.questionSize).toBeGreaterThanOrEqual(18);
@@ -89,9 +89,9 @@ describe('bốn bộ giao diện', () => {
     expect(new Set(keys).size).toBe(1);
     expect(themeCssVariables(LEARNING_THEMES['cap-1'])).toMatchObject({
       '--dsv-color-primary': '#0057B8',
-      '--dsv-text-body-m-size': '19px',
-      '--dsv-question-size': '24px',
-      '--dsv-touch-target': '48px',
+      '--dsv-text-body-m-size': '20px',
+      '--dsv-question-size': '28px',
+      '--dsv-touch-target': '64px',
     });
   });
 });

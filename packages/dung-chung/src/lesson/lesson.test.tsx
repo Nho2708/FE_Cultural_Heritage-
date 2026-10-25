@@ -126,7 +126,7 @@ describe('bộ giao diện của một cấp ghi trên một khối', () => {
     expect(style['--dsv-color-primary']).toBe(LEARNING_THEMES['cap-1'].color.primary);
     expect(style['--dsv-pill-bg']).toBe(LEARNING_THEMES['cap-1'].color.primary);
     expect(style['--dsv-tab-active-fg']).toBe(LEARNING_THEMES['cap-1'].color.primary);
-    expect(style['--dsv-touch-target']).toBe('48px');
+    expect(style['--dsv-touch-target']).toBe('64px');
     expect((lessonScopeStyle(3) as Record<string, string>)['--dsv-color-primary']).toBe(LEARNING_THEMES['cap-3'].color.primary);
   });
 

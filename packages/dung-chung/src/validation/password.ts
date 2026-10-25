@@ -57,6 +57,27 @@ export function validateNewPassword(password: string, field = 'mật khẩu'): s
   return isPasswordValid(password) ? null : MESSAGES.passwordPolicy;
 }
 
+// Học sinh lớp cấp 1 (khối 1-5): thầy cô phát mật khẩu đơn giản 6 chữ số, em dùng luôn, không bị buộc đổi. Khi em tự đổi, mật khẩu mới chỉ cần
+// dài 6-64 ký tự (giống quy tắc của máy chủ cho học sinh cấp 1). Học sinh cấp 2, 3 và người lớn vẫn theo quy tắc ở trên.
+export const SIMPLE_PASSWORD_MIN_LENGTH = 6;
+
+export const SIMPLE_PASSWORD_HINT = '6-64 ký tự, ví dụ 6 chữ số dễ nhớ';
+
+export const SIMPLE_PASSWORD_RULES = [{ key: 'length', label: 'Dài 6-64 ký tự' }] as const;
+
+export const SIMPLE_PASSWORD_POLICY_MESSAGE = 'Mật khẩu dài 6-64 ký tự.';
+
+export function isSimplePasswordValid(password: string): boolean {
+  return password.length >= SIMPLE_PASSWORD_MIN_LENGTH && password.length <= PASSWORD_MAX_LENGTH;
+}
+
+/** Lỗi ô mật khẩu mới của học sinh theo cấp lớp: cấp 1 theo quy tắc 6-64 ký tự, cấp khác như `validateNewPassword`. */
+export function validateStudentNewPassword(password: string, schoolLevel: number | null | undefined, field = 'mật khẩu mới'): string | null {
+  if (schoolLevel !== 1) return validateNewPassword(password, field);
+  if (password.trim() === '') return MESSAGES.required(field);
+  return isSimplePasswordValid(password) ? null : SIMPLE_PASSWORD_POLICY_MESSAGE;
+}
+
 /** Ô "Nhập lại mật khẩu mới": bắt buộc nhập, phải giống mật khẩu mới. Chỉ kiểm ở giao diện, API chỉ nhận một mật khẩu. */
 export function validatePasswordConfirmation(password: string, confirmation: string): string | null {
   if (confirmation === '') return MESSAGES.required('lại mật khẩu mới');
