@@ -61,7 +61,12 @@ export function resolveFileUrl(url: string | null | undefined, apiBaseUrl: strin
   if (!url) return null;
   if (!url.startsWith('/files/')) return url;
   try {
-    return new URL(url, apiBaseUrl).href;
+    const base = /^https?:\/\//i.test(apiBaseUrl)
+      ? apiBaseUrl
+      : typeof window !== 'undefined' && window.location?.origin
+        ? window.location.origin
+        : 'http://localhost';
+    return new URL(url, base).href;
   } catch {
     return url;
   }
