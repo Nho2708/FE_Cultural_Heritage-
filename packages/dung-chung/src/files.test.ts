@@ -30,6 +30,7 @@ describe('đường dẫn tệp trong kho', () => {
 
   it('đường dẫn tương đối ghép với địa chỉ gốc của máy chủ API', () => {
     expect(resolveFileUrl('/files/images/a.jpg', api)).toBe('http://localhost:5080/files/images/a.jpg');
+    expect(resolveFileUrl('/files/images/a.jpg', '/api/v1')).toBe(`${window.location.origin}/files/images/a.jpg`);
   });
 
   it('đường dẫn đủ địa chỉ và rỗng giữ nguyên', () => {
