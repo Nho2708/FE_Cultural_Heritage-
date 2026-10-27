@@ -124,4 +124,50 @@ describe('Học sinh đăng nhập', () => {
     await waitFor(() => expect(router.state.location.pathname).toBe('/bai-hoc/BH7F3K2Q'));
     expect(document.documentElement).toHaveAttribute('data-bo-giao-dien', 'cap-3');
   });
+
+  it('nhấn quên mật khẩu: mã học sinh không tồn tại báo đỏ dưới ô nhập', async () => {
+    mockApi(() =>
+      envelope(404, {
+        errorCode: ERROR_CODES.notFound,
+        message: MESSAGES.studentAccountNotFound,
+        errors: { studentCode: MESSAGES.studentAccountNotFound },
+      }),
+    );
+    const user = userEvent.setup();
+    renderApp('/dang-nhap');
+
+    await user.click(await screen.findByRole('button', { name: 'Quên mật khẩu?' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Tìm tài khoản học sinh' })).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText('Mã học sinh'), 'HSUNKNOWN');
+    await user.click(screen.getByRole('button', { name: 'Tiếp tục' }));
+
+    expect(await screen.findByText(MESSAGES.studentAccountNotFound)).toBeInTheDocument();
+  });
+
+  it('nhấn quên mật khẩu: mã học sinh tồn tại báo thành công đã gửi giáo viên', async () => {
+    const calls = mockApi(() =>
+      envelope(200, {
+        data: { studentName: 'Vũ Thảo My', teacherName: 'Trần Thị Minh Anh' },
+        message: MESSAGES.studentPasswordResetRequested,
+      }),
+    );
+    const user = userEvent.setup();
+    renderApp('/dang-nhap');
+
+    await user.click(await screen.findByRole('button', { name: 'Quên mật khẩu?' }));
+    await user.type(screen.getByLabelText('Mã học sinh'), 'HSHUWAND');
+    await user.click(screen.getByRole('button', { name: 'Tiếp tục' }));
+
+    expect(await screen.findByText(MESSAGES.studentPasswordResetRequested)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Gửi lại yêu cầu' })).toBeInTheDocument();
+    expect(calls[0]).toMatchObject({
+      method: 'POST',
+      path: STUDENT_ENDPOINTS.forgotPassword,
+      body: { studentCode: 'HSHUWAND' },
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Đã nhớ mật khẩu? Quay lại đăng nhập' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Học sinh đăng nhập' })).toBeInTheDocument();
+  });
 });

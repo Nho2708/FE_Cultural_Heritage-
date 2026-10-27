@@ -23,6 +23,7 @@ export const ERROR_CODES = {
   passwordLinkInvalid: 'PASSWORD_LINK_INVALID',
   forbidden: 'FORBIDDEN',
   blocked: 'BLOCKED',
+  notFound: 'NOT_FOUND',
   teacherLimitReached: 'TEACHER_LIMIT_REACHED',
   notReady: 'NOT_READY',
   aiUnavailable: 'AI_UNAVAILABLE',

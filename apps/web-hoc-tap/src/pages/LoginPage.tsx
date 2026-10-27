@@ -13,6 +13,7 @@ import { useRef, useState, type FormEvent } from 'react';
 import { useLocation } from 'react-router';
 import { isLessonPath } from '../access/access';
 import { ADMIN_WEB_URL } from '../config/env';
+import { studentApi } from '../lib/api/client';
 import { useAuth } from '../lib/auth/context';
 import { Illustration } from '@dsvhvn/dung-chung/lesson';
 
@@ -48,6 +49,35 @@ export function LoginPage() {
   const [errors, setErrors] = useState<Partial<Record<Field, string>>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  const [isForgot, setIsForgot] = useState(false);
+  const [forgotCode, setForgotCode] = useState('');
+  const [forgotError, setForgotError] = useState<string | null>(null);
+  const [forgotSuccess, setForgotSuccess] = useState<string | null>(null);
+  const [forgotSubmitting, setForgotSubmitting] = useState(false);
+  const forgotFormRef = useRef<HTMLFormElement>(null);
+
+  const onForgotSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setForgotSuccess(null);
+    const codeError = validateStudentCodeInput(forgotCode);
+    setForgotError(codeError);
+    if (codeError) return focusFirstInvalid(forgotFormRef.current);
+
+    setForgotSubmitting(true);
+    try {
+      const res = await studentApi.forgotPassword(normalizeCode(forgotCode));
+      setForgotSuccess(res.message ?? MESSAGES.studentPasswordResetRequested);
+      setForgotError(null);
+    } catch (error) {
+      setForgotSuccess(null);
+      const failure = splitApiError<'studentCode'>(error, ['studentCode']);
+      setForgotError(failure.fields.studentCode ?? failure.form ?? MESSAGES.studentAccountNotFound);
+      focusFirstInvalid(forgotFormRef.current);
+    } finally {
+      setForgotSubmitting(false);
+    }
+  };
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -85,44 +115,105 @@ export function LoginPage() {
           <BrandLogo variant="badge" size={96} decorative />
           <span className="type-h3 text-on-surface">DiViet</span>
         </div>
-        <div className="flex items-center gap-(--dsv-inline-gap)">
-          <Illustration state="chao" className="size-20" />
-          <div>
-            <h1 className="type-h1 text-on-surface">Học sinh đăng nhập</h1>
-            <p className="mt-1 type-body-m text-on-surface-variant">Em dùng mã học sinh và mật khẩu trên phiếu đăng nhập.</p>
-          </div>
-        </div>
+        {!isForgot ? (
+          <>
+            <div className="flex items-center gap-(--dsv-inline-gap)">
+              <Illustration state="chao" className="size-20" />
+              <div>
+                <h1 className="type-h1 text-on-surface">Học sinh đăng nhập</h1>
+                <p className="mt-1 type-body-m text-on-surface-variant">Em dùng mã học sinh và mật khẩu trên phiếu đăng nhập.</p>
+              </div>
+            </div>
 
-        {isLessonPath(state.from) && <InlineMessage tone="info">{MESSAGES.studentSignInToOpenLesson}</InlineMessage>}
+            {isLessonPath(state.from) && <InlineMessage tone="info">{MESSAGES.studentSignInToOpenLesson}</InlineMessage>}
 
-        <form ref={formRef} noValidate onSubmit={onSubmit} className="flex flex-col gap-(--dsv-inline-gap)">
-          {message && <InlineMessage tone="danger">{message}</InlineMessage>}
-          <TextField
-            label="Mã học sinh"
-            name="studentCode"
-            autoComplete="username"
-            autoCapitalize="characters"
-            autoCorrect="off"
-            spellCheck={false}
-            placeholder="Ví dụ: HS8K2QX7"
-            value={studentCode}
-            onChange={(e) => setStudentCode(normalizeCode(e.target.value))}
-            error={errors.studentCode}
-            className="type-mono-label tracking-wider"
-          />
-          <PasswordField
-            label="Mật khẩu"
-            name="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            error={errors.password}
-          />
-          <p className="type-body-m text-on-surface-variant">{MESSAGES.studentForgotPassword}</p>
-          <Button type="submit" size="lg" fullWidth loading={submitting}>
-            Đăng nhập
-          </Button>
-        </form>
+            <form ref={formRef} noValidate onSubmit={onSubmit} className="flex flex-col gap-(--dsv-inline-gap)">
+              {message && <InlineMessage tone="danger">{message}</InlineMessage>}
+              <TextField
+                label="Mã học sinh"
+                name="studentCode"
+                autoComplete="username"
+                autoCapitalize="characters"
+                autoCorrect="off"
+                spellCheck={false}
+                placeholder="Ví dụ: HS8K2QX7"
+                value={studentCode}
+                onChange={(e) => setStudentCode(normalizeCode(e.target.value))}
+                error={errors.studentCode}
+                className="type-mono-label tracking-wider"
+              />
+              <PasswordField
+                label="Mật khẩu"
+                name="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                error={errors.password}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setIsForgot(true);
+                  setForgotCode(studentCode);
+                  setForgotError(null);
+                  setForgotSuccess(null);
+                }}
+                className="w-fit cursor-pointer text-left type-body-m text-link underline-offset-4 hover:underline"
+              >
+                {MESSAGES.studentForgotPassword}
+              </button>
+              <Button type="submit" size="lg" fullWidth loading={submitting}>
+                Đăng nhập
+              </Button>
+            </form>
+          </>
+        ) : (
+          <>
+            <div className="flex items-center gap-(--dsv-inline-gap)">
+              <Illustration state="chao" className="size-20" />
+              <div>
+                <h1 className="type-h1 text-on-surface">Tìm tài khoản học sinh</h1>
+                <p className="mt-1 type-body-m text-on-surface-variant">{MESSAGES.studentForgotPasswordSubtitle}</p>
+              </div>
+            </div>
+
+            <form ref={forgotFormRef} noValidate onSubmit={onForgotSubmit} className="flex flex-col gap-(--dsv-inline-gap)">
+              {forgotSuccess && <InlineMessage tone="success">{forgotSuccess}</InlineMessage>}
+              <TextField
+                label="Mã học sinh"
+                name="studentCode"
+                autoComplete="username"
+                autoCapitalize="characters"
+                autoCorrect="off"
+                spellCheck={false}
+                placeholder="Ví dụ: HS8K2QX7"
+                value={forgotCode}
+                onChange={(e) => {
+                  setForgotCode(normalizeCode(e.target.value));
+                  setForgotError(null);
+                }}
+                error={forgotError}
+                className="type-mono-label tracking-wider"
+              />
+              <Button type="submit" size="lg" fullWidth loading={forgotSubmitting}>
+                {forgotSuccess ? 'Gửi lại yêu cầu' : 'Tiếp tục'}
+              </Button>
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsForgot(false);
+                    setForgotError(null);
+                    setForgotSuccess(null);
+                  }}
+                  className="cursor-pointer type-body-m text-link underline-offset-4 hover:underline"
+                >
+                  Đã nhớ mật khẩu? Quay lại đăng nhập
+                </button>
+              </div>
+            </form>
+          </>
+        )}
 
         <p className="rounded-sm bg-surface-container-low px-4 py-3 text-center type-body-s text-on-surface-variant">
           Thầy cô đăng nhập ở trang quản trị.{' '}

@@ -11,6 +11,7 @@ import type { AccessToken, LoginResult, OrganizationRef, SchoolLevel, StudentCla
 
 export const STUDENT_ENDPOINTS = {
   login: '/student/auth/login',
+  forgotPassword: '/student/auth/forgot-password',
   profile: '/student/me',
   password: '/student/me/password',
   class: '/student/class',
@@ -136,6 +137,14 @@ export function createStudentApi(client: ApiClient) {
       toLoginResult(
         await client.request<StudentSessionWire>(STUDENT_ENDPOINTS.login, { method: 'POST', body, auth: false }),
       ),
+
+    /** Học sinh xin đặt lại mật khẩu: gửi mã học sinh để hệ thống kiểm tra và báo giáo viên chủ nhiệm. */
+    forgotPassword: (studentCode: string) =>
+      client.request<{ studentName: string; teacherName: string }>(STUDENT_ENDPOINTS.forgotPassword, {
+        method: 'POST',
+        body: { studentCode },
+        auth: false,
+      }),
 
     /** Hồ sơ của em: họ tên, mã học sinh, lớp, khối, cấp học, trường. Gọi được cả khi đang bị buộc đổi mật khẩu. */
     profile: async (): Promise<ApiResult<StudentProfile>> => {
