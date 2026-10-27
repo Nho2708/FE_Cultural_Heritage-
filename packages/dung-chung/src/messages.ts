@@ -30,9 +30,11 @@ export const MESSAGES = {
   invalidCredentials: 'Email, tên đăng nhập hoặc mật khẩu không đúng.',
   /** Tài khoản người lớn không đăng nhập được: tạm khóa, bị khóa, ngừng sử dụng, trường đã ngừng. */
   cannotSignIn: (reason: string) => `Tài khoản không đăng nhập được. ${reason}`.trim(),
-  /** Luôn cùng một câu dù email có thuộc tài khoản nào hay không. */
+  /** Thông báo khi tài khoản tồn tại và đã gửi liên kết đặt lại mật khẩu. */
   forgotPasswordAccepted:
-    'Nếu email này thuộc một tài khoản, liên kết đặt lại mật khẩu sẽ được gửi tới hộp thư. Liên kết có hiệu lực 30 phút.',
+    'Liên kết đặt lại mật khẩu đã được gửi tới hộp thư của bạn. Vui lòng kiểm tra hộp thư (kể cả mục thư rác/spam) trong 1-2 phút tới. Liên kết có hiệu lực 30 phút.',
+  /** Không tìm thấy tài khoản theo email hoặc số điện thoại. */
+  accountNotFound: 'Không tìm thấy tài khoản. Hãy kiểm tra số di động hoặc email của bạn rồi thử lại.',
   /** Liên kết đặt mật khẩu hết hạn, đã dùng hoặc đã bị thay bằng liên kết mới. */
   passwordLinkInvalid: 'Liên kết đã hết hạn hoặc không còn dùng được. Vui lòng yêu cầu gửi liên kết mới.',
   /** Đã tạo tài khoản quản trị trường hoặc giáo viên và gửi liên kết đặt mật khẩu lần đầu. */
@@ -68,6 +70,12 @@ export const MESSAGES = {
   studentCannotSignIn: (reason: string) => `Tài khoản của em tạm thời chưa đăng nhập được. ${reason}`.trim(),
   /** Dòng nhắc cố định trên màn hình đăng nhập của học sinh. */
   studentForgotPassword: 'Quên mật khẩu?',
+  /** Không tìm thấy tài khoản học sinh. */
+  studentAccountNotFound: 'Không tìm thấy tài khoản học sinh. Hãy kiểm tra lại mã học sinh rồi thử lại.',
+  /** Đã gửi yêu cầu tới giáo viên chủ nhiệm. */
+  studentPasswordResetRequested: 'Đã báo thầy cô, em chờ thầy cô đặt lại mật khẩu nhé.',
+  /** Mô tả phụ cho form quên mật khẩu học sinh. */
+  studentForgotPasswordSubtitle: 'Hãy nhập mã học sinh của em để báo thầy cô đặt lại mật khẩu.',
   /** Màn hình đổi mật khẩu bắt buộc: lần đầu đăng nhập hoặc sau khi giáo viên đặt lại. */
   studentMustChangePassword:
     'Em hãy đặt mật khẩu mới của riêng em để bắt đầu học. Mật khẩu cần 8-64 ký tự, có chữ hoa, chữ thường và chữ số.',

@@ -49,10 +49,13 @@ function RequestLinkForm() {
     try {
       const { message } = await authApi.forgotPassword(email.trim());
       setSentMessage(message ?? MESSAGES.forgotPasswordAccepted);
+      setError(null);
+      setFormError(null);
     } catch (err) {
+      setSentMessage(null);
       const failure = splitApiError<'email'>(err, ['email']);
-      setError(failure.fields.email ?? null);
-      setFormError(failure.form);
+      setError(failure.fields.email ?? failure.form ?? MESSAGES.accountNotFound);
+      setFormError(failure.fields.email ? failure.form : null);
       focusFirstInvalid(formRef.current);
     } finally {
       setSubmitting(false);
