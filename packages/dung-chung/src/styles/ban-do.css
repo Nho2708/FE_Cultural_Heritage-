@@ -17,8 +17,10 @@
   stroke-opacity: 0.7;
 }
 
-.dsv-pin,
-.dsv-cluster {
+/* Ghép thêm .leaflet-marker-icon: leaflet.css nạp sau (theo chunk động) đặt `display: block` cùng độ ưu tiên,
+   làm biểu tượng ghim và số nhóm lệch lên góc trên bên trái. */
+.leaflet-marker-icon.dsv-pin,
+.leaflet-marker-icon.dsv-cluster {
   display: flex;
   align-items: center;
   justify-content: center;
