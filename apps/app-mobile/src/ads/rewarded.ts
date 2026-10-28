@@ -1,6 +1,7 @@
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { Platform } from 'react-native';
 import { privacyOptionsStateOf, type PrivacyOptionsState } from './consent';
+import { createRewardedLoader, type RewardedAdsApi, type RewardedOutcome } from './rewardedLoader';
 import { parseTestDeviceIds } from './testDevices';
 
 // Quảng cáo có thưởng của Google (AdMob) qua `react-native-google-mobile-ads`. Mô-đun này là mã gốc nên KHÔNG có trong Expo Go: ở đó `require` thất bại và app
@@ -10,13 +11,13 @@ import { parseTestDeviceIds } from './testDevices';
 // Học sinh và trẻ em cũng dùng app, còn khách không khai tuổi, nên theo chính sách Gia đình của Google Play mọi yêu cầu quảng cáo
 // đều được xử lý như cho trẻ em: quảng cáo không cá nhân hóa, nội dung mức G, Google không hỏi đồng ý quảng cáo cá nhân hóa (UMP)
 // và app không có quyền đọc mã quảng cáo của máy (app.json chặn quyền AD_ID).
+//
+// Hỏi đồng ý (UMP) và khởi tạo thư viện chỉ làm một lần mỗi lần mở app, ngay khi vào chế độ Khách: bước này có khi mất vài chục giây nếu để tới lúc khách bấm xem.
+// Tải trước và chiếu quảng cáo ở `rewardedLoader.ts`.
 const CONSENT_OPTIONS = { tagForUnderAgeOfConsent: true };
 
-interface AdsModule {
+interface AdsModule extends RewardedAdsApi {
   default: () => { initialize: () => Promise<unknown>; setRequestConfiguration: (config: Record<string, unknown>) => Promise<void> };
-  RewardedAd: { createForAdRequest: (unitId: string, options: Record<string, unknown>) => RewardedAdInstance };
-  RewardedAdEventType: { LOADED: string; EARNED_REWARD: string };
-  AdEventType: { CLOSED: string; ERROR: string };
   AdsConsent?: {
     gatherConsent: (options?: typeof CONSENT_OPTIONS) => Promise<unknown>;
     requestInfoUpdate: (options?: typeof CONSENT_OPTIONS) => Promise<{ privacyOptionsRequirementStatus?: string }>;
@@ -24,12 +25,6 @@ interface AdsModule {
   };
   MaxAdContentRating: { G: string };
   AgeRestrictedTreatment: { CHILD: string };
-}
-
-interface RewardedAdInstance {
-  addAdEventListener: (type: string, listener: (payload?: unknown) => void) => () => void;
-  load: () => void;
-  show: () => Promise<void>;
 }
 
 let cached: AdsModule | null | undefined;
@@ -59,6 +54,7 @@ export function adsAvailable(): boolean {
 }
 
 export type { PrivacyOptionsState } from './consent';
+export type { RewardedOutcome } from './rewardedLoader';
 
 /** Hỏi Google xem vùng của khách có yêu cầu tùy chọn quyền riêng tư (hộp đồng ý quảng cáo) không. Không hiện hộp nào. */
 export async function privacyOptionsState(): Promise<PrivacyOptionsState> {
@@ -83,45 +79,61 @@ export async function showPrivacyOptions(): Promise<boolean> {
   }
 }
 
-export type RewardedOutcome = 'earned' | 'closed' | 'failed' | 'unavailable';
+let preparing: Promise<boolean> | null = null;
+
+/** Hỏi đồng ý và khởi tạo thư viện quảng cáo, một lần cho cả phiên (lỗi thì lần gọi sau làm lại). Trả false khi không có quảng cáo. */
+export function prepareAds(): Promise<boolean> {
+  const ads = adsModule();
+  if (!ads) return Promise.resolve(false);
+  if (!preparing) {
+    const attempt = (async () => {
+      // Thông tin đồng ý của Google (UMP) gửi kèm cờ dưới tuổi đồng ý nên không hiện hộp hỏi; quảng cáo xử lý như cho trẻ em, mức G.
+      await ads.AdsConsent?.gatherConsent(CONSENT_OPTIONS).catch(() => undefined);
+      // Máy thử khai lúc dựng (EXPO_PUBLIC_ADMOB_TEST_DEVICE_IDS): Google chỉ trả quảng cáo thử cho các máy này, kể cả với đơn vị quảng cáo thật.
+      const testDeviceIdentifiers = parseTestDeviceIds(process.env.EXPO_PUBLIC_ADMOB_TEST_DEVICE_IDS);
+      await ads.default().setRequestConfiguration({
+        ageRestrictedTreatment: ads.AgeRestrictedTreatment.CHILD,
+        // Bản 17.2 của thư viện gửi "child" nhưng mã Android chỉ nhận "CHILD", nên trên Android dòng trên không có tác dụng;
+        // hai cờ cũ dưới đây Android vẫn nhận, giữ tới khi thư viện sửa.
+        tagForChildDirectedTreatment: true,
+        tagForUnderAgeOfConsent: true,
+        maxAdContentRating: ads.MaxAdContentRating.G,
+        ...(testDeviceIdentifiers.length > 0 ? { testDeviceIdentifiers } : {}),
+      });
+      await ads.default().initialize();
+      return true;
+    })().catch(() => {
+      preparing = null;
+      return false;
+    });
+    preparing = attempt;
+  }
+  return preparing;
+}
+
+let loader: ReturnType<typeof createRewardedLoader> | null = null;
+
+function loaderOf(ads: AdsModule) {
+  loader ??= createRewardedLoader(ads);
+  return loader;
+}
+
+/** Tải sẵn quảng cáo cho di sản đang hiện lời mời, để khách bấm xem thì chiếu được ngay. Không có quảng cáo hay khởi tạo hỏng thì thôi. */
+export function preloadRewardedAd(unitId: string, deviceKey: string, heritageId: number): void {
+  const ads = adsModule();
+  if (!ads) return;
+  void prepareAds().then((ready) => {
+    if (ready) loaderOf(ads).preload(unitId, deviceKey, heritageId);
+  });
+}
 
 /**
- * Hiện một quảng cáo có thưởng. Mã thiết bị gắn làm `user_id` và mã di sản (số) làm `custom_data` để Google gọi xác minh về máy chủ.
+ * Hiện một quảng cáo có thưởng (dùng quảng cáo đã tải sẵn nếu có). Mã thiết bị gắn làm `user_id` và mã di sản (số) làm `custom_data` để Google gọi xác minh về máy chủ.
  * Trả `earned` khi khách xem đủ và đóng quảng cáo; việc mở khóa vẫn do máy chủ quyết định.
  */
 export async function showRewardedAd(unitId: string, deviceKey: string, heritageId: number): Promise<RewardedOutcome> {
   const ads = adsModule();
   if (!ads) return 'unavailable';
-  try {
-    // Thông tin đồng ý của Google (UMP) gửi kèm cờ dưới tuổi đồng ý nên không hiện hộp hỏi; quảng cáo xử lý như cho trẻ em, mức G.
-    await ads.AdsConsent?.gatherConsent(CONSENT_OPTIONS).catch(() => undefined);
-    // Máy thử khai lúc dựng (EXPO_PUBLIC_ADMOB_TEST_DEVICE_IDS): Google chỉ trả quảng cáo thử cho các máy này, kể cả với đơn vị quảng cáo thật.
-    const testDeviceIdentifiers = parseTestDeviceIds(process.env.EXPO_PUBLIC_ADMOB_TEST_DEVICE_IDS);
-    await ads.default().setRequestConfiguration({
-      ageRestrictedTreatment: ads.AgeRestrictedTreatment.CHILD,
-      // Bản 17.2 của thư viện gửi "child" nhưng mã Android chỉ nhận "CHILD", nên trên Android dòng trên không có tác dụng;
-      // hai cờ cũ dưới đây Android vẫn nhận, giữ tới khi thư viện sửa.
-      tagForChildDirectedTreatment: true,
-      tagForUnderAgeOfConsent: true,
-      maxAdContentRating: ads.MaxAdContentRating.G,
-      ...(testDeviceIdentifiers.length > 0 ? { testDeviceIdentifiers } : {}),
-    });
-    await ads.default().initialize();
-  } catch {
-    return 'failed';
-  }
-  return new Promise<RewardedOutcome>((resolve) => {
-    const ad = ads.RewardedAd.createForAdRequest(unitId, { serverSideVerificationOptions: { userId: deviceKey, customData: String(heritageId) } });
-    let earned = false;
-    const offs: Array<() => void> = [];
-    const finish = (outcome: RewardedOutcome) => {
-      offs.forEach((off) => off());
-      resolve(outcome);
-    };
-    offs.push(ad.addAdEventListener(ads.RewardedAdEventType.LOADED, () => void ad.show().catch(() => finish('failed'))));
-    offs.push(ad.addAdEventListener(ads.RewardedAdEventType.EARNED_REWARD, () => (earned = true)));
-    offs.push(ad.addAdEventListener(ads.AdEventType.CLOSED, () => finish(earned ? 'earned' : 'closed')));
-    offs.push(ad.addAdEventListener(ads.AdEventType.ERROR, () => finish('failed')));
-    ad.load();
-  });
+  if (!(await prepareAds())) return 'failed';
+  return loaderOf(ads).show(unitId, deviceKey, heritageId);
 }

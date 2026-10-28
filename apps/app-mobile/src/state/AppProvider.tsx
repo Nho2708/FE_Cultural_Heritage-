@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { getLocales } from 'expo-localization';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { I18nextProvider } from 'react-i18next';
+import { prepareAds } from '../ads/rewarded';
 import { i18n } from '../i18n';
 import { KEYS, prefs } from '../storage/keyValue';
 import { createServices, readStoredMode, type AppMode, type Services } from './services';
@@ -122,6 +123,11 @@ function Ready({ initial, modeRef, children }: { initial: Loaded; modeRef: { cur
     if (mode !== 'guest' || services.platform === 'WEB') return;
     void services.guestApi.register(services.deviceId, { platform: services.platform, language, locationAllowed }, { platform: services.platform }).catch(() => undefined);
   }, [mode, language, locationAllowed, services]);
+
+  // Chế độ Khách: hỏi đồng ý và khởi tạo quảng cáo ngay khi mở app (có khi mất vài chục giây), để lúc khách mở tóm tắt thì quảng cáo tải được luôn.
+  useEffect(() => {
+    if (mode === 'guest') void prepareAds();
+  }, [mode]);
 
   const chooseLanguage = useCallback((code: LanguageCode) => {
     setChosenLanguage(code);
