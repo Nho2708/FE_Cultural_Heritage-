@@ -69,6 +69,8 @@ tính "Gợi ý cho bạn" và "Gần bạn" (chỉ khi khách cho phép vị tr
 
 Tóm tắt và nghe thuyết minh đi qua cổng quảng cáo có thưởng của máy chủ (`Ads:GateEnabled`). Khi máy chủ trả 403 `AD_UNLOCK_REQUIRED`, app hiện lời mời ([`src/components/AdGatePanel.tsx`](src/components/AdGatePanel.tsx));
 khách xem hết quảng cáo thì app hỏi `GET /public/ads/unlock?slug=` mỗi 2 giây (tối đa 20 giây) và chỉ mở khi **máy chủ** báo đã mở (Google gọi xác minh phía máy chủ về backend). Logic ở [`src/ads/gate.ts`](src/ads/gate.ts), phần gọi SDK ở [`src/ads/rewarded.ts`](src/ads/rewarded.ts).
+Hỏi đồng ý (UMP) và khởi tạo SDK làm một lần khi mở app ở chế độ Khách; quảng cáo được **tải sẵn** ngay khi lời mời hiện ([`src/ads/rewardedLoader.ts`](src/ads/rewardedLoader.ts)), vì quảng cáo video có khi tải
+gần hết hạn 60 giây của SDK (lỗi `Ad failed to load : 0`). Tải hỏng vì lỗi khác "không có quảng cáo" thì tự thử lại một lần; Google không có quảng cáo thì app báo "Quảng cáo chưa sẵn sàng".
 
 - **Expo Go không có AdMob.** Ở đó app gửi thêm `X-Ads-Unavailable: true`; backend ở môi trường phát triển (`Ads:AllowNoAdsDeclaration` = true) mở thẳng tóm tắt và nghe, app hiện ghi chú "chạy trong Expo Go nên chưa có quảng cáo".
   Nếu backend không bật cờ này (môi trường thật) mà cổng bật, app hiện "cần bản dựng phát triển để xem quảng cáo" và không mở được.
@@ -76,8 +78,9 @@ khách xem hết quảng cáo thì app hỏi `GET /public/ads/unlock?slug=` mỗ
   `eas build --profile development --platform android` (hoặc `ios`, cần tài khoản Apple Developer), cài bản dựng lên máy rồi `npx expo start --port 8083 --dev-client`. Đơn vị quảng cáo **không** nằm trong app: lấy từ
   `GET /public/ads/config`; ở môi trường phát triển backend trả **đơn vị thử của Google** (`.../5224354917` Android, `.../1712485313` iOS). Không dùng mã quảng cáo thật khi phát triển và không tự bấm quảng cáo thật (vi phạm chính sách của Google).
   Bản dựng dùng tài khoản AdMob của nhóm đặt mã ứng dụng lúc dựng bằng biến môi trường `ADMOB_ANDROID_APP_ID`, `ADMOB_IOS_APP_ID` ([`app.config.ts`](app.config.ts)); không đặt thì giữ mã thử.
-  Muốn thử trọn luồng mở khóa với đơn vị thật thì khai điện thoại là **thiết bị thử** trong AdMob (Settings → Test devices) để Google chỉ trả quảng cáo thử, hoặc đặt
-  `EXPO_PUBLIC_ADMOB_TEST_DEVICE_IDS` lúc dựng bằng mã băm mà SDK in ra log ("Use RequestConfiguration.Builder().setTestDeviceIds(...)").
+  Muốn thử với đơn vị thật mà không xem quảng cáo thật thì đặt `EXPO_PUBLIC_ADMOB_TEST_DEVICE_IDS` lúc dựng (`dung-apk.ps1 -TestDeviceIds`) bằng mã băm mà SDK in ra log
+  ("Use RequestConfiguration.Builder().setTestDeviceIds(...)"). Khai thiết bị thử trong AdMob (Settings → Test devices) dựa vào mã quảng cáo của máy, mà app chặn quyền đọc mã này,
+  nên cách đó không có tác dụng. Quảng cáo thử gọi xác minh với `user_id` giả (`fakeForAdDebugLog`) nên máy chủ không mở khóa: chỉ kiểm được phần tải và chiếu.
 - **Dựng APK tại máy** (không cần tài khoản Expo): đặt các biến trên cùng `EXPO_PUBLIC_API_BASE_URL` (địa chỉ HTTPS công khai của backend, vd đường hầm ngrok), chạy
   `npx expo prebuild --platform android --no-install` rồi trong `android/` chạy `gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a`; tệp ra ở `android/app/build/outputs/apk/release/`.
   Trên Windows phải bật đường dẫn dài (`LongPathsEnabled` = 1), vì đường dẫn biên dịch của reanimated dài tới 260 ký tự và ninja sẽ báo "build.ninja still dirty". `prebuild` sửa script
