@@ -1,8 +1,9 @@
 // Tải trước và chiếu quảng cáo có thưởng. Tách khỏi `rewarded.ts` (phần gọi mô-đun gốc) để kiểm thử bằng mô-đun quảng cáo giả.
 //
-// Quảng cáo video của Google có khi tải gần hết 60 giây (tài nguyên của quảng cáo về chậm ở lần đầu), quá hạn đó thư viện báo lỗi nội bộ dù Google đã trả quảng cáo.
-// Vì vậy app tải sẵn quảng cáo ngay khi hiện lời mời xem: khách bấm "Xem quảng cáo" thì chiếu luôn, hoặc chờ nốt lượt tải đang chạy thay vì tải lại từ đầu.
-// Mỗi lúc chỉ giữ một quảng cáo (của di sản đang xem). Tải hỏng vì lỗi khác "không có quảng cáo" thì tự thử lại một lần.
+// Quảng cáo video của Google có khi tải quá hạn 60 giây của thư viện ở lần đầu (đo trên mạng nhà có IPv6 hỏng: mỗi máy chủ mới chờ 30–50 giây), quá hạn thì thư viện báo
+// lỗi nội bộ dù Google đã trả quảng cáo; lần tải sau nhanh vì đã kết nối. Vì vậy app tải sẵn quảng cáo ngay khi hiện lời mời xem: khách bấm "Xem quảng cáo" thì chiếu luôn,
+// hoặc chờ nốt lượt tải đang chạy thay vì tải lại từ đầu. Mỗi lúc chỉ giữ một quảng cáo (của di sản đang xem). Tải hỏng vì lỗi khác "không có quảng cáo" thì tự tải lại
+// một lần (tính chung cho lượt tải sẵn và lượt bấm xem tiếp nối nó).
 
 export interface RewardedAdInstance {
   addAdEventListener: (type: string, listener: (payload?: unknown) => void) => () => void;
@@ -51,6 +52,8 @@ interface Slot {
   ad: RewardedAdInstance;
   result: Promise<LoadResult>;
   loadedAt: number | null;
+  /** Lần tải thứ mấy cho cùng một lượt (0 là lần đầu, 1 là lần tải lại). */
+  attempt: number;
   inUse: boolean;
   destroyed: boolean;
 }
@@ -70,7 +73,7 @@ export function createRewardedLoader(ads: RewardedAdsApi, now: () => number = Da
   }
 
   // Mã thiết bị làm `user_id` và mã di sản làm `custom_data` để Google gọi xác minh về máy chủ.
-  function start(unitId: string, deviceKey: string, heritageId: number): Slot {
+  function start(unitId: string, deviceKey: string, heritageId: number, attempt: number): Slot {
     const ad = ads.RewardedAd.createForAdRequest(unitId, { serverSideVerificationOptions: { userId: deviceKey, customData: String(heritageId) } });
     let next: Slot;
     const result = new Promise<LoadResult>((resolve) => {
@@ -87,7 +90,7 @@ export function createRewardedLoader(ads: RewardedAdsApi, now: () => number = Da
       );
       offs.push(ad.addAdEventListener(ads.AdEventType.ERROR, (payload) => done({ ok: false, reason: errorReason(payload) })));
     });
-    next = { key: keyOf(unitId, deviceKey, heritageId), ad, result, loadedAt: null, inUse: false, destroyed: false };
+    next = { key: keyOf(unitId, deviceKey, heritageId), ad, result, loadedAt: null, attempt, inUse: false, destroyed: false };
     ad.load();
     return next;
   }
@@ -115,11 +118,18 @@ export function createRewardedLoader(ads: RewardedAdsApi, now: () => number = Da
     const key = keyOf(unitId, deviceKey, heritageId);
     if (slot && (slot.inUse || (slot.key === key && !expired(slot)))) return;
     if (slot) discard(slot);
-    const loading = start(unitId, deviceKey, heritageId);
+    preloadAttempt(unitId, deviceKey, heritageId, 0);
+  }
+
+  // Tải hỏng mà chưa ai dùng thì bỏ; lỗi thử lại được thì tải lại một lần ngay, không thì để lần bấm sau tải mới.
+  function preloadAttempt(unitId: string, deviceKey: string, heritageId: number, attempt: number) {
+    const loading = start(unitId, deviceKey, heritageId, attempt);
     slot = loading;
-    // Tải hỏng mà chưa ai dùng thì bỏ, lần bấm sau tải lại.
     void loading.result.then((result) => {
-      if (!result.ok && !loading.inUse) discard(loading);
+      if (result.ok || loading.inUse) return;
+      const stillWanted = slot === loading;
+      discard(loading);
+      if (stillWanted && attempt === 0 && !FINAL_REASONS.has(result.reason)) preloadAttempt(unitId, deviceKey, heritageId, 1);
     });
   }
 
@@ -131,18 +141,18 @@ export function createRewardedLoader(ads: RewardedAdsApi, now: () => number = Da
     if (slot && slot.key === key && !expired(slot)) current = slot;
     else {
       if (slot) discard(slot);
-      current = start(unitId, deviceKey, heritageId);
+      current = start(unitId, deviceKey, heritageId, 0);
     }
     try {
-      for (let attempt = 0; ; attempt += 1) {
+      for (;;) {
         current.inUse = true;
         slot = current;
         const result = await current.result;
         if (result.ok) return await present(current.ad);
         discard(current);
         if (NO_AD_REASONS.has(result.reason)) return 'noFill';
-        if (FINAL_REASONS.has(result.reason) || attempt >= 1) return 'failed';
-        current = start(unitId, deviceKey, heritageId);
+        if (FINAL_REASONS.has(result.reason) || current.attempt >= 1) return 'failed';
+        current = start(unitId, deviceKey, heritageId, current.attempt + 1);
       }
     } finally {
       discard(current);

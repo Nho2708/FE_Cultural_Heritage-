@@ -159,6 +159,31 @@ describe('tải trước và chiếu quảng cáo có thưởng', () => {
     expect(await outcome).toBe('earned');
   });
 
+  it('tải sẵn hỏng vì hết hạn thì tự tải lại một lần, bấm xem thì dùng lượt tải lại đó', async () => {
+    const { loader, created, ad } = setup();
+    loader.preload('unit', 'device', 12);
+    ad(0).emit('error', { reason: 'internal-error' });
+    await flush();
+    expect(ad(0).destroyed).toBe(true);
+    expect(created).toHaveLength(2);
+    const outcome = loader.show('unit', 'device', 12);
+    ad(1).emit('loaded');
+    await watchToEnd(ad(1));
+    expect(await outcome).toBe('earned');
+    expect(created).toHaveLength(2);
+  });
+
+  it('lượt tải lại của tải sẵn cũng hỏng thì bấm xem không tải thêm lần nữa', async () => {
+    const { loader, created, ad } = setup();
+    loader.preload('unit', 'device', 12);
+    ad(0).emit('error', { reason: 'internal-error' });
+    await flush();
+    const outcome = loader.show('unit', 'device', 12);
+    ad(1).emit('error', { reason: 'internal-error' });
+    expect(await outcome).toBe('failed');
+    expect(created).toHaveLength(2);
+  });
+
   it('chiếu không được thì báo hỏng', async () => {
     const { loader, ad } = setup();
     const outcome = loader.show('unit', 'device', 12);
