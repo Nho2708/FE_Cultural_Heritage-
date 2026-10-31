@@ -41,7 +41,7 @@ describe('Chọn gói và thanh toán', () => {
     expect(screen.getByRole('link', { name: '← Trường và gói' })).toHaveAttribute('href', '/truong/thong-tin?tab=goi-va-han-muc');
   });
 
-  it('chọn gói nâng cấp: khối xác nhận có loại, gói, số tiền, hiệu lực ngay và lưu ý không hoàn tiền', async () => {
+  it('chọn gói nâng cấp: khối xác nhận có loại, gói, số tiền, thời hạn và lưu ý không hoàn tiền', async () => {
     signInAs('ORG_ADMIN');
     billingApi({ offers: [BASIC, ADVANCED], overview: overviewOf() });
     const user = userEvent.setup();
@@ -52,10 +52,11 @@ describe('Chọn gói và thanh toán', () => {
     expect(await within(block).findByText('Nâng cấp')).toBeInTheDocument();
     expect(within(block).getByText('Nâng cao')).toBeInTheDocument();
     expect(within(block).getByText('3.990.000 ₫')).toBeInTheDocument();
-    expect(within(block).getByText('Ngay khi thanh toán thành công')).toBeInTheDocument();
+    expect(within(block).getByText('Thời hạn dự kiến')).toBeInTheDocument();
+    expect(within(block).getByText(/• \d+ ngày$/)).toBeInTheDocument();
     expect(
       within(block).getByText(
-        'Nâng cấp không hoàn phần chưa dùng của gói hiện tại. Gói Cơ bản (còn 364 ngày) kết thúc khi gói Nâng cao có hiệu lực.',
+        'Nâng cấp không hoàn tiền hoặc khấu trừ thời gian chưa dùng của gói Cơ bản hiện tại.',
       ),
     ).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: 'Nâng cao' })).toBeChecked();
@@ -72,7 +73,7 @@ describe('Chọn gói và thanh toán', () => {
     await user.click(await screen.findByRole('radio', { name: 'Cơ bản' }));
     const block = await screen.findByRole('region', { name: 'Xác nhận thanh toán' });
     expect(await within(block).findByText('Gia hạn')).toBeInTheDocument();
-    expect(within(block).getByText('29/09/2027 – 28/09/2028')).toBeInTheDocument();
+    expect(within(block).getByText(/^29\/09\/2027 – 28\/09\/2028 • \d+ ngày$/)).toBeInTheDocument();
     expect(within(block).getByText(/Gia hạn: gói mới bắt đầu từ ngày 29\/09\/2027/)).toBeInTheDocument();
   });
 

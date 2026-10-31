@@ -72,6 +72,20 @@ function Attention({ data }: { data: SystemOverview }) {
       to: pathOf('schools'),
       action: 'Xem danh sách trường',
     });
+  if (data.content.questions.pending > 0)
+    items.push({
+      key: 'pending-questions',
+      text: `Có ${formatCount(data.content.questions.pending)} câu hỏi đang chờ giáo viên duyệt.`,
+      to: pathOf('questionModeration'),
+      action: 'Mở kiểm duyệt câu hỏi',
+    });
+  if (data.recentFailedPayments > 0)
+    items.push({
+      key: 'failed-payments',
+      text: `${formatCount(data.recentFailedPayments)} giao dịch thanh toán thất bại trong 7 ngày gần nhất.`,
+      to: `${pathOf('adminOverview')}?tab=doanh-thu&trang-thai=${PAYMENT_SLUG.toSlug('FAILED')}`,
+      action: 'Xem giao dịch thất bại',
+    });
   if (data.content.questions.hidden > 0)
     items.push({
       key: 'hidden',

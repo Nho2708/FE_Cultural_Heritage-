@@ -102,3 +102,11 @@ export function formatPlanRange(start: string | null | undefined, end: string | 
   const to = formatPlanDate(end);
   return from && to ? `${from} – ${to}` : from || to;
 }
+
+/** Thời hạn của gói: "27/10/2026 – 26/10/2027 • 365 ngày" (tính cả ngày đầu và ngày cuối). */
+export function formatPlanPeriod(start: string | null | undefined, end: string | null | undefined): string {
+  const range = formatPlanRange(start, end);
+  if (!start || !end) return range;
+  const days = Math.round((Date.parse(end) - Date.parse(start)) / 86_400_000) + 1;
+  return Number.isFinite(days) ? `${range} • ${days} ngày` : range;
+}

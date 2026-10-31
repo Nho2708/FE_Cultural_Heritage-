@@ -48,7 +48,7 @@ Năm phần, mỗi phần tối đa 3 mục, cùng nội dung ở mọi cấp (m
 
 Trên tab Gợi ý của Kết quả bài kiểm tra (chỉ bài này) và tab Gợi ý ôn tập của Chi tiết lớp (cả lớp hoặc một bài kiểm tra), kèm khoảng thời gian (30, 7, 90 ngày gần đây hoặc từ đầu đến nay).
 
-- **Di sản nên ôn**: tỉ lệ sai từ 40% và ít nhất 10 câu trả lời, tối đa 5, lý do "Lớp sai x% ở n câu về di sản này".
+- **Di sản nên ôn**: tỉ lệ sai từ 40% và ít nhất 10 câu trả lời (xem riêng một bài kiểm tra thì chỉ cần có câu trả lời), tối đa 5, lý do "Lớp sai x% ở n câu về di sản này".
 - **Di sản liên quan**: tối đa 5; Dịch vụ AI chưa phản hồi trong 2 giây thì máy chủ tự chọn theo cùng tỉnh hoặc cùng loại và giao diện báo điều đó.
 - Giao diện ghi rõ không gửi họ tên, mã học sinh hay tên lớp sang dịch vụ AI.
 - **Tạo bài ôn tập** (cả khối hoặc từng dòng): mở hộp thoại **Tạo bài học** với lớp chọn sẵn và khóa, di sản chọn sẵn, tiêu đề "Ôn tập: …"; tạo xong chuyển sang Soạn bài học (bài nháp mới của lớp).

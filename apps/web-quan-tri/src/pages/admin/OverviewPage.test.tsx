@@ -58,6 +58,15 @@ describe('Tổng quan và doanh thu', () => {
     expect(within(rows[1]!).getByText('1 trường')).toBeInTheDocument();
   });
 
+  it('cần chú ý: câu chờ duyệt và giao dịch thất bại có liên kết xử lý', async () => {
+    signInAs('ADMIN');
+    api(systemOverviewOf({ recentFailedPayments: 2 }));
+    renderApp('/quan-tri');
+    expect(await screen.findByText('Có 20 câu hỏi đang chờ giáo viên duyệt.')).toBeInTheDocument();
+    expect(screen.getByText('2 giao dịch thanh toán thất bại trong 7 ngày gần nhất.')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Xem giao dịch thất bại' })).toHaveAttribute('href', '/quan-tri?tab=doanh-thu&trang-thai=that-bai');
+  });
+
   it('cần chú ý: trường không có gói, gói sắp hết hạn và câu bị ẩn; rỗng thì báo chưa có', async () => {
     signInAs('ADMIN');
     api();
@@ -65,7 +74,7 @@ describe('Tổng quan và doanh thu', () => {
     expect(await screen.findByText('1 trường không có gói đang hiệu lực.')).toBeInTheDocument();
     expect(screen.getByText('1 trường có gói sắp hết hạn trong 14 ngày tới.')).toBeInTheDocument();
     expect(screen.getByText('4 câu hỏi đang bị ẩn khỏi ngân hàng.')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Mở kiểm duyệt câu hỏi' })).toHaveAttribute('href', '/quan-tri/cau-hoi');
+    expect(screen.getAllByRole('link', { name: 'Mở kiểm duyệt câu hỏi' })[0]).toHaveAttribute('href', '/quan-tri/cau-hoi');
     first.unmount();
 
     api(

@@ -263,7 +263,7 @@ try {
   const quote = page.getByRole('region', { name: 'Xác nhận thanh toán' });
   await quote.waitFor();
   await quote.getByText('Nâng cấp', { exact: true }).waitFor();
-  check('Chọn gói Cơ bản từ gói Miễn phí: loại Nâng cấp, 500.000 ₫, hiệu lực ngay', (await quote.innerText()).includes('500.000 ₫') && (await quote.innerText()).includes('Ngay khi thanh toán thành công'));
+  check('Chọn gói Cơ bản từ gói Miễn phí: loại Nâng cấp, 500.000 ₫, có thời hạn dự kiến', (await quote.innerText()).includes('500.000 ₫') && (await quote.innerText()).includes('Thời hạn dự kiến'));
   await shot(page, '04-chon-goi');
   await page.getByRole('button', { name: 'Thanh toán qua VNPay', exact: true }).click();
   const confirm = page.getByRole('dialog', { name: 'Thanh toán qua VNPay' });
@@ -316,7 +316,7 @@ try {
   await pickPlan(page, 'Nâng cao');
   await quote.waitFor();
   await quote.getByText('Nâng cấp', { exact: true }).waitFor();
-  check('Chọn Nâng cao khi đang dùng Cơ bản: Nâng cấp, 1.990.000 ₫, lưu ý không hoàn phần chưa dùng', (await quote.innerText()).includes('1.990.000 ₫') && (await quote.innerText()).includes('không hoàn phần chưa dùng'));
+  check('Chọn Nâng cao khi đang dùng Cơ bản: Nâng cấp, 1.990.000 ₫, lưu ý không hoàn tiền', (await quote.innerText()).includes('1.990.000 ₫') && (await quote.innerText()).includes('Nâng cấp không hoàn tiền'));
   await page.getByRole('button', { name: 'Thanh toán qua VNPay', exact: true }).click();
   await page.getByRole('dialog', { name: 'Thanh toán qua VNPay' }).getByRole('button', { name: 'Tiếp tục', exact: true }).click();
   const gw3 = await atGateway(page);

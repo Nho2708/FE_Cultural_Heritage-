@@ -154,7 +154,9 @@ function CurrentCard({
   ].filter(Boolean);
   const rules = [
     !current.isFree && 'Gia hạn: gói mới bắt đầu ngay sau ngày hết hạn của gói hiện tại, thanh toán qua VNPay.',
-    'Nâng cấp: gói mới có hiệu lực ngay khi thanh toán thành công; không hoàn phần chưa dùng của gói hiện tại.',
+    current.isFree
+      ? 'Nâng cấp: gói mới có hiệu lực ngay khi thanh toán thành công; gói Miễn phí kết thúc, không cộng dồn lượt AI cũ.'
+      : 'Nâng cấp: gói mới có hiệu lực ngay khi thanh toán thành công; không hoàn tiền hoặc khấu trừ thời gian chưa dùng của gói hiện tại.',
     !current.isFree &&
       'Hủy gói: gói kết thúc ngay, không được hoàn tiền. Giáo viên không tạo được bài học, bài kiểm tra mới cho đến khi trường có gói khác.',
   ].filter(Boolean) as string[];
