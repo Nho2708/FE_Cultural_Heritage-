@@ -109,20 +109,86 @@ function RejectDialog({ open, scopeLabel, pending, onConfirm, onClose }: { open:
   );
 }
 
+function checkTranslationCompleteness(original: TranslationText, draft: TranslationDraft, isOutdated: boolean): string | null {
+  if (isOutdated) {
+    return 'Di sản đang ở trạng thái Cần dịch lại. Hãy dịch lại bằng AI trước khi duyệt.';
+  }
+  if (original.name && !draft.name.trim()) {
+    return 'Tên di sản chưa được dịch.';
+  }
+  if (original.shortDescription && !draft.shortDescription.trim()) {
+    return 'Mô tả ngắn chưa được dịch.';
+  }
+  if (original.content && !draft.content.trim()) {
+    return 'Nội dung chưa được dịch.';
+  }
+  for (let i = 0; i < original.timelines.length; i++) {
+    const t = original.timelines[i]!;
+    const dt = draft.timelines[t.id];
+    if (t.name && (!dt || !dt.name.trim())) {
+      return `Tên giai đoạn ${i + 1} chưa được dịch.`;
+    }
+    if (t.description && (!dt || !dt.description.trim())) {
+      return `Mô tả giai đoạn ${i + 1} chưa được dịch.`;
+    }
+  }
+  for (let i = 0; i < original.events.length; i++) {
+    const e = original.events[i]!;
+    const de = draft.events[e.id];
+    if (e.name && (!de || !de.name.trim())) {
+      return `Tên sự kiện ${i + 1} chưa được dịch.`;
+    }
+    if (e.description && (!de || !de.description.trim())) {
+      return `Mô tả sự kiện ${i + 1} chưa được dịch.`;
+    }
+  }
+  for (let i = 0; i < original.media.length; i++) {
+    const m = original.media[i]!;
+    const caption = draft.media[m.id];
+    if (m.caption && (!caption || !caption.trim())) {
+      return `Chú thích ảnh ${i + 1} chưa được dịch.`;
+    }
+  }
+  return null;
+}
+
+function checkSummaryCompleteness(draft: SummaryText, isOutdated: boolean): string | null {
+  if (isOutdated) {
+    return 'Di sản đang ở trạng thái Cần dịch lại. Hãy dịch lại bằng AI trước khi duyệt.';
+  }
+  if (!draft.shortText.trim()) {
+    return 'Bản tóm tắt ngắn chưa được điền.';
+  }
+  if (!draft.detailedText.trim()) {
+    return 'Bản tóm tắt chi tiết chưa được điền.';
+  }
+  return null;
+}
+
 function ReviewBar({
   item,
   status,
   language,
+  isOutdated = false,
+  canApprove = true,
+  validationReason = null,
   editable,
   actions,
   onResolved,
+  onRegenerate,
+  isRegenerating = false,
 }: {
   item: ReviewItemRef;
   status: TranslationDetail['status'];
   language: ReviewItemRef['language'];
+  isOutdated?: boolean;
+  canApprove?: boolean;
+  validationReason?: string | null;
   editable: boolean;
   actions: Actions;
   onResolved: () => void;
+  onRegenerate?: () => void;
+  isRegenerating?: boolean;
 }) {
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -196,7 +262,6 @@ function ReviewBar({
       <div className="flex flex-wrap items-center gap-3">
         {rejectable && (
           <Button variant="danger" onClick={() => setRejecting(true)} disabled={busy}>
-            <Icon name="alert-triangle" size={16} />
             Từ chối
           </Button>
         )}
@@ -209,18 +274,36 @@ function ReviewBar({
               Lưu chỉnh sửa
             </Button>
           )}
+          {isOutdated && onRegenerate && (
+            <Button variant="secondary" onClick={onRegenerate} loading={isRegenerating} disabled={busy || isRegenerating}>
+              <Icon name="sparkles" size={16} />
+              Dịch lại bằng AI
+            </Button>
+          )}
           {approvable && language === 'en' && (
-            <Button variant="secondary" onClick={() => approve.mutate('BOTH')} loading={approve.isPending && approve.variables === 'BOTH'} disabled={busy}>
+            <Button
+              variant="secondary"
+              onClick={() => approve.mutate('BOTH')}
+              loading={approve.isPending && approve.variables === 'BOTH'}
+              disabled={busy || !canApprove || isRegenerating}
+            >
               Duyệt cả bản dịch và tóm tắt của ngôn ngữ này
             </Button>
           )}
           {approvable && (
-            <Button onClick={() => approve.mutate(item.kind)} loading={approve.isPending && approve.variables === item.kind} disabled={busy}>
+            <Button
+              onClick={() => approve.mutate(item.kind)}
+              loading={approve.isPending && approve.variables === item.kind}
+              disabled={busy || !canApprove || isRegenerating}
+            >
               Duyệt
             </Button>
           )}
         </div>
       </div>
+      {approvable && !canApprove && validationReason && (
+        <p className="type-body-s font-medium text-danger">{validationReason}</p>
+      )}
       <RejectDialog
         open={rejecting}
         scopeLabel={scopeLabel}
@@ -235,13 +318,26 @@ function ReviewBar({
 // ---------------------------------------------------------------------------------------------------------------
 // Bản dịch nội dung
 
-function TranslationBody({ detail, item, onResolved }: { detail: TranslationDetail; item: ReviewItemRef; onResolved: () => void }) {
+function TranslationBody({
+  detail,
+  item,
+  onResolved,
+  onRegenerate,
+  isRegenerating = false,
+}: {
+  detail: TranslationDetail;
+  item: ReviewItemRef;
+  onResolved: () => void;
+  onRegenerate?: () => void;
+  isRegenerating?: boolean;
+}) {
   const toast = useToast();
   const queryClient = useQueryClient();
   const [initial] = useState(() => draftOf(detail.original, detail.translated));
   const [draft, setDraft] = useState<TranslationDraft>(initial);
   const editable = detail.language === 'en' && detail.status !== 'MACHINE';
   const patch = patchOf(initial, draft, detail.original);
+  const validationError = checkTranslationCompleteness(detail.original, draft, detail.isOutdated);
 
   const save = useMutation({
     mutationFn: () => adminTranslationsApi.updateTranslation(item.heritageId, item.language, patch ?? {}),
@@ -348,9 +444,14 @@ function TranslationBody({ detail, item, onResolved }: { detail: TranslationDeta
         item={item}
         status={detail.status}
         language={detail.language}
+        isOutdated={detail.isOutdated}
+        canApprove={!detail.isOutdated && validationError === null}
+        validationReason={validationError}
         editable={editable}
         actions={{ dirty: patch !== null, save: () => save.mutateAsync() }}
         onResolved={onResolved}
+        onRegenerate={onRegenerate}
+        isRegenerating={isRegenerating}
       />
     </div>
   );
@@ -359,13 +460,26 @@ function TranslationBody({ detail, item, onResolved }: { detail: TranslationDeta
 // ---------------------------------------------------------------------------------------------------------------
 // Tóm tắt
 
-function SummaryBody({ detail, item, onResolved }: { detail: SummaryDetail; item: ReviewItemRef; onResolved: () => void }) {
+function SummaryBody({
+  detail,
+  item,
+  onResolved,
+  onRegenerate,
+  isRegenerating = false,
+}: {
+  detail: SummaryDetail;
+  item: ReviewItemRef;
+  onResolved: () => void;
+  onRegenerate?: () => void;
+  isRegenerating?: boolean;
+}) {
   const toast = useToast();
   const queryClient = useQueryClient();
   const [initial] = useState<SummaryText>(() => ({ shortText: detail.summary.shortText, detailedText: detail.summary.detailedText }));
   const [draft, setDraft] = useState<SummaryText>(initial);
   const editable = (detail.language === 'vi' || detail.language === 'en') && detail.status !== 'MACHINE';
   const dirty = draft.shortText !== initial.shortText || draft.detailedText !== initial.detailedText;
+  const validationError = checkSummaryCompleteness(draft, detail.isOutdated);
 
   const save = useMutation({
     mutationFn: () => adminTranslationsApi.updateSummary(item.heritageId, item.language, { shortText: draft.shortText, detailedText: draft.detailedText }),
@@ -412,9 +526,14 @@ function SummaryBody({ detail, item, onResolved }: { detail: SummaryDetail; item
         item={item}
         status={detail.status}
         language={detail.language}
+        isOutdated={detail.isOutdated}
+        canApprove={!detail.isOutdated && validationError === null}
+        validationReason={validationError}
         editable={editable}
         actions={{ dirty, save: () => save.mutateAsync() }}
         onResolved={onResolved}
+        onRegenerate={onRegenerate}
+        isRegenerating={isRegenerating}
       />
     </div>
   );
@@ -423,6 +542,9 @@ function SummaryBody({ detail, item, onResolved }: { detail: SummaryDetail; item
 // ---------------------------------------------------------------------------------------------------------------
 
 export function ReviewPanel({ item, onResolved }: { item: ReviewItemRef; onResolved: () => void }) {
+  const queryClient = useQueryClient();
+  const toast = useToast();
+
   const query = useQuery<TranslationDetail | SummaryDetail>({
     queryKey: queryKeys.translationDetail(item.heritageId, item.kind, item.language),
     queryFn: () =>
@@ -430,6 +552,18 @@ export function ReviewPanel({ item, onResolved }: { item: ReviewItemRef; onResol
         ? adminTranslationsApi.translation(item.heritageId, item.language).then((r) => r.data)
         : adminTranslationsApi.summary(item.heritageId, item.language).then((r) => r.data),
     staleTime: 0,
+  });
+
+  const generate = useMutation({
+    mutationFn: () => adminTranslationsApi.generate(item.heritageId),
+    onSuccess: ({ message }) => {
+      toast.success(message ?? 'Đã dịch và tóm tắt di sản.');
+      void queryClient.invalidateQueries({ queryKey: queryKeys.translations });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.translationDetail(item.heritageId, item.kind, item.language) });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.heritage(item.heritageId) });
+      void queryClient.invalidateQueries({ queryKey: [...queryKeys.heritages, 'list'] });
+    },
+    onError: (error) => toast.error(errorMessage(error)),
   });
 
   const detail = query.data;
@@ -459,15 +593,47 @@ export function ReviewPanel({ item, onResolved }: { item: ReviewItemRef; onResol
             </Link>
           </header>
           {detail.isOutdated && (
-            <InlineMessage tone="warning">Nội dung tiếng Việt đã được sửa sau khi dịch. Bản này vẫn hiện cho khách; hãy dịch lại di sản để cập nhật.</InlineMessage>
+            <div className="flex flex-col gap-3 rounded-md border border-warning/40 bg-warning-container/30 p-4 dsvsm:flex-row dsvsm:items-center dsvsm:justify-between">
+              <div className="flex items-center gap-2">
+                <Icon name="alert-triangle" size={18} className="shrink-0 text-warning" />
+                <p className="type-body-s text-on-warning-container">
+                  Nội dung tiếng Việt đã được sửa sau khi dịch. Bản này vẫn hiện cho khách; hãy dịch lại di sản để cập nhật.
+                </p>
+              </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => generate.mutate()}
+                loading={generate.isPending}
+                disabled={generate.isPending}
+                className="shrink-0"
+              >
+                <Icon name="sparkles" size={16} />
+                Dịch lại bằng AI
+              </Button>
+            </div>
           )}
           {item.language === 'en' && detail.status === 'PENDING' && (
             <InlineMessage tone="success">Duyệt bản tiếng Anh thì hệ thống dịch lại bản Hàn, Trung, Nhật từ bản đã duyệt.</InlineMessage>
           )}
           {'translated' in detail ? (
-            <TranslationBody key={query.dataUpdatedAt} detail={detail} item={item} onResolved={onResolved} />
+            <TranslationBody
+              key={query.dataUpdatedAt}
+              detail={detail}
+              item={item}
+              onResolved={onResolved}
+              onRegenerate={() => generate.mutate()}
+              isRegenerating={generate.isPending}
+            />
           ) : (
-            <SummaryBody key={query.dataUpdatedAt} detail={detail} item={item} onResolved={onResolved} />
+            <SummaryBody
+              key={query.dataUpdatedAt}
+              detail={detail}
+              item={item}
+              onResolved={onResolved}
+              onRegenerate={() => generate.mutate()}
+              isRegenerating={generate.isPending}
+            />
           )}
         </>
       )}
