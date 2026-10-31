@@ -109,10 +109,7 @@ function RejectDialog({ open, scopeLabel, pending, onConfirm, onClose }: { open:
   );
 }
 
-function checkTranslationCompleteness(original: TranslationText, draft: TranslationDraft, isOutdated: boolean): string | null {
-  if (isOutdated) {
-    return 'Di sản đang ở trạng thái Cần dịch lại. Hãy dịch lại bằng AI trước khi duyệt.';
-  }
+function checkTranslationCompleteness(original: TranslationText, draft: TranslationDraft): string | null {
   if (original.name && !draft.name.trim()) {
     return 'Tên di sản chưa được dịch.';
   }
@@ -152,10 +149,7 @@ function checkTranslationCompleteness(original: TranslationText, draft: Translat
   return null;
 }
 
-function checkSummaryCompleteness(draft: SummaryText, isOutdated: boolean): string | null {
-  if (isOutdated) {
-    return 'Di sản đang ở trạng thái Cần dịch lại. Hãy dịch lại bằng AI trước khi duyệt.';
-  }
+function checkSummaryCompleteness(draft: SummaryText): string | null {
   if (!draft.shortText.trim()) {
     return 'Bản tóm tắt ngắn chưa được điền.';
   }
@@ -337,7 +331,7 @@ function TranslationBody({
   const [draft, setDraft] = useState<TranslationDraft>(initial);
   const editable = detail.language === 'en' && detail.status !== 'MACHINE';
   const patch = patchOf(initial, draft, detail.original);
-  const validationError = checkTranslationCompleteness(detail.original, draft, detail.isOutdated);
+  const validationError = checkTranslationCompleteness(detail.original, draft);
 
   const save = useMutation({
     mutationFn: () => adminTranslationsApi.updateTranslation(item.heritageId, item.language, patch ?? {}),
@@ -445,7 +439,7 @@ function TranslationBody({
         status={detail.status}
         language={detail.language}
         isOutdated={detail.isOutdated}
-        canApprove={!detail.isOutdated && validationError === null}
+        canApprove={validationError === null}
         validationReason={validationError}
         editable={editable}
         actions={{ dirty: patch !== null, save: () => save.mutateAsync() }}
@@ -479,7 +473,7 @@ function SummaryBody({
   const [draft, setDraft] = useState<SummaryText>(initial);
   const editable = (detail.language === 'vi' || detail.language === 'en') && detail.status !== 'MACHINE';
   const dirty = draft.shortText !== initial.shortText || draft.detailedText !== initial.detailedText;
-  const validationError = checkSummaryCompleteness(draft, detail.isOutdated);
+  const validationError = checkSummaryCompleteness(draft);
 
   const save = useMutation({
     mutationFn: () => adminTranslationsApi.updateSummary(item.heritageId, item.language, { shortText: draft.shortText, detailedText: draft.detailedText }),
@@ -527,7 +521,7 @@ function SummaryBody({
         status={detail.status}
         language={detail.language}
         isOutdated={detail.isOutdated}
-        canApprove={!detail.isOutdated && validationError === null}
+        canApprove={validationError === null}
         validationReason={validationError}
         editable={editable}
         actions={{ dirty, save: () => save.mutateAsync() }}

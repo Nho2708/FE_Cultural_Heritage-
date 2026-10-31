@@ -355,7 +355,7 @@ describe('Duyệt bản dịch và tóm tắt — khung hai cột', () => {
     expect(screen.getByText('Tên giai đoạn 1 chưa được dịch.')).toBeInTheDocument();
   });
 
-  it('di sản ở trạng thái Cần dịch lại thì khóa Duyệt, có nút "Dịch lại bằng AI" tại chỗ', async () => {
+  it('di sản ở trạng thái Cần dịch lại thì có nút "Dịch lại bằng AI" tại chỗ', async () => {
     signInAs('ADMIN');
     const calls = api({ queue: queuePage([queueItemOf('TRANSLATION', 'en', { isOutdated: true })]) }, (call) => {
       if (call.path === '/admin/heritages/1/translations/en/translation') {
@@ -369,9 +369,8 @@ describe('Duyệt bản dịch và tóm tắt — khung hai cột', () => {
     const user = userEvent.setup();
     renderApp('/quan-tri/ban-dich?muc=1.ban-dich.en');
 
-    const approveBtn = await screen.findByRole('button', { name: 'Duyệt' });
-    expect(approveBtn).toBeDisabled();
-    expect(screen.getByText(/Di sản đang ở trạng thái Cần dịch lại/)).toBeInTheDocument();
+    await screen.findByRole('button', { name: 'Duyệt' });
+    expect(screen.getByText(/Nội dung tiếng Việt đã được sửa sau khi dịch/)).toBeInTheDocument();
 
     const regenButtons = screen.getAllByRole('button', { name: 'Dịch lại bằng AI' });
     expect(regenButtons.length).toBeGreaterThan(0);
