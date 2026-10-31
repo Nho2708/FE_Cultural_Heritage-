@@ -13,7 +13,7 @@ env:
 - tapOn: "Nhập mã thầy cô cho"
 - inputText: ${LESSON_CODE}
 - hideKeyboard
-- tapOn: "Mở bài học"
+- tapOn: "Mở"
 - extendedWaitUntil:
     visible: ".*bước 1 trên.*"
     timeout: 30000

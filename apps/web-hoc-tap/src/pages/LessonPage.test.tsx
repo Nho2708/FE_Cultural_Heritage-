@@ -228,12 +228,22 @@ describe('Bài học — lỗi mở bài', () => {
     expect(screen.getByRole('link', { name: 'Nhập mã khác' })).toHaveAttribute('href', '/nhap-ma');
   });
 
+  it('đường dẫn mang mã bài kiểm tra: chuyển thẳng tới bài kiểm tra', async () => {
+    const student = studentOf(7);
+    signInAs(student);
+    mockApi(studentServer(student), (call) =>
+      call.path === '/student/lessons/KT4M9P2R' ? envelope(200, { data: { ...studentLessonOf(2), accessCode: 'BH7F3K2Q', focusQuizId: 31 } }) : undefined,
+    );
+    const { router } = renderApp('/bai-hoc/KT4M9P2R');
+    await waitFor(() => expect(router.state.location.pathname).toBe('/bai-hoc/BH7F3K2Q/kiem-tra/31'));
+  });
+
   it('mã sai dạng trên đường dẫn: báo ngay, không gọi máy chủ', async () => {
     const student = studentOf(7);
     signInAs(student);
     const calls = mockApi(studentServer(student));
     renderApp('/bai-hoc/ABC');
-    expect(await screen.findByText(/Mã bài học gồm 8 ký tự, bắt đầu bằng BH/)).toBeInTheDocument();
+    expect(await screen.findByText(/Mã gồm 8 ký tự, bắt đầu bằng BH/)).toBeInTheDocument();
     await waitFor(() => expect(calls.some((c) => c.path.startsWith('/student/lessons/'))).toBe(false));
   });
 

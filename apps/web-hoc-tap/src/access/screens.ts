@@ -58,6 +58,7 @@ export const SCREENS = [
   // Cấp 1: thẻ di sản của các bài em học xong (mở từ cuối con đường, trang kết quả và bước Nhận thẻ).
   { key: 'album', name: 'Album di sản', area: 'learning', actors: STUDENT, path: '/hoc/album' },
   { key: 'enterCode', name: 'Nhập mã bài học', area: 'learning', actors: STUDENT, path: '/nhap-ma' },
+  { key: 'notifications', name: 'Thông báo', area: 'learning', actors: STUDENT, path: '/thong-bao' },
   { key: 'lesson', name: 'Bài học', area: 'learning', actors: STUDENT, path: '/bai-hoc/:maBaiHoc' },
   { key: 'startQuiz', name: 'Bắt đầu bài kiểm tra', area: 'learning', actors: STUDENT, path: null },
   {

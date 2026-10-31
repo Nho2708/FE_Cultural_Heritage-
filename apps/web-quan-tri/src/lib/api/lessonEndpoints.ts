@@ -10,6 +10,7 @@ import {
   type LessonMaterials,
   type LessonPreview,
   type LessonRow,
+  type NotifyClassResult,
   type Paged,
   type PublishLessonResult,
   type UpdateLessonBody,
@@ -46,6 +47,9 @@ export const lessonsApi = {
 
   /** Lần đầu sinh mã bài học; xuất bản lại giữ nguyên mã. */
   publish: (lessonId: number) => apiRequest<PublishLessonResult>(`/teacher/lessons/${lessonId}/publish`, { method: 'POST' }),
+  /** Gửi thông báo cho cả lớp về bài đã xuất bản; lời nhắn để trống thì dùng câu mặc định. */
+  notifyClass: (lessonId: number, message: string | null) =>
+    apiRequest<NotifyClassResult>(`/teacher/lessons/${lessonId}/notify-class`, { method: 'POST', body: { message } }),
 
   archive: (lessonId: number) => apiRequest<LessonDetail>(`/teacher/lessons/${lessonId}/archive`, { method: 'POST' }),
 

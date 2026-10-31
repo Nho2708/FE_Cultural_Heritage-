@@ -1,3 +1,4 @@
+import type { NotifyClassResult } from './notifications';
 import type { ApiClient } from './client';
 import type { ContentStatus } from './heritage';
 import type { QuestionDifficulty, QuestionRow, QuestionType } from './questions';
@@ -92,6 +93,8 @@ export interface QuizDetail {
   lessonId: number;
   lessonTitle: string | null;
   lessonStatus: ContentStatus | null;
+  /** Mã riêng của bài kiểm tra, có từ lúc phát hành lần đầu. */
+  accessCode: string | null;
   lessonAccessCode: string | null;
   classId: number;
   className: string | null;
@@ -194,6 +197,7 @@ export const QUIZ_ENDPOINTS = {
   publish: (id: number) => `/teacher/quizzes/${id}/publish`,
   close: (id: number) => `/teacher/quizzes/${id}/close`,
   duplicate: (id: number) => `/teacher/quizzes/${id}/duplicate`,
+  notifyClass: (id: number) => `/teacher/quizzes/${id}/notify-class`,
 } as const;
 
 export function createQuizzesApi(client: ApiClient) {
@@ -241,6 +245,8 @@ export function createQuizzesApi(client: ApiClient) {
     /** Đóng không mở lại được; các lượt đang dở được tự nộp. */
     close: (id: number) => request<CloseQuizResult>(QUIZ_ENDPOINTS.close(id), { method: 'POST' }),
     duplicate: (id: number, name?: string) => request<DuplicateQuizResult>(QUIZ_ENDPOINTS.duplicate(id), { method: 'POST', body: { name } }),
+    /** Gửi thông báo cho cả lớp về bài đang phát hành; lời nhắn để trống thì dùng câu mặc định. */
+    notifyClass: (id: number, message: string | null) => request<NotifyClassResult>(QUIZ_ENDPOINTS.notifyClass(id), { method: 'POST', body: { message } }),
   };
 }
 

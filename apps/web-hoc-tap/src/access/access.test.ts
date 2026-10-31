@@ -7,10 +7,10 @@ const student = { mustChangePassword: false };
 const mustChange = { mustChangePassword: true };
 
 describe('bảng màn hình của web học tập', () => {
-  it('21 màn hình: 10 khám phá công khai, 11 khu học; 1 hộp thoại; route chữ thường không dấu', () => {
-    expect(SCREENS).toHaveLength(21);
+  it('22 màn hình: 10 khám phá công khai, 12 khu học; 1 hộp thoại; route chữ thường không dấu', () => {
+    expect(SCREENS).toHaveLength(22);
     expect(ALL.filter((s) => s.area === 'explore')).toHaveLength(10);
-    expect(ALL.filter((s) => s.area === 'learning')).toHaveLength(11);
+    expect(ALL.filter((s) => s.area === 'learning')).toHaveLength(12);
     expect(ALL.filter((s) => s.path === null).map((s) => s.name)).toEqual(['Bắt đầu bài kiểm tra']);
     const paths = ALL.flatMap((s) => [s.path, ...(s.aliases ?? [])]).filter((p) => p !== null);
     expect(paths.every((p) => /^\/[a-z0-9/:-]*$/i.test(p) && !/[A-Z]/.test(p.replace(/:[A-Za-z]+/g, '')))).toBe(true);

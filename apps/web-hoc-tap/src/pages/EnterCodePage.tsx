@@ -1,4 +1,4 @@
-import { isWellFormedLessonCode, normalizeLessonCode } from '@dsvhvn/dung-chung';
+import { isWellFormedAccessCode, normalizeLessonCode } from '@dsvhvn/dung-chung';
 import { ApiError, errorMessage } from '@dsvhvn/dung-chung/api';
 import { Button, Icon, InlineMessage, TextField } from '@dsvhvn/dung-chung/ui';
 import { useQueryClient } from '@tanstack/react-query';
@@ -8,9 +8,10 @@ import { formatDate } from '@dsvhvn/dung-chung';
 import { useAuth } from '../lib/auth/context';
 import { lessonPath, lessonQueryFn, lessonQueryKey } from '../lessons/lessonData';
 import { readRecentLessons } from '../lessons/recent';
+import { takeQuizPath } from '../quiz/quizData';
 
-// Nhập mã bài học: em gõ tay mã thầy cô đưa cho lớp (không quét mã QR). Mã tự viết hoa, bỏ khoảng trắng và dấu gạch ("bh 7f3-k2q" vẫn
-// đúng). Mã sai dạng báo ngay, không gọi máy chủ. Mã đúng dạng thì máy chủ kiểm: mã sai, bài chưa xuất bản hoặc không thuộc lớp của em
+// Nhập mã: em gõ tay mã bài học (BH…) hoặc mã bài kiểm tra (KT…) thầy cô đưa cho lớp (không quét mã QR); mã bài kiểm tra vào thẳng bài đó.
+// Mã tự viết hoa, bỏ khoảng trắng và dấu gạch ("bh 7f3-k2q" vẫn đúng). Mã sai dạng báo ngay, không gọi máy chủ. Mã đúng dạng thì máy chủ kiểm: mã sai, bài chưa xuất bản hoặc không thuộc lớp của em
 // đều nhận cùng một câu (không cho biết mã có ở lớp khác hay không) và tính vào giới hạn nhập sai; nhập sai quá nhiều lần thì bị chặn
 // một lúc, mã đúng cũng chưa mở được. Dưới ô nhập là các mã em đã mở gần đây trên máy này.
 
@@ -28,15 +29,15 @@ export function EnterCodePage() {
     event.preventDefault();
     setBlocked(false);
     const code = normalizeLessonCode(text);
-    if (code === '') return setError('Vui lòng nhập mã bài học.');
-    if (!isWellFormedLessonCode(code)) {
-      return setError('Mã bài học gồm 8 ký tự, bắt đầu bằng BH. Em hãy kiểm tra lại mã thầy cô đã đưa.');
+    if (code === '') return setError('Vui lòng nhập mã.');
+    if (!isWellFormedAccessCode(code)) {
+      return setError('Mã gồm 8 ký tự, bắt đầu bằng BH (bài học) hoặc KT (bài kiểm tra). Em hãy kiểm tra lại mã thầy cô đã đưa.');
     }
     setError(null);
     setBusy(true);
     try {
-      await queryClient.fetchQuery({ queryKey: lessonQueryKey(code), queryFn: lessonQueryFn(code), staleTime: 30_000 });
-      void navigate(lessonPath(code));
+      const lesson = await queryClient.fetchQuery({ queryKey: lessonQueryKey(code), queryFn: lessonQueryFn(code), staleTime: 30_000 });
+      void navigate(lesson.focusQuizId ? takeQuizPath(lesson.accessCode, lesson.focusQuizId) : lessonPath(code));
     } catch (err) {
       setBlocked(err instanceof ApiError && err.status === 429);
       setError(errorMessage(err));
@@ -47,21 +48,21 @@ export function EnterCodePage() {
 
   return (
     <section className="dsv-content dsv-section" data-bo-man-hinh="nhap-ma">
-      <title>Nhập mã bài học · DiViet</title>
+      <title>Nhập mã · DiViet</title>
       <div className="mx-auto flex max-w-[560px] flex-col gap-(--dsv-block-gap)">
         <header>
-          <h1 className="type-h1 text-on-surface">Nhập mã bài học</h1>
+          <h1 className="type-h1 text-on-surface">Nhập mã</h1>
           <p className="mt-2 type-body-m text-on-surface-variant">
-            Thầy cô đưa mã bài học cho lớp em. Em gõ mã vào ô dưới đây để mở bài học và các bài kiểm tra của bài.
+            Thầy cô đưa mã cho lớp em. Mã bài học mở bài học và các bài kiểm tra của bài, mã bài kiểm tra đưa em vào thẳng bài kiểm tra.
           </p>
         </header>
 
         <form noValidate onSubmit={submit} className="rounded-lg border border-border bg-surface p-(--dsv-inline-gap)">
-          <p className="type-label text-on-surface">Mã bài học</p>
-          <p className="mt-1 type-body-s text-on-surface-variant">Mã gồm 8 ký tự, bắt đầu bằng BH.</p>
+          <p className="type-label text-on-surface">Mã bài học hoặc mã bài kiểm tra</p>
+          <p className="mt-1 type-body-s text-on-surface-variant">Mã gồm 8 ký tự, bắt đầu bằng BH hoặc KT.</p>
           <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-start">
             <TextField
-              label="Mã bài học"
+              label="Mã bài học hoặc mã bài kiểm tra"
               name="maBaiHoc"
               value={text}
               autoComplete="off"
@@ -75,13 +76,13 @@ export function EnterCodePage() {
               containerClassName="min-w-0 flex-1 [&>label]:sr-only"
             />
             <Button type="submit" size="lg" loading={busy} disabled={blocked} className="sm:mt-0">
-              Mở bài học
+              Mở
             </Button>
           </div>
           {!error && (
             <p className="mt-3 flex items-start gap-2 type-body-s text-on-surface-variant">
               <Icon name="info" size={16} className="mt-0.5 shrink-0" />
-              Mã tự viết hoa và bỏ khoảng trắng khi em gõ. Mã bài học chỉ mở được bài của lớp em.
+              Mã tự viết hoa và bỏ khoảng trắng khi em gõ. Mã chỉ mở được bài của lớp em.
             </p>
           )}
           {blocked && (

@@ -1,4 +1,4 @@
-import { formatMoney, formatMoneyPlain, formatPlanDate, formatPlanRange, PURCHASE_KIND_LABEL } from '@dsvhvn/dung-chung';
+import { formatMoney, formatMoneyPlain, formatPlanDate, formatPlanPeriod, PURCHASE_KIND_LABEL } from '@dsvhvn/dung-chung';
 import { errorMessage, type BillingOverview, type PlanOffer, type PurchaseQuote } from '@dsvhvn/dung-chung/api';
 import {
   Badge,
@@ -24,7 +24,7 @@ import { useAuth } from '../../lib/auth/context';
 import { goToGateway } from '../../lib/gateway';
 
 // Chọn gói và thanh toán — quản trị trường. Thẻ các gói đang bán (gói Miễn phí không bán qua VNPay); chọn một gói thì hiện khối
-// xác nhận: loại thao tác (hệ thống tự phân loại mua, gia hạn, nâng cấp), số tiền, ngày hiệu lực dự kiến, lưu ý và cảnh báo vượt
+// xác nhận: loại thao tác (hệ thống tự phân loại mua, gia hạn, nâng cấp), số tiền, thời hạn dự kiến, lưu ý và cảnh báo vượt
 // hạn mức giáo viên. "Thanh toán qua VNPay" tạo yêu cầu mua, hóa đơn và giao dịch rồi chuyển trình duyệt sang VNPay; gói chỉ có
 // hiệu lực khi VNPay báo thanh toán thành công (trang Kết quả thanh toán). `?goi=` chọn sẵn một gói (gia hạn gói hiện tại).
 
@@ -97,9 +97,10 @@ function quoteNote(quote: PurchaseQuote, overview: BillingOverview | undefined):
   const current = overview?.current && overview.hasEffectivePlan ? overview.current : null;
   switch (quote.kind) {
     case 'UPGRADE':
+      if (current?.isFree) return 'Gói Miễn phí sẽ kết thúc ngay khi gói mới có hiệu lực (không cộng dồn lượt AI cũ).';
       return current
-        ? `Nâng cấp không hoàn phần chưa dùng của gói hiện tại. Gói ${current.planName ?? ''}${current.daysLeft !== null ? ` (còn ${current.daysLeft} ngày)` : ''} kết thúc khi gói ${quote.planName ?? ''} có hiệu lực.`
-        : 'Nâng cấp không hoàn phần chưa dùng của gói hiện tại.';
+        ? `Nâng cấp không hoàn tiền hoặc khấu trừ thời gian chưa dùng của gói ${current.planName ?? ''} hiện tại.`
+        : 'Gói có hiệu lực từ ngày thanh toán thành công.';
     case 'RENEW':
       return `Gia hạn: gói mới bắt đầu từ ngày ${formatPlanDate(quote.expectedStartDate)}, ngay sau ngày hết hạn của gói hiện tại.`;
     default:
@@ -129,11 +130,7 @@ function QuoteBlock({
         <Fact label="Loại thao tác">{PURCHASE_KIND_LABEL[quote.kind]}</Fact>
         <Fact label="Gói">{quote.planName}</Fact>
         <Fact label="Số tiền">{formatMoney(quote.amount)}</Fact>
-        <Fact label="Ngày hiệu lực dự kiến">
-          {quote.kind === 'RENEW'
-            ? formatPlanRange(quote.expectedStartDate, quote.expectedEndDate)
-            : 'Ngay khi thanh toán thành công'}
-        </Fact>
+        <Fact label="Thời hạn dự kiến">{formatPlanPeriod(quote.expectedStartDate, quote.expectedEndDate)}</Fact>
       </dl>
       <InlineMessage tone="info">{quoteNote(quote, overview)}</InlineMessage>
       {quote.teacherWarning && <InlineMessage tone="warning">{quote.teacherWarning}</InlineMessage>}

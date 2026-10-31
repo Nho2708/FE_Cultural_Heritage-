@@ -294,4 +294,6 @@ export interface StudentLesson {
   sections: StudentSection[];
   heritages: StudentHeritageCard[];
   quizzes: StudentQuiz[];
+  /** Có giá trị khi em gõ mã bài kiểm tra: giao diện vào thẳng bài đó. */
+  focusQuizId?: number | null;
 }

@@ -56,6 +56,7 @@ export function schoolOverviewOf(overrides: Partial<SchoolOverview> = {}): Schoo
 export function systemOverviewOf(overrides: Partial<SystemOverview> = {}): SystemOverview {
   return {
     generatedAt: '2026-10-07T00:30:00Z',
+    recentFailedPayments: 0,
     schools: { total: 13, withEffectivePlan: 12, withoutEffectivePlan: 1 },
     teachers: { total: 84, active: 80 },
     activeStudents: 3260,

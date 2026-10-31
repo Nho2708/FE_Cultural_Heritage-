@@ -1,5 +1,6 @@
 import type { QuestionDifficulty } from './api/questions';
 import type { CreateQuizBody, QuizDetail, QuizOpenState, QuizStatus, TimeLimitRule, UpdateQuizBody } from './api/quizzes';
+import type { SchoolLevel } from './api/types';
 import { formatDateTime, parseVietnameseDate } from './format';
 import { MESSAGES } from './messages';
 
@@ -109,6 +110,35 @@ export function parseDateTimeInput(text: string): string | null {
   return `${day}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00+07:00`;
 }
 
+/** Cấp 1 không đặt giờ mở và đóng để em không bị áp lực; cấp 2, 3 bắt buộc đặt cả hai. */
+export function quizNeedsOpenWindow(level: SchoolLevel): boolean {
+  return level !== 1;
+}
+
+function partOfDay(hour: number): string {
+  if (hour < 4 || hour >= 22) return 'đêm';
+  if (hour < 11) return 'sáng';
+  if (hour < 13) return 'trưa';
+  if (hour < 18) return 'chiều';
+  return 'tối';
+}
+
+/**
+ * Đọc lại giờ thầy cô vừa nhập để không nhầm đồng hồ 24 giờ: "12:30 27/10/2026" thành "12:30 trưa 27/10/2026, còn 11 giờ 59 phút nữa".
+ * Chữ chưa đúng dạng thì trả null.
+ */
+export function describeQuizTime(text: string, now: Date = new Date()): string | null {
+  const iso = parseDateTimeInput(text);
+  if (iso === null) return null;
+  const [clock = '', day = ''] = text.trim().split(/\s+/);
+  const moment = `${clock} ${partOfDay(Number(clock.split(':')[0]))} ${day}`;
+  const minutes = Math.ceil((Date.parse(iso) - now.getTime()) / 60_000);
+  if (minutes <= 0) return `${moment}, đã qua`;
+  if (minutes >= 1440) return `${moment}, còn ${Math.floor(minutes / 1440)} ngày nữa`;
+  if (minutes >= 60) return `${moment}, còn ${Math.floor(minutes / 60)} giờ ${minutes % 60} phút nữa`;
+  return `${moment}, còn ${minutes} phút nữa`;
+}
+
 // ---- Biểu mẫu thiết lập ----
 
 export interface QuizDraft {
@@ -189,7 +219,7 @@ export function validateQuizDraft(draft: QuizDraft, level: number, options: { fo
   const timeFormat = 'Giờ viết theo dạng giờ:phút ngày/tháng/năm, ví dụ 07:00 06/10/2026.';
   if (draft.openAt.trim() !== '' && open === null) errors.openAt = timeFormat;
   if (draft.closeAt.trim() !== '' && close === null) errors.closeAt = timeFormat;
-  if (options.forPublish) {
+  if (options.forPublish && level !== 1) {
     if (draft.openAt.trim() === '') errors.openAt = MESSAGES.required('giờ mở');
     if (draft.closeAt.trim() === '') errors.closeAt = MESSAGES.required('giờ đóng');
   }

@@ -79,6 +79,8 @@ export interface SystemPlanUsage {
 
 export interface SystemOverview {
   generatedAt: string;
+  /** Số giao dịch thất bại trong 7 ngày gần nhất, cho mục Cần chú ý. */
+  recentFailedPayments: number;
   schools: { total: number; withEffectivePlan: number; withoutEffectivePlan: number };
   teachers: { total: number; active: number };
   activeStudents: number;

@@ -1,10 +1,10 @@
-import { isWellFormedLessonCode, normalizeLessonCode } from '@dsvhvn/dung-chung';
+import { isWellFormedAccessCode, normalizeLessonCode } from '@dsvhvn/dung-chung';
 import { ApiError, errorMessage } from '@dsvhvn/dung-chung/api';
 import { LessonLinksProvider, LessonView, type LessonLinks, type LessonPosition } from '@dsvhvn/dung-chung/lesson';
 import { ButtonLink, ErrorState, LoadingState } from '@dsvhvn/dung-chung/ui';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo } from 'react';
-import { useParams } from 'react-router';
+import { Navigate, useParams } from 'react-router';
 import { pathOf } from '../access/screens';
 import { heritagePath, mapPathOf, timelinePath } from '../discovery/paths';
 import { studentApi } from '../lib/api/client';
@@ -12,9 +12,9 @@ import { useAuth } from '../lib/auth/context';
 import { lessonQueryFn, lessonQueryKey } from '../lessons/lessonData';
 import { readPosition, rememberLesson, writePosition } from '../lessons/recent';
 import { StartQuizDialog } from '../quiz/QuizIntro';
-import { albumQueryKey, homeQueryKey } from '../quiz/quizData';
+import { albumQueryKey, homeQueryKey, takeQuizPath } from '../quiz/quizData';
 
-// Bài học (mở bằng mã trên đường dẫn /bai-hoc/<mã>): lấy bài từ máy chủ rồi chọn bố cục theo cấp của lớp em (cấp 1 kể chuyện từng
+// Bài học (mở bằng mã trên đường dẫn /bai-hoc/<mã>; mã bài kiểm tra thì chuyển thẳng tới bài đó): lấy bài từ máy chủ rồi chọn bố cục theo cấp của lớp em (cấp 1 kể chuyện từng
 // bước, cấp 2 bài đọc và dòng thời gian, cấp 3 tài liệu). Học sinh không chọn bố cục. Mã sai, bài chưa xuất bản hoặc không thuộc
 // lớp của em đều hiện cùng một câu; nhập sai quá nhiều lần thì hiện câu chặn của máy chủ.
 
@@ -68,7 +68,7 @@ export function LessonPage() {
   const { user } = useAuth();
   const links = useStudentLinks();
   const code = normalizeLessonCode(useParams().maBaiHoc ?? '');
-  const valid = isWellFormedLessonCode(code);
+  const valid = isWellFormedAccessCode(code);
   const query = useQuery({ queryKey: lessonQueryKey(code), queryFn: lessonQueryFn(code), enabled: valid, staleTime: 0 });
   const lesson = query.data;
   const userId = user?.id;
@@ -89,7 +89,7 @@ export function LessonPage() {
     [lessonCode, userId],
   );
 
-  if (!valid) return <CodeProblem message="Mã bài học gồm 8 ký tự, bắt đầu bằng BH. Em hãy kiểm tra lại mã thầy cô đã đưa." />;
+  if (!valid) return <CodeProblem message="Mã gồm 8 ký tự, bắt đầu bằng BH (bài học) hoặc KT (bài kiểm tra). Em hãy kiểm tra lại mã thầy cô đã đưa." />;
   if (query.isError) {
     const status = query.error instanceof ApiError ? query.error.status : 0;
     if (status === 404 || status === 429) return <CodeProblem message={errorMessage(query.error)} />;
@@ -107,6 +107,8 @@ export function LessonPage() {
       </section>
     );
   }
+
+  if (lesson.focusQuizId) return <Navigate to={takeQuizPath(lesson.accessCode, lesson.focusQuizId)} replace />;
 
   return (
     <LessonLinksProvider links={links}>
