@@ -67,6 +67,6 @@ export default function ChooseMode() {
 const styles = StyleSheet.create({
   card: { padding: 16 },
   brand: { alignItems: 'center', gap: 8 },
-  logo: { width: 140, aspectRatio: 1.4 },
+  logo: { width: 140, height: 100 },
   brandName: { textAlign: 'center' },
 });
