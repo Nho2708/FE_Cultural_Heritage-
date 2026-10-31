@@ -204,7 +204,7 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
       const { data: result } = await lessonsApi.publish(lessonId);
       adopt(result.lesson);
       toast.success(result.message);
-      if (result.codeCreated) setCodeTarget({ title: result.lesson.title, className: result.lesson.className, accessCode: result.accessCode });
+      if (result.codeCreated) setCodeTarget({ notify: (message) => lessonsApi.notifyClass(result.lesson.id, message), title: result.lesson.title, className: result.lesson.className, accessCode: result.accessCode });
     } catch (err) {
       setProblem(errorMessage(err));
     } finally {
@@ -523,7 +523,7 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
                   variant="secondary"
                   fullWidth
                   className="mt-3"
-                  onClick={() => setCodeTarget({ title: lesson.title, className: lesson.className, accessCode: lesson.accessCode! })}
+                  onClick={() => setCodeTarget({ notify: lesson.status === 'PUBLISHED' ? (message) => lessonsApi.notifyClass(lesson.id, message) : undefined, title: lesson.title, className: lesson.className, accessCode: lesson.accessCode! })}
                 >
                   <Icon name="eye" size={16} />
                   Hiện mã

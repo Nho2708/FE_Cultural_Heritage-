@@ -57,7 +57,7 @@ Thanh báo màu vàng khi trường không có gói hiệu lực (đọc từ `G
 
 | Route | Màn hình | Nội dung |
 |---|---|---|
-| `/nhap-ma` | Nhập mã bài học | Gõ tay, tự viết hoa, bỏ khoảng trắng và dấu gạch (`bh 7f3-k2q` vẫn đúng). Mã sai dạng báo ngay, **không gọi máy chủ** (không tính vào giới hạn nhập sai). Mã sai, bài chưa xuất bản hoặc không thuộc lớp của em cùng một câu 404; nhập sai quá nhiều lần hiện câu chặn của máy chủ (429) và khóa nút. Dưới ô nhập là các mã em đã mở gần đây **trên máy này** (tối đa 5, mỗi học sinh một khóa riêng) |
+| `/nhap-ma` | Nhập mã bài học | Nhận cả mã bài học (`BH`, mở bài học) và mã bài kiểm tra (`KT`, vào thẳng bài đó). Gõ tay, tự viết hoa, bỏ khoảng trắng và dấu gạch (`bh 7f3-k2q` vẫn đúng). Mã sai dạng báo ngay, **không gọi máy chủ** (không tính vào giới hạn nhập sai). Mã sai, bài chưa xuất bản hoặc không thuộc lớp của em cùng một câu 404; nhập sai quá nhiều lần hiện câu chặn của máy chủ (429) và khóa nút. Dưới ô nhập là các mã em đã mở gần đây **trên máy này** (tối đa 5, mỗi học sinh một khóa riêng) |
 | `/bai-hoc/:maBaiHoc` | Bài học | Bố cục theo **cấp của lớp em** (học sinh không chọn): ba bản dưới đây |
 
 ### Ba bố cục

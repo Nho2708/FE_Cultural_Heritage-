@@ -243,7 +243,14 @@ export default function LessonsPage() {
                             variant="ghost"
                             size="icon"
                             aria-label={`Mã bài học "${title}"`}
-                            onClick={() => setCode({ title: row.title, className: row.className, accessCode: row.accessCode! })}
+                            onClick={() =>
+                              setCode({
+                                title: row.title,
+                                className: row.className,
+                                accessCode: row.accessCode!,
+                                notify: row.status === 'PUBLISHED' ? (message) => lessonsApi.notifyClass(row.id, message) : undefined,
+                              })
+                            }
                           >
                             <Icon name="keyboard" size={18} />
                           </Button>

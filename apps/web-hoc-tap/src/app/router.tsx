@@ -14,6 +14,7 @@ import { GuestHistoryPage } from '../pages/GuestHistoryPage';
 import { HeritageDetailPage } from '../pages/HeritageDetailPage';
 import { HeritagePreviewPage } from '../pages/HeritagePreviewPage';
 import { EnterCodePage } from '../pages/EnterCodePage';
+import { NotificationsPage } from '../pages/NotificationsPage';
 import { HomePage } from '../pages/HomePage';
 import { LearnHomePage } from '../pages/LearnHomePage';
 import { LessonPage } from '../pages/LessonPage';
@@ -51,6 +52,7 @@ const BUILT: Partial<Record<ScreenKey, ReactNode>> = {
   learnHome: <LearnHomePage />,
   album: <LazyAlbumPage />,
   enterCode: <EnterCodePage />,
+  notifications: <NotificationsPage />,
   lesson: <LessonPage />,
   takeQuiz: <TakeQuizPage />,
   result: <ResultPage />,

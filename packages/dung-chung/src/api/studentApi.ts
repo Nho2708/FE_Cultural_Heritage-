@@ -2,6 +2,7 @@ import { createAttemptsApi, type StudentAlbumCard } from './attempts';
 import { createStudentRecommendationsApi } from './recommendations';
 import type { ApiClient, ApiResult } from './client';
 import type { StudentLesson } from './lessons';
+import type { StudentNotificationPage } from './notifications';
 import type { QuestionPreviewOption } from './questions';
 import type { AccessToken, LoginResult, OrganizationRef, SchoolLevel, StudentClassDetail, StudentProfile } from './types';
 
@@ -18,6 +19,9 @@ export const STUDENT_ENDPOINTS = {
   lesson: (code: string) => `/student/lessons/${encodeURIComponent(code)}`,
   lessonComplete: (code: string) => `/student/lessons/${encodeURIComponent(code)}/complete`,
   lessonRecall: (code: string) => `/student/lessons/${encodeURIComponent(code)}/recall`,
+  notifications: '/student/notifications',
+  notificationRead: (id: number) => `/student/notifications/${id}/read`,
+  notificationsReadAll: '/student/notifications/read-all',
 } as const;
 
 /** Cấp 1: em tới bước Nhận thẻ của bài. Gọi lại nhiều lần vẫn chỉ ghi một lần (`firstTime` chỉ bật ở lần đầu). */
@@ -160,8 +164,8 @@ export function createStudentApi(client: ApiClient) {
     classroom: () => client.request<StudentClassDetail>(STUDENT_ENDPOINTS.class),
 
     /**
-     * Mở bài học bằng mã bài học (đã chuẩn hóa). Mã sai, bài chưa xuất bản hoặc không thuộc lớp của em đều trả cùng một câu 404
-     * và tính vào giới hạn nhập sai (429 khi vượt).
+     * Mở bài học bằng mã bài học hoặc mã bài kiểm tra (đã chuẩn hóa). Mã bài kiểm tra trả bài học chứa bài đó kèm `focusQuizId`. Mã sai, bài chưa xuất bản
+     * hoặc không thuộc lớp của em đều trả cùng một câu 404 và tính vào giới hạn nhập sai (429 khi vượt).
      */
     lessonByCode: (code: string) => client.request<StudentLesson>(STUDENT_ENDPOINTS.lesson(code)),
 
@@ -170,6 +174,14 @@ export function createStudentApi(client: ApiClient) {
 
     /** Cấp 1: tối đa 3 câu ôn của bài trước cho bước Nhớ lại. Mã sai như `lessonByCode`. */
     lessonRecall: (code: string) => client.request<StudentRecall>(STUDENT_ENDPOINTS.lessonRecall(code)),
+
+    /** Thông báo của em, mới nhất trước, kèm số chưa đọc. */
+    notifications: (page = 1, pageSize = 30) =>
+      client.request<StudentNotificationPage>(`${STUDENT_ENDPOINTS.notifications}?page=${page}&pageSize=${pageSize}`),
+
+    markNotificationRead: (id: number) => client.request<unknown>(STUDENT_ENDPOINTS.notificationRead(id), { method: 'POST' }),
+
+    markAllNotificationsRead: () => client.request<unknown>(STUDENT_ENDPOINTS.notificationsReadAll, { method: 'POST' }),
 
     /** Làm bài kiểm tra, kết quả, lịch sử, tiến độ và trang học của em. */
     ...createAttemptsApi(client),

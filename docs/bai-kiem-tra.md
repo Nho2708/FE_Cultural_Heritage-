@@ -3,7 +3,7 @@
 Phần giao diện của khu **Bài kiểm tra** của giáo viên (web quản trị): tạo bài kiểm tra cho **một bài học của mình** (lớp làm bài là lớp của bài học), chọn câu từ ngân hàng
 (chỉ câu **đúng dạng của cấp**), đặt điểm, thứ tự, thời gian làm **theo cấp**, giờ mở, giờ đóng, xáo câu, cho xem đáp án sau khi nộp; **phát hành** để khóa danh sách câu;
 **đóng** khi muốn dừng nhận bài; **nhân bản** để đổi câu hoặc dùng lại. Cùng luồng này, phía bài học có **nhân bản bài học kèm bài kiểm tra** và **cột, bộ lọc Độ khó**.
-Bài kiểm tra **không có mã riêng**: học sinh của lớp vào bằng mã bài học. Backend ở `BE_Cultural_Heritage-/docs/bai-kiem-tra.md` (nhánh
+Phát hành lần đầu sinh **mã bài kiểm tra** (`KT` + 6 ký tự): em gõ mã này ở ô nhập mã để vào thẳng bài kiểm tra; mã bài học vẫn mở bài học và từ đó vào được bài kiểm tra. Lớp **cấp 1** không đặt giờ mở và đóng: bài chơi mở ngay khi phát hành. Ô giờ theo đồng hồ 24 giờ và đọc lại buổi trong ngày ("12:30 trưa, còn 11 giờ 59 phút nữa") để không nhầm 12:30 với 00:30. Backend ở `BE_Cultural_Heritage-/docs/bai-kiem-tra.md` (nhánh
 `feature/DSVHVN-011-bai-kiem-tra`); thiết kế ở Figma (file `AfNZ3KxFxJqqUxmGhYLXuS`) và ảnh trong `doc/design/mockups/`.
 
 ## 1. Màn hình (web quản trị, khu giáo viên)
@@ -32,7 +32,7 @@ Bài kiểm tra **không có mã riêng**: học sinh của lớp vào bằng m�
 - **Câu không dùng được ở cấp của lớp** (câu bị ẩn, đã xóa, hoặc lớp vừa đổi khối): hàng nền đỏ kèm lý do của máy chủ, dòng báo thiếu điều kiện có liên kết "Xem câu số N".
 - **Xem trước như học sinh**: con mắt ở mỗi dòng và nút "Xem trước như học sinh" mở từng câu theo bố cục của cấp (gọi xem trước câu hỏi của luồng ngân hàng), có Câu trước, Câu sau; không hiện đáp án, không chấm.
 - **Phát hành**: lưu thiết lập đang soạn (nếu có thay đổi), kiểm giờ và thời gian làm, rồi hỏi xác nhận bằng lời của máy chủ ("Sau khi phát hành, danh sách câu hỏi và điểm sẽ bị khóa. Học sinh lớp … làm được bài
-  kiểm tra … qua mã bài học … từ … đến …"). Phát hành xong nhắc đưa mã bài học cho lớp (mở hộp thoại Mã bài học). **Chưa đủ điều kiện** thì liệt kê đủ một lượt ngay dưới thanh thao tác
+  kiểm tra … bằng mã đó hoặc qua mã bài học … từ … đến …"). Phát hành xong mở hộp thoại Mã bài kiểm tra (sao chép, chiếu lên bảng, gửi thông báo cho lớp). **Chưa đủ điều kiện** thì liệt kê đủ một lượt ngay dưới thanh thao tác
   ("Chưa đủ điều kiện phát hành. Còn thiếu: …"), bài học chưa xuất bản có liên kết "Mở bài học"; không hỏi xác nhận.
 - **Sau khi phát hành**: khóa danh sách câu, điểm, thứ tự, bài học, độ khó, thời gian làm, giờ mở, hai công tắc. Còn sửa tên, mô tả, **giờ đóng** (giao diện gửi lại nguyên giá trị các trường khóa, giữ đúng mốc giờ
   cũ của máy chủ để không bị từ chối vì lệch giây). Thanh trạng thái có số đã nộp trên sĩ số, **Nhân bản**, **Kết quả**, **Đóng bài kiểm tra** (hỏi xác nhận: không mở lại được, lượt đang dở được tự nộp).

@@ -4,9 +4,11 @@ import { normalizeCode } from './validation/studentCode';
 
 // Quy tắc và nhãn của bài học dùng chung cho giáo viên (soạn) và học sinh (mở bằng mã). Mã bài học: tiền tố "BH" + 6 ký
 // tự lấy từ bảng 32 ký tự (chữ số 2-9, chữ in hoa A-Z bỏ O và I), ví dụ BH7F3K2Q. Người dùng gõ "bh 7f3-k2q" vẫn đúng:
-// bỏ khoảng trắng và dấu gạch, đổi chữ hoa. Máy chủ chuẩn hóa lại, không dựa vào giao diện.
+// bỏ khoảng trắng và dấu gạch, đổi chữ hoa. Máy chủ chuẩn hóa lại, không dựa vào giao diện. Mã bài kiểm tra cùng cách viết với tiền tố "KT":
+// em gõ ở cùng ô nhập mã để vào thẳng bài kiểm tra.
 
 export const LESSON_CODE_PATTERN = /^BH[2-9A-HJ-NP-Z]{6}$/;
+export const QUIZ_CODE_PATTERN = /^KT[2-9A-HJ-NP-Z]{6}$/;
 
 /** Mã người dùng gõ → dạng gửi lên máy chủ. */
 export function normalizeLessonCode(value: string): string {
@@ -17,10 +19,16 @@ export function isWellFormedLessonCode(value: string): boolean {
   return LESSON_CODE_PATTERN.test(normalizeLessonCode(value));
 }
 
+/** Mã bài học hoặc mã bài kiểm tra: hai loại mã em gõ được ở ô nhập mã. */
+export function isWellFormedAccessCode(value: string): boolean {
+  const normalized = normalizeLessonCode(value);
+  return LESSON_CODE_PATTERN.test(normalized) || QUIZ_CODE_PATTERN.test(normalized);
+}
+
 /** BH7F3K2Q → "BH 7F3 K2Q" để đọc to trên bảng; mã sai dạng giữ nguyên. */
 export function spacedLessonCode(code: string): string {
   const normalized = normalizeLessonCode(code);
-  return LESSON_CODE_PATTERN.test(normalized) ? `${normalized.slice(0, 2)} ${normalized.slice(2, 5)} ${normalized.slice(5)}` : code;
+  return isWellFormedAccessCode(normalized) ? `${normalized.slice(0, 2)} ${normalized.slice(2, 5)} ${normalized.slice(5)}` : code;
 }
 
 /** Số từ như máy chủ đếm: tách theo khoảng trắng. */

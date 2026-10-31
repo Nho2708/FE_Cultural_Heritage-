@@ -68,6 +68,7 @@ export function quizOf(overrides: Partial<QuizDetail> & { level?: SchoolLevel } 
     lessonId: 5,
     lessonTitle: 'Ngọ Môn và Kinh thành Huế',
     lessonStatus: 'PUBLISHED',
+    accessCode: null,
     lessonAccessCode: 'BH7F3K2Q',
     classId: 1,
     className: level === 1 ? '4B1' : level === 3 ? '10A1' : '7A1',

@@ -9,8 +9,8 @@ import { RecentCodes } from '../../src/hocsinh/RecentCodes';
 import { serverErrorText } from '../../src/hocsinh/serverErrorText';
 import { useAuth, useServices } from '../../src/state/AppProvider';
 
-// Nhập mã bài học: em chỉ gõ mã (viết hoa, bỏ khoảng trắng và dấu gạch). Máy chủ kiểm mã, bài đã xuất bản và bài thuộc lớp của em; sai thì báo chung một câu và giới hạn
-// số lần nhập sai. Cùng mã này mở luôn bài kiểm tra của bài, em không nhập lần hai. Dưới ô nhập là các mã em đã mở gần đây trên máy này.
+// Nhập mã: em chỉ gõ mã (viết hoa, bỏ khoảng trắng và dấu gạch). Máy chủ kiểm mã, bài đã xuất bản và bài thuộc lớp của em; sai thì báo chung một câu và giới hạn
+// số lần nhập sai. Mã bài học mở bài học và các bài kiểm tra của bài, mã bài kiểm tra vào thẳng bài đó. Dưới ô nhập là các mã em đã mở gần đây trên máy này.
 
 export default function EnterCode() {
   const { t } = useTranslation();
@@ -29,9 +29,10 @@ export default function EnterCode() {
     setLoading(true);
     try {
       const { data } = await studentApi.lessonByCode(code);
-      queryClient.setQueryData(['student', session?.user.id ?? null, 'lesson', code], data);
+      queryClient.setQueryData(['student', session?.user.id ?? null, 'lesson', data.accessCode], data);
       setValue('');
-      router.push({ pathname: '/bai-hoc/[ma]', params: { ma: code } });
+      if (data.focusQuizId) router.push({ pathname: '/kiem-tra/[quizId]', params: { quizId: String(data.focusQuizId) } });
+      else router.push({ pathname: '/bai-hoc/[ma]', params: { ma: code } });
     } catch (failure) {
       setError(serverErrorText(failure, t('hs.common.error')));
     } finally {

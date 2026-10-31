@@ -38,6 +38,18 @@ export function useStudentAlbum() {
   return useQuery({ queryKey: ['student', user, 'album'], enabled: user !== null, staleTime: 0, queryFn: async () => (await studentApi.album()).data });
 }
 
+/** Thông báo của em: dùng chung cho nút chuông và màn hình Thông báo, tự làm mới mỗi phút để thấy bài thầy cô vừa giao. */
+export function useStudentNotifications() {
+  const { studentApi } = useServices();
+  const user = useStudentKey();
+  return useQuery({
+    queryKey: ['student', user, 'notifications'],
+    enabled: user !== null,
+    refetchInterval: 60_000,
+    queryFn: async () => (await studentApi.notifications()).data,
+  });
+}
+
 /** Mở bài học bằng mã. Mã sai tính vào giới hạn nhập sai của máy chủ nên không tự thử lại. */
 export function useLessonByCode(code: string | undefined) {
   const { studentApi } = useServices();
