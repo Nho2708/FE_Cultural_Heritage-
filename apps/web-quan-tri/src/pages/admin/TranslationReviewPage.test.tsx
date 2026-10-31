@@ -158,7 +158,7 @@ describe('Duyệt bản dịch và tóm tắt — khung hai cột', () => {
     expect(await screen.findByText('Đã duyệt bản dịch tiếng Anh. Nội dung này đã hiện cho khách.')).toBeInTheDocument();
     expect(calls.find((c) => c.path.endsWith('/approve'))?.body).toEqual({ kind: 'TRANSLATION' });
     await waitFor(() => expect(router.state.location.search).toBe(''));
-    expect(screen.queryByRole('region', { name: 'Chi tiết bản dịch hoặc tóm tắt' })).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole('region', { name: 'Chi tiết bản dịch hoặc tóm tắt' })).not.toBeInTheDocument());
     await waitFor(() => expect(queueCalls(calls).length).toBeGreaterThan(1));
   });
 
