@@ -239,8 +239,9 @@ export interface LevelOneStation {
 
 /** Trạm trên con đường theo đúng thứ tự học máy chủ trả; không khóa bài nào. */
 export function levelOneStations(home: Pick<StudentHome, 'classLessons'>): LevelOneStation[] {
-  const current = home.classLessons.find((lesson) => !lesson.completed);
-  return home.classLessons.map((lesson) => ({
+  const classLessons = home.classLessons ?? [];
+  const current = classLessons.find((lesson) => !lesson.completed);
+  return classLessons.map((lesson) => ({
     lesson,
     state: lesson.completed ? 'done' : lesson === current ? 'current' : 'open',
   }));
@@ -248,7 +249,7 @@ export function levelOneStations(home: Pick<StudentHome, 'classLessons'>): Level
 
 /** Bài nên học bây giờ: bài đầu tiên em chưa học xong; null khi đã xong hết hoặc lớp chưa có bài. */
 export function nextLevelOneLesson(home: Pick<StudentHome, 'classLessons'>): StudentClassLesson | null {
-  return home.classLessons.find((lesson) => !lesson.completed) ?? null;
+  return home.classLessons?.find((lesson) => !lesson.completed) ?? null;
 }
 
 /** Lượt em đang chơi dở (ưu tiên hiện "Chơi tiếp" trước bài mới). */

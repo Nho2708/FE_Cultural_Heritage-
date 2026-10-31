@@ -3,7 +3,7 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { envelope, mockApi, studentOf, studentServer } from '../test/fixtures';
-import { homeOf, progressOf, rowOf } from '../test/quizFixtures';
+import { classLessonOf, homeOf, progressOf, rowOf } from '../test/quizFixtures';
 import { renderApp, signInAs } from '../test/renderApp';
 
 // Tiến độ của em: cấp 1 là "Sao của em"; cấp 2 và 3 có bốn tab (Lịch sử bài làm, Tiến độ, Thành thạo, Huy hiệu).
@@ -144,5 +144,56 @@ describe('Sao của em — cấp 1', () => {
     open(1, progressOf(1, { totalStars: 0, finishedAttempts: 0, badges: [] }), []);
     expect(await screen.findByRole('heading', { name: 'Chưa có bài học nào!' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Nhập mã bài học' })).toHaveAttribute('href', '/nhap-ma');
+  });
+
+  it('học xong bài nhưng chưa làm bài kiểm tra: vẫn hiện ở Sao của từng bài, Di sản em đã khám phá và tab Bài đã học', async () => {
+    const user = userEvent.setup();
+    const student = studentOf(4);
+    signInAs(student);
+    const lesson = classLessonOf(10, {
+      title: 'Đô thị cổ Hội An',
+      accessCode: 'BH101010',
+      completed: true,
+      heritageNames: ['Đô thị cổ Hội An'],
+      stars: null,
+    });
+    mockApi(
+      (call) =>
+        call.path === ATTEMPT_ENDPOINTS.progress
+          ? envelope(200, {
+              data: progressOf(1, {
+                totalStars: 3,
+                finishedAttempts: 1,
+                mastery: [{ heritageId: 1, name: 'Vịnh Hạ Long', answered: 3, correct: 3, percent: 100, level: 'MASTERED', label: 'Thành thạo', stars: 3 }],
+              }),
+            })
+          : undefined,
+      (call) =>
+        call.path.startsWith(ATTEMPT_ENDPOINTS.history)
+          ? envelope(200, {
+              data: {
+                items: [rowOf(1, { lessonId: 1, quizName: 'Trò chơi: Vịnh Hạ Long', stars: 3, score: null, totalPoint: null, percent: null })],
+                page: 1,
+                pageSize: 100,
+                totalItems: 1,
+                totalPages: 1,
+              },
+            })
+          : undefined,
+      (call) => (call.path === ATTEMPT_ENDPOINTS.home ? envelope(200, { data: homeOf(1, { classLessons: [lesson] }) }) : undefined),
+      studentServer(student),
+    );
+
+    renderApp('/tien-do');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Sao của em' })).toBeInTheDocument();
+    const starSection = await screen.findByRole('region', { name: 'Sao của từng bài' });
+    expect(within(starSection).getByText('Đô thị cổ Hội An')).toBeInTheDocument();
+
+    const heritageSection = screen.getByRole('region', { name: 'Di sản em đã khám phá' });
+    expect(within(heritageSection).getByText('Đô thị cổ Hội An')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('tab', { name: 'Bài đã học' }));
+    expect(await screen.findByText('Đã học xong bài học')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Vào bài học: Đô thị cổ Hội An' })).toHaveAttribute('href', '/bai-hoc/BH101010');
   });
 });

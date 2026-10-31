@@ -10,6 +10,7 @@ import { classFacts, useClassroom, whoAmI } from '../learn-home/classroom';
 import { useStudentHome } from '../learn-home/useStudentHome';
 import { useAuth } from '../lib/auth/context';
 import { historyQueryFn, historyQueryKey, progressQueryFn, progressQueryKey, resultPath } from '../quiz/quizData';
+import { lessonPath } from '../lessons/lessonData';
 import { Bar } from '../quiz/Meters';
 
 // Tiến độ của em. Cấp 1 là "Sao của em": tổng số sao, số ngày đã học, sao từng bài, huy hiệu, danh sách bài đã học, không điểm hay phần trăm,
@@ -452,6 +453,43 @@ function LevelOneProgress({ progress, rows }: { progress: StudentProgress; rows:
     { id: 'bai-da-hoc', label: 'Bài đã học', icon: 'book-open' },
   ] as const;
 
+  const completedClassLessons = home.data?.classLessons?.filter((l) => l.completed) ?? [];
+  const attemptedLessonIds = new Set(rows.map((r) => r.lessonId));
+  const unattemptedCompletedLessons = completedClassLessons.filter((l) => !attemptedLessonIds.has(l.lessonId));
+
+  const quizCards = rows.map((row) => ({
+    key: `attempt-${row.attemptId}`,
+    title: row.quizName ?? 'Bài chơi',
+    stars: row.stars,
+  }));
+  const lessonCards = unattemptedCompletedLessons.map((lesson) => ({
+    key: `lesson-${lesson.lessonId}`,
+    title: lesson.title ?? 'Bài học',
+    stars: lesson.stars,
+  }));
+  const starCards = [...quizCards, ...lessonCards].slice(0, 8);
+
+  const masteredNames = new Set(progress.mastery.map((m) => m.name?.trim().toLowerCase()).filter(Boolean));
+  const additionalHeritages: Array<{ id: string; name: string; stars: number | null }> = [];
+  for (const lesson of completedClassLessons) {
+    for (const hName of lesson.heritageNames) {
+      const lower = hName.trim().toLowerCase();
+      if (!masteredNames.has(lower)) {
+        masteredNames.add(lower);
+        additionalHeritages.push({
+          id: `lesson-${lesson.lessonId}-${hName}`,
+          name: hName,
+          stars: lesson.stars,
+        });
+      }
+    }
+  }
+
+  const discoveredHeritages = [
+    ...progress.mastery.map((m) => ({ id: `mastery-${m.heritageId}`, name: m.name, stars: m.stars })),
+    ...additionalHeritages,
+  ];
+
   useEffect(() => {
     document.title = 'Sao của em · DiViet';
   }, []);
@@ -479,7 +517,7 @@ function LevelOneProgress({ progress, rows }: { progress: StudentProgress; rows:
 
         <TabPanel idPrefix="sao" id={tab}>
           {tab === 'sao' ? (
-            rows.length === 0 && earned.length === 0 ? (
+            rows.length === 0 && earned.length === 0 && unattemptedCompletedLessons.length === 0 ? (
               <EmptyHistory level={1} />
             ) : (
               <div className="flex flex-col gap-(--dsv-block-gap)">
@@ -509,17 +547,17 @@ function LevelOneProgress({ progress, rows }: { progress: StudentProgress; rows:
                   )}
                 </div>
 
-                {rows.length > 0 && (
+                {starCards.length > 0 && (
                   <section aria-labelledby="sao-tung-bai" className="flex flex-col gap-3">
                     <SectionTitle id="sao-tung-bai" icon="star">
                       Sao của từng bài
                     </SectionTitle>
                     <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-                      {rows.slice(0, 8).map((row) => (
-                        <li key={row.attemptId} className="flex flex-col justify-between gap-3 rounded-[20px] border-2 border-border bg-surface p-4">
-                          <p className="line-clamp-2 text-[18px] leading-tight font-bold text-on-surface">{row.quizName}</p>
+                      {starCards.map((card) => (
+                        <li key={card.key} className="flex flex-col justify-between gap-3 rounded-[20px] border-2 border-border bg-surface p-4">
+                          <p className="line-clamp-2 text-[18px] leading-tight font-bold text-on-surface">{card.title}</p>
                           <div className="flex items-center justify-center">
-                            <SmallStars count={clampStars(row.stars)} size={26} />
+                            <SmallStars count={clampStars(card.stars)} size={26} />
                           </div>
                         </li>
                       ))}
@@ -527,21 +565,21 @@ function LevelOneProgress({ progress, rows }: { progress: StudentProgress; rows:
                   </section>
                 )}
 
-                {progress.mastery.length > 0 && (
+                {discoveredHeritages.length > 0 && (
                   <section aria-labelledby="di-san-em-kham-pha" className="flex flex-col gap-3">
                     <SectionTitle id="di-san-em-kham-pha" icon="building">
                       Di sản em đã khám phá
                     </SectionTitle>
                     <ul className="flex flex-col gap-3">
-                      {progress.mastery.map((m) => (
-                        <li key={m.heritageId} className="flex items-center justify-between gap-4 rounded-[20px] border-2 border-border bg-surface p-4">
+                      {discoveredHeritages.map((item) => (
+                        <li key={item.id} className="flex items-center justify-between gap-4 rounded-[20px] border-2 border-border bg-surface p-4">
                           <div className="flex min-w-0 items-center gap-3">
                             <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary-container text-on-primary-container">
                               <Icon name="map-pin" size={26} />
                             </span>
-                            <span className="min-w-0 text-[20px] leading-tight font-bold text-on-surface">{m.name}</span>
+                            <span className="min-w-0 text-[20px] leading-tight font-bold text-on-surface">{item.name}</span>
                           </div>
-                          <SmallStars count={clampStars(m.stars)} size={26} />
+                          <SmallStars count={clampStars(item.stars)} size={26} />
                         </li>
                       ))}
                     </ul>
@@ -574,7 +612,7 @@ function LevelOneProgress({ progress, rows }: { progress: StudentProgress; rows:
                 </section>
               </div>
             )
-          ) : rows.length === 0 ? (
+          ) : rows.length === 0 && unattemptedCompletedLessons.length === 0 ? (
             <EmptyHistory level={1} />
           ) : (
             <ul className="flex flex-col gap-3">
@@ -591,6 +629,23 @@ function LevelOneProgress({ progress, rows }: { progress: StudentProgress; rows:
                     <SmallStars count={clampStars(row.stars)} size={28} />
                     <LevelOneButtonLink to={resultPath(row.attemptId)} variant="secondary" size="md" aria-label={`Xem kết quả: ${row.quizName}`}>
                       Xem kết quả
+                    </LevelOneButtonLink>
+                  </div>
+                </li>
+              ))}
+              {unattemptedCompletedLessons.map((lesson) => (
+                <li key={`lesson-${lesson.lessonId}`} className="flex flex-wrap items-center justify-between gap-4 rounded-[20px] border-2 border-border bg-surface p-4 sm:p-5">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[22px] leading-tight font-bold text-on-surface">{lesson.title ?? 'Bài học'}</p>
+                    <p className="mt-1 flex items-center gap-1.5 text-[16px] text-on-surface-variant">
+                      <Icon name="check" size={18} className="text-primary" />
+                      <span>Đã học xong bài học</span>
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <SmallStars count={clampStars(lesson.stars)} size={28} />
+                    <LevelOneButtonLink to={lessonPath(lesson.accessCode)} variant="secondary" size="md" aria-label={`Vào bài học: ${lesson.title}`}>
+                      Vào bài học
                     </LevelOneButtonLink>
                   </div>
                 </li>

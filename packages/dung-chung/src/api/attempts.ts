@@ -376,7 +376,22 @@ export interface StudentHome {
 export function createAttemptsApi(client: ApiClient) {
   return {
     /** Trang học của em: lượt đang làm, bài kiểm tra còn mở, bài học của em, huy hiệu gần đây. */
-    home: () => client.request<StudentHome>(ATTEMPT_ENDPOINTS.home),
+    home: async () => {
+      const res = await client.request<StudentHome>(ATTEMPT_ENDPOINTS.home);
+      return {
+        ...res,
+        data: res.data
+          ? {
+              ...res.data,
+              classLessons: res.data.classLessons ?? [],
+              inProgress: res.data.inProgress ?? [],
+              openQuizzes: res.data.openQuizzes ?? [],
+              myLessons: res.data.myLessons ?? [],
+              recentBadges: res.data.recentBadges ?? [],
+            }
+          : res.data,
+      };
+    },
 
     /** Tiến độ của em: quiz đã nộp, bài học hoàn thành, mức thành thạo theo di sản, huy hiệu. */
     progress: () => client.request<StudentProgress>(ATTEMPT_ENDPOINTS.progress),
