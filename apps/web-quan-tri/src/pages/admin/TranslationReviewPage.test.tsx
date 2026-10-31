@@ -332,4 +332,51 @@ describe('Duyệt bản dịch và tóm tắt — khung hai cột', () => {
     await screen.findByRole('heading', { level: 1, name: 'Duyệt bản dịch và tóm tắt' });
     expect(screen.queryByRole('region', { name: 'Chi tiết bản dịch hoặc tóm tắt' })).not.toBeInTheDocument();
   });
+
+  it('ô bản dịch bị trống thì khóa nút Duyệt và báo rõ trường chưa dịch', async () => {
+    signInAs('ADMIN');
+    api({ queue: queuePage([queueItemOf('TRANSLATION', 'en')]) }, (call) =>
+      call.path === '/admin/heritages/1/translations/en/translation'
+        ? envelope(200, {
+            data: translationDetailOf({
+              translated: {
+                ...translationDetailOf().translated,
+                timelines: [{ id: 11, name: '', description: '' }],
+              },
+            }),
+          })
+        : undefined,
+    );
+    renderApp('/quan-tri/ban-dich?muc=1.ban-dich.en');
+
+    const approveBtn = await screen.findByRole('button', { name: 'Duyệt' });
+    expect(approveBtn).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Duyệt cả bản dịch và tóm tắt của ngôn ngữ này' })).toBeDisabled();
+    expect(screen.getByText('Tên giai đoạn 1 chưa được dịch.')).toBeInTheDocument();
+  });
+
+  it('di sản ở trạng thái Cần dịch lại thì khóa Duyệt, có nút "Dịch lại bằng AI" tại chỗ', async () => {
+    signInAs('ADMIN');
+    const calls = api({ queue: queuePage([queueItemOf('TRANSLATION', 'en', { isOutdated: true })]) }, (call) => {
+      if (call.path === '/admin/heritages/1/translations/en/translation') {
+        return envelope(200, { data: translationDetailOf({ isOutdated: true }) });
+      }
+      if (call.path === '/admin/heritages/1/translations/generate') {
+        return envelope(200, { data: generatedOverview(), message: 'Đã dịch và tóm tắt di sản.' });
+      }
+      return undefined;
+    });
+    const user = userEvent.setup();
+    renderApp('/quan-tri/ban-dich?muc=1.ban-dich.en');
+
+    const approveBtn = await screen.findByRole('button', { name: 'Duyệt' });
+    expect(approveBtn).toBeDisabled();
+    expect(screen.getByText(/Di sản đang ở trạng thái Cần dịch lại/)).toBeInTheDocument();
+
+    const regenButtons = screen.getAllByRole('button', { name: 'Dịch lại bằng AI' });
+    expect(regenButtons.length).toBeGreaterThan(0);
+    await user.click(regenButtons[0]!);
+    expect(calls.some((c) => c.path === '/admin/heritages/1/translations/generate')).toBe(true);
+    expect(await screen.findByText('Đã dịch và tóm tắt di sản.')).toBeInTheDocument();
+  });
 });
