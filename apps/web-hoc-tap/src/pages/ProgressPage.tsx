@@ -453,7 +453,7 @@ function LevelOneProgress({ progress, rows }: { progress: StudentProgress; rows:
     { id: 'bai-da-hoc', label: 'Bài đã học', icon: 'book-open' },
   ] as const;
 
-  const completedClassLessons = home.data?.classLessons.filter((l) => l.completed) ?? [];
+  const completedClassLessons = home.data?.classLessons?.filter((l) => l.completed) ?? [];
   const attemptedLessonIds = new Set(rows.map((r) => r.lessonId));
   const unattemptedCompletedLessons = completedClassLessons.filter((l) => !attemptedLessonIds.has(l.lessonId));
 

@@ -91,6 +91,18 @@ describe('Trang học — cấp 1', () => {
     expect(screen.queryByRole('region', { name: 'Gợi ý cho em' })).not.toBeInTheDocument();
   });
 
+  it('dữ liệu máy chủ không có classLessons (API phiên bản cũ): không làm hỏng trang, vẫn hiện thông tin em và lớp', async () => {
+    const rawHome = homeOf(1, { cheer: 'Chào em!' });
+    // @ts-expect-error Mô phỏng backend chưa có thuộc tính classLessons
+    delete rawHome.classLessons;
+    open(rawHome);
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'Chào An!' })).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Con đường bài học' })).not.toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Thầy cô đưa mã bài?' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Lớp của em' })).toBeInTheDocument();
+  });
+
   describe('giọng đọc của máy chủ', () => {
     afterEach(() => {
       setTtsAccessTokenProvider(() => null);

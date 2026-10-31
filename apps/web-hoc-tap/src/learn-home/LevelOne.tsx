@@ -21,7 +21,7 @@ function givenName(fullName: string | null | undefined): string {
 
 /** Mã bài học của một bài trên trang học: bài của lớp trước, rồi bài em đã mở. */
 function codeOfLesson(home: StudentHome, lessonId: number): string | null {
-  return home.classLessons.find((l) => l.lessonId === lessonId)?.accessCode ?? home.myLessons.find((l) => l.lessonId === lessonId)?.accessCode ?? null;
+  return home.classLessons?.find((l) => l.lessonId === lessonId)?.accessCode ?? home.myLessons?.find((l) => l.lessonId === lessonId)?.accessCode ?? null;
 }
 
 export function LevelOne({ user, classroom }: { user: StudentProfile; classroom: StudentClassDetail }) {
@@ -61,10 +61,12 @@ export function LevelOne({ user, classroom }: { user: StudentProfile; classroom:
             <LoadingState rows={3} />
           ) : home.isError ? (
             <ErrorState error={home.error} onRetry={() => void home.refetch()} />
+          ) : !home.data ? (
+            <LoadingState rows={3} />
           ) : (
             <>
               <TodayCard home={home.data} teacherName={home.data.teacherName ?? classroom.teacherName} />
-              {home.data.classLessons.length > 0 && <LessonPath home={home.data} />}
+              {(home.data.classLessons?.length ?? 0) > 0 && <LessonPath home={home.data} />}
             </>
           )}
         </div>
@@ -108,7 +110,7 @@ function TodayCard({ home, teacherName }: { home: StudentHome; teacherName: stri
   const shell = 'grid grid-cols-[96px_minmax(0,1fr)] items-center gap-x-4 gap-y-4 rounded-[24px] border-2 border-secondary-container bg-surface-container-low p-4 sm:grid-cols-[160px_minmax(0,1fr)] sm:p-5';
 
   if (resume) {
-    const thumb = home.classLessons.find((l) => l.lessonId === resume.lessonId)?.thumbnailUrl ?? null;
+    const thumb = home.classLessons?.find((l) => l.lessonId === resume.lessonId)?.thumbnailUrl ?? null;
     return (
       <section aria-labelledby="the-hom-nay" className={shell}>
         <Thumb url={thumb} />
@@ -148,7 +150,7 @@ function TodayCard({ home, teacherName }: { home: StudentHome; teacherName: stri
     );
   }
 
-  if (home.classLessons.length > 0) {
+  if ((home.classLessons?.length ?? 0) > 0) {
     return (
       <section aria-labelledby="the-hom-nay" className="flex flex-col items-center gap-4 rounded-[24px] border-2 border-secondary-container bg-surface-container-low p-5 text-center">
         <Illustration state="chuc-mung" className="size-24 rounded-full bg-surface" />
