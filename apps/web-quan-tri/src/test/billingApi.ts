@@ -1,4 +1,4 @@
-import type { StaffRole, BillingOverview, Invoice, InvoiceDetail, PaymentResult, PlanOffer, PurchaseQuote } from '@dsvhvn/dung-chung/api';
+import type { StaffRole, BillingOverview, Invoice, InvoiceDetail, PaymentProvider, PaymentResult, PlanOffer, PurchaseQuote } from '@dsvhvn/dung-chung/api';
 import { overviewOf, quoteOf, schoolOf } from './billingFixtures';
 import { envelope, mockApi, userOf, type FetchCall } from './fixtures';
 
@@ -13,6 +13,8 @@ export interface BillingState {
   invoices?: Invoice[];
   details?: Record<number, InvoiceDetail>;
   payments?: Record<number, PaymentResult>;
+  /** Phương thức thanh toán dùng được (mặc định chỉ VNPay). */
+  providers?: PaymentProvider[];
 }
 
 export function billingApi(state: BillingState = {}, extra?: (call: FetchCall) => Response | Promise<Response> | undefined) {
@@ -24,8 +26,9 @@ export function billingApi(state: BillingState = {}, extra?: (call: FetchCall) =
       if (path === '/me') return envelope(200, { data: userOf(state.role ?? 'ORG_ADMIN') });
       if (path === '/org') return envelope(200, { data: schoolOf(overview.hasEffectivePlan) });
       if (path === '/org/billing') return envelope(200, { data: overview });
+      if (path === '/org/payments/providers') return envelope(200, { data: state.providers ?? [{ code: 'VNPAY', name: 'VNPay' }] });
       if (path === '/org/plans') return envelope(200, { data: state.offers ?? [] });
-      const quote = /^\/org\/plans\/(\d+)\/quote$/.exec(path);
+      const quote = /^\/org\/plans\/(\d+)\/quote(?:\?.*)?$/.exec(path);
       if (quote) {
         const found = state.quotes?.[Number(quote[1])] ?? (state.quotes ? undefined : quoteOf());
         return found

@@ -147,6 +147,41 @@ describe('Chọn gói và thanh toán', () => {
     expect(calls.find((c) => c.method === 'POST')).toMatchObject({ path: '/org/billing/checkout', body: { planId: 3 } });
   });
 
+  it('có nhiều phương thức: chọn MoMo thì nút, hộp xác nhận và yêu cầu tạo giao dịch đều theo MoMo', async () => {
+    signInAs('ORG_ADMIN');
+    const providers = [
+      { code: 'VNPAY', name: 'VNPay' },
+      { code: 'MOMO', name: 'Ví MoMo' },
+      { code: 'PAYOS', name: 'PayOS (QR ngân hàng)' },
+    ];
+    const calls = billingApi({ offers: [BASIC, ADVANCED], providers }, (call) =>
+      call.path === '/org/billing/checkout' && call.method === 'POST'
+        ? envelope(201, {
+            data: {
+              invoice: invoiceOf(32, { status: 'UNPAID', canPay: true }),
+              paymentId: 78,
+              paymentUrl: 'https://test-payment.momo.vn/pay/abc',
+              expiresAt: '2026-10-06T04:00:00Z',
+              kind: 'UPGRADE',
+              providerCode: 'MOMO',
+            },
+          })
+        : undefined,
+    );
+    const user = userEvent.setup();
+    renderApp('/truong/chon-goi');
+
+    await user.click(await screen.findByRole('radio', { name: 'Nâng cao' }));
+    expect(await screen.findByRole('radio', { name: 'VNPay' })).toBeChecked();   // mặc định phương thức đầu tiên
+    await user.click(screen.getByRole('radio', { name: 'Ví MoMo' }));
+    await user.click(await screen.findByRole('button', { name: 'Thanh toán qua Ví MoMo' }));
+    await user.click(within(await screen.findByRole('dialog', { name: 'Thanh toán qua Ví MoMo' })).getByRole('button', { name: 'Tiếp tục' }));
+
+    await waitFor(() => expect(open).toHaveBeenCalledWith('https://test-payment.momo.vn/pay/abc'));
+    expect(calls.find((c) => c.method === 'POST')).toMatchObject({ path: '/org/billing/checkout', body: { planId: 3, providerCode: 'MOMO' } });
+    expect(calls.some((c) => c.path === '/org/plans/3/quote?provider=MOMO')).toBe(true);
+  });
+
   it('cổng VNPay chưa sẵn sàng (503): hiện câu của máy chủ, không chuyển trang, đóng hộp xác nhận', async () => {
     signInAs('ORG_ADMIN');
     const message = 'Không thể thanh toán lúc này. Cổng VNPay chưa sẵn sàng, bạn hãy thử lại sau hoặc liên hệ quản trị viên.';
