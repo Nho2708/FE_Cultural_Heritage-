@@ -33,6 +33,7 @@ import type {
   Paged,
   PasswordTokenInfo,
   PaymentResult,
+  PaymentProvider,
   PaymentStart,
   Plan,
   PlanInput,
@@ -426,10 +427,15 @@ export const orgBillingApi = {
   offers: () => apiRequest<PlanOffer[]>('/org/plans'),
 
   /** Khối xác nhận sau khi chọn gói; gói không mua được thì 422 kèm lý do. */
-  quote: (planId: number) => apiRequest<PurchaseQuote>(`/org/plans/${planId}/quote`),
+  quote: (planId: number, providerCode?: string) =>
+    apiRequest<PurchaseQuote>(`/org/plans/${planId}/quote${providerCode ? `?provider=${encodeURIComponent(providerCode)}` : ''}`),
+
+  /** Các phương thức thanh toán dùng được (VNPay đứng đầu). */
+  providers: () => apiRequest<PaymentProvider[]>('/org/payments/providers'),
 
   /** Tạo yêu cầu mua, hóa đơn và giao dịch chờ; trả địa chỉ VNPay để chuyển trình duyệt tới. Đã có yêu cầu mua chưa trả: 422. */
-  checkout: (planId: number) => apiRequest<PaymentStart>('/org/billing/checkout', { method: 'POST', body: { planId } }),
+  checkout: (planId: number, providerCode?: string) =>
+    apiRequest<PaymentStart>('/org/billing/checkout', { method: 'POST', body: providerCode ? { planId, providerCode } : { planId } }),
 
   /** Kích hoạt ngay, không qua VNPay; chỉ khi trường không có gói hiệu lực. */
   activateFreePlan: () => apiRequest<BillingOverview>('/org/billing/free-plan', { method: 'POST' }),
@@ -443,7 +449,8 @@ export const orgBillingApi = {
   invoice: (id: number) => apiRequest<InvoiceDetail>(`/org/invoices/${id}`),
 
   /** "Thanh toán" hoặc "Thanh toán lại" hóa đơn chưa trả: giao dịch mới và địa chỉ VNPay. */
-  pay: (invoiceId: number) => apiRequest<PaymentStart>(`/org/invoices/${invoiceId}/pay`, { method: 'POST' }),
+  pay: (invoiceId: number, providerCode?: string) =>
+    apiRequest<PaymentStart>(`/org/invoices/${invoiceId}/pay`, { method: 'POST', body: providerCode ? { providerCode } : undefined }),
 
   /** Trang Kết quả thanh toán: chỉ đọc trạng thái do IPN ghi nhận. */
   payment: (id: number) => apiRequest<PaymentResult>(`/org/payments/${id}`),
