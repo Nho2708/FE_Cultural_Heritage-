@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { RouteStep } from './route';
-import { instructionText, stepGlyph, wayNameOf } from './routeInstructions';
+import { instructionText, ordinalEn, stepGlyph, wayNameOf } from './routeInstructions';
 
 // Câu hướng dẫn từng bước: đúng loại thao tác và hướng rẽ, kèm tên đường và số hiệu, đủ năm ngôn ngữ và không để lộ dấu giữ chỗ.
 
@@ -96,5 +96,28 @@ describe('hình minh họa bước', () => {
     expect(stepGlyph({ type: 'depart', modifier: 'left' })).toEqual({ kind: 'depart' });
     expect(stepGlyph({ type: 'arrive', modifier: 'left' })).toEqual({ kind: 'arrive' });
     expect(stepGlyph({ type: 'rotary', modifier: 'right' })).toEqual({ kind: 'roundabout' });
+  });
+});
+
+describe('số thứ tự tiếng Anh viết tay (không dùng Intl.PluralRules)', () => {
+  it('đủ các đuôi st, nd, rd, th và ngoại lệ 11, 12, 13', () => {
+    const expected: Array<[number, string]> = [
+      [1, '1st'], [2, '2nd'], [3, '3rd'], [4, '4th'], [5, '5th'], [9, '9th'], [10, '10th'],
+      [11, '11th'], [12, '12th'], [13, '13th'], [14, '14th'],
+      [20, '20th'], [21, '21st'], [22, '22nd'], [23, '23rd'], [24, '24th'],
+      [101, '101st'], [102, '102nd'], [103, '103rd'], [111, '111th'], [112, '112th'], [113, '113th'], [121, '121st'],
+    ];
+    for (const [n, text] of expected) expect(ordinalEn(n)).toBe(text);
+  });
+
+  it('tạo câu vòng xuyến vẫn chạy khi môi trường không có Intl.PluralRules', () => {
+    const original = Object.getOwnPropertyDescriptor(Intl, 'PluralRules')!;
+    // Mô phỏng Hermes trong Expo Go: không có PluralRules.
+    Object.defineProperty(Intl, 'PluralRules', { value: undefined, configurable: true, writable: true });
+    try {
+      expect(instructionText(step({ type: 'roundabout', modifier: 'right', exit: 3 }), 'en')).toContain('3rd exit');
+    } finally {
+      Object.defineProperty(Intl, 'PluralRules', original);
+    }
   });
 });
