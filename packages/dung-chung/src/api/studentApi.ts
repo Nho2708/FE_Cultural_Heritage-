@@ -142,9 +142,12 @@ export function createStudentApi(client: ApiClient) {
         await client.request<StudentSessionWire>(STUDENT_ENDPOINTS.login, { method: 'POST', body, auth: false }),
       ),
 
-    /** Học sinh xin đặt lại mật khẩu: gửi mã học sinh để hệ thống kiểm tra và báo giáo viên chủ nhiệm. */
+    /**
+     * Học sinh xin đặt lại mật khẩu: gửi mã học sinh, máy chủ báo giáo viên chủ nhiệm nếu mã có thật. Mã đúng định dạng luôn nhận 200 với
+     * một thông điệp chung; quá giới hạn thì 429 kèm số phút chờ. Phần `data` chỉ chứa giá trị trung tính, giao diện không được hiển thị.
+     */
     forgotPassword: (studentCode: string) =>
-      client.request<{ studentName: string; teacherName: string }>(STUDENT_ENDPOINTS.forgotPassword, {
+      client.request<unknown>(STUDENT_ENDPOINTS.forgotPassword, {
         method: 'POST',
         body: { studentCode },
         auth: false,
