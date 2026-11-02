@@ -1,5 +1,5 @@
 import { formatMoney, formatMoneyPlain, formatPlanDate, formatPlanPeriod, PURCHASE_KIND_LABEL } from '@dsvhvn/dung-chung';
-import { errorMessage, type BillingOverview, type PlanOffer, type PurchaseQuote } from '@dsvhvn/dung-chung/api';
+import { errorMessage, type BillingOverview, type PaymentProvider, type PlanOffer, type PurchaseQuote } from '@dsvhvn/dung-chung/api';
 import {
   Badge,
   Button,
@@ -25,8 +25,8 @@ import { goToGateway } from '../../lib/gateway';
 
 // Chọn gói và thanh toán — quản trị trường. Thẻ các gói đang bán (gói Miễn phí không bán qua VNPay); chọn một gói thì hiện khối
 // xác nhận: loại thao tác (hệ thống tự phân loại mua, gia hạn, nâng cấp), số tiền, thời hạn dự kiến, lưu ý và cảnh báo vượt
-// hạn mức giáo viên. "Thanh toán qua VNPay" tạo yêu cầu mua, hóa đơn và giao dịch rồi chuyển trình duyệt sang VNPay; gói chỉ có
-// hiệu lực khi VNPay báo thanh toán thành công (trang Kết quả thanh toán). `?goi=` chọn sẵn một gói (gia hạn gói hiện tại).
+// hạn mức giáo viên. Có nhiều phương thức thanh toán (VNPay, MoMo, PayOS) thì chọn một bằng thẻ radio; "Thanh toán qua …" tạo yêu cầu
+// mua, hóa đơn và giao dịch rồi chuyển trình duyệt sang cổng đã chọn; gói chỉ có hiệu lực khi cổng báo thanh toán thành công (trang Kết quả thanh toán). `?goi=` chọn sẵn một gói (gia hạn gói hiện tại).
 
 function PlanCard({ offer, selected, onSelect }: { offer: PlanOffer; selected: boolean; onSelect: () => void }) {
   const hint = !offer.available
@@ -93,6 +93,48 @@ function PlanCard({ offer, selected, onSelect }: { offer: PlanOffer; selected: b
   );
 }
 
+function ProviderPicker({
+  providers,
+  value,
+  onChange,
+  disabled,
+}: {
+  providers: PaymentProvider[];
+  value: string;
+  onChange: (code: string) => void;
+  disabled: boolean;
+}) {
+  return (
+    <fieldset className="flex min-w-0 flex-col gap-3" disabled={disabled}>
+      <legend className="type-label text-on-surface">Phương thức thanh toán</legend>
+      <div className="grid gap-3 dsvsm:grid-cols-3">
+        {providers.map((p) => (
+          <label
+            key={p.code}
+            className={[
+              'flex cursor-pointer items-center gap-3 rounded-md border bg-surface p-4',
+              'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary',
+              value === p.code ? 'border-2 border-primary' : 'border-border hover:border-border-strong',
+            ].join(' ')}
+          >
+            <input type="radio" name="phuong-thuc" className="sr-only" checked={value === p.code} onChange={() => onChange(p.code)} />
+            <span
+              aria-hidden="true"
+              className={[
+                'flex size-5 shrink-0 items-center justify-center rounded-full border-2',
+                value === p.code ? 'border-primary bg-primary text-on-primary' : 'border-border-strong',
+              ].join(' ')}
+            >
+              {value === p.code && <Icon name="check" size={12} />}
+            </span>
+            <span className="type-body-m text-on-surface">{p.name}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
 function quoteNote(quote: PurchaseQuote, overview: BillingOverview | undefined): string {
   const current = overview?.current && overview.hasEffectivePlan ? overview.current : null;
   switch (quote.kind) {
@@ -112,12 +154,14 @@ function QuoteBlock({
   quote,
   overview,
   paying,
+  providerName,
   onPay,
   onCancel,
 }: {
   quote: PurchaseQuote;
   overview: BillingOverview | undefined;
   paying: boolean;
+  providerName: string;
   onPay: () => void;
   onCancel: () => void;
 }) {
@@ -136,7 +180,7 @@ function QuoteBlock({
       {quote.teacherWarning && <InlineMessage tone="warning">{quote.teacherWarning}</InlineMessage>}
       <div className="flex flex-wrap items-center gap-3">
         <Button onClick={onPay} loading={paying}>
-          Thanh toán qua VNPay
+          Thanh toán qua {providerName}
         </Button>
         <Button variant="ghost" onClick={onCancel} disabled={paying}>
           Hủy
@@ -155,6 +199,17 @@ export default function PlanPurchasePage() {
   const offers = useQuery({ queryKey: queryKeys.planOffers, queryFn: () => orgBillingApi.offers().then((r) => r.data) });
   const overview = useQuery({ queryKey: queryKeys.billingOverview, queryFn: () => orgBillingApi.overview().then((r) => r.data) });
 
+  const providers = useQuery({
+    queryKey: queryKeys.paymentProviders,
+    queryFn: () => orgBillingApi.providers().then((r) => r.data),
+    staleTime: 60_000,
+  });
+  const [pickedProvider, setPickedProvider] = useState<string | null>(null);
+  const providerList = providers.data ?? [];
+  // Chưa chọn thì lấy phương thức đầu tiên (VNPay đứng đầu); danh sách chưa tải xong hoặc lỗi thì để trống và backend dùng VNPay.
+  const providerCode = providerList.find((p) => p.code === pickedProvider)?.code ?? providerList[0]?.code ?? '';
+  const providerName = providerList.find((p) => p.code === providerCode)?.name ?? 'VNPay';
+
   const [picked, setPicked] = useState<number | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [paying, setPaying] = useState(false);
@@ -163,9 +218,9 @@ export default function PlanPurchasePage() {
   const preselected = offers.data?.find((o) => o.id === wanted && o.available)?.id ?? null;
   const selectedId = picked ?? preselected;
   const quote = useQuery({
-    queryKey: queryKeys.planQuote(selectedId ?? 0),
-    queryFn: () => orgBillingApi.quote(selectedId as number).then((r) => r.data),
-    enabled: selectedId !== null,
+    queryKey: queryKeys.planQuote(selectedId ?? 0, providerCode),
+    queryFn: () => orgBillingApi.quote(selectedId as number, providerCode || undefined).then((r) => r.data),
+    enabled: selectedId !== null && !providers.isPending,
     retry: false,
     staleTime: 0,
   });
@@ -177,9 +232,9 @@ export default function PlanPurchasePage() {
     setPaying(true);
     setFailure(null);
     try {
-      const { data } = await orgBillingApi.checkout(selectedId);
+      const { data } = await orgBillingApi.checkout(selectedId, providerCode || undefined);
       if (goToGateway(data.paymentUrl)) return; // trình duyệt đang rời trang
-      setFailure('Không mở được trang thanh toán của VNPay. Vui lòng thử lại hoặc liên hệ quản trị viên.');
+      setFailure(`Không mở được trang thanh toán của ${providerName}. Vui lòng thử lại hoặc liên hệ quản trị viên.`);
     } catch (error) {
       setFailure(errorMessage(error));
     }
@@ -195,10 +250,10 @@ export default function PlanPurchasePage() {
       <PageHeader
         title="Chọn gói"
         before={<TextLink to={PATHS.schoolPlan}>← Trường và gói</TextLink>}
-        description={`Chọn gói dịch vụ${schoolName ? ` cho ${schoolName}` : ''}. Thanh toán qua VNPay; gói giới hạn số giáo viên và lượt AI, không giới hạn số học sinh.`}
+        description={`Chọn gói dịch vụ${schoolName ? ` cho ${schoolName}` : ''}. Thanh toán trực tuyến qua cổng thanh toán; gói giới hạn số giáo viên và lượt AI, không giới hạn số học sinh.`}
       />
 
-      {SHOW_VNPAY_SANDBOX_NOTE && (
+      {SHOW_VNPAY_SANDBOX_NOTE && (providerCode === '' || providerCode === 'VNPAY') && (
         <InlineMessage tone="info">
           Môi trường thử VNPay: thanh toán bằng thẻ và tài khoản thử của VNPay sandbox, không trừ tiền thật.
         </InlineMessage>
@@ -249,16 +304,26 @@ export default function PlanPurchasePage() {
           <ErrorState error={quote.error} onRetry={() => void quote.refetch()} />
         ) : (
           <>
+            {providerList.length > 1 && (
+              <ProviderPicker providers={providerList} value={providerCode} onChange={setPickedProvider} disabled={paying} />
+            )}
+            {providerCode === 'MOMO' && (
+              <InlineMessage tone="info">Môi trường thử MoMo: thanh toán bằng ứng dụng MoMo thử nghiệm, không trừ tiền thật.</InlineMessage>
+            )}
+            {providerCode === 'PAYOS' && (
+              <InlineMessage tone="info">PayOS không có môi trường thử riêng: quét mã QR bằng ứng dụng ngân hàng, giao dịch là chuyển khoản thật.</InlineMessage>
+            )}
             <QuoteBlock
               quote={quote.data}
               overview={overview.data}
               paying={paying}
+              providerName={providerName}
               onPay={() => setConfirming(true)}
               onCancel={backToPlan}
             />
             <ConfirmDialog
               open={confirming}
-              title="Thanh toán qua VNPay"
+              title={`Thanh toán qua ${providerName}`}
               confirmLabel="Tiếp tục"
               cancelLabel="Quay lại"
               confirming={paying}
