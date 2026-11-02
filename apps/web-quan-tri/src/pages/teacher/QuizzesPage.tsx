@@ -35,7 +35,7 @@ import { PAGE_SIZE, slugMap, useListParams } from '../../lib/listParams';
 // Bài kiểm tra của tôi — giáo viên. Mọi bài kiểm tra thầy cô tạo: tên (kèm số câu và thời gian làm), bài học, lớp (của bài học), trạng
 // thái (Nháp, Đang phát hành, Đã đóng), giờ mở và đóng, số đã nộp trên sĩ số. Lọc theo trạng thái, bài học, lớp và từ khóa; bộ lọc nằm
 // trên URL. Thao tác trên dòng: sao chép = Nhân bản (bản Nháp mới trong cùng bài học, không chép giờ mở và đóng), ổ khóa = Đóng (hỏi
-// xác nhận, không mở lại được), biểu đồ = Kết quả, bút = Soạn, thùng rác = Xóa bài Nháp. Bài kiểm tra không có mã riêng.
+// xác nhận, không mở lại được), biểu đồ = Kết quả, bút = Soạn, thùng rác = Xóa bài Nháp. Bài kiểm tra có mã riêng (sinh khi phát hành lần đầu).
 // Trường hết gói thì "Tạo bài kiểm tra" và "Nhân bản" bị khóa.
 
 const STATUS_SLUG = slugMap<QuizStatus>({ DRAFT: 'nhap', PUBLISHED: 'dang-phat-hanh', CLOSED: 'da-dong' });
@@ -146,7 +146,7 @@ export default function QuizzesPage() {
             {list.data ? <p>{summaryOf(list.data.totalItems, rows)}</p> : null}
             <p className="mt-1 flex items-center gap-2 type-body-s">
               <Icon name="info" size={16} className="shrink-0" />
-              Học sinh vào bài kiểm tra bằng mã bài học; bài kiểm tra không có mã riêng.
+              Bài kiểm tra có mã riêng, sinh khi phát hành lần đầu; học sinh gõ mã đó ở ô nhập mã để vào thẳng bài.
             </p>
           </>
         }

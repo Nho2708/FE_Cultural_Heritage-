@@ -78,7 +78,7 @@ describe('Lớp học', () => {
 
   it('tên lớp trùng trong cùng năm học: câu của máy chủ hiện dưới ô Tên lớp', async () => {
     signInAs('TEACHER');
-    const duplicate = 'Tên lớp "7A1" đã được sử dụng cho một lớp khác.';
+    const duplicate = 'Tên lớp "7A1" đã có trong năm học này.';
     api([], (call) =>
       call.method === 'POST' ? envelope(409, { errorCode: ERROR_CODES.duplicate, message: duplicate, errors: { name: duplicate } }) : undefined,
     );
