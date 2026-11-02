@@ -142,13 +142,21 @@ export interface InvoiceDetail {
   payments: Payment[];
 }
 
-/** Địa chỉ VNPay để chuyển trình duyệt tới, kèm hóa đơn và giao dịch vừa tạo. */
+/** Địa chỉ cổng thanh toán (VNPay, MoMo, PayOS) để chuyển trình duyệt tới, kèm hóa đơn và giao dịch vừa tạo. */
 export interface PaymentStart {
   invoice: Invoice;
   paymentId: number;
   paymentUrl: string;
   expiresAt: string;
   kind: PurchaseKind | null;
+  /** Cổng đã chọn (VNPAY, MOMO, PAYOS). */
+  providerCode: string | null;
+}
+
+/** Một phương thức thanh toán dùng được (đã có khóa và đang bật), cho hộp chọn ở màn hình Chọn gói. */
+export interface PaymentProvider {
+  code: string;
+  name: string;
 }
 
 export interface PaymentResult {
