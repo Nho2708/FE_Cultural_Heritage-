@@ -77,10 +77,31 @@ export interface SystemPlanUsage {
   expiringSoonSchools: number;
 }
 
+/**
+ * Khoản thanh toán VNPay thành công đến muộn sau khi hóa đơn đã bị hủy: tiền đã ghi nhận (hóa đơn đã thanh toán) nhưng trường đã có gói mới hơn
+ * nên gói cũ không kích hoạt lại. Quản trị hệ thống tự xử lý (liên hệ trường, hoàn tiền ngoài hệ thống).
+ */
+export interface LatePayment {
+  paymentId: number;
+  invoiceId: number;
+  invoiceNumber: string;
+  organizationId: number;
+  organizationName: string;
+  planName: string | null;
+  /** Số tiền (đồng). */
+  amount: number;
+  /** Giờ thanh toán (ISO). */
+  paidAt: string;
+}
+
 export interface SystemOverview {
   generatedAt: string;
   /** Số giao dịch thất bại trong 7 ngày gần nhất, cho mục Cần chú ý. */
   recentFailedPayments: number;
+  /** Số khoản thanh toán đến muộn cần xử lý (tự rời danh sách sau 30 ngày). Máy chủ cũ không có trường này: coi như 0. */
+  latePaymentsToReview?: number;
+  /** Tối đa 20 khoản thanh toán đến muộn mới nhất. Máy chủ cũ không có trường này: coi như danh sách rỗng. */
+  latePayments?: LatePayment[];
   schools: { total: number; withEffectivePlan: number; withoutEffectivePlan: number };
   teachers: { total: number; active: number };
   activeStudents: number;
