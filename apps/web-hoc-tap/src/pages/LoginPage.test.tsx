@@ -125,12 +125,11 @@ describe('Học sinh đăng nhập', () => {
     expect(document.documentElement).toHaveAttribute('data-bo-giao-dien', 'cap-3');
   });
 
-  it('nhấn quên mật khẩu: mã học sinh không tồn tại báo đỏ dưới ô nhập', async () => {
-    mockApi(() =>
-      envelope(404, {
-        errorCode: ERROR_CODES.notFound,
-        message: MESSAGES.studentAccountNotFound,
-        errors: { studentCode: MESSAGES.studentAccountNotFound },
+  it('nhấn quên mật khẩu: mã dù có hay không đều nhận cùng một câu chung, không hiện tên em hay tên thầy cô', async () => {
+    const calls = mockApi(() =>
+      envelope(200, {
+        data: { studentName: 'Vũ Thảo My', teacherName: 'Trần Thị Minh Anh' },
+        message: 'Thông điệp của máy chủ không được dùng.',
       }),
     );
     const user = userEvent.setup();
@@ -139,27 +138,13 @@ describe('Học sinh đăng nhập', () => {
     await user.click(await screen.findByRole('button', { name: 'Quên mật khẩu?' }));
     expect(await screen.findByRole('heading', { level: 1, name: 'Tìm tài khoản học sinh' })).toBeInTheDocument();
 
-    await user.type(screen.getByLabelText('Mã học sinh'), 'HSUNKNOWN');
-    await user.click(screen.getByRole('button', { name: 'Tiếp tục' }));
-
-    expect(await screen.findByText(MESSAGES.studentAccountNotFound)).toBeInTheDocument();
-  });
-
-  it('nhấn quên mật khẩu: mã học sinh tồn tại báo thành công đã gửi giáo viên', async () => {
-    const calls = mockApi(() =>
-      envelope(200, {
-        data: { studentName: 'Vũ Thảo My', teacherName: 'Trần Thị Minh Anh' },
-        message: MESSAGES.studentPasswordResetRequested,
-      }),
-    );
-    const user = userEvent.setup();
-    renderApp('/dang-nhap');
-
-    await user.click(await screen.findByRole('button', { name: 'Quên mật khẩu?' }));
     await user.type(screen.getByLabelText('Mã học sinh'), 'HSHUWAND');
     await user.click(screen.getByRole('button', { name: 'Tiếp tục' }));
 
-    expect(await screen.findByText(MESSAGES.studentPasswordResetRequested)).toBeInTheDocument();
+    const sent = 'Nếu mã học sinh đúng, thầy cô chủ nhiệm của em sẽ nhận được thông báo để đặt lại mật khẩu.';
+    expect(await screen.findByText(sent)).toBeInTheDocument();
+    expect(MESSAGES.studentForgotPasswordSent).toBe(sent);
+    expect(screen.queryByText(/Vũ Thảo My|Trần Thị Minh Anh|Thông điệp của máy chủ/)).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Gửi lại yêu cầu' })).toBeInTheDocument();
     expect(calls[0]).toMatchObject({
       method: 'POST',
@@ -167,7 +152,21 @@ describe('Học sinh đăng nhập', () => {
       body: { studentCode: 'HSHUWAND' },
     });
 
-    await user.click(screen.getByRole('button', { name: 'Đã nhớ mật khẩu? Quay lại đăng nhập' }));
+    await user.click(screen.getByRole('button', { name: 'Đã có tài khoản? Quay lại đăng nhập' }));
     expect(await screen.findByRole('heading', { level: 1, name: 'Học sinh đăng nhập' })).toBeInTheDocument();
+  });
+
+  it('nhấn quên mật khẩu: gửi quá nhiều lần (429) thì hiện câu của máy chủ kèm số phút chờ, không hiện câu thành công', async () => {
+    const blocked = 'Em gửi yêu cầu quá nhiều lần. Em thử lại sau 15 phút nhé.';
+    mockApi(() => envelope(429, { errorCode: ERROR_CODES.blocked, message: blocked }));
+    const user = userEvent.setup();
+    renderApp('/dang-nhap');
+
+    await user.click(await screen.findByRole('button', { name: 'Quên mật khẩu?' }));
+    await user.type(screen.getByLabelText('Mã học sinh'), 'HSHUWAND');
+    await user.click(screen.getByRole('button', { name: 'Tiếp tục' }));
+
+    expect(await screen.findByText(blocked)).toBeInTheDocument();
+    expect(screen.queryByText(MESSAGES.studentForgotPasswordSent)).not.toBeInTheDocument();
   });
 });

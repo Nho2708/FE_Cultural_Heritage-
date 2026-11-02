@@ -38,7 +38,8 @@ khẩu; Đăng xuất). Dưới 841px gom vào ngăn kéo. Đăng xuất về tr
 | Việc | Cách làm |
 |---|---|
 | Ô mã học sinh | Tự viết hoa, bỏ khoảng trắng và dấu gạch khi gõ ("hs 8k2-qx7" → `HS8K2QX7`); chỉ kiểm bắt buộc nhập, mã sai dạng vẫn gửi để máy chủ trả cùng một câu |
-| Dòng cố định | "Quên mật khẩu?" (không có liên kết quên mật khẩu qua email) và "Thầy cô đăng nhập ở trang quản trị" kèm đường dẫn web quản trị |
+| Quên mật khẩu | Nút "Quên mật khẩu?" mở ô nhập mã học sinh (không gửi liên kết qua email): máy chủ báo thầy cô chủ nhiệm đặt lại. Gửi xong luôn hiện cùng một câu "Nếu mã học sinh đúng, thầy cô chủ nhiệm của em sẽ nhận được thông báo để đặt lại mật khẩu." dù mã có tài khoản hay không; tên em và tên thầy cô trong phản hồi không được hiện. Chỉ báo lỗi khi gõ sai định dạng hoặc gửi quá nhiều lần (câu của máy chủ, có số phút chờ). App dùng cùng câu |
+| Dòng cố định | "Thầy cô đăng nhập ở trang quản trị" kèm đường dẫn web quản trị |
 | Lỗi | Câu của máy chủ In line (sai mã hoặc mật khẩu; tạm khóa, vô hiệu, lớp đã xóa). Cửa đăng nhập trả 404 hoặc "không có quyền" (máy chủ chưa có endpoint) thì báo câu lỗi hệ thống |
 | Sau đăng nhập | Cờ `mustChangePassword` bật → Đổi mật khẩu chế độ bắt buộc; không thì trang bị chặn trước đó hoặc trang học |
 | Đổi mật khẩu bắt buộc | Không có thanh điều hướng, không có nút bỏ qua; thanh báo đặt mật khẩu mới; mật khẩu mới + nhập lại (không hỏi mật khẩu hiện tại); danh sách quy tắc đánh dấu khi đạt; máy chủ trả token mới, cờ tắt, vào thẳng trang học (hoặc trang đang chờ) |

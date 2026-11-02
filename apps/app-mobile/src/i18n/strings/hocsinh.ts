@@ -14,6 +14,10 @@ export const studentVi = {
     submit: 'Đăng nhập',
     teacherNote: 'Thầy cô đăng nhập ở trang quản trị trên máy tính, không đăng nhập ở app này.',
     visitorMode: 'Tôi là khách tham quan',
+    forgotTitle: 'Tìm tài khoản học sinh',
+    forgotSubmit: 'Tiếp tục',
+    forgotSubmitAgain: 'Gửi lại yêu cầu',
+    forgotBack: 'Đã có tài khoản? Quay lại đăng nhập',
     welcome: 'Đăng nhập thành công.',
   },
   changePassword: {

@@ -24,7 +24,10 @@ export const MESSAGES = {
   samePassword: 'Mật khẩu mới phải khác mật khẩu cũ.',
   /** Hai lần nhập mật khẩu mới không giống nhau. */
   passwordMismatch: 'Hai lần nhập mật khẩu chưa giống nhau.',
-  /** Email hoặc tên đăng nhập đã có tài khoản khác dùng. */
+  /**
+   * Email hoặc tên đăng nhập đã có tài khoản khác dùng. Chỉ dành cho tài khoản: tên lớp trùng trong năm học dùng câu riêng của máy chủ
+   * (hiện dưới ô Tên lớp), giao diện không tự ghép câu này cho lớp.
+   */
   taken: (field: string, value: string) => `${field} "${value}" đã được sử dụng cho một tài khoản khác.`,
   /** Sai thông tin đăng nhập web quản trị, không cho biết sai ô nào. */
   invalidCredentials: 'Email, tên đăng nhập hoặc mật khẩu không đúng.',
@@ -68,12 +71,13 @@ export const MESSAGES = {
   studentInvalidCredentials: 'Mã học sinh hoặc mật khẩu chưa đúng. Em hãy kiểm tra lại phiếu đăng nhập.',
   /** Học sinh không đăng nhập được: tạm khóa, bị vô hiệu, lớp đã xóa hoặc trường đã ngừng. */
   studentCannotSignIn: (reason: string) => `Tài khoản của em tạm thời chưa đăng nhập được. ${reason}`.trim(),
-  /** Dòng nhắc cố định trên màn hình đăng nhập của học sinh. */
+  /** Nhãn nút mở màn hình quên mật khẩu trên màn hình đăng nhập của học sinh (cũng là dòng cuối của phiếu đăng nhập). */
   studentForgotPassword: 'Quên mật khẩu?',
-  /** Không tìm thấy tài khoản học sinh. */
-  studentAccountNotFound: 'Không tìm thấy tài khoản học sinh. Hãy kiểm tra lại mã học sinh rồi thử lại.',
-  /** Đã gửi yêu cầu tới giáo viên chủ nhiệm. */
-  studentPasswordResetRequested: 'Đã báo thầy cô, em chờ thầy cô đặt lại mật khẩu nhé.',
+  /**
+   * Sau khi em gửi mã học sinh ở màn hình quên mật khẩu: luôn hiện đúng câu này, dù mã có tài khoản hay không, để người ngoài
+   * không dò được mã nào có thật. Không hiện tên em hay tên thầy cô từ phản hồi của máy chủ.
+   */
+  studentForgotPasswordSent: 'Nếu mã học sinh đúng, thầy cô chủ nhiệm của em sẽ nhận được thông báo để đặt lại mật khẩu.',
   /** Mô tả phụ cho form quên mật khẩu học sinh. */
   studentForgotPasswordSubtitle: 'Hãy nhập mã học sinh của em để báo thầy cô đặt lại mật khẩu.',
   /** Màn hình đổi mật khẩu bắt buộc: lần đầu đăng nhập hoặc sau khi giáo viên đặt lại. */

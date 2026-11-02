@@ -87,7 +87,7 @@ function RequestLinkForm() {
           {sentMessage ? 'Gửi lại liên kết' : 'Gửi liên kết'}
         </Button>
         <p className="text-center type-body-s text-on-surface-variant">
-          Đã nhớ mật khẩu? <TextLink to={pathOf('login')}>Đăng nhập</TextLink>
+          Đã có tài khoản? <TextLink to={pathOf('login')}>Đăng nhập</TextLink>
         </p>
       </form>
     </AuthLayout>

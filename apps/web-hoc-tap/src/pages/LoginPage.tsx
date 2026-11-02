@@ -19,9 +19,10 @@ import { Illustration } from '@dsvhvn/dung-chung/lesson';
 
 // Học sinh đăng nhập: ô "Mã học sinh" (tự viết hoa, bỏ khoảng trắng và dấu gạch) + mật khẩu có nút hiện / ẩn. Sai mã
 // hoặc mật khẩu luôn cùng một câu, không cho biết sai ô nào (tài khoản người lớn đăng nhập ở đây cũng nhận câu đó);
-// tạm khóa, bị vô hiệu, lớp đã xóa báo In line theo câu của máy chủ. Dòng cố định "Quên mật khẩu? Em hãy nhờ thầy cô
-// đặt lại." (không có liên kết quên mật khẩu qua email) và dòng "Thầy cô đăng nhập ở trang quản trị" kèm đường dẫn,
-// không phụ thuộc thứ đã nhập. Mở từ đường dẫn bài học khi chưa đăng nhập thì báo và mở lại bài sau khi đăng nhập.
+// tạm khóa, bị vô hiệu, lớp đã xóa báo In line theo câu của máy chủ. Nút "Quên mật khẩu?" mở ô nhập mã học sinh để báo
+// thầy cô chủ nhiệm đặt lại (không gửi liên kết qua email); gửi xong luôn hiện cùng một câu, dù mã có tài khoản hay không,
+// và chỉ báo lỗi khi gõ sai định dạng hoặc gửi quá nhiều lần (câu của máy chủ). Dòng "Thầy cô đăng nhập ở trang quản trị"
+// kèm đường dẫn không phụ thuộc thứ đã nhập. Mở từ đường dẫn bài học khi chưa đăng nhập thì báo và mở lại bài sau khi đăng nhập.
 // Màn hình dùng bộ giao diện mặc định vì chưa biết cấp học.
 
 type Field = 'studentCode' | 'password';
@@ -66,13 +67,13 @@ export function LoginPage() {
 
     setForgotSubmitting(true);
     try {
-      const res = await studentApi.forgotPassword(normalizeCode(forgotCode));
-      setForgotSuccess(res.message ?? MESSAGES.studentPasswordResetRequested);
+      await studentApi.forgotPassword(normalizeCode(forgotCode));
+      setForgotSuccess(MESSAGES.studentForgotPasswordSent);
       setForgotError(null);
     } catch (error) {
       setForgotSuccess(null);
       const failure = splitApiError<'studentCode'>(error, ['studentCode']);
-      setForgotError(failure.fields.studentCode ?? failure.form ?? MESSAGES.studentAccountNotFound);
+      setForgotError(failure.fields.studentCode ?? failure.form ?? MESSAGES.systemError);
       focusFirstInvalid(forgotFormRef.current);
     } finally {
       setForgotSubmitting(false);
@@ -208,7 +209,7 @@ export function LoginPage() {
                   }}
                   className="cursor-pointer type-body-m text-link underline-offset-4 hover:underline"
                 >
-                  Đã nhớ mật khẩu? Quay lại đăng nhập
+                  Đã có tài khoản? Quay lại đăng nhập
                 </button>
               </div>
             </form>

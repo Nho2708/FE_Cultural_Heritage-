@@ -120,6 +120,8 @@ jobs:
           kiem "http://127.0.0.1:8080$tep" 200 'immutable'
           kiem http://127.0.0.1:8080/video/du-khach-60s.en.vtt 200 'content-type: text/vtt'
           kiem http://127.0.0.1:8080/ 200 'x-content-type-options: nosniff'
+          kiem http://127.0.0.1:8080/ 200 'x-frame-options: SAMEORIGIN'
+          kiem http://127.0.0.1:8081/ 200 "content-security-policy: frame-ancestors 'self'"
           # Địa chỉ web quản trị gắn vào bản build của web học tập.
           docker exec web grep -rlq 'https://203.0.113.7:8443' /srv/web-hoc-tap/assets
       - name: Nhật ký container khi hỏng

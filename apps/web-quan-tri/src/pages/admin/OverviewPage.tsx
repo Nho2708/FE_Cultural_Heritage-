@@ -33,7 +33,7 @@ import {
 } from '@dsvhvn/dung-chung/ui';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { pathOf } from '../../access/screens';
+import { PATHS, pathOf } from '../../access/screens';
 import { PaymentStatusBadge } from '../../components/billing/billingUi';
 import { AreaPage, PageHeader } from '../../components/layout/PageHeader';
 import { MetricTile, TrendBars, UsageBar } from '../../components/overview/OverviewBits';
@@ -55,8 +55,39 @@ const PAYMENT_SLUG = slugMap<PaymentStatus>({ PENDING: 'dang-cho', SUCCEEDED: 't
 const PAYMENT_RANGES = [{ id: 'tat-ca', label: 'Mọi thời điểm' }, ...TREND_RANGES] as const;
 const AD_MANAGER_URL = 'https://admanager.google.com';
 
+/** Số khoản thanh toán đến muộn hiện ngay trong mục Cần chú ý; phần còn lại chỉ nêu số. */
+const LATE_PAYMENTS_SHOWN = 5;
+
+function LatePayments({ data }: { data: SystemOverview }) {
+  const total = data.latePaymentsToReview ?? 0;
+  const rows = (data.latePayments ?? []).slice(0, LATE_PAYMENTS_SHOWN);
+  return (
+    <li className="border-b border-border pb-4 last:border-b-0 last:pb-0">
+      <p className="type-body-m text-on-surface">Có {formatCount(total)} khoản thanh toán đến muộn cần xử lý.</p>
+      <p className="mt-1 type-body-s text-on-surface-variant">
+        Tiền đã ghi nhận nhưng trường đã có gói mới hơn nên gói cũ không kích hoạt lại. Hãy liên hệ trường hoặc hoàn tiền ngoài hệ thống.
+      </p>
+      {rows.length > 0 && (
+        <ul aria-label="Khoản thanh toán đến muộn" className="mt-2 flex flex-col gap-2">
+          {rows.map((row) => (
+            <li key={row.paymentId} className="type-body-s text-on-surface">
+              <span className="font-medium">Hóa đơn {row.invoiceNumber}</span>
+              {' · '}
+              <TextLink to={PATHS.school(row.organizationId)}>{row.organizationName}</TextLink>
+              {row.planName ? ` · gói ${row.planName}` : ''}
+              {` · ${formatMoney(row.amount)} · ${formatDateTime(row.paidAt)}`}
+            </li>
+          ))}
+        </ul>
+      )}
+      {total > rows.length && <p className="mt-2 type-body-s text-on-surface-variant">Còn {formatCount(total - rows.length)} khoản khác.</p>}
+    </li>
+  );
+}
+
 function Attention({ data }: { data: SystemOverview }) {
   const expiring = data.plans.reduce((sum, p) => sum + p.expiringSoonSchools, 0);
+  const latePayments = data.latePaymentsToReview ?? 0;
   const items: Array<{ key: string; text: string; to: string; action: string }> = [];
   if (data.schools.withoutEffectivePlan > 0)
     items.push({
@@ -95,10 +126,11 @@ function Attention({ data }: { data: SystemOverview }) {
     });
   return (
     <Block title="Cần chú ý" hint="Tính từ số liệu hiện có, không phải cảnh báo thời gian thực.">
-      {items.length === 0 ? (
+      {items.length === 0 && latePayments === 0 ? (
         <p className="type-body-m text-on-surface-variant">Chưa có việc nào cần chú ý.</p>
       ) : (
         <ul className="flex flex-col gap-4">
+          {latePayments > 0 && <LatePayments data={data} />}
           {items.map((item) => (
             <li key={item.key} className="border-b border-border pb-4 last:border-b-0 last:pb-0">
               <p className="type-body-m text-on-surface">{item.text}</p>
