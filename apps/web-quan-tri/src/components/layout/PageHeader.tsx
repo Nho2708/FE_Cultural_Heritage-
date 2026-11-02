@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 // Đầu trang của các màn hình trong khu làm việc: tiêu đề h1, mô tả ngắn, nhóm nút hành động bên phải.
-// Đặt luôn <title> của tab trình duyệt theo tên màn hình. Tên màn hình luôn giữ rộng tối thiểu 32rem: nhóm nút nhiều (Soạn bài học có sáu nút)
+// Đặt luôn <title> của tab trình duyệt theo tên màn hình. Tên màn hình luôn giữ rộng tối thiểu 32rem (không vượt bề rộng khung): nhóm nút nhiều (Soạn bài học có sáu nút)
 // không còn ép tên xuống từng chữ một dòng mà xuống hàng riêng bên dưới, căn phải.
 
 interface PageHeaderProps {
@@ -16,7 +16,7 @@ export function PageHeader({ title, description, actions, before }: PageHeaderPr
   return (
     <header className="flex flex-col gap-4 dsvmd:flex-row dsvmd:flex-wrap dsvmd:items-end dsvmd:justify-between">
       <title>{`${title} · DiViet`}</title>
-      <div className="min-w-0 dsvmd:min-w-[32rem] dsvmd:flex-1">
+      <div className="min-w-0 dsvmd:min-w-[min(32rem,100%)] dsvmd:flex-1">
         {before && <div className="mb-2">{before}</div>}
         <h1 className="type-h1 text-on-surface">{title}</h1>
         {description && <div className="mt-2 max-w-[760px] type-body-m text-on-surface-variant">{description}</div>}
