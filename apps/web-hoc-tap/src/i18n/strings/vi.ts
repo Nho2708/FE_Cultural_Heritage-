@@ -435,6 +435,8 @@ export const vi = {
     schoolsTitle: 'Dành cho nhà trường',
     schoolsText: 'Giáo viên soạn bài học và bài kiểm tra về di sản cho lớp mình; học sinh học theo cấp 1, 2, 3 bằng mã bài học.',
     schoolsLink: 'Xem trang dành cho nhà trường',
+    trailerTitle: 'Trailer DiViet',
+    trailerLabel: 'Trailer giới thiệu DiViet',
     videoTitle: 'Video giới thiệu',
     videoLabel: 'Video giới thiệu DiViet',
     videoNoSupport: 'Trình duyệt này không phát được video.',

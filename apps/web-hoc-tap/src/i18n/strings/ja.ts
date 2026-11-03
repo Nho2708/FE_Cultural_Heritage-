@@ -430,6 +430,8 @@ export const ja: Strings = {
     schoolsTitle: '学校の方へ',
     schoolsText: '先生はクラス向けに遺産の授業とテストを作成し、生徒は授業コードを使って小学校・中学校・高校の段階に合わせて学びます。',
     schoolsLink: '学校向けページを見る',
+    trailerTitle: 'DiViet トレーラー',
+    trailerLabel: 'DiViet のトレーラー動画',
     videoTitle: '紹介動画',
     videoLabel: 'DiViet の紹介動画',
     videoNoSupport: 'このブラウザでは動画を再生できません。',

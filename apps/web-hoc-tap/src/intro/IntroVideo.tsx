@@ -7,11 +7,11 @@ import { useI18n } from '../i18n/context';
 // không lặp. Tệp video nằm trên kho lưu tệp (`<tên>.<ngôn ngữ>.720.webm|mp4`); phụ đề cùng nguồn gốc với web trong
 // `public/video/<tên>.<ngôn ngữ>.vtt`, bật sẵn khi ngôn ngữ giao diện không phải tiếng Việt.
 
-export type IntroVideoName = 'demo-tinh-nang' | 'gioi-thieu-nha-truong' | 'mot-di-san-ba-cach-hoc';
+export type IntroVideoName = 'trailer' | 'demo-tinh-nang' | 'gioi-thieu-nha-truong' | 'mot-di-san-ba-cach-hoc';
 
 export interface IntroVideoPlayerProps {
   name: IntroVideoName;
-  /** Bản dựng của video (demo tính năng có 5 bản theo ngôn ngữ; hai video cho nhà trường chỉ có tiếng Việt). */
+  /** Bản dựng của video (demo tính năng có 5 bản theo ngôn ngữ; trailer có bản tiếng Việt và tiếng Anh; hai video cho nhà trường chỉ có tiếng Việt). */
   edition: LanguageCode;
   /** Ngôn ngữ có tệp phụ đề (ít nhất một). */
   captions: readonly [LanguageCode, ...LanguageCode[]];
