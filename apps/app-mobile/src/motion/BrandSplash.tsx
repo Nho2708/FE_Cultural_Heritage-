@@ -1,16 +1,14 @@
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
+import { Animated, StyleSheet, Text, View } from 'react-native';
 import { APP_CHANNEL } from '../config/env';
+import { LOGO_MARK_RATIO, LogoMark } from './LogoMark';
 import { DURATION, EASING } from './tokens';
 import { useReducedMotion } from './useReducedMotion';
 
-// Màn hình chờ trong app: nối liền với màn hình chờ gốc (cùng nền xanh than, cùng biểu tượng bản nền tối rộng 180 dp ở giữa) rồi chạy bản logo ngắn, dựng từ bốn lớp ảnh
-// cùng khung (nóc, mái, hai trang sách) xếp chồng, cùng nhịp với logo chuyển động của web:
-//   0–450 ms     hai trang sách mở ra từ gáy (phóng ngang từ 15% lên 100%, gáy nằm đúng giữa ảnh), hiện dần trong 200 ms đầu;
-//   250–850 ms   mái đình rơi xuống, vượt nhẹ rồi về chỗ;
-//   550–1050 ms  nóc rơi xuống cùng kiểu.
+// Màn hình chờ trong app: nối liền với màn hình chờ gốc (cùng nền xanh than, cùng biểu tượng bản nền tối rộng 180 dp ở giữa) rồi chạy bản logo ngắn
+// (bốn lớp ảnh: sách mở, mái rơi, nóc rơi; xem LogoMark).
 // Không có thời gian chờ giả: nạp xong sớm thì phần ra (mờ dần 300 ms) chạy ngay. Bật giảm chuyển động thì biểu tượng đứng yên.
 // Biểu tượng không có chữ nên tên "DiViet" viết dưới biểu tượng (đặt tuyệt đối, biểu tượng vẫn nằm đúng chỗ của màn hình chờ gốc).
 // Phủ lên toàn app (app dựng ngay bên dưới) và tự gỡ khi mờ xong.
@@ -23,13 +21,7 @@ const NAME_COLOR = '#F4ECDD';
 // Android 12 trở lên chỉ hiện biểu tượng màn hình chờ gốc trong vùng 192 dp, nên để 180 dp cho mái đao không bị cụt.
 const FRAME_SIZE = 180;
 const MARK_WIDTH = (FRAME_SIZE * 946) / 1024;
-const MARK_HEIGHT = (MARK_WIDTH * 600) / 840;
-/** Một đơn vị của khung vẽ 256 × 256 tính ra dp (phần nhìn thấy rộng 224 đơn vị). */
-const UNIT = MARK_WIDTH / 224;
-const PAGE_LEFT = require('../../assets/images/lop-sach-trai.png');
-const PAGE_RIGHT = require('../../assets/images/lop-sach-phai.png');
-const ROOF = require('../../assets/images/lop-mai.png');
-const RIDGE = require('../../assets/images/lop-noc.png');
+const MARK_HEIGHT = MARK_WIDTH * LOGO_MARK_RATIO;
 
 // Giữ màn hình chờ gốc cho tới khi màn hình chờ trong app đã vẽ xong khung đầu, để không nháy nền trống giữa hai màn.
 void SplashScreen.preventAutoHideAsync().catch(() => undefined);
@@ -48,12 +40,6 @@ function hideNativeSplash() {
 
 export function BrandSplash({ ready, onDone }: { ready: boolean; onDone: () => void }) {
   const reduced = useReducedMotion();
-  const [pageGrow] = useState(() => new Animated.Value(0.15));
-  const [pageFade] = useState(() => new Animated.Value(0));
-  const [roofDrop] = useState(() => new Animated.Value(-28 * UNIT));
-  const [roofFade] = useState(() => new Animated.Value(0));
-  const [ridgeDrop] = useState(() => new Animated.Value(-20 * UNIT));
-  const [ridgeFade] = useState(() => new Animated.Value(0));
   const [leave] = useState(() => new Animated.Value(0));
   const done = useRef(false);
 
@@ -62,35 +48,6 @@ export function BrandSplash({ ready, onDone }: { ready: boolean; onDone: () => v
     done.current = true;
     onDone();
   }, [onDone]);
-
-  // Phần vào: khoảng 1,1 giây. Mái và nóc rơi xuống nhanh dần, vượt chỗ cũ chút ít (2 và 1,5 đơn vị) rồi về chỗ bằng đường cong expo-out.
-  useEffect(() => {
-    if (reduced === null) return;
-    if (reduced) {
-      pageGrow.setValue(1);
-      pageFade.setValue(1);
-      roofDrop.setValue(0);
-      roofFade.setValue(1);
-      ridgeDrop.setValue(0);
-      ridgeFade.setValue(1);
-      return;
-    }
-    const drop = (value: Animated.Value, overshoot: number, delay: number) =>
-      Animated.sequence([
-        Animated.timing(value, { toValue: overshoot * UNIT, duration: 360, delay, easing: EASING.drop, useNativeDriver: true }),
-        Animated.timing(value, { toValue: 0, duration: 240, easing: EASING.enter, useNativeDriver: true }),
-      ]);
-    const enter = Animated.parallel([
-      Animated.timing(pageGrow, { toValue: 1, duration: 450, easing: EASING.enter, useNativeDriver: true }),
-      Animated.timing(pageFade, { toValue: 1, duration: 200, easing: Easing.linear, useNativeDriver: true }),
-      drop(roofDrop, 2, 250),
-      Animated.timing(roofFade, { toValue: 1, duration: 240, delay: 250, easing: Easing.linear, useNativeDriver: true }),
-      drop(ridgeDrop, 1.5, 550),
-      Animated.timing(ridgeFade, { toValue: 1, duration: 200, delay: 550, easing: Easing.linear, useNativeDriver: true }),
-    ]);
-    enter.start();
-    return () => enter.stop();
-  }, [reduced, pageGrow, pageFade, roofDrop, roofFade, ridgeDrop, ridgeFade]);
 
   // Phần ra: ngay khi nạp xong, không đợi phần vào chạy hết.
   useEffect(() => {
@@ -121,12 +78,7 @@ export function BrandSplash({ ready, onDone }: { ready: boolean; onDone: () => v
     >
       <StatusBar style="light" />
       <View style={styles.frame} onLayout={hideNativeSplash}>
-        <View style={styles.mark}>
-          <Animated.Image source={PAGE_LEFT} accessible={false} resizeMode="contain" style={[styles.layer, { opacity: pageFade, transform: [{ scaleX: pageGrow }] }]} />
-          <Animated.Image source={PAGE_RIGHT} accessible={false} resizeMode="contain" style={[styles.layer, { opacity: pageFade, transform: [{ scaleX: pageGrow }] }]} />
-          <Animated.Image source={ROOF} accessible={false} resizeMode="contain" style={[styles.layer, { opacity: roofFade, transform: [{ translateY: roofDrop }] }]} />
-          <Animated.Image source={RIDGE} accessible={false} resizeMode="contain" style={[styles.layer, { opacity: ridgeFade, transform: [{ translateY: ridgeDrop }] }]} />
-        </View>
+        <LogoMark width={MARK_WIDTH} />
         <Text style={styles.name}>DiViet</Text>
       </View>
     </Animated.View>
@@ -136,7 +88,5 @@ export function BrandSplash({ ready, onDone }: { ready: boolean; onDone: () => v
 const styles = StyleSheet.create({
   overlay: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center', backgroundColor: SPLASH_BACKGROUND },
   frame: { width: FRAME_SIZE, height: FRAME_SIZE, alignItems: 'center', justifyContent: 'center' },
-  mark: { width: MARK_WIDTH, height: MARK_HEIGHT },
-  layer: { position: 'absolute', top: 0, left: 0, width: MARK_WIDTH, height: MARK_HEIGHT },
   name: { position: 'absolute', top: (FRAME_SIZE + MARK_HEIGHT) / 2 + 20, left: -60, width: FRAME_SIZE + 120, textAlign: 'center', color: NAME_COLOR, fontSize: 28, lineHeight: 34, fontWeight: '700' },
 });
