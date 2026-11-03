@@ -71,7 +71,7 @@ describe('IntroCards', () => {
     expect(screen.has('Khám phá di sản gần bạn')).toBe(true);
     expect(screen.step()).toBe('Bước 2 trên 5');
     await screen.press('Tiếp');
-    expect(screen.has('Nghe thuyết minh bằng tiếng của bạn')).toBe(true);
+    expect(screen.has('Lắng nghe thuyết minh theo ngôn ngữ của bạn')).toBe(true);
     await screen.press('Tiếp');
     expect(screen.has('Xem 3D và dòng thời gian')).toBe(true);
     await screen.press('Tiếp');

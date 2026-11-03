@@ -412,7 +412,7 @@ export const vi = {
   about: {
     title: 'Giới thiệu',
     kicker: 'GIỚI THIỆU',
-    heroTitle: 'Di sản Việt Nam, kể bằng ngôn ngữ của bạn',
+    heroTitle: 'Di sản Việt Nam, nghe bằng ngôn ngữ của bạn',
     heroText: 'DiViet là trang web và app miễn phí để khám phá di sản văn hóa và thiên nhiên Việt Nam. Đọc được bằng tiếng Việt, Anh, Hàn, Trung hoặc Nhật, không cần tài khoản.',
     start: 'Bắt đầu khám phá',
     openMap: 'Mở bản đồ di sản',
