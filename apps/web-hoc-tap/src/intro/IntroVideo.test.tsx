@@ -37,6 +37,7 @@ describe('khung video giới thiệu', () => {
     expect(video).toHaveAttribute('controls');
     expect(video).not.toHaveAttribute('autoplay');
     expect(video).not.toHaveAttribute('loop');
+    expect(video).toHaveAttribute('poster', '/video/demo-tinh-nang.ko.jpg');
     expect([...video.querySelectorAll('source')].map((source) => source.getAttribute('src'))).toEqual([
       'https://video.test/gioi-thieu/demo-tinh-nang.ko.720.webm',
       'https://video.test/gioi-thieu/demo-tinh-nang.ko.720.mp4',
@@ -71,6 +72,7 @@ describe('khung video giới thiệu', () => {
       'https://video.test/gioi-thieu/trailer.en.720.webm',
       'https://video.test/gioi-thieu/trailer.en.720.mp4',
     ]);
+    expect(video).toHaveAttribute('poster', '/video/trailer.en.jpg');
     const tracks = [...video.querySelectorAll('track')];
     expect(tracks.map((track) => track.getAttribute('src'))).toEqual(['/video/trailer.vi.vtt', '/video/trailer.en.vtt']);
     expect(tracks[0]).not.toHaveAttribute('default');

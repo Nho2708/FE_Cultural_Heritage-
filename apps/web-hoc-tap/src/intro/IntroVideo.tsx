@@ -4,8 +4,8 @@ import { useI18n } from '../i18n/context';
 
 // Khung video giới thiệu của trang Giới thiệu và trang Dành cho nhà trường. Chưa cấu hình VITE_INTRO_VIDEO_BASE_URL thì
 // không hiện gì: trang vẫn đủ nội dung bằng chữ. Video chỉ tải khi người xem bấm phát (preload="none"), không tự phát,
-// không lặp. Tệp video nằm trên kho lưu tệp (`<tên>.<ngôn ngữ>.720.webm|mp4`); phụ đề cùng nguồn gốc với web trong
-// `public/video/<tên>.<ngôn ngữ>.vtt`, bật sẵn khi ngôn ngữ giao diện không phải tiếng Việt.
+// không lặp. Tệp video nằm trên kho lưu tệp (`<tên>.<ngôn ngữ>.720.webm|mp4`); phụ đề và ảnh bìa cùng nguồn gốc với web trong
+// `public/video/<tên>.<ngôn ngữ>.vtt` và `public/video/<tên>.<bản dựng>.jpg` (1280 × 720). Phụ đề bật sẵn khi ngôn ngữ giao diện không phải tiếng Việt.
 
 export type IntroVideoName = 'trailer' | 'demo-tinh-nang' | 'gioi-thieu-nha-truong' | 'mot-di-san-ba-cach-hoc';
 
@@ -19,13 +19,11 @@ export interface IntroVideoPlayerProps {
   defaultCaption: LanguageCode | null;
   label: string;
   noSupport: string;
-  /** Kho lưu tệp trả ảnh từ khung hình đầu của video khi đổi đuôi thành .jpg; bật thì dùng làm ảnh bìa. */
-  withPoster?: boolean;
   className?: string;
 }
 
 /** Chỉ riêng thẻ video (không có tiêu đề hay khung trang): dùng chung cho trang Giới thiệu, Dành cho nhà trường và trang nhúng của app. */
-export function IntroVideoPlayer({ name, edition, captions, defaultCaption, label, noSupport, withPoster = false, className }: IntroVideoPlayerProps) {
+export function IntroVideoPlayer({ name, edition, captions, defaultCaption, label, noSupport, className }: IntroVideoPlayerProps) {
   const { t } = useI18n();
   if (!INTRO_VIDEO_BASE_URL) return null;
   const file = `${INTRO_VIDEO_BASE_URL}/${name}.${edition}.720`;
@@ -42,7 +40,7 @@ export function IntroVideoPlayer({ name, edition, captions, defaultCaption, labe
       preload="none"
       playsInline
       aria-label={label}
-      poster={withPoster ? `${file}.jpg` : undefined}
+      poster={`/video/${name}.${edition}.jpg`}
       className={className ?? 'aspect-video w-full max-w-[960px] rounded-md bg-(--color-brand-navy)'}
     >
       <source src={`${file}.webm`} type="video/webm" />
@@ -56,7 +54,7 @@ export function IntroVideoPlayer({ name, edition, captions, defaultCaption, labe
   );
 }
 
-export interface IntroVideoProps extends Omit<IntroVideoPlayerProps, 'withPoster' | 'className'> {
+export interface IntroVideoProps extends Omit<IntroVideoPlayerProps, 'className'> {
   title: string;
   headingId: string;
 }

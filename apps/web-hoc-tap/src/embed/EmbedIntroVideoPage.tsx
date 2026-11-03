@@ -35,7 +35,6 @@ export function EmbedIntroVideoPage() {
         defaultCaption={language === 'vi' ? null : language}
         label={t.about.videoLabel}
         noSupport={t.about.videoNoSupport}
-        withPoster
         className="max-h-full w-full bg-(--color-brand-navy)"
       />
     </div>

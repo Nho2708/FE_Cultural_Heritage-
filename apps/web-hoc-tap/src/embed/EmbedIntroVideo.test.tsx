@@ -49,7 +49,7 @@ describe('Trang video giới thiệu nhúng', () => {
     expect(video).toHaveAttribute('controls');
     expect(video).not.toHaveAttribute('autoplay');
     expect(video).not.toHaveAttribute('loop');
-    expect(video).toHaveAttribute('poster', 'https://video.test/gioi-thieu/demo-tinh-nang.en.720.jpg');
+    expect(video).toHaveAttribute('poster', '/video/demo-tinh-nang.en.jpg');
     expect(video).toHaveAttribute('aria-label', STRINGS.en.about.videoLabel);
     expect([...video.querySelectorAll('source')].map((source) => source.getAttribute('src'))).toEqual([
       'https://video.test/gioi-thieu/demo-tinh-nang.en.720.webm',
