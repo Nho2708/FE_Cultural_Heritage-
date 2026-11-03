@@ -2,6 +2,7 @@ import type { Strings } from './vi';
 
 export const en: Strings = {
   appName: 'DiViet',
+  tagline: 'Discover Vietnamese heritage',
   common: {
     back: 'Back',
     close: 'Close',
@@ -40,7 +41,7 @@ export const en: Strings = {
   intro: {
     title: 'App introduction',
     replay: 'View again',
-    replayText: 'Watch the four short introduction cards again.',
+    replayText: 'Watch the five short introduction cards again.',
     videoTitle: 'Intro video',
     videoText: 'Watch a short video about the app. It needs an internet connection.',
     watchVideo: 'Watch intro video',
@@ -49,6 +50,7 @@ export const en: Strings = {
     next: 'Next',
     start: 'Get started',
     step: 'Step {{current}} of {{total}}',
+    welcome: { text: 'Maps, audio guides, 3D models and lessons about Vietnamese heritage, all in one app.' },
     discover: { title: 'Discover heritage near you', text: 'Open the map, find sites around where you stand and read a short summary of each.' },
     narration: { title: 'Listen in your own language', text: 'Pick one of five languages, then listen to a narration of each heritage site.' },
     model: { title: 'See 3D models and the timeline', text: 'Turn a 3D model of a site and follow the historical timeline.' },

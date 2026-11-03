@@ -3,6 +3,8 @@
 
 export interface Strings {
   appName: string;
+  /** Khẩu hiệu dưới tên DiViet (màn hình chọn ngôn ngữ, thẻ chào mừng). */
+  tagline: string;
   common: {
     back: string;
     close: string;
@@ -50,6 +52,7 @@ export interface Strings {
     next: string;
     start: string;
     step: string;
+    welcome: { text: string };
     discover: { title: string; text: string };
     narration: { title: string; text: string };
     model: { title: string; text: string };
@@ -205,6 +208,7 @@ export interface Strings {
 
 export const vi: Strings = {
   appName: 'DiViet',
+  tagline: 'Khám phá di sản Việt Nam',
   common: {
     back: 'Quay lại',
     close: 'Đóng',
@@ -243,7 +247,7 @@ export const vi: Strings = {
   intro: {
     title: 'Giới thiệu ứng dụng',
     replay: 'Xem lại',
-    replayText: 'Xem lại bốn thẻ giới thiệu ngắn về ứng dụng.',
+    replayText: 'Xem lại năm thẻ giới thiệu ngắn về ứng dụng.',
     videoTitle: 'Video giới thiệu',
     videoText: 'Xem video giới thiệu ngắn về ứng dụng, cần kết nối mạng.',
     watchVideo: 'Xem video giới thiệu',
@@ -252,6 +256,7 @@ export const vi: Strings = {
     next: 'Tiếp',
     start: 'Bắt đầu',
     step: 'Bước {{current}} trên {{total}}',
+    welcome: { text: 'Bản đồ, thuyết minh, mô hình 3D và bài học về di sản Việt Nam, gói gọn trong một ứng dụng.' },
     discover: { title: 'Khám phá di sản gần bạn', text: 'Mở bản đồ, tìm di sản quanh nơi bạn đứng và đọc tóm tắt từng nơi.' },
     narration: { title: 'Nghe thuyết minh bằng tiếng của bạn', text: 'Chọn một trong năm ngôn ngữ, rồi nghe thuyết minh về từng di sản.' },
     model: { title: 'Xem 3D và dòng thời gian', text: 'Xoay mô hình 3D của di sản và đi theo dòng thời gian lịch sử.' },
