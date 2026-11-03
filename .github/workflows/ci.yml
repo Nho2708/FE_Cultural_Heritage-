@@ -118,7 +118,7 @@ jobs:
           kiem http://127.0.0.1:8080/assets/khong-co.js 404
           tep=$(curl -fsS http://127.0.0.1:8080/ | grep -o '/assets/[^"]*\.js' | head -n 1)
           kiem "http://127.0.0.1:8080$tep" 200 'immutable'
-          kiem http://127.0.0.1:8080/video/du-khach-60s.en.vtt 200 'content-type: text/vtt'
+          kiem http://127.0.0.1:8080/video/demo-tinh-nang.en.vtt 200 'content-type: text/vtt'
           kiem http://127.0.0.1:8080/ 200 'x-content-type-options: nosniff'
           kiem http://127.0.0.1:8080/ 200 'x-frame-options: SAMEORIGIN'
           kiem http://127.0.0.1:8081/ 200 "content-security-policy: frame-ancestors 'self'"

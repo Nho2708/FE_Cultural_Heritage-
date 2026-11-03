@@ -49,14 +49,14 @@ describe('Trang video giới thiệu nhúng', () => {
     expect(video).toHaveAttribute('controls');
     expect(video).not.toHaveAttribute('autoplay');
     expect(video).not.toHaveAttribute('loop');
-    expect(video).toHaveAttribute('poster', 'https://video.test/gioi-thieu/du-khach-60s.en.720.jpg');
+    expect(video).toHaveAttribute('poster', 'https://video.test/gioi-thieu/demo-tinh-nang.en.720.jpg');
     expect(video).toHaveAttribute('aria-label', STRINGS.en.about.videoLabel);
     expect([...video.querySelectorAll('source')].map((source) => source.getAttribute('src'))).toEqual([
-      'https://video.test/gioi-thieu/du-khach-60s.en.720.webm',
-      'https://video.test/gioi-thieu/du-khach-60s.en.720.mp4',
+      'https://video.test/gioi-thieu/demo-tinh-nang.en.720.webm',
+      'https://video.test/gioi-thieu/demo-tinh-nang.en.720.mp4',
     ]);
     const track = video.querySelector('track');
-    expect(track).toHaveAttribute('src', '/video/du-khach-60s.en.vtt');
+    expect(track).toHaveAttribute('src', '/video/demo-tinh-nang.en.vtt');
     expect(track).toHaveAttribute('default');
     expect(video.closest('[lang]')).toHaveAttribute('lang', 'en');
     await waitFor(() => expect(messages()).toContainEqual({ type: 'ready', version: 1 }));
@@ -68,7 +68,7 @@ describe('Trang video giới thiệu nhúng', () => {
 
     await waitFor(() => expect(document.querySelector('video')).not.toBeNull());
     const video = theVideo();
-    expect(video.querySelector('source')).toHaveAttribute('src', 'https://video.test/gioi-thieu/du-khach-60s.vi.720.webm');
+    expect(video.querySelector('source')).toHaveAttribute('src', 'https://video.test/gioi-thieu/demo-tinh-nang.vi.720.webm');
     expect(video.querySelector('track')).not.toHaveAttribute('default');
     expect(video.closest('[lang]')).toHaveAttribute('lang', 'vi');
   });

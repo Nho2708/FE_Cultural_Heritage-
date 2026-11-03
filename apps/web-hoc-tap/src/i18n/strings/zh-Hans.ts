@@ -428,6 +428,8 @@ export const zhHans: Strings = {
     schoolsTitle: '学校专区',
     schoolsText: '教师为自己的班级制作遗产课程和测验；学生凭课程代码，按小学、初中或高中学段学习。',
     schoolsLink: '查看学校专区',
+    trailerTitle: 'DiViet 预告片',
+    trailerLabel: 'DiViet 预告片视频',
     videoTitle: '介绍视频',
     videoLabel: 'DiViet 介绍视频',
     videoNoSupport: '此浏览器无法播放视频。',

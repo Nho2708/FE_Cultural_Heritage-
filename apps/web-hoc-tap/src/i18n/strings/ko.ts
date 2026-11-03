@@ -430,6 +430,8 @@ export const ko: Strings = {
     schoolsTitle: '학교용 안내',
     schoolsText: '교사는 반을 위한 유산 수업과 시험을 만들고, 학생은 수업 코드로 초등·중학교·고등학교 수준에 맞춰 공부합니다.',
     schoolsLink: '학교용 페이지 보기',
+    trailerTitle: 'DiViet 트레일러',
+    trailerLabel: 'DiViet 트레일러 영상',
     videoTitle: '소개 영상',
     videoLabel: 'DiViet 소개 영상',
     videoNoSupport: '이 브라우저에서는 영상을 재생할 수 없습니다.',

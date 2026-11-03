@@ -17,7 +17,7 @@ describe('khung video giới thiệu', () => {
     render(
       <I18nContext value={{ language: 'ko', t: STRINGS.ko, canChoose: true, setLanguage: () => {} }}>
         <IntroVideo
-          name="du-khach-60s"
+          name="demo-tinh-nang"
           edition="ko"
           captions={['ko']}
           defaultCaption="ko"
@@ -38,13 +38,42 @@ describe('khung video giới thiệu', () => {
     expect(video).not.toHaveAttribute('autoplay');
     expect(video).not.toHaveAttribute('loop');
     expect([...video.querySelectorAll('source')].map((source) => source.getAttribute('src'))).toEqual([
-      'https://video.test/gioi-thieu/du-khach-60s.ko.720.webm',
-      'https://video.test/gioi-thieu/du-khach-60s.ko.720.mp4',
+      'https://video.test/gioi-thieu/demo-tinh-nang.ko.720.webm',
+      'https://video.test/gioi-thieu/demo-tinh-nang.ko.720.mp4',
     ]);
     const track = video.querySelector('track');
-    expect(track).toHaveAttribute('src', '/video/du-khach-60s.ko.vtt');
+    expect(track).toHaveAttribute('src', '/video/demo-tinh-nang.ko.vtt');
     expect(track).toHaveAttribute('srclang', 'ko');
     expect(track).toHaveAttribute('label', STRINGS.ko.language.names.ko);
     expect(track).toHaveAttribute('default');
+  });
+
+  it('trailer ở ngôn ngữ không phải tiếng Việt: phát bản tiếng Anh, có hai phụ đề và bật sẵn phụ đề tiếng Anh', () => {
+    render(
+      <I18nContext value={{ language: 'ja', t: STRINGS.ja, canChoose: true, setLanguage: () => {} }}>
+        <IntroVideo
+          name="trailer"
+          edition="en"
+          captions={['vi', 'en']}
+          defaultCaption="en"
+          title={STRINGS.ja.about.trailerTitle}
+          label={STRINGS.ja.about.trailerLabel}
+          noSupport={STRINGS.ja.about.videoNoSupport}
+          headingId="trailer"
+        />
+      </I18nContext>,
+    );
+
+    expect(screen.getByRole('heading', { level: 2, name: STRINGS.ja.about.trailerTitle })).toBeInTheDocument();
+    const video = document.querySelector('video');
+    if (!video) throw new Error('Không thấy video');
+    expect([...video.querySelectorAll('source')].map((source) => source.getAttribute('src'))).toEqual([
+      'https://video.test/gioi-thieu/trailer.en.720.webm',
+      'https://video.test/gioi-thieu/trailer.en.720.mp4',
+    ]);
+    const tracks = [...video.querySelectorAll('track')];
+    expect(tracks.map((track) => track.getAttribute('src'))).toEqual(['/video/trailer.vi.vtt', '/video/trailer.en.vtt']);
+    expect(tracks[0]).not.toHaveAttribute('default');
+    expect(tracks[1]).toHaveAttribute('default');
   });
 });

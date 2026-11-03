@@ -431,6 +431,8 @@ export const en: Strings = {
     schoolsTitle: 'For schools',
     schoolsText: 'Teachers create heritage lessons and tests for their classes; students learn at primary, lower or upper secondary level with a lesson code.',
     schoolsLink: 'See the page for schools',
+    trailerTitle: 'DiViet trailer',
+    trailerLabel: 'DiViet trailer',
     videoTitle: 'Introduction video',
     videoLabel: 'DiViet introduction video',
     videoNoSupport: 'This browser cannot play the video.',
