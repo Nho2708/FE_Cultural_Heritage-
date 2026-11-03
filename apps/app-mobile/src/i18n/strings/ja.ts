@@ -2,6 +2,7 @@ import type { Strings } from './vi';
 
 export const ja: Strings = {
   appName: 'DiViet',
+  tagline: 'ベトナムの遺産をめぐる',
   common: {
     back: '戻る',
     close: '閉じる',
@@ -40,7 +41,7 @@ export const ja: Strings = {
   intro: {
     title: 'アプリの紹介',
     replay: 'もう一度見る',
-    replayText: '4枚の短い紹介カードをもう一度見ます。',
+    replayText: '5枚の短い紹介カードをもう一度見ます。',
     videoTitle: '紹介動画',
     videoText: 'アプリを紹介する短い動画を見ます。インターネット接続が必要です。',
     watchVideo: '紹介動画を見る',
@@ -49,6 +50,7 @@ export const ja: Strings = {
     next: '次へ',
     start: '始める',
     step: 'ステップ {{current}} / {{total}}',
+    welcome: { text: 'ベトナムの遺産の地図、音声解説、3Dモデル、授業をひとつのアプリにまとめました。' },
     discover: { title: 'あなたの近くの遺産を探す', text: '地図を開いて、今いる場所の周りの遺産を探し、それぞれの概要を読めます。' },
     narration: { title: 'あなたの言語で解説を聞く', text: '5つの言語から選んで、遺産ごとの解説を聞けます。' },
     model: { title: '3Dモデルと年表を見る', text: '遺産の3Dモデルを回して、歴史の年表をたどれます。' },

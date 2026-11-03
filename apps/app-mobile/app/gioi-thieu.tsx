@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { IntroCards } from '../src/intro/IntroCards';
 import { useApp } from '../src/state/AppProvider';
 
-// Giới thiệu ứng dụng: bốn thẻ ngắn. Lần đầu nằm giữa chọn ngôn ngữ và chọn chế độ, chỉ hiện một lần (bỏ qua hay xem hết đều đánh dấu đã xem).
+// Giới thiệu ứng dụng: năm thẻ ngắn (chào mừng rồi bốn chức năng). Lần đầu nằm giữa chọn ngôn ngữ và chọn chế độ, chỉ hiện một lần (bỏ qua hay xem hết đều đánh dấu đã xem).
 // Mở lại từ "Lịch sử và cài đặt" (Khách) hoặc "Của em" (Học sinh, tiếng Việt) thì xong là quay về màn hình đó. Không nằm giữa đăng nhập, nhập mã, bài học hay bài kiểm tra.
 
 export default function AppIntroduction() {

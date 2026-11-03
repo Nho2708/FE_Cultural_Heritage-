@@ -2,6 +2,7 @@ import type { Strings } from './vi';
 
 export const ko: Strings = {
   appName: 'DiViet',
+  tagline: '베트남의 유산을 만나다',
   common: {
     back: '뒤로',
     close: '닫기',
@@ -40,7 +41,7 @@ export const ko: Strings = {
   intro: {
     title: '앱 소개',
     replay: '다시 보기',
-    replayText: '짧은 소개 카드 네 장을 다시 봅니다.',
+    replayText: '짧은 소개 카드 다섯 장을 다시 봅니다.',
     videoTitle: '소개 영상',
     videoText: '앱을 소개하는 짧은 영상을 봅니다. 인터넷 연결이 필요합니다.',
     watchVideo: '소개 영상 보기',
@@ -49,6 +50,7 @@ export const ko: Strings = {
     next: '다음',
     start: '시작하기',
     step: '{{total}}단계 중 {{current}}단계',
+    welcome: { text: '베트남 유산의 지도, 음성 해설, 3D 모델과 수업을 하나의 앱에 담았습니다.' },
     discover: { title: '내 주변의 유산 찾기', text: '지도를 열어 내가 있는 곳 주변의 유산을 찾고 각 유산의 요약을 읽어 보세요.' },
     narration: { title: '내 언어로 해설 듣기', text: '다섯 가지 언어 중 하나를 고르고 각 유산의 해설을 들어 보세요.' },
     model: { title: '3D 모델과 연표 보기', text: '유산의 3D 모델을 돌려 보고 역사 연표를 따라가 보세요.' },
