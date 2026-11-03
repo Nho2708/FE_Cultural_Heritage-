@@ -35,7 +35,7 @@ describe('trang Giới thiệu', () => {
     const calls = mockApi();
     renderApp('/gioi-thieu');
 
-    expect(await screen.findByRole('heading', { level: 1, name: 'Di sản Việt Nam, kể bằng ngôn ngữ của bạn' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Di sản Việt Nam, nghe bằng ngôn ngữ của bạn' })).toBeInTheDocument();
     expect(document.title).toBe('Giới thiệu · DiViet');
     expect(screen.getByRole('link', { name: 'Bắt đầu khám phá' })).toHaveAttribute('href', '/di-san');
 
