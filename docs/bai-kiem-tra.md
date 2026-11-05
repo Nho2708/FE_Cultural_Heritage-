@@ -40,9 +40,9 @@ Phát hành lần đầu sinh **mã bài kiểm tra** (`KT` + 6 ký tự): em g�
 
 ## 3. Chọn câu từ ngân hàng
 
-Câu đã duyệt, chưa ẩn, dùng chung mọi trường; **chỉ hiện câu có dạng dùng được ở cấp của lớp** (dòng giải thích liệt kê các dạng). Mặc định lọc theo các di sản của bài (chip "Di sản của bài", bấm để xem mọi
-di sản), lọc thêm độ khó, dạng câu (chỉ các dạng của cấp), từ khóa. Chọn nhiều câu, kể cả qua nhiều trang; câu đã có trong bài hiện mờ và không chọn lại; bài chỉ còn chỗ cho đủ 50 câu. Con mắt mở câu ở chế độ xem như
-học sinh, chồng lên hộp thoại và **không làm mất các câu đang chọn**. Mỗi câu thêm vào được 1 điểm, sửa ở danh sách câu. Một câu sai thì máy chủ không thêm câu nào và lý do hiện trong hộp thoại.
+Câu đã duyệt, chưa ẩn, dùng chung mọi trường; **chỉ hiện câu có dạng dùng được ở cấp của lớp** (dòng giải thích liệt kê các dạng). **Chỉ hiện câu về các di sản đã gắn với bài học** (bài kiểm tra không nhận câu về di sản khác; không có công tắc để xem
+di sản khác, dòng mô tả của hộp thoại nói rõ điều này), lọc thêm độ khó, dạng câu (chỉ các dạng của cấp), từ khóa. Chọn nhiều câu, kể cả qua nhiều trang; câu đã có trong bài hiện mờ và không chọn lại; bài chỉ còn chỗ cho đủ 50 câu. Con mắt mở câu ở chế độ xem như
+học sinh, chồng lên hộp thoại và **không làm mất các câu đang chọn**. Mỗi câu thêm vào được 1 điểm, sửa ở danh sách câu. Một câu sai (kể cả câu về di sản ngoài bài học) thì máy chủ không thêm câu nào và lý do hiện trong hộp thoại.
 
 ## 4. Nhân bản bài học kèm bài kiểm tra và độ khó của bài học
 

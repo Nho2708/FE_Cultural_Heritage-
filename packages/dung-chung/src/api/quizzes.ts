@@ -169,8 +169,6 @@ export interface QuizCandidateFilter {
   questionType?: QuestionType | '';
   difficultyLevel?: QuestionDifficulty | '';
   heritageId?: number | '';
-  /** Mặc định true: chỉ câu của các di sản của bài học. */
-  lessonHeritagesOnly?: boolean;
   keyword?: string;
   page?: number;
   pageSize?: number;
@@ -226,7 +224,6 @@ export function createQuizzesApi(client: ApiClient) {
           questionType: filter.questionType || undefined,
           difficultyLevel: filter.difficultyLevel || undefined,
           heritageId: filter.heritageId === '' ? undefined : filter.heritageId,
-          lessonHeritagesOnly: filter.lessonHeritagesOnly,
           keyword: filter.keyword || undefined,
           page: filter.page,
           pageSize: filter.pageSize,
