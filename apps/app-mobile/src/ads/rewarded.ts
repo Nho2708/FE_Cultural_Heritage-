@@ -1,5 +1,6 @@
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { Platform } from 'react-native';
+import { ADS_DISABLED } from '../config/env';
 import { privacyOptionsStateOf, type PrivacyOptionsState } from './consent';
 import { createRewardedLoader, type RewardedAdsApi, type RewardedOutcome } from './rewardedLoader';
 import { parseTestDeviceIds } from './testDevices';
@@ -32,7 +33,8 @@ let cached: AdsModule | null | undefined;
 function adsModule(): AdsModule | null {
   if (cached !== undefined) return cached;
   // Expo Go không chứa mô-đun quảng cáo: gọi `require` ở đó làm Metro báo lỗi đỏ dù đã bắt, nên không thử.
-  if (Platform.OS === 'web' || Constants.executionEnvironment === ExecutionEnvironment.StoreClient) {
+  // Bản không quảng cáo cũng không có mã gốc của thư viện: gọi `require` sẽ lỗi ngay khi nạp.
+  if (ADS_DISABLED || Platform.OS === 'web' || Constants.executionEnvironment === ExecutionEnvironment.StoreClient) {
     cached = null;
     return cached;
   }

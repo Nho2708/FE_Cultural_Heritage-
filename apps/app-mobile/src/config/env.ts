@@ -20,5 +20,11 @@ export const PRIVACY_POLICY_URL = `${WEB_BASE_URL}/chinh-sach-quyen-rieng-tu`;
 
 export const APP_VERSION: string = Constants.expoConfig?.version ?? '0.0.0';
 
+/**
+ * Bản dựng không có quảng cáo (bản đưa lên Google Play): `scripts/dung-apk.ps1 -ChoGooglePlay` hoặc `-KhongQuangCao` đặt `EXPO_PUBLIC_ADS_DISABLED=true`,
+ * bỏ hẳn thư viện quảng cáo khỏi bản dựng (`app.config.ts`, `react-native.config.js`). Khách mở tóm tắt và nghe thuyết minh không cần xem quảng cáo.
+ */
+export const ADS_DISABLED = process.env.EXPO_PUBLIC_ADS_DISABLED === 'true';
+
 /** `expo-go` khi chạy trong Expo Go (không có quảng cáo), `apk` với bản dựng riêng. */
 export const APP_CHANNEL: 'expo-go' | 'apk' = Constants.executionEnvironment === 'storeClient' ? 'expo-go' : 'apk';

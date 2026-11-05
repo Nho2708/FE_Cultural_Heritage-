@@ -6,7 +6,7 @@ import { Linking, Pressable, StyleSheet, Switch, View } from 'react-native';
 import { AdChoices } from '../../src/components/AdChoices';
 import { confirmAction } from '../../src/components/confirm';
 import { Button, Card, Divider, Notice, Screen, Section, Txt, styles as ui } from '../../src/components/ui';
-import { API_BASE_URL, APP_CHANNEL, APP_VERSION, PRIVACY_POLICY_URL } from '../../src/config/env';
+import { ADS_DISABLED, API_BASE_URL, APP_CHANNEL, APP_VERSION, PRIVACY_POLICY_URL } from '../../src/config/env';
 import { useHistory } from '../../src/guest/HistoryProvider';
 import type { HistoryEntry, HistoryKind } from '../../src/guest/historyCore';
 import { localeOf } from '../../src/i18n/dates';
@@ -14,7 +14,7 @@ import { useApp } from '../../src/state/AppProvider';
 import { useTheme } from '../../src/theme/ThemeProvider';
 
 // Lịch sử và cài đặt của khách. Lịch sử (từ khóa đã tìm, di sản đã xem, nghe, xem 3D) lưu ở máy chủ theo mã thiết bị ẩn danh, xóa được từng mục hoặc xóa hết, tự xóa sau 90 ngày.
-// Cài đặt: ngôn ngữ, vị trí, thông tin quảng cáo, đổi chế độ.
+// Cài đặt: ngôn ngữ, vị trí, thông tin quảng cáo (bản không quảng cáo thì ẩn), đổi chế độ.
 
 const GROUPS: Array<{ kind: HistoryKind; title: 'searches' | 'viewed' | 'listened' | 'viewed3d' }> = [
   { kind: 'search', title: 'searches' },
@@ -121,10 +121,14 @@ export default function HistoryAndSettings() {
               />
             </View>
           </View>
-          <Divider />
-          <View style={local.setting}>
-            <AdChoices />
-          </View>
+          {ADS_DISABLED ? null : (
+            <>
+              <Divider />
+              <View style={local.setting}>
+                <AdChoices />
+              </View>
+            </>
+          )}
           <Divider />
           <View style={local.setting}>
             <Txt variant="label">{t('settings.privacy')}</Txt>

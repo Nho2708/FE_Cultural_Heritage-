@@ -137,6 +137,7 @@ export const ko: Strings = {
     detailed: '읽기',
     short: '들을 수 있는 짧은 버전',
     unavailable: '이 유산에는 아직 요약이 없습니다.',
+    locked: '지금은 이 유산의 요약과 오디오 해설을 열 수 없습니다. 잠시 후 다시 시도해 주세요.',
     fallbackOnly: '아직 {{language}} 버전이 없어 베트남어 버전을 표시합니다.',
   },
   speech: {

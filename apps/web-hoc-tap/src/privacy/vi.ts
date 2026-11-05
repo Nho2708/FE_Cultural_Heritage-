@@ -59,7 +59,8 @@ export const vi: PrivacyPolicy = {
       body: [
         'Học sinh đã đăng nhập không bao giờ thấy quảng cáo. Khách tham quan có thể tự chọn xem một quảng cáo ngắn của Google để mở tóm tắt và nghe thuyết minh của một di sản trong 24 giờ; mọi nội dung khác đều miễn phí, không cần xem quảng cáo.',
         [
-          'Trên ứng dụng Android, quảng cáo do Google AdMob cung cấp. Vì học sinh và trẻ em cũng dùng ứng dụng, mọi yêu cầu quảng cáo đều được đánh dấu là dành cho trẻ em: Google chỉ hiện quảng cáo không cá nhân hóa, có nội dung phù hợp với mọi lứa tuổi, và ứng dụng không đọc mã quảng cáo (advertising ID) của thiết bị. Google vẫn có thể dùng thông tin kỹ thuật của thiết bị để phân phối, đo lường quảng cáo và chống gian lận.',
+          'Ứng dụng DiViet tải từ Google Play không có quảng cáo: khách mở tóm tắt và nghe thuyết minh mà không cần xem quảng cáo, và ứng dụng không chứa thư viện quảng cáo nào.',
+          'Bản ứng dụng Android cài riêng (tệp APK tải từ trang web) dùng quảng cáo của Google AdMob. Vì học sinh và trẻ em cũng dùng ứng dụng, mọi yêu cầu quảng cáo đều được đánh dấu là dành cho trẻ em: Google chỉ hiện quảng cáo không cá nhân hóa, có nội dung phù hợp với mọi lứa tuổi, và ứng dụng không đọc mã quảng cáo (advertising ID) của thiết bị. Google vẫn có thể dùng thông tin kỹ thuật của thiết bị để phân phối, đo lường quảng cáo và chống gian lận.',
           'Trên web, mã quảng cáo của Google (Google Ad Manager) chỉ được tải khi bạn bấm xem quảng cáo, và DiViet yêu cầu quảng cáo không cá nhân hóa.',
           'Để mở khóa đúng thiết bị, DiViet gửi cho Google mã thiết bị ẩn danh và mã di sản; Google gửi lại xác nhận bạn đã xem hết. DiViet không nhận mã quảng cáo của thiết bị và không lưu nội dung quảng cáo.',
         ],

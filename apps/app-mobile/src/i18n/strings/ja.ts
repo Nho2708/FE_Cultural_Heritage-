@@ -137,6 +137,7 @@ export const ja: Strings = {
     detailed: '読む',
     short: '聞くための短縮版',
     unavailable: 'この遺産にはまだ要約がありません。',
+    locked: '現在、この遺産の要約と音声ガイドを開けません。数分後にもう一度お試しください。',
     fallbackOnly: 'まだ{{language}}版がないため、ベトナム語版を表示しています。',
   },
   speech: {

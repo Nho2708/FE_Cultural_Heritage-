@@ -10,6 +10,8 @@
   Với -ChoGooglePlay: expo prebuild --clean -> gradlew bundleRelease (đủ bốn kiến trúc) ký bằng khóa tải lên
   (tạo một lần bằng scripts/tao-khoa-tai-len.ps1) -> apps/app-mobile/dist-apk/diviet-<phiên bản>-<versionCode>-<yyyyMMdd>.aab.
   Mỗi lần tải lên Google Play phải tăng expo.android.versionCode trong app.json.
+  Bản cho Google Play luôn là bản không quảng cáo (nhóm chốt 05/11/2026): không có thư viện quảng cáo, khách mở tóm tắt và nghe thuyết minh
+  không cần xem quảng cáo (máy chủ phải bật Ads:AllowNoAdsDeclaration). Dựng xong, script kiểm tệp không còn bộ SDK quảng cáo của Google.
   Runner của GitHub trên máy demo chạy bằng NETWORK SERVICE, không có Android SDK, nên APK không dựng trong workflow.
 
 .PARAMETER ApiBaseUrl
@@ -31,7 +33,10 @@
   Thêm --clean cho expo prebuild: xoá và sinh lại thư mục android/.
 
 .PARAMETER ChoGooglePlay
-  Dựng tệp AAB ký bằng khóa tải lên để đưa lên Google Play (bắt buộc mã ứng dụng AdMob thật, không nhận máy thử).
+  Dựng tệp AAB ký bằng khóa tải lên để đưa lên Google Play. Luôn là bản không quảng cáo (như -KhongQuangCao).
+
+.PARAMETER KhongQuangCao
+  Dựng bản không quảng cáo: bỏ thư viện quảng cáo khỏi bản dựng (EXPO_PUBLIC_ADS_DISABLED=true), không cần mã ứng dụng AdMob.
 
 .PARAMETER ThuMucKhoa
   Thư mục chứa khóa tải lên (khoa-tai-len.jks và khoa-tai-len.json), mặc định %APPDATA%\DSVHVN\google-play.
@@ -40,6 +45,7 @@
   ./scripts/dung-apk.ps1
   ./scripts/dung-apk.ps1 -TaiLenRelease v0.1
   ./scripts/dung-apk.ps1 -ChoGooglePlay
+  ./scripts/dung-apk.ps1 -KhongQuangCao
 #>
 [CmdletBinding()]
 param(
@@ -50,6 +56,7 @@ param(
     [string]$TaiLenRelease,
     [switch]$LamSach,
     [switch]$ChoGooglePlay,
+    [switch]$KhongQuangCao,
     [string]$ThuMucKhoa = (Join-Path $env:APPDATA 'DSVHVN\google-play')
 )
 
@@ -58,6 +65,26 @@ $KhoGitHub = 'Nho2708/FE_Cultural_Heritage-'
 $ThuMucApp = Join-Path (Split-Path -Parent $PSScriptRoot) 'apps\app-mobile'
 
 function Ghi([string]$noiDung) { Write-Host "[dung-apk] $noiDung" }
+
+# Tìm các chuỗi đánh dấu bộ SDK quảng cáo của Google trong tệp APK/AAB (mã dex và tệp kê khai); trả về các chuỗi tìm thấy.
+function Tim-SdkQuangCao([string]$tep) {
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $dauHieu = 'Lcom/google/android/gms/ads/MobileAds;', 'com.google.android.gms.ads.APPLICATION_ID'
+    $timThay = [System.Collections.Generic.HashSet[string]]::new()
+    $zip = [System.IO.Compression.ZipFile]::OpenRead($tep)
+    try {
+        foreach ($muc in $zip.Entries) {
+            if ($muc.FullName -notmatch '(\.dex|AndroidManifest\.xml)$') { continue }
+            $luong = $muc.Open()
+            $bo = [System.IO.MemoryStream]::new()
+            try { $luong.CopyTo($bo) } finally { $luong.Dispose() }
+            $chu = [System.Text.Encoding]::GetEncoding('ISO-8859-1').GetString($bo.ToArray())
+            foreach ($d in $dauHieu) { if ($chu.Contains($d)) { [void]$timThay.Add("$d ($($muc.FullName))") } }
+        }
+    }
+    finally { $zip.Dispose() }
+    return @($timThay)
+}
 
 # Chạy lệnh ngoài và dừng nếu mã thoát khác 0.
 function Chay([string]$mota, [scriptblock]$lenh) {
@@ -89,11 +116,17 @@ foreach ($p in $appJson.plugins) {
     if ($p -is [System.Array] -and $p[0] -eq 'react-native-google-mobile-ads') { $maThu = $p[1].androidAppId }
 }
 
+# Bản cho Google Play luôn không có quảng cáo.
+if ($ChoGooglePlay) { $KhongQuangCao = $true }
+if ($KhongQuangCao) {
+    if ($TestDeviceIds) { throw 'Bản không quảng cáo không nhận máy thử AdMob (bỏ -TestDeviceIds).' }
+    $AdMobAndroidAppId = $null
+    $LamSach = $true # phải sinh lại android/ để bỏ mã gốc của thư viện quảng cáo
+}
+
 # Bản cho Google Play: kiểm trước khi chạy Gradle lâu.
 $khoa = $null
 if ($ChoGooglePlay) {
-    if ($TestDeviceIds) { throw 'Bản cho Google Play không được khai máy thử AdMob (bỏ -TestDeviceIds).' }
-    if (-not $AdMobAndroidAppId -or $AdMobAndroidAppId -eq $maThu) { throw 'Bản cho Google Play cần mã ứng dụng AdMob thật (-AdMobAndroidAppId hoặc biến ADMOB_ANDROID_APP_ID).' }
     if (-not $appJson.android.versionCode) { throw 'app.json không có expo.android.versionCode.' }
     $tepKhoa = Join-Path $ThuMucKhoa 'khoa-tai-len.jks'
     $tepMatKhau = Join-Path $ThuMucKhoa 'khoa-tai-len.json'
@@ -110,7 +143,7 @@ if ($LASTEXITCODE -ne 0) { throw 'apps/app-mobile/package.json đang có thay đ
 
 $bienCu = @{}
 $bienKhoa = 'DIVIET_UPLOAD_STORE_FILE', 'DIVIET_UPLOAD_STORE_PASSWORD', 'DIVIET_UPLOAD_KEY_ALIAS', 'DIVIET_UPLOAD_KEY_PASSWORD'
-foreach ($ten in @('EXPO_PUBLIC_API_BASE_URL', 'EXPO_PUBLIC_WEB_BASE_URL', 'ADMOB_ANDROID_APP_ID', 'EXPO_PUBLIC_ADMOB_TEST_DEVICE_IDS') + $bienKhoa) {
+foreach ($ten in @('EXPO_PUBLIC_API_BASE_URL', 'EXPO_PUBLIC_WEB_BASE_URL', 'ADMOB_ANDROID_APP_ID', 'EXPO_PUBLIC_ADMOB_TEST_DEVICE_IDS', 'EXPO_PUBLIC_ADS_DISABLED') + $bienKhoa) {
     $bienCu[$ten] = [Environment]::GetEnvironmentVariable($ten, 'Process')
 }
 
@@ -122,11 +155,18 @@ try {
 
     $env:EXPO_PUBLIC_API_BASE_URL = $ApiBaseUrl
     $env:EXPO_PUBLIC_WEB_BASE_URL = $WebBaseUrl
-    if ($AdMobAndroidAppId) {
+    if ($KhongQuangCao) {
+        $env:EXPO_PUBLIC_ADS_DISABLED = 'true'
+        Remove-Item Env:\ADMOB_ANDROID_APP_ID -ErrorAction SilentlyContinue
+        Ghi 'Bản không quảng cáo: bỏ thư viện quảng cáo khỏi bản dựng.'
+    }
+    elseif ($AdMobAndroidAppId) {
+        Remove-Item Env:\EXPO_PUBLIC_ADS_DISABLED -ErrorAction SilentlyContinue
         $env:ADMOB_ANDROID_APP_ID = $AdMobAndroidAppId
         Ghi "Mã ứng dụng AdMob Android: $AdMobAndroidAppId"
     }
     else {
+        Remove-Item Env:\EXPO_PUBLIC_ADS_DISABLED -ErrorAction SilentlyContinue
         Remove-Item Env:\ADMOB_ANDROID_APP_ID -ErrorAction SilentlyContinue
         Ghi "Mã ứng dụng AdMob Android: mã thử của Google trong app.json ($maThu)"
     }
@@ -165,6 +205,9 @@ try {
         $keytool = if ($env:JAVA_HOME) { Join-Path $env:JAVA_HOME 'bin\keytool.exe' } else { 'keytool' }
         $chungChi = (& $keytool -printcert -jarfile $aab 2>&1) -join "`n"
         if ($chungChi -match 'Android Debug') { throw 'Tệp AAB vẫn ký bằng khóa gỡ lỗi; kiểm lại cấu hình ký trong android/app/build.gradle.' }
+        $sdk = Tim-SdkQuangCao $aab
+        if ($sdk.Count -gt 0) { throw "Tệp AAB vẫn chứa bộ SDK quảng cáo của Google: $($sdk -join '; ')" }
+        Ghi 'Đã kiểm: tệp không chứa bộ SDK quảng cáo của Google.'
         $vanTay = [regex]::Match($chungChi, 'SHA256:\s*([0-9A-F:]+)').Groups[1].Value
         $tep = Get-Item -LiteralPath $aab
         Ghi "Đường dẫn: $($tep.FullName)"
@@ -179,8 +222,14 @@ try {
 
     $thuMucRa = Join-Path $ThuMucApp 'dist-apk'
     New-Item -ItemType Directory -Force -Path $thuMucRa | Out-Null
-    $apk = Join-Path $thuMucRa ("diviet-{0}-{1}.apk" -f $phienBan, (Get-Date -Format 'yyyyMMdd'))
+    $duoi = if ($KhongQuangCao) { '-khong-quang-cao' } else { '' }
+    $apk = Join-Path $thuMucRa ("diviet-{0}-{1}{2}.apk" -f $phienBan, (Get-Date -Format 'yyyyMMdd'), $duoi)
     Copy-Item -LiteralPath $apkGoc -Destination $apk -Force
+    if ($KhongQuangCao) {
+        $sdk = Tim-SdkQuangCao $apk
+        if ($sdk.Count -gt 0) { throw "Tệp APK vẫn chứa bộ SDK quảng cáo của Google: $($sdk -join '; ')" }
+        Ghi 'Đã kiểm: tệp không chứa bộ SDK quảng cáo của Google.'
+    }
 
     $tep = Get-Item -LiteralPath $apk
     $bam = (Get-FileHash -LiteralPath $apk -Algorithm SHA256).Hash

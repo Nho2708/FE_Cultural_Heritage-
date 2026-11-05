@@ -132,6 +132,7 @@ export interface Strings {
     detailed: string;
     short: string;
     unavailable: string;
+    locked: string;
     fallbackOnly: string;
   };
   speech: {
@@ -349,6 +350,7 @@ export const vi: Strings = {
     detailed: 'Đọc',
     short: 'Bản ngắn để nghe',
     unavailable: 'Di sản này chưa có tóm tắt.',
+    locked: 'Tóm tắt và nghe thuyết minh của di sản này tạm thời chưa mở được. Bạn thử lại sau ít phút.',
     fallbackOnly: 'Chưa có bản {{language}}, đang hiện bản tiếng Việt.',
   },
   speech: {
