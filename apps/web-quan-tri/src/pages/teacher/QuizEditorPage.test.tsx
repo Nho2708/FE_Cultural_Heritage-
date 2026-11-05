@@ -273,7 +273,9 @@ describe('Soạn bài kiểm tra: danh sách câu', () => {
     await user.click(await screen.findByRole('button', { name: 'Thêm câu từ ngân hàng' }));
     const dialog = await screen.findByRole('dialog', { name: 'Chọn câu từ ngân hàng' });
     expect(await within(dialog).findByText(/Chỉ hiện câu có dạng dùng được ở lớp cấp 2 \(Một đáp án đúng, Đúng\/Sai, Sắp xếp, Điền từ\)/)).toBeInTheDocument();
-    expect(calls.find((c) => c.path.includes('question-candidates'))?.path).toContain('lessonHeritagesOnly=true');
+    expect(within(dialog).getByText(/Câu đã duyệt về các di sản đã gắn với bài học/)).toBeInTheDocument();
+    expect(within(dialog).queryByRole('button', { name: /Di sản của bài/ })).not.toBeInTheDocument();
+    expect(calls.find((c) => c.path.includes('question-candidates'))?.path).not.toContain('lessonHeritagesOnly');
     const existing = within(dialog).getByRole('checkbox', { name: /Chọn câu: Câu hỏi số 101/ });
     expect(existing).toBeChecked();
     expect(existing).toBeDisabled();
@@ -291,7 +293,7 @@ describe('Soạn bài kiểm tra: danh sách câu', () => {
     expect(await screen.findByText('Danh sách câu hỏi (5 câu)')).toBeInTheDocument();
   });
 
-  it('hộp chọn câu: bỏ lọc di sản của bài, lọc độ khó, dạng câu và từ khóa gửi đúng tham số; câu không khớp thì báo rỗng', async () => {
+  it('hộp chọn câu: lọc độ khó, dạng câu và từ khóa gửi đúng tham số; câu không khớp thì báo rỗng', async () => {
     signInAs('TEACHER');
     const calls = api(draft(), (call) =>
       call.path.startsWith('/teacher/quizzes/9/question-candidates') ? envelope(200, { data: candidatePageOf([]) }) : undefined,
@@ -303,14 +305,13 @@ describe('Soạn bài kiểm tra: danh sách câu', () => {
     const dialog = await screen.findByRole('dialog', { name: 'Chọn câu từ ngân hàng' });
     expect(await within(dialog).findByText(/Không tìm thấy kết quả phù hợp/)).toBeInTheDocument();
 
-    await user.click(within(dialog).getByRole('button', { name: /Di sản của bài/ }));
     await user.selectOptions(within(dialog).getByLabelText('Độ khó'), 'HARD');
     await user.selectOptions(within(dialog).getByLabelText('Dạng câu'), 'FILL_BLANK');
     await user.type(within(dialog).getByLabelText('Từ khóa'), 'văn miếu{enter}');
 
     await waitFor(() => {
       const last = decodeURIComponent(calls.filter((c) => c.path.includes('question-candidates')).at(-1)?.path ?? '');
-      expect(last).toContain('lessonHeritagesOnly=false');
+      expect(last).not.toContain('lessonHeritagesOnly');
       expect(last).toContain('difficultyLevel=HARD');
       expect(last).toContain('questionType=FILL_BLANK');
       expect(last).toContain('keyword=văn+miếu');
