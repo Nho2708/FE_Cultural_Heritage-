@@ -79,7 +79,8 @@ export async function createServices(getMode: () => AppMode | null): Promise<Ser
       if (getMode() === 'guest') {
         headers['X-Device-Key'] = deviceId;
         headers['X-Client-Platform'] = platform;
-        // Bản không có mô-đun quảng cáo (Expo Go) khai báo để máy chủ ở môi trường phát triển mở thẳng; môi trường thật bỏ qua tiêu đề này.
+        // Bản không có mô-đun quảng cáo (Expo Go, bản không quảng cáo đưa lên Google Play) khai báo để máy chủ mở thẳng tóm tắt và nghe;
+        // máy chủ chỉ nhận khai báo này khi cấu hình Ads:AllowNoAdsDeclaration bật.
         if (!adsAvailable()) headers['X-Ads-Unavailable'] = 'true';
       }
       return headers;

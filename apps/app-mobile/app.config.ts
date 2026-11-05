@@ -5,6 +5,12 @@ import { withAppBuildGradle, withGradleProperties } from 'expo/config-plugins';
 // ADMOB_ANDROID_APP_ID, ADMOB_IOS_APP_ID lúc dựng (mã ứng dụng không phải bí mật, nhưng không viết cứng để bản dựng thử vẫn dùng mã thử).
 const ADS_PLUGIN = 'react-native-google-mobile-ads';
 
+// Bản không quảng cáo (bản đưa lên Google Play, `scripts/dung-apk.ps1 -ChoGooglePlay`): đặt EXPO_PUBLIC_ADS_DISABLED=true lúc dựng thì bỏ plugin quảng cáo
+// (không ghi mã ứng dụng AdMob vào AndroidManifest) và `react-native.config.js` bỏ mã gốc của thư viện khỏi bản dựng.
+export function adsDisabled(env: Record<string, string | undefined> = process.env): boolean {
+  return env.EXPO_PUBLIC_ADS_DISABLED === 'true';
+}
+
 // Gradle của thư viện quảng cáo đọc khóa gốc "react-native-google-mobile-ads" trong app.json; dự án Expo khai ở mục plugins nên
 // khóa đó không có và Gradle dừng với lỗi "Cannot get property 'googleMobileAdsJson'". Đặt sẵn bản SDK Android (classic, mặc định của thư viện)
 // trong gradle.properties thì Gradle bỏ qua bước đọc đó; mã ứng dụng vẫn do plugin Expo ghi vào AndroidManifest.
@@ -55,21 +61,26 @@ const withUploadSigning = (config: ExpoConfig): ExpoConfig =>
     return gradle;
   });
 
-export default ({ config }: ConfigContext): ExpoConfig =>
-  withUploadSigning(withAdsAndroidBackend({
-    ...config,
-    name: config.name ?? 'DiViet',
-    slug: config.slug ?? 'hoc-di-san',
-    plugins: (config.plugins ?? []).map((plugin) => {
-      if (!Array.isArray(plugin) || plugin[0] !== ADS_PLUGIN) return plugin;
-      const options = (plugin[1] ?? {}) as Record<string, string>;
-      return [
+const isAdsPlugin = (plugin: NonNullable<ExpoConfig['plugins']>[number]) =>
+  plugin === ADS_PLUGIN || (Array.isArray(plugin) && plugin[0] === ADS_PLUGIN);
+
+export default ({ config }: ConfigContext): ExpoConfig => {
+  const noAds = adsDisabled();
+  const plugins = (config.plugins ?? []).flatMap((plugin): NonNullable<ExpoConfig['plugins']> => {
+    if (!isAdsPlugin(plugin)) return [plugin];
+    if (noAds) return [];
+    const options = ((Array.isArray(plugin) ? plugin[1] : undefined) ?? {}) as Record<string, string>;
+    return [
+      [
         ADS_PLUGIN,
         {
           ...options,
           androidAppId: process.env.ADMOB_ANDROID_APP_ID || options.androidAppId,
           iosAppId: process.env.ADMOB_IOS_APP_ID || options.iosAppId,
         },
-      ];
-    }),
-  }));
+      ],
+    ];
+  });
+  const base: ExpoConfig = { ...config, name: config.name ?? 'DiViet', slug: config.slug ?? 'hoc-di-san', plugins };
+  return withUploadSigning(noAds ? base : withAdsAndroidBackend(base));
+};

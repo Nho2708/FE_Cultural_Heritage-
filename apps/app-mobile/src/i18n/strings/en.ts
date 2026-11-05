@@ -143,6 +143,7 @@ export const en: Strings = {
     detailed: 'Read',
     short: 'Short version to listen to',
     unavailable: 'This heritage site has no summary yet.',
+    locked: 'The summary and audio guide for this site are not available right now. Please try again in a few minutes.',
     fallbackOnly: 'No {{language}} version yet, showing the Vietnamese version.',
   },
   speech: {

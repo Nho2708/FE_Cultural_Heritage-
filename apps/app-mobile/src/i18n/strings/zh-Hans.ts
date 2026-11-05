@@ -137,6 +137,7 @@ export const zhHans: Strings = {
     detailed: '阅读',
     short: '适合收听的简短版',
     unavailable: '该遗产暂无摘要。',
+    locked: '暂时无法打开该遗产的摘要和语音讲解，请几分钟后再试。',
     fallbackOnly: '暂无{{language}}版本，正在显示越南语版本。',
   },
   speech: {
