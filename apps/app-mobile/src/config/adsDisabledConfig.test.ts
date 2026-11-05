@@ -26,17 +26,17 @@ describe('cấu hình bản không quảng cáo', () => {
 
   it('bỏ plugin quảng cáo khi dựng bản không quảng cáo', () => {
     process.env.EXPO_PUBLIC_ADS_DISABLED = 'true';
-    process.env.ADMOB_ANDROID_APP_ID = 'ca-app-pub-1111111111111111~2222222222';
+    process.env.ADMOB_ANDROID_APP_ID = 'ca-app-pub-3940256099942544~1111111111';
     const config = buildConfig({ config: BASE } as never);
     expect(pluginNames(config)).toEqual(['expo-router']);
   });
 
   it('bản thường giữ plugin quảng cáo và dùng mã ứng dụng AdMob lúc dựng', () => {
     delete process.env.EXPO_PUBLIC_ADS_DISABLED;
-    process.env.ADMOB_ANDROID_APP_ID = 'ca-app-pub-1111111111111111~2222222222';
+    process.env.ADMOB_ANDROID_APP_ID = 'ca-app-pub-3940256099942544~1111111111';
     const config = buildConfig({ config: BASE } as never);
     expect(pluginNames(config)).toEqual(['expo-router', ADS_PLUGIN]);
     const ads = (config.plugins ?? []).find((plugin) => Array.isArray(plugin) && plugin[0] === ADS_PLUGIN) as [string, Record<string, string>];
-    expect(ads[1].androidAppId).toBe('ca-app-pub-1111111111111111~2222222222');
+    expect(ads[1].androidAppId).toBe('ca-app-pub-3940256099942544~1111111111');
   });
 });
