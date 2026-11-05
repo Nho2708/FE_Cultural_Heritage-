@@ -58,7 +58,8 @@ export const en: PrivacyPolicy = {
       body: [
         'Signed-in students never see ads. Visitors may choose to watch a short Google ad to unlock the summary and narration of one heritage site for 24 hours; everything else is free and needs no ad.',
         [
-          'In the Android app, ads are provided by Google AdMob. Because students and children also use the app, every ad request is marked as directed to children: Google shows only non-personalized ads with content suitable for all ages, and the app does not read the device advertising ID. Google may still use technical information about the device to deliver and measure ads and to prevent fraud.',
+          'The DiViet app on Google Play has no ads: visitors open summaries and audio guides without watching ads, and the app contains no ad library.',
+          'The separately installed Android app (the APK file downloaded from the website) shows ads from Google AdMob. Because students and children also use the app, every ad request is marked as directed to children: Google shows only non-personalized ads with content suitable for all ages, and the app does not read the device advertising ID. Google may still use technical information about the device to deliver and measure ads and to prevent fraud.',
           'On the website, Google ad code (Google Ad Manager) is loaded only when you choose to watch an ad, and DiViet requests non-personalized ads.',
           'To unlock the right device, DiViet sends Google the anonymous device code and the heritage code; Google sends back a confirmation that you watched to the end. DiViet does not receive the device advertising ID and does not store ad content.',
         ],
