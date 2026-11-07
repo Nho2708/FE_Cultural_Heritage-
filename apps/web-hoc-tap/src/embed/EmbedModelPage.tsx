@@ -12,7 +12,7 @@ import { discoveryApi } from '../lib/api/client';
 import { postToHost } from './hostMessages';
 
 // Trang xem 3D nhúng cho app mobile: cùng trình xem `<model-viewer>` với hộp thoại "Xem 3D" của web, nhưng chiếm cả khung WebView. Báo tiến trình tải, tải xong và
-// lỗi cho app bằng thông điệp; thiết bị không vẽ được 3D hoặc tải lỗi thì app quay về bộ ảnh của di sản. Miễn phí, không cần đăng nhập, không có quảng cáo.
+// lỗi cho app bằng thông điệp; thiết bị không vẽ được 3D hoặc tải lỗi thì app quay về bộ ảnh của di sản. Miễn phí, không cần đăng nhập.
 
 export function EmbedModelPage() {
   const { slug = '' } = useParams();

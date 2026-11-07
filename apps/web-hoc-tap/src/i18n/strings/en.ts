@@ -254,36 +254,6 @@ export const en: Strings = {
     sourceNote: 'Summarized from the saved content of the heritage site; nothing is generated while you view it.',
   },
 
-  ads: {
-    gateTitle: 'Watch an ad to unlock the summary and audio guide',
-    gateBody: (name, hours) =>
-      `Watch a short ad to unlock the summary and audio guide of "${name}" for ${hours} hours on this device.`,
-    freeNote: 'Photos, the map, the timeline and the 3D model stay free.',
-    later: 'Not now',
-    unlockedUntil: (time) => `Unlocked until ${time}`,
-    watch: 'Watch an ad',
-    watchAgain: 'Watch the ad again',
-    resend: 'Send again',
-    providedByGoogle: 'Ads are provided by Google and are not personalized. Watch the whole ad to unlock.',
-    starting: 'Getting ready…',
-    loading: 'Loading the ad…',
-    watching: 'The ad is playing.',
-    verifying: 'Confirming your reward, please wait a moment.',
-    problem: {
-      closed: 'You did not finish the ad, so the summary is still locked. Watch the ad again all the way through.',
-      noFill: 'There is no ad to show right now. Please try again in a few minutes.',
-      unsupported: 'This browser or device cannot show rewarded ads. Try on a phone or use the DiViet app.',
-      blocked: 'The ad could not be loaded. If you use an ad blocker, turn it off for this page and try again.',
-      timeout: 'The ad took too long to load. Please try again in a few minutes.',
-      rejected: 'The summary could not be unlocked. Watch the whole ad or try again in a few minutes.',
-      network: 'Could not reach the server. Check your connection and try again.',
-      resend: 'We could not tell the server you finished the ad. Check your connection and send it again; you do not need to watch the ad again.',
-      unavailable: 'There is no ad to show right now. Please try again in a few minutes.',
-      rateLimited: (minutes) =>
-        minutes === null ? 'You have watched too many ads in a short time. Please try again in a few minutes.' : `You have watched too many ads in a short time. Please try again in ${minutes} minutes.`,
-    },
-  },
-
   model: {
     kicker: '3D MODEL',
     viewerAria: (name) => `3D model of ${name}`,
@@ -418,7 +388,7 @@ export const en: Strings = {
     nearbyLink: 'Open the heritage map',
     listenTitle: 'Listen to an audio guide in your language',
     listenText: "Each site has a short summary you can read, or listen to in your device's voice.",
-    listenNote: 'The summary and audio guide of a site unlock with one short ad and stay open for 24 hours; everything else is free. Korean, Chinese and Japanese are machine translations.',
+    listenNote: 'The summary and audio guide of every site are free for everyone, with no sign-in needed. Korean, Chinese and Japanese are machine translations.',
     listenLink: 'Find a heritage site',
     modelTitle: '3D models and heritage timelines',
     modelText: 'Turn a 3D model to see a site from every side, then travel along its timeline through each period and event.',

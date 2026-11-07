@@ -14,7 +14,7 @@ import { previewApi } from '../lib/api/previewClient';
 import { PublicErrorState } from './PublicErrorState';
 
 // Xem mô hình 3D (hộp thoại toàn màn hình) mở từ nút "Xem 3D" ở chi tiết di sản và ở trang xem trước bản nháp. Xem 3D miễn phí, không cần
-// đăng nhập, không qua quảng cáo. Trình xem là thành phần dùng chung với web quản trị (`<model-viewer>` chính thức): kéo để xoay, cuộn hoặc chụm để phóng
+// đăng nhập. Trình xem là thành phần dùng chung với web quản trị (`<model-viewer>` chính thức): kéo để xoay, cuộn hoặc chụm để phóng
 // to, "Đặt lại góc nhìn", thanh tiến trình khi tải, ghi công hiện ngay trong hộp thoại (tác giả, giấy phép, nguồn không dịch). Mô hình nặng mà đang
 // dùng mạng di động thì hỏi trước khi tải. Không có mô hình hiển thị, tải lỗi hoặc thiết bị không hỗ trợ 3D thì quay về bộ ảnh của di sản kèm một câu thông báo.
 

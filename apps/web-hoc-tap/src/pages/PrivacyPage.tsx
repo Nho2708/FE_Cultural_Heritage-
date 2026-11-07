@@ -4,7 +4,7 @@ import { localeOf } from '../i18n/format';
 import { useI18n } from '../i18n/context';
 import { PRIVACY_POLICIES, PRIVACY_UPDATED_ON, type PrivacyBlock } from '../privacy';
 
-// Trang Chính sách quyền riêng tư (công khai, 5 ngôn ngữ, không cần đăng nhập, không gọi API): Google Play, AdMob và AdSense
+// Trang Chính sách quyền riêng tư (công khai, 5 ngôn ngữ, không cần đăng nhập, không gọi API): Google Play
 // yêu cầu một địa chỉ công khai cố định; app và web quản trị trỏ tới đây. Nội dung theo ngôn ngữ đang chọn; bản dịch có dòng ghi
 // chú rằng bản tiếng Việt được áp dụng khi có khác biệt. Địa chỉ trang web và email trong chữ hiện thành liên kết.
 
