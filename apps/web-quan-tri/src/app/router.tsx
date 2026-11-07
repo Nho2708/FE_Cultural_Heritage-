@@ -11,7 +11,6 @@ import { PendingScreen } from '../pages/PendingScreen';
 import { HomeRedirect, OutsideNotFound } from './fallbackRoutes';
 import { ProfilePage } from '../pages/profile/ProfilePage';
 import {
-  AdStatsPage,
   AiQuestionsPage,
   AreaRoute,
   AuditLogPage,
@@ -38,6 +37,7 @@ import {
   StudentRecordPage,
   TeachersPage,
   TranslationReviewPage,
+  VisitorStatsPage,
 } from './areas';
 
 // Khung route của web quản trị: xác thực (Đăng nhập, Quên / đặt mật khẩu), Hồ sơ cá nhân, khu giáo viên `/giao-vien`,
@@ -62,7 +62,7 @@ const BUILT: Partial<Record<ScreenKey, ReactNode>> = {
   heritageEditor: <HeritageEditorPage />,
   translationReview: <TranslationReviewPage />,
   plans: <PlansPage />,
-  adStats: <AdStatsPage />,
+  visitorStats: <VisitorStatsPage />,
   auditLog: <AuditLogPage />,
   classes: <ClassesPage />,
   classDetail: <ClassDetailPage />,
@@ -132,7 +132,11 @@ export const routes: RouteObject[] = [
         ...screenRoutes(keysOf('teacher')),
       ]),
       areaRoute(AREA_ROOT.school, 'ORG_ADMIN', screenRoutes(keysOf('school'), AREA_ROOT.school)),
-      areaRoute(AREA_ROOT.admin, 'ADMIN', screenRoutes(keysOf('admin'), AREA_ROOT.admin)),
+      // Đường dẫn cũ của màn hình thống kê khách chuyển sang đường dẫn mới.
+      areaRoute(AREA_ROOT.admin, 'ADMIN', [
+        ...screenRoutes(keysOf('admin'), AREA_ROOT.admin),
+        { path: 'khach-va-quang-cao', element: <Navigate to={pathOf('visitorStats')} replace /> },
+      ]),
       { path: '*', element: <OutsideNotFound /> },
     ],
   },

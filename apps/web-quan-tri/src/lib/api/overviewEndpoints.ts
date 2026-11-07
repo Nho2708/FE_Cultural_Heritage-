@@ -7,5 +7,5 @@ import { apiClient } from './client';
 export const overviewApi = createOverviewApi(apiClient);
 export const adminQuestionsApi = createAdminQuestionsApi(apiClient);
 
-/** Thống kê khách và lượt mở khóa bằng quảng cáo Google có thưởng (quản trị hệ thống). */
-export const adStatsApi = createAdminAdsApi(apiClient);
+/** Thống kê khách tham quan (quản trị hệ thống). */
+export const visitorStatsApi = createAdminAdsApi(apiClient);

@@ -45,15 +45,12 @@ import { PAGE_SIZE, slugMap, useListParams } from '../../lib/listParams';
 
 // Tổng quan và doanh thu — quản trị hệ thống. Tab Tổng quan: số trường, giáo viên, học sinh, lượt AI toàn hệ thống, nội dung, số trường đang
 // dùng từng gói, việc cần chú ý và biểu đồ theo thời gian (ngày Việt Nam). Tab Doanh thu: doanh thu từ giao dịch VNPay thành công theo ngày thanh
-// toán (tháng này, hôm nay, từ trước tới nay, biểu đồ theo kỳ) và danh sách giao dịch lọc theo trạng thái, trường, khoảng ngày; doanh thu quảng cáo
-// xem ở bảng điều khiển của Google, hệ thống không nhận số liệu đó.
+// toán (tháng này, hôm nay, từ trước tới nay, biểu đồ theo kỳ) và danh sách giao dịch lọc theo trạng thái, trường, khoảng ngày.
 
 type TabId = 'tong-quan' | 'doanh-thu';
 
-const ADMOB_URL = 'https://admob.google.com';
 const PAYMENT_SLUG = slugMap<PaymentStatus>({ PENDING: 'dang-cho', SUCCEEDED: 'thanh-cong', FAILED: 'that-bai', REFUNDED: 'da-hoan-tien' });
 const PAYMENT_RANGES = [{ id: 'tat-ca', label: 'Mọi thời điểm' }, ...TREND_RANGES] as const;
-const AD_MANAGER_URL = 'https://admanager.google.com';
 
 /** Số khoản thanh toán đến muộn hiện ngay trong mục Cần chú ý; phần còn lại chỉ nêu số. */
 const LATE_PAYMENTS_SHOWN = 5;
@@ -426,18 +423,6 @@ function RevenueTab({ data }: { data: SystemOverview }) {
       </section>
       <RevenueTrend />
       <PaymentList />
-      <Block title="Doanh thu quảng cáo" hint="Hệ thống không nhận số liệu doanh thu quảng cáo từ Google nên không tính ở đây.">
-        <div className="flex flex-wrap gap-3">
-          <a href={ADMOB_URL} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center gap-2 rounded-sm border border-border-strong px-4 type-control text-on-surface hover:bg-surface-container-low">
-            <Icon name="external-link" size={16} />
-            Mở bảng điều khiển AdMob
-          </a>
-          <a href={AD_MANAGER_URL} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center gap-2 rounded-sm border border-border-strong px-4 type-control text-on-surface hover:bg-surface-container-low">
-            <Icon name="external-link" size={16} />
-            Mở bảng điều khiển Ad Manager
-          </a>
-        </div>
-      </Block>
     </div>
   );
 }
