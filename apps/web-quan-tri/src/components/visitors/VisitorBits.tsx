@@ -1,9 +1,9 @@
 import { formatCount } from '@dsvhvn/dung-chung';
-import type { AdHeritageCount } from '@dsvhvn/dung-chung/api';
+import type { AdHeritageCount as HeritageCount } from '@dsvhvn/dung-chung/api';
 import { EmptyState, Table, Td, TextLink, Th, Tr } from '@dsvhvn/dung-chung/ui';
 import { PATHS } from '../../access/screens';
 
-// Mảnh dùng chung của màn hình Khách và quảng cáo: thanh ngang theo tỉ lệ và bảng di sản có nhiều lượt nhất. Vẽ bằng HTML, màu lấy từ token; mọi thanh đều có số đi kèm.
+// Mảnh dùng chung của màn hình Thống kê khách tham quan: thanh ngang theo tỉ lệ và bảng di sản có nhiều lượt nhất. Vẽ bằng HTML, màu lấy từ token; mọi thanh đều có số đi kèm.
 
 export interface CountRow {
   key: string;
@@ -43,7 +43,7 @@ export function CountBars({ rows, caption, unit, total }: { rows: CountRow[]; ca
 }
 
 /** Bảng các di sản có nhiều lượt nhất. Di sản đã xóa khỏi hệ thống vẫn có dòng, ghi "Di sản không còn". */
-export function HeritageCountTable({ caption, items, unit }: { caption: string; items: AdHeritageCount[]; unit: string }) {
+export function HeritageCountTable({ caption, items, unit }: { caption: string; items: HeritageCount[]; unit: string }) {
   if (items.length === 0) return <EmptyState icon="bar-chart" title="Chưa có số liệu trong khoảng này." />;
   return (
     <Table caption={caption}>

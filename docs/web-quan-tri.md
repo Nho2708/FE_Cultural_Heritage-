@@ -49,7 +49,7 @@ Ba khu làm việc và màn hình của chúng tách chunk riêng, chỉ tải s
 | `/quan-tri/truong/moi` | Chi tiết trường, tạo mới | ADMIN | Thông tin trường + quản trị trường đầu tiên trong một lần lưu; lỗi `orgAdmin.*` hiện dưới đúng ô |
 | `/quan-tri/truong/:truong` | Chi tiết trường, xem / sửa | ADMIN | Sửa thông tin (khóa khi trường đã ngừng); gói hiện tại chỉ đọc; quản trị trường: khóa / mở, thêm; ngừng trường |
 | `/quan-tri/goi` | Gói dịch vụ | ADMIN | Bảng gói, tạo và sửa ở khung bên phải, bật tắt bán; gói Miễn phí bị khóa; không có thao tác xóa |
-| `/quan-tri/khach-va-quang-cao` | Khách và quảng cáo (thống kê khách và lượt mở khóa bằng quảng cáo) | ADMIN | Chỉ đọc, hai tab, lọc khoảng ngày; không có doanh thu. Chi tiết ở [quang-cao-google.md](quang-cao-google.md) |
+| `/quan-tri/khach-tham-quan` | Thống kê khách tham quan (đường dẫn cũ `/quan-tri/khach-va-quang-cao` chuyển tới đây) | ADMIN | Chỉ đọc, lọc khoảng ngày: thiết bị hoạt động, ngôn ngữ, di sản được xem, nghe, xem 3D nhiều |
 | `/quan-tri/nhat-ky` | Nhật ký thao tác | ADMIN | Chỉ đọc. Lọc người làm, vai trò (có Học sinh, Hệ thống), hành động (21 mã), đối tượng, từ ngày / đến ngày (gõ ngày/tháng/năm, giờ Việt Nam); mở dòng xem giá trị cũ / mới bằng nhãn tiếng Việt |
 | (tại chỗ) | 403 | — | Giữ URL; hiện trong khu làm việc của chính người dùng |
 | `*` | 404 | Mọi người | Có cả trong từng khu làm việc |

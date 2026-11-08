@@ -12,27 +12,24 @@ const shape = (policy: PrivacyPolicy) =>
   policy.sections.map((section) => ({ id: section.id, body: section.body.map((block) => (typeof block === 'string' ? 'p' : block.length)) }));
 
 describe('trang Chính sách quyền riêng tư', () => {
-  it('khách mở được không cần đăng nhập; có ngày cập nhật, mục lục, 11 mục, email và địa chỉ thành liên kết', async () => {
+  it('khách mở được không cần đăng nhập; có ngày cập nhật, mục lục, 10 mục, email và địa chỉ thành liên kết', async () => {
     const calls = mockApi();
     renderApp('/chinh-sach-quyen-rieng-tu');
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Chính sách quyền riêng tư' })).toBeInTheDocument();
     expect(document.title).toBe('Chính sách quyền riêng tư · DiViet');
     const updated = document.querySelector('time');
-    expect(updated).toHaveAttribute('dateTime', '2026-11-05');
-    expect(updated?.parentElement).toHaveTextContent(/^Cập nhật lần cuối: 5 tháng 11, 2026$/);
+    expect(updated).toHaveAttribute('dateTime', '2026-11-08');
+    expect(updated?.parentElement).toHaveTextContent(/^Cập nhật lần cuối: 8 tháng 11, 2026$/);
     expect(screen.queryByRole('note')).not.toBeInTheDocument();
 
     const contents = screen.getByRole('navigation', { name: 'Nội dung' });
-    expect(within(contents).getAllByRole('link')).toHaveLength(11);
-    expect(within(contents).getByRole('link', { name: '4. Quảng cáo' })).toHaveAttribute('href', '#quang-cao');
-    expect(screen.getByRole('heading', { level: 2, name: '9. Học sinh và trẻ em' }).closest('section')).toHaveAttribute('id', 'hoc-sinh-va-tre-em');
+    expect(within(contents).getAllByRole('link')).toHaveLength(10);
+    expect(within(contents).getByRole('link', { name: '4. Chia sẻ dữ liệu với bên thứ ba' })).toHaveAttribute('href', '#chia-se');
+    expect(screen.getByRole('heading', { level: 2, name: '8. Học sinh và trẻ em' }).closest('section')).toHaveAttribute('id', 'hoc-sinh-va-tre-em');
 
     expect(screen.getAllByRole('link', { name: 'support@diviet.id.vn' })[0]).toHaveAttribute('href', 'mailto:support@diviet.id.vn');
-    expect(screen.getByRole('link', { name: 'https://policies.google.com/technologies/partner-sites' })).toHaveAttribute(
-      'href',
-      'https://policies.google.com/technologies/partner-sites',
-    );
+    expect(screen.queryByText(/quảng cáo|AdMob|Ad Manager/i)).not.toBeInTheDocument();
     // Dấu chấm cuối câu không lọt vào liên kết.
     const site = screen.getAllByRole('link', { name: 'https://diviet.id.vn' });
     expect(site).toHaveLength(2);
@@ -48,7 +45,7 @@ describe('trang Chính sách quyền riêng tư', () => {
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Privacy policy' })).toBeInTheDocument();
     expect(screen.getByRole('note')).toHaveTextContent('the Vietnamese version applies');
-    expect(screen.getByRole('heading', { level: 2, name: '4. Advertising' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: '4. Sharing data with third parties' })).toBeInTheDocument();
   });
 
   it('bốn bản dịch có đúng các mục, đúng thứ tự và đúng hình dạng thân mục như bản tiếng Việt, kèm ghi chú bản dịch', () => {

@@ -40,7 +40,7 @@ export const SCREENS = [
   // Trang giới thiệu công khai: Giới thiệu (5 ngôn ngữ) và Dành cho nhà trường (chỉ tiếng Việt).
   { key: 'about', name: 'Giới thiệu', area: 'explore', actors: EVERYONE, path: '/gioi-thieu' },
   { key: 'forSchools', name: 'Dành cho nhà trường', area: 'explore', actors: EVERYONE, path: '/nha-truong' },
-  // Chính sách quyền riêng tư (5 ngôn ngữ): địa chỉ công khai cố định cho Google Play, AdMob, AdSense; app và web quản trị trỏ tới đây.
+  // Chính sách quyền riêng tư (5 ngôn ngữ): địa chỉ công khai cố định cho Google Play; app và web quản trị trỏ tới đây.
   { key: 'privacy', name: 'Chính sách quyền riêng tư', area: 'explore', actors: EVERYONE, path: '/chinh-sach-quyen-rieng-tu' },
   {
     key: 'timeline',

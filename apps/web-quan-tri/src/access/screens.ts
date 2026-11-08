@@ -127,11 +127,11 @@ export const SCREENS = [
   { key: 'questionModeration', name: 'Kiểm duyệt ngân hàng câu hỏi', area: 'admin', actors: ADMIN, path: '/quan-tri/cau-hoi' },
   { key: 'plans', name: 'Gói dịch vụ', area: 'admin', actors: ADMIN, path: '/quan-tri/goi' },
   {
-    key: 'adStats',
-    name: 'Thống kê khách và lượt mở khóa bằng quảng cáo',
+    key: 'visitorStats',
+    name: 'Thống kê khách tham quan',
     area: 'admin',
     actors: ADMIN,
-    path: '/quan-tri/khach-va-quang-cao',
+    path: '/quan-tri/khach-tham-quan',
   },
   { key: 'auditLog', name: 'Nhật ký thao tác', area: 'admin', actors: ADMIN, path: '/quan-tri/nhat-ky' },
 ] as const satisfies readonly Screen[];

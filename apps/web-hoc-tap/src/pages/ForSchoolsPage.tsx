@@ -93,7 +93,7 @@ export function ForSchoolsPage() {
           headingId="nha-truong-tieu-de"
           kicker="DÀNH CHO NHÀ TRƯỜNG"
           title="Dạy di sản Việt Nam, soạn nhanh, học theo cấp"
-          text="Giáo viên soạn bài học và bài kiểm tra về di sản từ kho dữ liệu dựa trên nguồn của Cục Di sản văn hóa. Học sinh có tài khoản riêng, học theo cấp 1, 2, 3 và không thấy quảng cáo."
+          text="Giáo viên soạn bài học và bài kiểm tra về di sản từ kho dữ liệu dựa trên nguồn của Cục Di sản văn hóa. Học sinh có tài khoản riêng, học theo cấp 1, 2, 3 và tập trung vào bài học."
           actions={
             <>
               <HeroAnchor href={ADMIN_WEB_URL}>

@@ -7,7 +7,7 @@ import { renderApp, signInAs } from '../../test/renderApp';
 import type { SystemOverview } from '@dsvhvn/dung-chung/api';
 
 // Tổng quan và doanh thu của quản trị hệ thống: tab Tổng quan (số liệu, gói, cần chú ý, biểu đồ theo thời gian) và tab Doanh thu (doanh thu từ giao
-// dịch VNPay thành công, biểu đồ theo kỳ, danh sách giao dịch có bộ lọc, liên kết sang bảng điều khiển quảng cáo của Google).
+// dịch VNPay thành công, biểu đồ theo kỳ, danh sách giao dịch có bộ lọc).
 
 function api(overview: SystemOverview = systemOverviewOf()) {
   return mockApi(
@@ -152,7 +152,7 @@ describe('Tổng quan và doanh thu', () => {
     expect(await screen.findByRole('figure', { name: 'Học sinh mới theo ngày' })).toBeInTheDocument();
   });
 
-  it('tab Doanh thu: doanh thu tháng này, hôm nay, từ trước tới nay, biểu đồ theo kỳ bằng tiền, doanh thu quảng cáo xem ở Google', async () => {
+  it('tab Doanh thu: doanh thu tháng này, hôm nay, từ trước tới nay, biểu đồ theo kỳ bằng tiền', async () => {
     signInAs('ADMIN');
     api();
     const user = userEvent.setup();
@@ -169,8 +169,7 @@ describe('Tổng quan và doanh thu', () => {
     const chart = await screen.findByRole('figure', { name: 'Doanh thu theo ngày' });
     expect(within(chart).getByRole('cell', { name: '1.990.000 ₫' })).toBeInTheDocument();
     expect(screen.getByText(/Tổng cả khoảng:/)).toHaveTextContent('1.990.000 ₫');
-    expect(screen.getByRole('link', { name: /Mở bảng điều khiển AdMob/ })).toHaveAttribute('target', '_blank');
-    expect(screen.getByRole('link', { name: /Mở bảng điều khiển Ad Manager/ })).toHaveAttribute('rel', 'noreferrer');
+    expect(screen.queryByText(/quảng cáo|AdMob|Ad Manager/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'Số liệu toàn hệ thống' })).not.toBeInTheDocument();
   });
 
