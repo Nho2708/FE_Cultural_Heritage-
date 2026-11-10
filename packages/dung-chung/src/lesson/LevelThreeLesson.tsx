@@ -3,7 +3,9 @@ import { ButtonLink, Icon, type IconName } from '../ui';
 import { Link } from 'react-router';
 import { milestonesOf, sectionsOf } from './lessonData';
 import { useLessonLinks } from './lessonLinks';
-import { LessonFigure, Paragraphs, QuizList } from './LessonParts';
+import { LessonFigure, QuizList } from './LessonParts';
+import { ReadAloud } from './ReadAloud';
+import { usePrefetchMainContent } from './readAloudPrefetch';
 
 // Bài học — bố cục cấp 3 (khối 10-12): trang tài liệu. Mục lục cố định ở bên trái, một cột nội dung rộng, đề mục và đường kẻ phân
 // cách, đoạn trích tư liệu gốc có khung và nguồn, câu hỏi gợi suy nghĩ (không chấm điểm, không lưu câu trả lời), liên kết di sản,
@@ -23,6 +25,7 @@ interface TocItem {
 
 export function LevelThreeLesson({ lesson }: { lesson: StudentLesson }) {
   const links = useLessonLinks();
+  usePrefetchMainContent(lesson.summary);
   const readings = sectionsOf(lesson, 'READING');
   const milestones = milestonesOf(lesson);
   const excerpts = sectionsOf(lesson, 'SOURCE_EXCERPT');
@@ -99,8 +102,8 @@ export function LevelThreeLesson({ lesson }: { lesson: StudentLesson }) {
             <h2 id="noi-dung-chinh-tieu-de" className="type-h2 text-on-surface">
               Nội dung chính
             </h2>
-            <div className="mt-3 flex flex-col gap-3 type-body-m text-on-surface">
-              <Paragraphs text={lesson.summary} />
+            <div className="mt-3">
+              <ReadAloud text={lesson.summary} label="Nghe bài đọc" className="flex flex-col gap-3 type-body-m text-on-surface" />
             </div>
             {images.map((image, index) => (
               <LessonFigure key={index} url={image.imageUrl} caption={image.body} image={image.image} className="mt-4 max-w-md" />
@@ -113,8 +116,8 @@ export function LevelThreeLesson({ lesson }: { lesson: StudentLesson }) {
               <h2 id={`phan-${index + 1}-tieu-de`} className="type-h2 text-on-surface">
                 {reading.title ?? `Phần ${index + 1}`}
               </h2>
-              <div className="mt-3 flex flex-col gap-3 type-body-m text-on-surface">
-                <Paragraphs text={reading.body} />
+              <div className="mt-3">
+                <ReadAloud text={reading.body} label="Nghe phần này" className="flex flex-col gap-3 type-body-m text-on-surface" />
               </div>
             </section>
           ))}

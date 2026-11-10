@@ -10,6 +10,8 @@ export * from './LevelOneLesson';
 export * from './LevelOneParts';
 export * from './LevelThreeLesson';
 export * from './LevelTwoLesson';
+export * from './ReadAloud';
+export * from './readAloudPrefetch';
 export * from './LessonView';
 export * from './lessonData';
 export * from './lessonLinks';
