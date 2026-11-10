@@ -1,3 +1,4 @@
+import type { CurriculumTopicRef } from './curriculum';
 import type { ContentStatus, HeritageType } from './heritage';
 import type { QuestionDifficulty } from './questions';
 import type { SchoolLevel } from './types';
@@ -145,6 +146,8 @@ export interface LessonDetail {
   aiQuota: AiQuota;
   /** Trạng thái trong thư viện bài mẫu; null (hoặc vắng) khi bài không ở thư viện. */
   sample?: LessonSampleInfo | null;
+  /** Chủ đề chương trình đang dùng của khối lớp mà di sản của bài thuộc về (tính khi xem, không lưu); vắng khi máy chủ cũ. */
+  curriculumTopics?: CurriculumTopicRef[];
   createdAt: string | null;
   updatedAt: string | null;
 }
@@ -254,6 +257,8 @@ export interface LessonLibraryFilter {
   level?: number | '';
   grade?: number | '';
   heritageId?: number | '';
+  /** Chủ đề chương trình (theo khối đang lọc). */
+  topicId?: number | '';
   keyword?: string;
   sort?: LessonLibrarySort;
   page?: number;
@@ -276,6 +281,8 @@ export interface LessonLibraryItem {
   useCount: number;
   approvedAt: string | null;
   isMine: boolean;
+  /** Chủ đề chương trình của bài; vắng khi máy chủ cũ. */
+  curriculumTopics?: CurriculumTopicRef[];
 }
 
 export interface LessonLibraryQuiz {

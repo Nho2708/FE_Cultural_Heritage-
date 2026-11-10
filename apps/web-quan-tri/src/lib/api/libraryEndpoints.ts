@@ -22,6 +22,7 @@ export const lessonLibraryApi = {
         level: filter.level === '' ? undefined : filter.level,
         grade: filter.grade === '' ? undefined : filter.grade,
         heritageId: filter.heritageId === '' ? undefined : filter.heritageId,
+        topicId: filter.topicId === '' ? undefined : filter.topicId,
         keyword: filter.keyword || undefined,
         sort: filter.sort || undefined,
         page: filter.page,
