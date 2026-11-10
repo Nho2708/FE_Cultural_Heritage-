@@ -42,11 +42,12 @@ const SCHOOL: readonly NavSpec[] = [
   { screen: 'schoolTeachers', label: 'Giáo viên', icon: 'users' },
 ];
 
-/** Thanh bên /quan-tri: Tổng quan · Trường · Di sản · Bản dịch · Câu hỏi · Thư viện bài mẫu · Gói dịch vụ · Khách tham quan · Nhật ký. */
+/** Thanh bên /quan-tri: Tổng quan · Trường · Di sản · Chủ đề chương trình · Bản dịch · Câu hỏi · Thư viện bài mẫu · Gói dịch vụ · Khách tham quan · Nhật ký. */
 const ADMIN: readonly NavSpec[] = [
   { screen: 'adminOverview', label: 'Tổng quan', icon: 'bar-chart' },
   { screen: 'schools', label: 'Trường', icon: 'building' },
   { screen: 'heritages', label: 'Di sản', icon: 'map-pin' },
+  { screen: 'curriculumTopics', label: 'Chủ đề chương trình', icon: 'list' },
   { screen: 'translationReview', label: 'Bản dịch', icon: 'languages' },
   { screen: 'questionModeration', label: 'Câu hỏi', icon: 'shield-check' },
   { screen: 'lessonLibraryReview', label: 'Thư viện bài mẫu', icon: 'cards' },

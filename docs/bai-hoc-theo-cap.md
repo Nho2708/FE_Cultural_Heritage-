@@ -91,6 +91,18 @@ Trạng thái bài kiểm tra với riêng em: Chưa mở · Đang mở · Em đ
 - Mã: `lib/api/libraryEndpoints.ts`, `components/lesson/` (`LibraryPreviewDialog`, `UseSampleDialog`, `SampleReviewDialogs`, `sampleNotice.ts`), `pages/teacher/LessonLibraryPage`,
   `pages/admin/LessonLibraryReviewPage`. Kiểm thử: `LessonLibraryPage.test.tsx`, `LessonLibraryReviewPage.test.tsx`, `LessonEditorRewriteAndLibrary.test.tsx`.
 
+### Chủ đề chương trình (bản gọn)
+
+- Hộp Tạo bài học, bước Chọn di sản: ô "Chủ đề chương trình (lớp N)" theo khối của lớp, nhóm theo chủ đề lớn (`TopicPicker.tsx`, `GET /teacher/curriculum-topics?grade=`).
+  Chọn chủ đề thì danh sách di sản là di sản đã xuất bản của chủ đề (`GET /teacher/curriculum-topics/{id}/heritages`, lọc theo tên ngay trên trang); chủ đề "Địa phương em"
+  (`localProvince`) nhắc chọn tỉnh, thành phố của trường và giữ danh sách thường; khối không có chủ đề (hoặc chưa tải được) thì ẩn ô. Đổi lớp ở bước một thì bỏ chủ đề đã chọn.
+- Soạn bài học: nhãn "Chủ đề chương trình" dưới ô Lớp (`TopicLabels.tsx`, từ `curriculumTopics` của chi tiết bài; ẩn khi rỗng). Thư viện bài mẫu của giáo viên: nhãn trên thẻ và
+  bộ lọc chủ đề (chỉ hiện khi đã chọn khối có chủ đề; `?chu-de=`, gửi `topicId`; đổi khối thì bỏ chủ đề).
+- Quản trị hệ thống: trang "Chủ đề chương trình" `/quan-tri/chu-de-chuong-trinh` và trang con quản lý di sản của chủ đề; trang Biên tập di sản hiện nhãn chủ đề chỉ đọc kèm lối sang trang này.
+- Mã: `lib/api/curriculumEndpoints.ts`, `packages/dung-chung/src/api/curriculum.ts` (kiểu dữ liệu), `SelectField` có nhóm (`group` của mục), `components/curriculum/` (`topicForm`,
+  `CurriculumTopicFormDialog`), `pages/admin/CurriculumTopicsPage`, `CurriculumTopicHeritagesPage`. Kiểm thử: `CreateLessonTopics.test.tsx`, `LessonEditorTopics.test.tsx`,
+  `LessonLibraryTopics.test.tsx`, `CurriculumTopicsPage.test.tsx`, `CurriculumTopicHeritagesPage.test.tsx`, `HeritageEditorTopics.test.tsx`, `topicForm.test.ts`.
+
 ## 3. Cấu trúc mã
 
 | Nơi | Tệp |
