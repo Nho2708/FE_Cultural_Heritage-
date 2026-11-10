@@ -19,6 +19,8 @@ import { PATHS } from '../../access/screens';
 import { LibraryPreviewDialog } from '../../components/lesson/LibraryPreviewDialog';
 import { PlanNotice } from '../../components/lesson/LessonBits';
 import { sampleNoticeOf } from '../../components/lesson/sampleNotice';
+import { TopicLabels } from '../../components/lesson/TopicLabels';
+import { topicOptionLabel, useGradeTopics } from '../../components/lesson/topics';
 import { UseSampleDialog } from '../../components/lesson/UseSampleDialog';
 import { AreaPage, PageHeader } from '../../components/layout/PageHeader';
 import { HeritageSelect } from '../../components/question/QuestionPickers';
@@ -32,7 +34,7 @@ import { PAGE_SIZE, slugMap, useListParams } from '../../lib/listParams';
 // mình để khỏi soạn từ đầu. Lọc theo cấp, khối, di sản, từ khóa; sắp xếp Mới nhất hoặc Dùng nhiều. Thẻ bài hiện tiêu đề, cấp và khối, di sản,
 // trích tóm tắt, số phần, số bài kiểm tra, người soạn và trường, số lượt dùng, nhãn "Bài của tôi". "Xem trước" mở bài như học sinh thấy (chỉ đọc);
 // "Dùng cho lớp…" tạo bài Nháp mới ở lớp đã chọn (chép kèm bài kiểm tra được) rồi chuyển tới trang Soạn bài học của bài mới.
-// Bộ lọc nằm trên URL. Trường hết gói thì nút "Dùng cho lớp…" bị khóa.
+// Lọc theo chủ đề chương trình (theo khối đang lọc) và nhãn chủ đề trên thẻ. Bộ lọc nằm trên URL. Trường hết gói thì nút "Dùng cho lớp…" bị khóa.
 
 const SORT_SLUG = slugMap<LessonLibrarySort>({ newest: 'moi-nhat', popular: 'dung-nhieu' });
 const SORT_OPTIONS = [
@@ -53,6 +55,7 @@ function SampleCard({ item, onPreview, onUse, planLocked }: { item: LessonLibrar
       <p className="type-body-s text-on-surface-variant">
         Cấp {item.schoolLevel} · Khối {item.grade}
       </p>
+      <TopicLabels topics={item.curriculumTopics} />
       {item.heritages.length > 0 && (
         <ul className="flex flex-col gap-2" aria-label="Di sản của bài">
           {item.heritages.map((h) => (
@@ -101,11 +104,13 @@ export default function LessonLibraryPage() {
   const heritageParam = params.get('di-san') ?? '';
   const heritageName = params.get('ten-di-san') ?? '';
   const keyword = params.get('tu-khoa') ?? '';
+  const topicParam = params.get('chu-de') ?? '';
   const sort = SORT_SLUG.fromSlug(params.get('sap-xep')) || 'newest';
   const filter = {
     level: level ? Number(level) : ('' as const),
     grade: grade ? Number(grade) : ('' as const),
     heritageId: heritageParam ? Number(heritageParam) : ('' as const),
+    topicId: topicParam && grade ? Number(topicParam) : ('' as const),
     keyword,
     sort,
     page,
@@ -119,13 +124,20 @@ export default function LessonLibraryPage() {
   });
   const quota = useQuery({ queryKey: queryKeys.aiQuota, queryFn: () => lessonsApi.aiQuota().then((r) => r.data) });
   const planLocked = quota.data?.hasEffectivePlan === false;
+  // Chủ đề lọc được khi đã chọn một khối; khối không có chủ đề thì không hiện ô lọc.
+  const gradeTopics = useGradeTopics(grade ? Number(grade) : null);
+  const topics = grade ? (gradeTopics.data ?? []) : [];
+  const topicOptions = [
+    { value: '', label: 'Tất cả chủ đề' },
+    ...topics.map((t) => ({ value: String(t.id), label: topicOptionLabel(t), group: t.groupTitle })),
+  ];
 
   const [previewing, setPreviewing] = useState<LessonLibraryItem | null>(null);
   const [using, setUsing] = useState<LessonLibraryItem | null>(null);
 
   const rows = list.data?.items ?? [];
-  const filtered = Boolean(level || grade || heritageParam || keyword);
-  const clearAll = () => update({ cap: null, khoi: null, 'di-san': null, 'ten-di-san': null, 'tu-khoa': null });
+  const filtered = Boolean(level || grade || heritageParam || keyword || filter.topicId !== '');
+  const clearAll = () => update({ cap: null, khoi: null, 'chu-de': null, 'di-san': null, 'ten-di-san': null, 'tu-khoa': null });
 
   return (
     <AreaPage>
@@ -142,7 +154,7 @@ export default function LessonLibraryPage() {
       <div className="flex flex-col gap-3">
         <div className="grid gap-3 dsvsm:grid-cols-2 dsvlg:grid-cols-3">
           <SelectField label="Cấp" value={level} options={LEVEL_OPTIONS} onChange={(e) => update({ cap: e.target.value })} />
-          <SelectField label="Khối" value={grade} options={GRADE_OPTIONS} onChange={(e) => update({ khoi: e.target.value })} />
+          <SelectField label="Khối" value={grade} options={GRADE_OPTIONS} onChange={(e) => update({ khoi: e.target.value, 'chu-de': null })} />
           <SelectField
             label="Sắp xếp"
             value={sort === 'newest' ? '' : SORT_SLUG.toSlug(sort)}
@@ -150,6 +162,14 @@ export default function LessonLibraryPage() {
             onChange={(e) => update({ 'sap-xep': e.target.value })}
           />
         </div>
+        {topics.length > 0 && (
+          <SelectField
+            label={`Chủ đề chương trình (khối ${grade})`}
+            value={filter.topicId === '' ? '' : String(filter.topicId)}
+            options={topicOptions}
+            onChange={(e) => update({ 'chu-de': e.target.value })}
+          />
+        )}
         <div className="flex flex-wrap items-end gap-3">
           <HeritageSelect
             heritageId={heritageParam ? Number(heritageParam) : null}

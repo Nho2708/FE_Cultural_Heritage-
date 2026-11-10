@@ -41,6 +41,7 @@ import {
 } from '../../components/lesson/lessonForm';
 import { SampleLibraryBlock } from '../../components/lesson/SampleLibraryBlock';
 import { SectionCard } from '../../components/lesson/SectionCard';
+import { TopicLabels } from '../../components/lesson/TopicLabels';
 import { StudentPreviewDialog } from '../../components/lesson/StudentPreviewDialog';
 import { AreaPage, PageHeader } from '../../components/layout/PageHeader';
 import { lessonsApi } from '../../lib/api/lessonEndpoints';
@@ -375,6 +376,7 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
                 value={`${lesson.className} · Khối ${lesson.grade} · ${lesson.schoolLevelName}`}
                 hint="Lớp của bài học không đổi sau khi tạo."
               />
+              <TopicLabels topics={lesson.curriculumTopics} />
               <TextField
                 label="Tiêu đề"
                 name="title"
