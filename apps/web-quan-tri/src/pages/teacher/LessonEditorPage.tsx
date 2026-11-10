@@ -16,7 +16,7 @@ import {
 } from '@dsvhvn/dung-chung/ui';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
-import { useBlocker, useNavigate, useParams } from 'react-router';
+import { useBlocker, useLocation, useNavigate, useParams } from 'react-router';
 import { PATHS, pathOf } from '../../access/screens';
 import { AiPanel, KeyPointsEditor } from '../../components/lesson/ContentParts';
 import { DuplicateLessonDialog } from '../../components/lesson/DuplicateLessonDialog';
@@ -39,6 +39,7 @@ import {
   type LessonFormState,
   type SectionState,
 } from '../../components/lesson/lessonForm';
+import { SampleLibraryBlock } from '../../components/lesson/SampleLibraryBlock';
 import { SectionCard } from '../../components/lesson/SectionCard';
 import { StudentPreviewDialog } from '../../components/lesson/StudentPreviewDialog';
 import { AreaPage, PageHeader } from '../../components/layout/PageHeader';
@@ -132,6 +133,14 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
   const [creatingQuiz, setCreatingQuiz] = useState(false);
   const [confirmArchive, setConfirmArchive] = useState(false);
   const [confirmCompose, setConfirmCompose] = useState(false);
+  const [instructions, setInstructions] = useState('');
+  // Bài đang ở thư viện bài mẫu: lưu thay đổi sẽ đưa bài về chờ duyệt lại nên hỏi trước.
+  const [confirmSave, setConfirmSave] = useState<'save' | 'publish' | null>(null);
+  const location = useLocation();
+  const [sampleNotice, setSampleNotice] = useState<string[]>(() => {
+    const notice = (location.state as { sampleNotice?: unknown } | null)?.sampleNotice;
+    return Array.isArray(notice) ? notice.filter((n): n is string => typeof n === 'string') : [];
+  });
 
   const adopt = (next: LessonDetail) => {
     const state = formOf(next);
@@ -231,7 +240,7 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
     setComposing(true);
     setProblem(null);
     try {
-      const { data } = await lessonsApi.compose(lessonId, length);
+      const { data } = await lessonsApi.compose(lessonId, length, instructions);
       setForm(applyDraft(form, data));
       setErrorsBySection(new Map());
       setAiWarnings(data.warnings);
@@ -244,6 +253,14 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
     } finally {
       setComposing(false);
     }
+  };
+
+  const inLibrary = lesson.sample?.status === 'APPROVED';
+  /** Lưu hoặc xuất bản (có lưu): bài đang ở thư viện thì nhắc bài sẽ chờ duyệt lại, rồi mới làm. */
+  const guarded = (kind: 'save' | 'publish') => {
+    if (inLibrary && dirty && !readOnly) setConfirmSave(kind);
+    else if (kind === 'save') void save();
+    else void publish();
   };
 
   const addSection = (type: LessonSectionType) => setForm({ ...form, sections: [...form.sections, newSection(type)] });
@@ -314,11 +331,11 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
               </Button>
             )}
             {!readOnly && (
-              <Button variant="secondary" loading={saving} disabled={busy || !dirty} onClick={() => void save()}>
+              <Button variant="secondary" loading={saving} disabled={busy || !dirty} onClick={() => guarded('save')}>
                 {saveLabel}
               </Button>
             )}
-            <Button loading={publishing} disabled={busy || (lesson.status === 'PUBLISHED' && !dirty)} onClick={() => void publish()}>
+            <Button loading={publishing} disabled={busy || (lesson.status === 'PUBLISHED' && !dirty)} onClick={() => guarded('publish')}>
               {publishLabel}
             </Button>
           </>
@@ -326,6 +343,18 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
       />
 
       {problem && <ProblemMessage text={problem} />}
+      {sampleNotice.length > 0 && (
+        <InlineMessage
+          tone="info"
+          action={
+            <Button variant="ghost" size="sm" className="text-link" onClick={() => setSampleNotice([])}>
+              Đã hiểu
+            </Button>
+          }
+        >
+          {sampleNotice.join(' ')}
+        </InlineMessage>
+      )}
       {readOnly && (
         <InlineMessage tone="info">
           Bài học đã lưu trữ nên học sinh không mở được bằng mã nữa và thầy cô chưa sửa được. Bấm "Xuất bản lại" để mở lại cho lớp và sửa tiếp; mã
@@ -415,6 +444,8 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
                 composing={composing}
                 disabled={readOnly || busy}
                 onCompose={() => (hasContent ? setConfirmCompose(true) : void compose())}
+                instructions={instructions}
+                onInstructions={setInstructions}
               />
             </div>
 
@@ -476,6 +507,15 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
                         onMove={(delta) => setForm({ ...form, sections: moveItem(form.sections, index, delta) })}
                         onRemove={() => setForm({ ...form, sections: form.sections.filter((s) => s.key !== section.key) })}
                         onPickImage={() => setPickingKey(section.key)}
+                        rewrite={{
+                          lessonId: lesson.id,
+                          quota: lesson.aiQuota,
+                          disabled: busy,
+                          onQuota: (aiQuota) => {
+                            setLesson((current) => ({ ...current, aiQuota }));
+                            void queryClient.invalidateQueries({ queryKey: queryKeys.aiQuota });
+                          },
+                        }}
                       />
                     ))}
                   </ol>
@@ -560,6 +600,16 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
               Số từ, số bước, số mốc ngoài khoảng của cấp chỉ nhắc, không chặn xuất bản. Thầy cô nên đọc lại nội dung AI soạn trước khi dùng.
             </p>
           </section>
+
+          <SampleLibraryBlock
+            lesson={lesson}
+            dirty={dirty}
+            busy={busy}
+            onChanged={(next, message) => {
+              adopt(next);
+              toast.success(message);
+            }}
+          />
 
           <section aria-labelledby="bai-kiem-tra" className="rounded-md border border-border bg-surface p-5">
             <h2 id="bai-kiem-tra" className="type-h3 text-on-surface">
@@ -654,6 +704,20 @@ function LessonEditor({ initial }: { initial: LessonDetail }) {
         onClose={() => setConfirmArchive(false)}
       >
         Bạn có chắc muốn lưu trữ bài học này? Học sinh lớp {lesson.className} không mở được bài học bằng mã nữa; kết quả các bài đã làm vẫn được giữ.
+      </ConfirmDialog>
+      <ConfirmDialog
+        open={confirmSave !== null}
+        title="Bài đang ở thư viện bài mẫu"
+        confirmLabel={confirmSave === 'publish' ? publishLabel : saveLabel}
+        onConfirm={() => {
+          const kind = confirmSave;
+          setConfirmSave(null);
+          if (kind === 'publish') void publish();
+          else void save();
+        }}
+        onClose={() => setConfirmSave(null)}
+      >
+        Bài này đang ở thư viện bài mẫu. Nếu lưu thay đổi nội dung, bài sẽ chờ quản trị hệ thống duyệt lại và tạm thời giáo viên khác không thấy trong thư viện.
       </ConfirmDialog>
       <ConfirmDialog
         open={confirmCompose}

@@ -1,7 +1,9 @@
 import { LESSON_LIMITS, LESSON_SECTION_LABEL, cn, countLessonWords } from '@dsvhvn/dung-chung';
-import type { LessonEventOption, LessonFrame, LessonImageOption } from '@dsvhvn/dung-chung/api';
+import type { AiQuota, LessonEventOption, LessonFrame, LessonImageOption } from '@dsvhvn/dung-chung/api';
 import { Button, Icon, SelectField, TextAreaField, TextField } from '@dsvhvn/dung-chung/ui';
 import { creditLine, type SectionState } from './lessonForm';
+import { isRewritable } from './rewriteSection';
+import { SectionRewrite } from './SectionRewrite';
 import { fileUrl } from '../../lib/fileUrl';
 
 // Một phần nội dung của bài trên màn hình Soạn bài học. Mỗi loại phần có ô nhập riêng theo khung của cấp: bước câu chuyện (cấp 1:
@@ -23,6 +25,8 @@ interface SectionCardProps {
   onMove: (delta: -1 | 1) => void;
   onRemove: () => void;
   onPickImage: () => void;
+  /** Có thì phần (trừ đoạn trích tư liệu) hiện nút "Viết lại bằng AI". */
+  rewrite?: { lessonId: number; quota: AiQuota; disabled: boolean; onQuota: (quota: AiQuota) => void };
 }
 
 function speak(text: string) {
@@ -75,7 +79,7 @@ function ImageBlock({
 }
 
 export function SectionCard(props: SectionCardProps) {
-  const { section, ordinal, position, total, frame, readOnly, error, events, onChange, onMove, onRemove, onPickImage } = props;
+  const { section, ordinal, position, total, frame, readOnly, error, events, onChange, onMove, onRemove, onPickImage, rewrite } = props;
   const outside = !frame.allowedTypes.includes(section.type);
   const words = countLessonWords(section.body);
   const label = LESSON_SECTION_LABEL[section.type];
@@ -261,6 +265,18 @@ export function SectionCard(props: SectionCardProps) {
           />
         )}
       </div>
+
+      {rewrite && !readOnly && !outside && isRewritable(section.type) && (
+        <SectionRewrite
+          lessonId={rewrite.lessonId}
+          section={section}
+          heading={heading}
+          quota={rewrite.quota}
+          disabled={rewrite.disabled}
+          onQuota={rewrite.onQuota}
+          onApply={onChange}
+        />
+      )}
     </li>
   );
 }

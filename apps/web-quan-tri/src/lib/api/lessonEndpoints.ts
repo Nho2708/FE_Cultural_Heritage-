@@ -10,9 +10,12 @@ import {
   type LessonMaterials,
   type LessonPreview,
   type LessonRow,
+  type LessonSampleResult,
   type NotifyClassResult,
   type Paged,
   type PublishLessonResult,
+  type RewriteSectionBody,
+  type RewriteSectionResult,
   type UpdateLessonBody,
 } from '@dsvhvn/dung-chung/api';
 import { apiClient, apiRequest } from './client';
@@ -60,9 +63,29 @@ export const lessonsApi = {
   /** Ảnh và sự kiện của các di sản của bài, để chọn hình và mốc thời gian. */
   materials: (lessonId: number) => apiRequest<LessonMaterials>(`/teacher/lessons/${lessonId}/materials`),
 
-  /** AI soạn bản nháp đúng cấp của lớp; không tự lưu hay xuất bản. */
-  compose: (lessonId: number, length: LessonLength) =>
-    apiRequest<LessonDraft>(`/teacher/lessons/${lessonId}/ai/compose`, { method: 'POST', body: { length } }),
+  /**
+   * AI soạn bản nháp đúng cấp của lớp; không tự lưu hay xuất bản. `instructions` là yêu cầu thêm của giáo viên (cắt khoảng trắng,
+   * tối đa 500 ký tự); để trống thì không gửi.
+   */
+  compose: (lessonId: number, length: LessonLength, instructions?: string) => {
+    const note = instructions?.trim();
+    return apiRequest<LessonDraft>(`/teacher/lessons/${lessonId}/ai/compose`, {
+      method: 'POST',
+      body: note ? { length, instructions: note } : { length },
+    });
+  },
+
+  /** AI viết lại riêng một phần (chữ đang sửa, chưa cần lưu); không lưu vào bài, mỗi lần tính một lượt AI. */
+  rewriteSection: (lessonId: number, body: RewriteSectionBody) =>
+    apiRequest<RewriteSectionResult>(`/teacher/lessons/${lessonId}/ai/rewrite-section`, { method: 'POST', body }),
+
+  /** Đề xuất bài đã xuất bản vào thư viện bài mẫu (chờ quản trị hệ thống duyệt). */
+  requestSample: (lessonId: number) =>
+    apiRequest<LessonSampleResult>(`/teacher/lessons/${lessonId}/sample-request`, { method: 'POST' }),
+
+  /** Rút bài khỏi thư viện bài mẫu (từ chờ duyệt, trong thư viện hoặc bị từ chối). */
+  withdrawSample: (lessonId: number) =>
+    apiRequest<LessonSampleResult>(`/teacher/lessons/${lessonId}/sample-request`, { method: 'DELETE' }),
 
   /** "Xem như học sinh": bài đúng như học sinh của lớp thấy, kể cả bài Nháp; chỉ đọc, không ghi gì. */
   previewAsStudent: (lessonId: number) => apiRequest<LessonPreview>(`/teacher/lessons/${lessonId}/preview`),

@@ -1,4 +1,4 @@
-import type { ClassMasteryFilter, QuestionQualityFilter, SystemPaymentQuery, TrendQuery, ClassRecommendationFilter, LessonListFilter, QuestionListFilter, QuizCandidateFilter, QuizListFilter } from '@dsvhvn/dung-chung/api';
+import type { AdminLessonLibraryQuery, LessonLibraryFilter, ClassMasteryFilter, QuestionQualityFilter, SystemPaymentQuery, TrendQuery, ClassRecommendationFilter, LessonListFilter, QuestionListFilter, QuizCandidateFilter, QuizListFilter } from '@dsvhvn/dung-chung/api';
 import type { ClassListQuery, StudentListQuery } from './classroomEndpoints';
 import type { AdStatsQuery as VisitorStatsQuery, LanguageCode, TranslationQueueQuery } from '@dsvhvn/dung-chung/api';
 import type { AuditLogQuery, HeritageListQuery, InvoiceListQuery, OrganizationListQuery, TeacherListQuery } from './endpoints';
@@ -50,6 +50,11 @@ export const queryKeys = {
   /** Di sản đã xuất bản để chọn cho bài học. */
   publishedHeritages: (filter: unknown) => ['teacher', 'published-heritages', filter] as const,
   discoveryFilters: ['teacher', 'discovery-filters'] as const,
+
+  /** Thư viện bài mẫu của giáo viên: danh sách và xem trước một bài mẫu. */
+  lessonLibrary: ['teacher', 'lesson-library'] as const,
+  lessonLibraryList: (filter: LessonLibraryFilter) => ['teacher', 'lesson-library', 'list', filter] as const,
+  lessonLibraryDetail: (id: number) => ['teacher', 'lesson-library', 'detail', id] as const,
 
   /** Ngân hàng câu hỏi của giáo viên: danh sách, số đếm các tab, bảng dạng câu theo cấp, chi tiết (làm mới cả nhóm sau khi ghi). */
   questions: ['teacher', 'questions'] as const,
@@ -104,6 +109,11 @@ export const queryKeys = {
   moderation: ['admin', 'moderation'] as const,
   moderationList: (filter: QuestionQualityFilter) => ['admin', 'moderation', 'list', filter] as const,
   moderationDetail: (id: number) => ['admin', 'moderation', 'detail', id] as const,
+
+  /** Thư viện bài mẫu của quản trị hệ thống: danh sách theo tab và xem trước chỉ đọc (làm mới cả nhóm sau khi duyệt, từ chối, gỡ). */
+  adminLessonLibrary: ['admin', 'lesson-library'] as const,
+  adminLessonLibraryList: (query: AdminLessonLibraryQuery) => ['admin', 'lesson-library', 'list', query] as const,
+  adminLessonLibraryDetail: (id: number) => ['admin', 'lesson-library', 'detail', id] as const,
 
   /** Thống kê khách tham quan theo khoảng ngày. */
   visitorStats: (query: VisitorStatsQuery) => ['admin', 'visitors', 'stats', query] as const,

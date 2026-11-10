@@ -39,6 +39,20 @@ export interface LessonHeritageRef {
   status: ContentStatus | null;
 }
 
+/** Trạng thái của bài trong thư viện bài mẫu: chờ duyệt, đã duyệt (trong thư viện), bị từ chối hoặc bị gỡ. */
+export type LessonSampleStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+/** Thông tin thư viện bài mẫu của một bài; bài không ở thư viện thì `sample` là null. */
+export interface LessonSampleInfo {
+  status: LessonSampleStatus;
+  requestedAt: string | null;
+  reviewedAt: string | null;
+  /** Lý do bị từ chối hoặc bị gỡ. */
+  note: string | null;
+  /** Số bài đã được tạo từ bài mẫu này. */
+  useCount: number;
+}
+
 /** Dòng của màn hình Bài học của tôi. */
 export interface LessonRow {
   id: number;
@@ -56,6 +70,8 @@ export interface LessonRow {
   difficulty: QuestionDifficulty | null;
   /** "Dễ", "Trung bình", "Khó" hoặc "Chưa có bài kiểm tra". */
   difficultyLabel: string;
+  /** Trạng thái trong thư viện bài mẫu; null (hoặc vắng) khi bài không ở thư viện. */
+  sample?: LessonSampleInfo | null;
   createdAt: string | null;
   updatedAt: string | null;
 }
@@ -127,6 +143,8 @@ export interface LessonDetail {
   readiness: LessonReadiness;
   quizCount: number;
   aiQuota: AiQuota;
+  /** Trạng thái trong thư viện bài mẫu; null (hoặc vắng) khi bài không ở thư viện. */
+  sample?: LessonSampleInfo | null;
   createdAt: string | null;
   updatedAt: string | null;
 }
@@ -191,6 +209,124 @@ export interface DuplicateLessonResult {
   copiedQuizzes: number;
   /** Số câu hỏi bị bỏ khi chép bài kiểm tra: câu đã ẩn hoặc không dùng được ở cấp của lớp đích. */
   skippedQuestions: number;
+  message: string;
+}
+
+/** Kết quả đề xuất hoặc rút khỏi thư viện bài mẫu: chi tiết bài đã cập nhật kèm câu báo. */
+export interface LessonSampleResult {
+  lesson: LessonDetail;
+  message: string;
+}
+
+/** Yêu cầu viết lại riêng một phần bằng AI; đoạn trích tư liệu không viết lại được. */
+export interface RewriteSectionBody {
+  sectionType: Exclude<LessonSectionType, 'SOURCE_EXCERPT'>;
+  text: string;
+  title?: string;
+  year?: number;
+  instructions?: string;
+}
+
+/** Bản viết lại của một phần, chưa đưa vào bài. `title` null thì giữ tiêu đề cũ. */
+export interface RewriteSectionResult {
+  generationId: number;
+  sectionType: LessonSectionType;
+  text: string;
+  title: string | null;
+  warnings: string[];
+  model: string;
+  aiQuota: AiQuota;
+  message: string;
+}
+
+// ---- Thư viện bài mẫu ----
+
+export interface LessonLibraryHeritage {
+  id: number;
+  slug: string | null;
+  name: string | null;
+  thumbnailUrl: string | null;
+}
+
+export type LessonLibrarySort = 'newest' | 'popular';
+
+export interface LessonLibraryFilter {
+  level?: number | '';
+  grade?: number | '';
+  heritageId?: number | '';
+  keyword?: string;
+  sort?: LessonLibrarySort;
+  page?: number;
+  pageSize?: number;
+}
+
+/** Thẻ bài mẫu trong thư viện của giáo viên. */
+export interface LessonLibraryItem {
+  id: number;
+  title: string | null;
+  schoolLevel: SchoolLevel;
+  grade: number;
+  heritages: LessonLibraryHeritage[];
+  /** Tối đa 200 ký tự. */
+  summaryExcerpt: string | null;
+  sectionCount: number;
+  quizCount: number;
+  authorName: string | null;
+  schoolName: string | null;
+  useCount: number;
+  approvedAt: string | null;
+  isMine: boolean;
+}
+
+export interface LessonLibraryQuiz {
+  title: string | null;
+  questionCount: number;
+}
+
+/** Xem trước một bài mẫu: bài đúng như học sinh thấy (chỉ đọc) và các bài kiểm tra đi kèm. */
+export interface LessonLibraryDetail {
+  item: LessonLibraryItem;
+  lesson: StudentLesson;
+  quizzes: LessonLibraryQuiz[];
+}
+
+export interface UseLibraryLessonBody {
+  targetClassId: number;
+  includeQuizzes?: boolean;
+}
+
+/** Dòng của trang Thư viện bài mẫu của quản trị hệ thống. */
+export interface AdminLessonLibraryRow {
+  id: number;
+  title: string | null;
+  schoolLevel: SchoolLevel;
+  grade: number;
+  heritages: LessonLibraryHeritage[];
+  authorName: string | null;
+  schoolName: string | null;
+  status: LessonSampleStatus;
+  requestedAt: string | null;
+  reviewedAt: string | null;
+  note: string | null;
+  useCount: number;
+}
+
+export interface AdminLessonLibraryQuery {
+  status?: LessonSampleStatus;
+  level?: number | '';
+  keyword?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface AdminLessonLibraryDetail {
+  item: AdminLessonLibraryRow;
+  lesson: StudentLesson;
+  quizzes: LessonLibraryQuiz[];
+}
+
+export interface AdminLessonLibraryResult {
+  item: AdminLessonLibraryRow;
   message: string;
 }
 
