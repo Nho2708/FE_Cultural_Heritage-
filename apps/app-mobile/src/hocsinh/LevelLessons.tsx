@@ -6,7 +6,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Photo } from '../components/Heritage';
 import { Card, Chip, Divider, EmptyState, Section, Txt, styles as ui } from '../components/ui';
 import { useTheme } from '../theme/ThemeProvider';
-import { Figure, HeritageLinks, Paragraphs, QuizList } from './LessonParts';
+import { Figure, HeritageLinks, QuizList } from './LessonParts';
+import { ReadAloud, usePrefetchMainContent } from './ReadAloud';
 
 // Ba bố cục bài học khác nhau thật sự theo cấp (cùng dữ liệu, khác luồng): cấp 1 kể chuyện từng bước với nút lớn và đọc to (ở levelOne/LevelOneLesson);
 // cấp 2 ba bước chuyển qua lại tự do bằng chip (Đọc bài, Dòng thời gian của bài, Bài kiểm tra); cấp 3 là trang tài liệu có đề mục, tư liệu gốc,
@@ -19,6 +20,7 @@ type TabId = 'READ' | 'TIMELINE' | 'QUIZ';
 export function LevelTwoLesson({ lesson }: { lesson: StudentLesson }) {
   const { t } = useTranslation();
   const theme = useTheme();
+  usePrefetchMainContent(lesson.summary);
   const [tab, setTab] = useState<TabId>('READ');
   const milestones = milestonesOf(lesson);
   const body = sectionsOf(lesson, 'READING', 'IMAGE');
@@ -47,14 +49,14 @@ export function LevelTwoLesson({ lesson }: { lesson: StudentLesson }) {
 
       {tab === 'READ' ? (
         <View style={{ gap: theme.spacing.inline }}>
-          <Paragraphs text={lesson.summary} />
+          <ReadAloud text={lesson.summary} listenLabel={t('hs.lesson.listenReading')} />
           {body.map((section, index) =>
             section.type === 'IMAGE' ? (
               <Figure key={index} url={section.imageUrl} caption={section.body} image={section.image} />
             ) : (
               <View key={index} style={{ gap: 8 }}>
                 {section.title ? <Txt variant="title">{section.title}</Txt> : null}
-                <Paragraphs text={section.body} />
+                <ReadAloud text={section.body} listenLabel={t('hs.lesson.listenSection')} />
               </View>
             ),
           )}
@@ -112,6 +114,7 @@ export function LevelTwoLesson({ lesson }: { lesson: StudentLesson }) {
 export function LevelThreeLesson({ lesson }: { lesson: StudentLesson }) {
   const { t } = useTranslation();
   const theme = useTheme();
+  usePrefetchMainContent(lesson.summary);
   const readings = sectionsOf(lesson, 'READING');
   const milestones = milestonesOf(lesson);
   const excerpts = sectionsOf(lesson, 'SOURCE_EXCERPT');
@@ -143,7 +146,7 @@ export function LevelThreeLesson({ lesson }: { lesson: StudentLesson }) {
       </View>
 
       {heading(t('hs.lesson.mainContent'))}
-      <Paragraphs text={lesson.summary} />
+      <ReadAloud text={lesson.summary} listenLabel={t('hs.lesson.listenReading')} />
       {images.map((image, index) => (
         <Figure key={index} url={image.imageUrl} caption={image.body} image={image.image} />
       ))}
@@ -151,7 +154,7 @@ export function LevelThreeLesson({ lesson }: { lesson: StudentLesson }) {
       {readings.map((reading, index) => (
         <View key={index} style={{ gap: theme.spacing.inline }}>
           {heading(reading.title ?? `${index + 1}`)}
-          <Paragraphs text={reading.body} />
+          <ReadAloud text={reading.body} listenLabel={t('hs.lesson.listenSection')} />
         </View>
       ))}
 
