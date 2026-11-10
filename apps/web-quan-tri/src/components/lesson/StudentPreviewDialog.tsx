@@ -1,4 +1,5 @@
 import { LessonLinksProvider, LessonThemeScope, LessonView, NO_LESSON_LINKS, SpeechNotice } from '@dsvhvn/dung-chung/lesson';
+import type { StudentLesson } from '@dsvhvn/dung-chung/api';
 import { ErrorState, InlineMessage, LoadingState, Modal } from '@dsvhvn/dung-chung/ui';
 import { useQuery } from '@tanstack/react-query';
 import { lessonsApi } from '../../lib/api/lessonEndpoints';
@@ -7,6 +8,18 @@ import { queryKeys } from '../../lib/api/queryKeys';
 // "Xem như học sinh" (giáo viên, màn hình Soạn bài học): bài học đúng bố cục, khung và dữ liệu mà học sinh của lớp thấy, vẽ bằng
 // chính các thành phần bố cục cấp 1, 2, 3 của web học tập và bộ giao diện của cấp đó. Chỉ đọc: không có liên kết sang trang công
 // khai của di sản, không làm bài kiểm tra, không ghi kết quả hay tiến độ. Xem được cả bài Nháp, chưa có mã.
+
+/** Bài vẽ đúng như học sinh thấy (bố cục và bộ giao diện theo cấp), chỉ đọc; dùng chung cho "Xem như học sinh" và xem trước bài mẫu. */
+export function StudentLessonPreviewView({ lesson }: { lesson: StudentLesson }) {
+  return (
+    <LessonThemeScope level={lesson.schoolLevel}>
+      <LessonLinksProvider links={NO_LESSON_LINKS}>
+        <LessonView lesson={lesson} />
+        <SpeechNotice />
+      </LessonLinksProvider>
+    </LessonThemeScope>
+  );
+}
 
 interface Props {
   lessonId: number;
@@ -38,14 +51,7 @@ export function StudentPreviewDialog({ lessonId, open, onClose }: Props) {
         )}
         {preview.isPending && open && <LoadingState rows={4} />}
         {preview.isError && <ErrorState error={preview.error} onRetry={() => void preview.refetch()} />}
-        {lesson && (
-          <LessonThemeScope level={lesson.schoolLevel}>
-            <LessonLinksProvider links={NO_LESSON_LINKS}>
-              <LessonView lesson={lesson} />
-              <SpeechNotice />
-            </LessonLinksProvider>
-          </LessonThemeScope>
-        )}
+        {lesson && <StudentLessonPreviewView lesson={lesson} />}
       </div>
     </Modal>
   );

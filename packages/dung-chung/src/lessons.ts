@@ -1,5 +1,5 @@
 import type { ContentStatus } from './api/heritage';
-import type { LessonLength, LessonSectionType } from './api/lessons';
+import type { LessonLength, LessonSampleStatus, LessonSectionType } from './api/lessons';
 import { normalizeCode } from './validation/studentCode';
 
 // Quy tắc và nhãn của bài học dùng chung cho giáo viên (soạn) và học sinh (mở bằng mã). Mã bài học: tiền tố "BH" + 6 ký
@@ -44,6 +44,13 @@ export const LESSON_STATUS_LABEL: Record<ContentStatus, string> = {
   ARCHIVED: 'Lưu trữ',
 };
 
+/** Trạng thái của bài trong thư viện bài mẫu. */
+export const LESSON_SAMPLE_STATUS_LABEL: Record<LessonSampleStatus, string> = {
+  PENDING: 'Chờ duyệt',
+  APPROVED: 'Trong thư viện',
+  REJECTED: 'Bị từ chối',
+};
+
 export const LESSON_LENGTH_LABEL: Record<LessonLength, string> = {
   SHORT: 'Ngắn',
   MEDIUM: 'Vừa',
@@ -81,4 +88,10 @@ export const LESSON_LIMITS = {
   level2MaxMilestones: 8,
   level3MaxExcerpts: 3,
   level3ExcerptMaxWords: 150,
+  /** Yêu cầu thêm cho AI khi soạn bài hoặc viết lại một phần. */
+  aiInstructionsMaxLength: 500,
+  /** Chữ của một phần gửi đi để AI viết lại. */
+  rewriteTextMaxLength: 4000,
+  /** Lý do từ chối hoặc gỡ bài khỏi thư viện bài mẫu. */
+  sampleNoteMaxLength: 500,
 } as const;

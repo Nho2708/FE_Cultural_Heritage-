@@ -1,4 +1,4 @@
-import { useId, useState, type ComponentProps, type ReactNode } from 'react';
+import { Fragment, useId, useState, type ComponentProps, type ReactNode } from 'react';
 import { cn } from '../cn';
 import { Icon } from './Icon';
 
@@ -113,9 +113,24 @@ type SelectProps = Omit<ComponentProps<'select'>, 'id'> & {
   label: string;
   hint?: ReactNode;
   error?: string | null;
-  options: ReadonlyArray<{ value: string; label: string }>;
+  /** Mục có `group` được gom vào một nhóm (optgroup) theo thứ tự xuất hiện; các mục liền nhau cùng `group` chung một nhóm. */
+  options: ReadonlyArray<{ value: string; label: string; group?: string }>;
   containerClassName?: string;
 };
+
+type SelectOption = SelectProps['options'][number];
+
+/** Gom các mục liền nhau có cùng `group` thành một nhóm; mục không có `group` đứng riêng. */
+function groupOptions(options: SelectProps['options']): Array<{ group: string | null; items: SelectOption[] }> {
+  const blocks: Array<{ group: string | null; items: SelectOption[] }> = [];
+  for (const option of options) {
+    const group = option.group ?? null;
+    const last = blocks.at(-1);
+    if (last && last.group === group && group !== null) last.items.push(option);
+    else blocks.push({ group, items: [option] });
+  }
+  return blocks;
+}
 
 export function SelectField({ label, hint, error, options, containerClassName, className, ...rest }: SelectProps) {
   return (
@@ -129,11 +144,20 @@ export function SelectField({ label, hint, error, options, containerClassName, c
             className={inputClasses(invalid, cn('appearance-none pr-10', className))}
             {...rest}
           >
-            {options.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
+            {groupOptions(options).map((block, index) => {
+              const items = block.items.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ));
+              return block.group === null ? (
+                <Fragment key={`o-${index}`}>{items}</Fragment>
+              ) : (
+                <optgroup key={`${block.group}-${index}`} label={block.group}>
+                  {items}
+                </optgroup>
+              );
+            })}
           </select>
           <Icon
             name="chevron-down"

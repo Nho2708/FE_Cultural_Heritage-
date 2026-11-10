@@ -75,6 +75,34 @@ Trạng thái bài kiểm tra với riêng em: Chưa mở · Đang mở · Em đ
 
 Đăng nhập: khách mở đường dẫn bài học thì sang Học sinh đăng nhập, đăng nhập xong mở lại đúng bài (đã có từ luồng học sinh).
 
+### Yêu cầu thêm cho AI và viết lại một phần (cải tiến 10/11/2026)
+
+- Ô "Yêu cầu thêm cho AI (không bắt buộc)" cạnh nút soạn (tối đa 500 ký tự, có đếm và gợi ý mẫu): gửi `instructions` cho API soạn bài; để trống thì không gửi.
+- "Viết lại bằng AI" trên từng phần trừ đoạn trích tư liệu gốc (`SectionRewrite.tsx`): dùng chữ đang sửa chưa lưu, ba yêu cầu chọn nhanh (Ngắn hơn, Dễ hiểu hơn,
+  Sinh động hơn) điền vào ô yêu cầu, bản cũ cạnh bản mới, "Dùng bản này" chỉ thay chữ trong biểu mẫu, "Giữ bản cũ". Mỗi lần tính một lượt AI; lỗi 422 và 503 hiện câu của máy chủ.
+
+### Thư viện bài mẫu
+
+- Soạn bài học có khối "Thư viện bài mẫu" (`SampleLibraryBlock.tsx`): trạng thái, đề xuất (bài Đã xuất bản và đủ điều kiện, đã lưu hết thay đổi), rút khỏi thư viện;
+  lưu bài đang ở thư viện thì nhắc bài sẽ chờ duyệt lại. Bài học của tôi có nhãn trạng thái thư viện.
+- Giáo viên: trang "Thư viện bài mẫu" `/giao-vien/thu-vien-bai-mau` (lọc theo cấp, khối, di sản, từ khóa, sắp xếp; xem trước chỉ đọc; "Dùng cho lớp…" chép kèm bài kiểm tra được,
+  rồi mở bài Nháp mới kèm câu lưu ý).
+- Quản trị hệ thống: trang "Thư viện bài mẫu" `/quan-tri/thu-vien-bai-mau` (ba tab Chờ duyệt, Trong thư viện, Đã từ chối; xem trước; Duyệt; Từ chối hoặc Gỡ khỏi thư viện bắt buộc lý do).
+- Mã: `lib/api/libraryEndpoints.ts`, `components/lesson/` (`LibraryPreviewDialog`, `UseSampleDialog`, `SampleReviewDialogs`, `sampleNotice.ts`), `pages/teacher/LessonLibraryPage`,
+  `pages/admin/LessonLibraryReviewPage`. Kiểm thử: `LessonLibraryPage.test.tsx`, `LessonLibraryReviewPage.test.tsx`, `LessonEditorRewriteAndLibrary.test.tsx`.
+
+### Chủ đề chương trình (bản gọn)
+
+- Hộp Tạo bài học, bước Chọn di sản: ô "Chủ đề chương trình (lớp N)" theo khối của lớp, nhóm theo chủ đề lớn (`TopicPicker.tsx`, `GET /teacher/curriculum-topics?grade=`).
+  Chọn chủ đề thì danh sách di sản là di sản đã xuất bản của chủ đề (`GET /teacher/curriculum-topics/{id}/heritages`, lọc theo tên ngay trên trang); chủ đề "Địa phương em"
+  (`localProvince`) nhắc chọn tỉnh, thành phố của trường và giữ danh sách thường; khối không có chủ đề (hoặc chưa tải được) thì ẩn ô. Đổi lớp ở bước một thì bỏ chủ đề đã chọn.
+- Soạn bài học: nhãn "Chủ đề chương trình" dưới ô Lớp (`TopicLabels.tsx`, từ `curriculumTopics` của chi tiết bài; ẩn khi rỗng). Thư viện bài mẫu của giáo viên: nhãn trên thẻ và
+  bộ lọc chủ đề (chỉ hiện khi đã chọn khối có chủ đề; `?chu-de=`, gửi `topicId`; đổi khối thì bỏ chủ đề).
+- Quản trị hệ thống: trang "Chủ đề chương trình" `/quan-tri/chu-de-chuong-trinh` và trang con quản lý di sản của chủ đề; trang Biên tập di sản hiện nhãn chủ đề chỉ đọc kèm lối sang trang này.
+- Mã: `lib/api/curriculumEndpoints.ts`, `packages/dung-chung/src/api/curriculum.ts` (kiểu dữ liệu), `SelectField` có nhóm (`group` của mục), `components/curriculum/` (`topicForm`,
+  `CurriculumTopicFormDialog`), `pages/admin/CurriculumTopicsPage`, `CurriculumTopicHeritagesPage`. Kiểm thử: `CreateLessonTopics.test.tsx`, `LessonEditorTopics.test.tsx`,
+  `LessonLibraryTopics.test.tsx`, `CurriculumTopicsPage.test.tsx`, `CurriculumTopicHeritagesPage.test.tsx`, `HeritageEditorTopics.test.tsx`, `topicForm.test.ts`.
+
 ## 3. Cấu trúc mã
 
 | Nơi | Tệp |

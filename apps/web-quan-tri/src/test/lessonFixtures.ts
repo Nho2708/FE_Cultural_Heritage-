@@ -1,5 +1,11 @@
 import type {
+  AdminLessonLibraryDetail,
+  AdminLessonLibraryRow,
   AiQuota,
+  LessonLibraryDetail,
+  LessonLibraryItem,
+  LessonSampleInfo,
+  RewriteSectionResult,
   LessonDetail,
   LessonDraft,
   LessonFrame,
@@ -291,6 +297,81 @@ export function studentLessonOf(level: SchoolLevel, overrides: Partial<StudentLe
     keyPoints: ['Kinh thành Huế khởi công năm 1805.', 'Ngọ Môn là cổng chính.'],
     sections: [],
     heritages: [heritageCardOf()],
+    quizzes: [],
+    ...overrides,
+  };
+}
+
+// Thư viện bài mẫu và viết lại một phần bằng AI.
+
+export function sampleOf(overrides: Partial<LessonSampleInfo> = {}): LessonSampleInfo {
+  return { status: 'PENDING', requestedAt: '2026-11-10T01:00:00Z', reviewedAt: null, note: null, useCount: 0, ...overrides };
+}
+
+export function rewriteOf(overrides: Partial<RewriteSectionResult> = {}): RewriteSectionResult {
+  return {
+    generationId: 31,
+    sectionType: 'READING',
+    text: 'Bản viết lại ngắn gọn hơn.',
+    title: null,
+    warnings: [],
+    model: 'simulated-v1',
+    aiQuota: quotaOf({ used: 269, remaining: 31 }),
+    message: 'Đã viết lại phần. Còn 31 lượt AI trong kỳ.',
+    ...overrides,
+  };
+}
+
+export function libraryItemOf(id: number, overrides: Partial<LessonLibraryItem> = {}): LessonLibraryItem {
+  return {
+    id,
+    title: `Bài mẫu số ${id}`,
+    schoolLevel: 2,
+    grade: 7,
+    heritages: [{ id: 11, slug: 'quan-the-co-do-hue', name: 'Quần thể di tích Cố đô Huế', thumbnailUrl: null }],
+    summaryExcerpt: 'Kinh thành Huế được xây dựng từ năm 1805.',
+    sectionCount: 4,
+    quizCount: 1,
+    authorName: 'Trần Văn Bình',
+    schoolName: 'Trường THCS Nguyễn Du',
+    useCount: 3,
+    approvedAt: '2026-11-09T01:00:00Z',
+    isMine: false,
+    ...overrides,
+  };
+}
+
+export function libraryDetailOf(id: number, overrides: Partial<LessonLibraryDetail> = {}): LessonLibraryDetail {
+  return {
+    item: libraryItemOf(id),
+    lesson: studentLessonOf(2, { id, accessCode: '', sections: [studentSectionOf({ type: 'READING', body: 'Nội dung bài mẫu.' })] }),
+    quizzes: [{ title: 'Kiểm tra 15 phút', questionCount: 10 }],
+    ...overrides,
+  };
+}
+
+export function adminLibraryRowOf(id: number, overrides: Partial<AdminLessonLibraryRow> = {}): AdminLessonLibraryRow {
+  return {
+    id,
+    title: `Bài chờ duyệt số ${id}`,
+    schoolLevel: 2,
+    grade: 7,
+    heritages: [{ id: 11, slug: 'quan-the-co-do-hue', name: 'Quần thể di tích Cố đô Huế', thumbnailUrl: null }],
+    authorName: 'Trần Văn Bình',
+    schoolName: 'Trường THCS Nguyễn Du',
+    status: 'PENDING',
+    requestedAt: '2026-11-10T01:00:00Z',
+    reviewedAt: null,
+    note: null,
+    useCount: 0,
+    ...overrides,
+  };
+}
+
+export function adminLibraryDetailOf(id: number, overrides: Partial<AdminLessonLibraryDetail> = {}): AdminLessonLibraryDetail {
+  return {
+    item: adminLibraryRowOf(id),
+    lesson: studentLessonOf(2, { id, accessCode: '', sections: [studentSectionOf({ type: 'READING', body: 'Nội dung bài chờ duyệt.' })] }),
     quizzes: [],
     ...overrides,
   };

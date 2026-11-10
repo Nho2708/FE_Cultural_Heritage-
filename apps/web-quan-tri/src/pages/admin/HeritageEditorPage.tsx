@@ -34,6 +34,7 @@ import { GENERAL_FORM_ID, GeneralInfoTab } from '../../components/heritage/Gener
 import { HeritageActionDialog } from '../../components/heritage/HeritageActionDialog';
 import { HERITAGE_FIELDS, EDITOR_TABS, EMPTY_HERITAGE, formFieldOf, heritageBody, heritageValuesOf, readTab, sameHeritage, tabOfMissing, type EditorTab } from '../../components/heritage/heritageForm';
 import { HeritageStatusBadge } from '../../components/heritage/HeritageStatusBadge';
+import { TopicLabels } from '../../components/lesson/TopicLabels';
 import { MediaTab } from '../../components/heritage/MediaTab';
 import { ModelTab } from '../../components/model/ModelTab';
 import { ReferencesTab } from '../../components/heritage/ReferencesTab';
@@ -364,6 +365,19 @@ function Workspace({ heritage }: { heritage: HeritageDetail | null }) {
         >
           {translationNudge.message}
         </InlineMessage>
+      )}
+
+      {heritage && heritage.curriculumTopics && (
+        <div className="flex flex-col gap-1">
+          <TopicLabels
+            topics={heritage.curriculumTopics}
+            showGrade
+            emptyText="Di sản chưa thuộc chủ đề chương trình nào."
+          />
+          <p className="type-body-s text-on-surface-variant">
+            Chỉ đọc. Muốn đổi chủ đề của di sản, mở <TextLink to={pathOf('curriculumTopics')}>Chủ đề chương trình</TextLink> rồi sửa danh sách di sản của chủ đề.
+          </p>
+        </div>
       )}
 
       <Tabs idPrefix={TAB_PREFIX} label="Nội dung di sản" items={EDITOR_TABS} value={tab} onChange={setTab} />

@@ -1,5 +1,5 @@
-// Bảng màn hình và ma trận phân quyền của web quản trị (38 màn hình: xác thực và tài khoản, khu giáo viên, khu quản
-// trị trường, khu quản trị hệ thống; 10 hộp thoại không có URL). Đây là nguồn duy nhất cho route guard, thanh bên và
+// Bảng màn hình và ma trận phân quyền của web quản trị (44 màn hình: xác thực và tài khoản, khu giáo viên, khu quản
+// trị trường, khu quản trị hệ thống; 12 hộp thoại không có URL). Đây là nguồn duy nhất cho route guard, thanh bên và
 // menu tài khoản. Tên màn hình bằng lời, khóa đặt theo nghĩa. Học sinh không dùng web quản trị (web học tập riêng).
 // Ẩn menu ở giao diện chỉ để tiện dùng; backend tự kiểm vai trò ở mọi endpoint.
 
@@ -59,6 +59,8 @@ export const SCREENS = [
   { key: 'lessonEditor', name: 'Soạn bài học', area: 'teacher', actors: TEACHER, path: '/giao-vien/bai-hoc/:baiHoc' },
   { key: 'lessonCode', name: 'Mã bài học', area: 'teacher', actors: TEACHER, path: null },
   { key: 'lessonCopy', name: 'Nhân bản bài học sang lớp khác', area: 'teacher', actors: TEACHER, path: null },
+  { key: 'lessonLibrary', name: 'Thư viện bài mẫu', area: 'teacher', actors: TEACHER, path: '/giao-vien/thu-vien-bai-mau' },
+  { key: 'lessonLibraryUse', name: 'Dùng bài mẫu cho lớp', area: 'teacher', actors: TEACHER, path: null },
   {
     key: 'aiQuestions',
     name: 'Sinh và duyệt câu hỏi bằng AI',
@@ -123,8 +125,24 @@ export const SCREENS = [
     aliases: ['/quan-tri/di-san/moi'],
   },
   { key: 'timelineForm', name: 'Biểu mẫu giai đoạn và sự kiện', area: 'admin', actors: ADMIN, path: null },
+  { key: 'curriculumTopics', name: 'Chủ đề chương trình', area: 'admin', actors: ADMIN, path: '/quan-tri/chu-de-chuong-trinh' },
+  {
+    key: 'curriculumTopicHeritages',
+    name: 'Di sản của chủ đề chương trình',
+    area: 'admin',
+    actors: ADMIN,
+    path: '/quan-tri/chu-de-chuong-trinh/:chuDe/di-san',
+  },
+  { key: 'curriculumTopicForm', name: 'Biểu mẫu chủ đề chương trình', area: 'admin', actors: ADMIN, path: null },
   { key: 'translationReview', name: 'Duyệt bản dịch và tóm tắt', area: 'admin', actors: ADMIN, path: '/quan-tri/ban-dich' },
   { key: 'questionModeration', name: 'Kiểm duyệt ngân hàng câu hỏi', area: 'admin', actors: ADMIN, path: '/quan-tri/cau-hoi' },
+  {
+    key: 'lessonLibraryReview',
+    name: 'Duyệt thư viện bài mẫu',
+    area: 'admin',
+    actors: ADMIN,
+    path: '/quan-tri/thu-vien-bai-mau',
+  },
   { key: 'plans', name: 'Gói dịch vụ', area: 'admin', actors: ADMIN, path: '/quan-tri/goi' },
   {
     key: 'visitorStats',
@@ -190,6 +208,8 @@ export const PATHS = {
   newHeritage: '/quan-tri/di-san/moi',
   /** Biên tập di sản: sửa một di sản (tab nằm trong tham số `?tab=`). */
   heritage: (id: number) => `/quan-tri/di-san/${id}`,
+  /** Quản lý di sản của một chủ đề chương trình (tìm thêm, bỏ, lưu). */
+  curriculumTopicHeritages: (id: number) => `/quan-tri/chu-de-chuong-trinh/${id}/di-san`,
   /** Tab Bản dịch và tóm tắt của một di sản. */
   heritageTranslations: (id: number) => `/quan-tri/di-san/${id}?tab=ban-dich`,
 } as const;

@@ -1,5 +1,5 @@
-import { LESSON_STATUS_LABEL, cn, formatPlanDate } from '@dsvhvn/dung-chung';
-import type { AiQuota, ContentStatus } from '@dsvhvn/dung-chung/api';
+import { LESSON_SAMPLE_STATUS_LABEL, LESSON_STATUS_LABEL, cn, formatPlanDate } from '@dsvhvn/dung-chung';
+import type { AiQuota, ContentStatus, LessonSampleInfo, LessonSampleStatus } from '@dsvhvn/dung-chung/api';
 import { Badge, InlineMessage, type BadgeTone } from '@dsvhvn/dung-chung/ui';
 
 // Phần nhỏ dùng chung của khu Bài học: nhãn trạng thái, mã bài học, thanh báo gói hết hiệu lực, đồng hồ lượt AI.
@@ -9,6 +9,14 @@ const STATUS_TONE: Record<ContentStatus, BadgeTone> = { DRAFT: 'neutral', PUBLIS
 export function LessonStatusBadge({ status }: { status: ContentStatus | null }) {
   if (!status) return null;
   return <Badge tone={STATUS_TONE[status]}>{LESSON_STATUS_LABEL[status]}</Badge>;
+}
+
+const SAMPLE_TONE: Record<LessonSampleStatus, BadgeTone> = { PENDING: 'warning', APPROVED: 'success', REJECTED: 'danger' };
+
+/** Nhãn nhỏ trạng thái thư viện bài mẫu của một bài ("Thư viện: Chờ duyệt"); bài không ở thư viện thì không hiện gì. */
+export function SampleStatusBadge({ sample }: { sample: LessonSampleInfo | null | undefined }) {
+  if (!sample) return null;
+  return <Badge tone={SAMPLE_TONE[sample.status]}>{`Thư viện: ${LESSON_SAMPLE_STATUS_LABEL[sample.status]}`}</Badge>;
 }
 
 /** Thanh báo khi trường không có gói hiệu lực: các thao tác tạo, nhân bản, gọi AI bị khóa; học sinh vẫn học bình thường. */

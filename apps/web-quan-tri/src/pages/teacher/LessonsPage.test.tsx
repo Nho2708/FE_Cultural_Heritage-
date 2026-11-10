@@ -3,7 +3,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { classOf, envelope, mockApi, userOf, type FetchCall } from '../../test/fixtures';
-import { lessonOf, lessonRowOf, quotaOf } from '../../test/lessonFixtures';
+import { lessonOf, lessonRowOf, quotaOf, sampleOf } from '../../test/lessonFixtures';
 import { renderApp, signInAs } from '../../test/renderApp';
 
 // Bài học của tôi: danh sách, lọc, mã bài học và chiếu lên bảng, lưu trữ, xóa, khóa theo gói, tạo bài học hai bước.
@@ -45,6 +45,23 @@ describe('Bài học của tôi', () => {
     expect(within(draft).getByText('Nháp')).toBeInTheDocument();
     expect(within(draft).queryByRole('button', { name: /Mã bài học/ })).not.toBeInTheDocument();
     expect(await screen.findByText(/2 bài học ở 2 lớp · 1 đã xuất bản · 1 nháp · 0 lưu trữ/)).toBeInTheDocument();
+  });
+
+  it('nhãn nhỏ trạng thái thư viện bài mẫu: Chờ duyệt, Trong thư viện, Bị từ chối; bài không ở thư viện không có nhãn', async () => {
+    signInAs('TEACHER');
+    api([
+      lessonRowOf(1, { title: 'Bài chờ duyệt', status: 'PUBLISHED', accessCode: 'BH7F3K2Q', sample: sampleOf() }),
+      lessonRowOf(2, { title: 'Bài trong thư viện', status: 'PUBLISHED', accessCode: 'BH7F3K2R', sample: sampleOf({ status: 'APPROVED', useCount: 2 }) }),
+      lessonRowOf(3, { title: 'Bài bị từ chối', status: 'PUBLISHED', accessCode: 'BH7F3K2S', sample: sampleOf({ status: 'REJECTED', note: 'Sai năm.' }) }),
+      lessonRowOf(4, { title: 'Bài thường', status: 'DRAFT' }),
+    ]);
+    renderApp('/giao-vien/bai-hoc');
+
+    const table = await screen.findByRole('table', { name: 'Bài học của tôi' });
+    expect(within(within(table).getByRole('row', { name: /Bài chờ duyệt/ })).getByText('Thư viện: Chờ duyệt')).toBeInTheDocument();
+    expect(within(within(table).getByRole('row', { name: /Bài trong thư viện/ })).getByText('Thư viện: Trong thư viện')).toBeInTheDocument();
+    expect(within(within(table).getByRole('row', { name: /Bài bị từ chối/ })).getByText('Thư viện: Bị từ chối')).toBeInTheDocument();
+    expect(within(within(table).getByRole('row', { name: /Bài thường/ })).queryByText(/Thư viện:/)).not.toBeInTheDocument();
   });
 
   it('cột Độ khó tính từ bài kiểm tra: ba mức và "Chưa có bài kiểm tra"; bộ lọc Độ khó gửi đúng tham số và nằm trên URL', async () => {

@@ -26,7 +26,7 @@ import { useNavigate } from 'react-router';
 import { PATHS } from '../../access/screens';
 import { CreateLessonDialog } from '../../components/lesson/CreateLessonDialog';
 import { DuplicateLessonDialog } from '../../components/lesson/DuplicateLessonDialog';
-import { CodeDisplay, LessonStatusBadge, PlanNotice } from '../../components/lesson/LessonBits';
+import { CodeDisplay, LessonStatusBadge, PlanNotice, SampleStatusBadge } from '../../components/lesson/LessonBits';
 import { LessonCodeDialog, type CodeTarget } from '../../components/lesson/LessonCodeDialog';
 import { AreaPage, PageHeader } from '../../components/layout/PageHeader';
 import { classesApi } from '../../lib/api/classroomEndpoints';
@@ -39,7 +39,7 @@ import { PAGE_SIZE, slugMap, useListParams } from '../../lib/listParams';
 // dòng: bàn phím = Mã bài học (chỉ bài đã xuất bản), sao chép = Nhân bản sang lớp khác (chép kèm bài kiểm tra được), bút = Soạn, hộp = Lưu
 // trữ (hỏi xác nhận), thùng rác = Xóa bài nháp chưa có bài kiểm tra. Cột và bộ lọc Độ khó: độ khó của bài tính từ các câu trong các bài
 // kiểm tra của bài (không nhập tay); bài chưa có bài kiểm tra ghi "Chưa có bài kiểm tra" và không khớp mức nào. Trường hết gói thì nút
-// "Tạo bài học" và "Nhân bản" bị khóa.
+// "Tạo bài học" và "Nhân bản" bị khóa. Bài đã đề xuất vào thư viện bài mẫu có thêm nhãn nhỏ trạng thái thư viện dưới trạng thái bài.
 
 const STATUS_SLUG = slugMap<ContentStatus>({ DRAFT: 'nhap', PUBLISHED: 'da-xuat-ban', ARCHIVED: 'luu-tru' });
 const TYPE_SLUG = slugMap<HeritageType>({
@@ -228,7 +228,10 @@ export default function LessonsPage() {
                     </Td>
                     <Td className="whitespace-nowrap">{row.className}</Td>
                     <Td>
-                      <LessonStatusBadge status={row.status} />
+                      <span className="flex flex-col items-start gap-1">
+                        <LessonStatusBadge status={row.status} />
+                        <SampleStatusBadge sample={row.sample} />
+                      </span>
                     </Td>
                     <Td>{row.accessCode ? <CodeDisplay code={row.accessCode} className="type-mono-label" /> : <Blank />}</Td>
                     <Td className="type-mono-label">{row.quizCount}</Td>
