@@ -75,6 +75,22 @@ Trạng thái bài kiểm tra với riêng em: Chưa mở · Đang mở · Em đ
 
 Đăng nhập: khách mở đường dẫn bài học thì sang Học sinh đăng nhập, đăng nhập xong mở lại đúng bài (đã có từ luồng học sinh).
 
+### Yêu cầu thêm cho AI và viết lại một phần (cải tiến 10/11/2026)
+
+- Ô "Yêu cầu thêm cho AI (không bắt buộc)" cạnh nút soạn (tối đa 500 ký tự, có đếm và gợi ý mẫu): gửi `instructions` cho API soạn bài; để trống thì không gửi.
+- "Viết lại bằng AI" trên từng phần trừ đoạn trích tư liệu gốc (`SectionRewrite.tsx`): dùng chữ đang sửa chưa lưu, ba yêu cầu chọn nhanh (Ngắn hơn, Dễ hiểu hơn,
+  Sinh động hơn) điền vào ô yêu cầu, bản cũ cạnh bản mới, "Dùng bản này" chỉ thay chữ trong biểu mẫu, "Giữ bản cũ". Mỗi lần tính một lượt AI; lỗi 422 và 503 hiện câu của máy chủ.
+
+### Thư viện bài mẫu
+
+- Soạn bài học có khối "Thư viện bài mẫu" (`SampleLibraryBlock.tsx`): trạng thái, đề xuất (bài Đã xuất bản và đủ điều kiện, đã lưu hết thay đổi), rút khỏi thư viện;
+  lưu bài đang ở thư viện thì nhắc bài sẽ chờ duyệt lại. Bài học của tôi có nhãn trạng thái thư viện.
+- Giáo viên: trang "Thư viện bài mẫu" `/giao-vien/thu-vien-bai-mau` (lọc theo cấp, khối, di sản, từ khóa, sắp xếp; xem trước chỉ đọc; "Dùng cho lớp…" chép kèm bài kiểm tra được,
+  rồi mở bài Nháp mới kèm câu lưu ý).
+- Quản trị hệ thống: trang "Thư viện bài mẫu" `/quan-tri/thu-vien-bai-mau` (ba tab Chờ duyệt, Trong thư viện, Đã từ chối; xem trước; Duyệt; Từ chối hoặc Gỡ khỏi thư viện bắt buộc lý do).
+- Mã: `lib/api/libraryEndpoints.ts`, `components/lesson/` (`LibraryPreviewDialog`, `UseSampleDialog`, `SampleReviewDialogs`, `sampleNotice.ts`), `pages/teacher/LessonLibraryPage`,
+  `pages/admin/LessonLibraryReviewPage`. Kiểm thử: `LessonLibraryPage.test.tsx`, `LessonLibraryReviewPage.test.tsx`, `LessonEditorRewriteAndLibrary.test.tsx`.
+
 ## 3. Cấu trúc mã
 
 | Nơi | Tệp |

@@ -26,10 +26,11 @@ function build(specs: readonly NavSpec[], role: StaffRole | null | undefined): N
 /** Menu tài khoản: Hồ sơ. Lối vào khu làm việc lấy từ `workArea` của vai trò. */
 const ACCOUNT: readonly NavSpec[] = [{ screen: 'profile', label: 'Hồ sơ', icon: 'user' }];
 
-/** Thanh bên /giao-vien: Lớp học · Bài học · Ngân hàng câu hỏi · Bài kiểm tra. */
+/** Thanh bên /giao-vien: Lớp học · Bài học · Thư viện bài mẫu · Ngân hàng câu hỏi · Bài kiểm tra. */
 const TEACHER: readonly NavSpec[] = [
   { screen: 'classes', label: 'Lớp học', icon: 'users' },
   { screen: 'lessons', label: 'Bài học', icon: 'book-open' },
+  { screen: 'lessonLibrary', label: 'Thư viện bài mẫu', icon: 'cards' },
   { screen: 'questionBank', label: 'Ngân hàng câu hỏi', icon: 'shield-check' },
   { screen: 'quizzes', label: 'Bài kiểm tra', icon: 'check' },
 ];
@@ -41,13 +42,14 @@ const SCHOOL: readonly NavSpec[] = [
   { screen: 'schoolTeachers', label: 'Giáo viên', icon: 'users' },
 ];
 
-/** Thanh bên /quan-tri: Tổng quan · Trường · Di sản · Bản dịch · Câu hỏi · Gói dịch vụ · Khách tham quan · Nhật ký. */
+/** Thanh bên /quan-tri: Tổng quan · Trường · Di sản · Bản dịch · Câu hỏi · Thư viện bài mẫu · Gói dịch vụ · Khách tham quan · Nhật ký. */
 const ADMIN: readonly NavSpec[] = [
   { screen: 'adminOverview', label: 'Tổng quan', icon: 'bar-chart' },
   { screen: 'schools', label: 'Trường', icon: 'building' },
   { screen: 'heritages', label: 'Di sản', icon: 'map-pin' },
   { screen: 'translationReview', label: 'Bản dịch', icon: 'languages' },
   { screen: 'questionModeration', label: 'Câu hỏi', icon: 'shield-check' },
+  { screen: 'lessonLibraryReview', label: 'Thư viện bài mẫu', icon: 'cards' },
   { screen: 'plans', label: 'Gói dịch vụ', icon: 'star' },
   { screen: 'visitorStats', label: 'Khách tham quan', icon: 'eye' },
   { screen: 'auditLog', label: 'Nhật ký', icon: 'file-text' },

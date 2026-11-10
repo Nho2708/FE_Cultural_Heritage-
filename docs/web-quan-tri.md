@@ -23,9 +23,9 @@ ma trận phân quyền. Khóa màn hình đặt theo nghĩa (`login`, `schoolTe
 | Xác thực | `/dang-nhap`, `/quen-mat-khau`, `/dat-mat-khau` | Chỉ khách | Thanh trên có chữ nhận diện "Trang quản trị" và "Mở trang khám phá di sản" (web học tập, tab mới) |
 | `/` | — | Mọi người | Khách → Đăng nhập; người đã đăng nhập → trang mặc định của vai trò |
 | Hồ sơ cá nhân | `/tai-khoan` | Ba vai trò | Hiện trong khu làm việc của người đang đăng nhập |
-| Giáo viên | `/giao-vien` | TEACHER | Thanh bên: Lớp học · Bài học · Ngân hàng câu hỏi · Bài kiểm tra. Bài học (danh sách, tạo, soạn, mã bài học, nhân bản) dựng ở [bai-hoc-theo-cap.md](bai-hoc-theo-cap.md). Bài kiểm tra (danh sách, soạn và phát hành, chọn câu từ ngân hàng) dựng ở [bai-kiem-tra.md](bai-kiem-tra.md) |
+| Giáo viên | `/giao-vien` | TEACHER | Thanh bên: Lớp học · Bài học · Thư viện bài mẫu · Ngân hàng câu hỏi · Bài kiểm tra. Bài học (danh sách, tạo, soạn, mã bài học, nhân bản) dựng ở [bai-hoc-theo-cap.md](bai-hoc-theo-cap.md). Bài kiểm tra (danh sách, soạn và phát hành, chọn câu từ ngân hàng) dựng ở [bai-kiem-tra.md](bai-kiem-tra.md) |
 | Quản trị trường | `/truong` | ORG_ADMIN | Thanh bên: Trường và gói · Giáo viên (thêm "Tổng quan" khi màn hình này được dựng) |
-| Quản trị hệ thống | `/quan-tri` | ADMIN | Thanh bên: Tổng quan · Trường · Di sản · Bản dịch · Câu hỏi · Gói dịch vụ · Khách và quảng cáo · Nhật ký; dark mode theo hệ điều hành |
+| Quản trị hệ thống | `/quan-tri` | ADMIN | Thanh bên: Tổng quan · Trường · Di sản · Bản dịch · Câu hỏi · Thư viện bài mẫu · Gói dịch vụ · Khách và quảng cáo · Nhật ký; dark mode theo hệ điều hành |
 
 Ba khu làm việc và màn hình của chúng tách chunk riêng, chỉ tải sau khi cổng khu cho qua. Chân thanh bên của mọi khu có
 "Mở trang khám phá di sản" dẫn sang web học tập.
@@ -48,6 +48,8 @@ Ba khu làm việc và màn hình của chúng tách chunk riêng, chỉ tải s
 | `/quan-tri/truong` | Quản lý trường | ADMIN | Bảng trường; tìm, lọc; "Tạo trường"; ngừng trường |
 | `/quan-tri/truong/moi` | Chi tiết trường, tạo mới | ADMIN | Thông tin trường + quản trị trường đầu tiên trong một lần lưu; lỗi `orgAdmin.*` hiện dưới đúng ô |
 | `/quan-tri/truong/:truong` | Chi tiết trường, xem / sửa | ADMIN | Sửa thông tin (khóa khi trường đã ngừng); gói hiện tại chỉ đọc; quản trị trường: khóa / mở, thêm; ngừng trường |
+| `/quan-tri/thu-vien-bai-mau` | Duyệt thư viện bài mẫu | ADMIN | Ba tab `?tab=` Chờ duyệt (mặc định) · `trong-thu-vien` · `da-tu-choi`; xem trước, Duyệt, Từ chối và Gỡ khỏi thư viện (bắt buộc lý do). Xem [bai-hoc-theo-cap.md](bai-hoc-theo-cap.md) |
+| `/giao-vien/thu-vien-bai-mau` | Thư viện bài mẫu | TEACHER | Thẻ bài mẫu đã duyệt của mọi trường; lọc, xem trước, "Dùng cho lớp…". Xem [bai-hoc-theo-cap.md](bai-hoc-theo-cap.md) |
 | `/quan-tri/goi` | Gói dịch vụ | ADMIN | Bảng gói, tạo và sửa ở khung bên phải, bật tắt bán; gói Miễn phí bị khóa; không có thao tác xóa |
 | `/quan-tri/khach-tham-quan` | Thống kê khách tham quan (đường dẫn cũ `/quan-tri/khach-va-quang-cao` chuyển tới đây) | ADMIN | Chỉ đọc, lọc khoảng ngày: thiết bị hoạt động, ngôn ngữ, di sản được xem, nghe, xem 3D nhiều |
 | `/quan-tri/nhat-ky` | Nhật ký thao tác | ADMIN | Chỉ đọc. Lọc người làm, vai trò (có Học sinh, Hệ thống), hành động (21 mã), đối tượng, từ ngày / đến ngày (gõ ngày/tháng/năm, giờ Việt Nam); mở dòng xem giá trị cũ / mới bằng nhãn tiếng Việt |
