@@ -35,10 +35,11 @@ const TEACHER: readonly NavSpec[] = [
   { screen: 'quizzes', label: 'Bài kiểm tra', icon: 'check' },
 ];
 
-/** Thanh bên /truong: Tổng quan · Trường và gói · Giáo viên. */
+/** Thanh bên /truong: Tổng quan · Trường · Gói đã mua · Giáo viên. */
 const SCHOOL: readonly NavSpec[] = [
   { screen: 'schoolOverview', label: 'Tổng quan', icon: 'bar-chart' },
-  { screen: 'schoolInfo', label: 'Trường và gói', icon: 'building' },
+  { screen: 'schoolInfo', label: 'Trường', icon: 'building' },
+  { screen: 'schoolSubscription', label: 'Gói đã mua', icon: 'star' },
   { screen: 'schoolTeachers', label: 'Giáo viên', icon: 'users' },
 ];
 

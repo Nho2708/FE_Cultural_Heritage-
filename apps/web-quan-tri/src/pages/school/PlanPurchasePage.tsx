@@ -194,7 +194,7 @@ export default function PlanPurchasePage() {
     <AreaPage>
       <PageHeader
         title="Chọn gói"
-        before={<TextLink to={PATHS.schoolPlan}>← Trường và gói</TextLink>}
+        before={<TextLink to={PATHS.schoolPlan}>← Gói đã mua</TextLink>}
         description={`Chọn gói dịch vụ${schoolName ? ` cho ${schoolName}` : ''}. Thanh toán qua VNPay; gói giới hạn số giáo viên và lượt AI, không giới hạn số học sinh.`}
       />
 

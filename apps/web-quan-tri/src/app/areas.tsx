@@ -11,6 +11,7 @@ const AdminArea = lazy(() => import('../areas/admin/AdminArea'));
 
 /** Màn hình trong khu làm việc (tải lười; AreaLayout bọc Suspense quanh nội dung). */
 export const SchoolInfoPage = lazy(() => import('../pages/school/SchoolInfoPage'));
+export const SchoolBillingPage = lazy(() => import('../pages/school/SchoolBillingPage'));
 export const TeachersPage = lazy(() => import('../pages/school/TeachersPage'));
 export const SchoolsPage = lazy(() => import('../pages/admin/SchoolsPage'));
 export const SchoolDetailPage = lazy(() => import('../pages/admin/SchoolDetailPage'));

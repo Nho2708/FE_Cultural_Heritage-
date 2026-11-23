@@ -231,13 +231,13 @@ try {
   check('Điểm trung bình theo lớp: có tên lớp và điểm 5', (await classList.innerText()).includes(className) && /\b5\b/.test(await classList.innerText()));
   const body = await orgPage.locator('body').innerText();
   check('Chỉ có số tổng: không có tên giáo viên hay học sinh trên trang', !body.includes(teacherName) && !studentNames.some((n) => body.includes(n)));
-  check('Thanh bên khu quản trị trường có mục Tổng quan, Trường và gói, Giáo viên', (await orgPage.getByRole('navigation', { name: 'Quản trị trường' }).getByRole('link').allInnerTexts()).join('|') === 'Tổng quan|Trường và gói|Giáo viên');
+  check('Thanh bên khu quản trị trường có mục Tổng quan, Trường, Gói đã mua, Giáo viên', (await orgPage.getByRole('navigation', { name: 'Quản trị trường' }).getByRole('link').allInnerTexts()).join('|') === 'Tổng quan|Trường|Gói đã mua|Giáo viên');
   check('Gói hiện tại: thẻ gói có nút Xem gói và hóa đơn', await visible(orgPage.getByRole('link', { name: 'Xem gói và hóa đơn' })));
   await shot(orgPage, '1-tong-quan-truong');
 
   await orgPage.getByRole('link', { name: 'Xem gói và hóa đơn' }).click();
-  await orgPage.waitForURL(/\/truong\/thong-tin/);
-  check('Xem gói và hóa đơn mở màn hình Trường và gói', pathOf(orgPage) === '/truong/thong-tin');
+  await orgPage.waitForURL(/\/truong\/goi/);
+  check('Xem gói và hóa đơn mở màn hình Gói đã mua', pathOf(orgPage) === '/truong/goi');
 
   // Màn hình hẹp.
   await orgPage.setViewportSize({ width: 390, height: 800 });
