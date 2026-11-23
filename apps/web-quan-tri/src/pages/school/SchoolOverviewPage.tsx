@@ -170,7 +170,7 @@ function PlanCard({ data }: { data: SchoolOverview }) {
           <InlineMessage tone="warning">{planNotice.message}</InlineMessage>
         </div>
       )}
-      <ButtonLink to={pathOf('schoolInfo')} variant="secondary" className="mt-5 justify-center">
+      <ButtonLink to={pathOf('schoolSubscription')} variant="secondary" className="mt-5 justify-center">
         Xem gói và hóa đơn
       </ButtonLink>
     </section>
@@ -209,7 +209,7 @@ export default function SchoolOverviewPage() {
               <InlineMessage
                 tone="warning"
                 action={
-                  <ButtonLink to={pathOf('schoolInfo')} variant="secondary" size="sm">
+                  <ButtonLink to={pathOf('schoolSubscription')} variant="secondary" size="sm">
                     Xem gói
                   </ButtonLink>
                 }

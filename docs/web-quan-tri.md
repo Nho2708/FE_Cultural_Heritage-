@@ -24,7 +24,7 @@ ma trận phân quyền. Khóa màn hình đặt theo nghĩa (`login`, `schoolTe
 | `/` | — | Mọi người | Khách → Đăng nhập; người đã đăng nhập → trang mặc định của vai trò |
 | Hồ sơ cá nhân | `/tai-khoan` | Ba vai trò | Hiện trong khu làm việc của người đang đăng nhập |
 | Giáo viên | `/giao-vien` | TEACHER | Thanh bên: Lớp học · Bài học · Thư viện bài mẫu · Ngân hàng câu hỏi · Bài kiểm tra. Bài học (danh sách, tạo, soạn, mã bài học, nhân bản) dựng ở [bai-hoc-theo-cap.md](bai-hoc-theo-cap.md). Bài kiểm tra (danh sách, soạn và phát hành, chọn câu từ ngân hàng) dựng ở [bai-kiem-tra.md](bai-kiem-tra.md) |
-| Quản trị trường | `/truong` | ORG_ADMIN | Thanh bên: Trường và gói · Giáo viên (thêm "Tổng quan" khi màn hình này được dựng) |
+| Quản trị trường | `/truong` | ORG_ADMIN | Thanh bên: Tổng quan · Trường · Gói đã mua · Giáo viên |
 | Quản trị hệ thống | `/quan-tri` | ADMIN | Thanh bên: Tổng quan · Trường · Di sản · Chủ đề chương trình · Bản dịch · Câu hỏi · Thư viện bài mẫu · Gói dịch vụ · Khách và quảng cáo · Nhật ký; dark mode theo hệ điều hành |
 
 Ba khu làm việc và màn hình của chúng tách chunk riêng, chỉ tải sau khi cổng khu cho qua. Chân thanh bên của mọi khu có
@@ -39,7 +39,8 @@ Ba khu làm việc và màn hình của chúng tách chunk riêng, chỉ tải s
 | `/dat-mat-khau?token=…` | Đặt mật khẩu | Khách | Kiểm liên kết trước, hiện tên đăng nhập và hạn; mật khẩu mới + nhập lại; dùng chung cho tài khoản mới (48 giờ) và quên mật khẩu (30 phút). Hỏng → báo lỗi + "Gửi lại liên kết". Xong → Đăng nhập, tên đăng nhập điền sẵn |
 | `/tai-khoan` | Hồ sơ cá nhân | 3 vai trò | `?tab=thong-tin` (mặc định) · `doi-mat-khau`. Sửa họ tên, số điện thoại, ảnh (đường dẫn); email, tên đăng nhập, vai trò, trường chỉ đọc. Đổi mật khẩu: mật khẩu mới phải khác mật khẩu cũ, nhận access token mới |
 | `/truong` | Tổng quan trường | ORG_ADMIN | Tới khi dựng: chuyển tới Giáo viên của trường |
-| `/truong/thong-tin` | Trường và gói | ORG_ADMIN | `?tab=` Thông tin trường (mặc định: tên chỉ đọc, sửa địa chỉ, số điện thoại, email) · `goi-va-han-muc` · `hoa-don`. Mua, gia hạn, nâng cấp, hủy gói qua VNPay: [goi-thanh-toan.md](goi-thanh-toan.md) |
+| `/truong/thong-tin` | Thông tin trường | ORG_ADMIN | Tên chỉ đọc, sửa địa chỉ, số điện thoại, email liên hệ. |
+| `/truong/goi` | Gói đã mua | ORG_ADMIN | `?tab=` Gói và hạn mức (mặc định) · `hoa-don`. Mua, gia hạn, nâng cấp, hủy gói qua VNPay: [goi-thanh-toan.md](goi-thanh-toan.md) |
 | `/truong/chon-goi` | Chọn gói và thanh toán | ORG_ADMIN | Thẻ gói đang bán, khối xác nhận theo loại thao tác, hộp xác nhận rồi chuyển sang VNPay; `?goi=` chọn sẵn gói |
 | `/truong/ket-qua-thanh-toan` | Kết quả thanh toán | ORG_ADMIN | VNPay đưa trình duyệt về; chỉ đọc trạng thái do IPN ghi nhận, tự kiểm tra lại khi đang chờ |
 | `/truong/giao-vien` | Giáo viên của trường | ORG_ADMIN | Bảng + bộ đếm "x / tối đa giáo viên"; "Thêm giáo viên" khóa khi đủ hạn mức hoặc không có gói hiệu lực; khóa / mở, xóa mềm; tìm, lọc trạng thái, trang trên URL |

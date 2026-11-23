@@ -53,7 +53,7 @@ describe('Kết quả thanh toán', () => {
     expect(screen.getByText('3.990.000 ₫')).toBeInTheDocument();
     expect(screen.getByText('14571026')).toBeInTheDocument();
     expect(screen.getByText('09:10 06/10/2026')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Xem gói và hóa đơn' })).toHaveAttribute('href', '/truong/thong-tin?tab=goi-va-han-muc');
+    expect(screen.getByRole('link', { name: 'Xem gói và hóa đơn' })).toHaveAttribute('href', '/truong/goi');
     expect(screen.queryByRole('button', { name: 'Thanh toán lại' })).not.toBeInTheDocument();
   });
 
@@ -92,7 +92,7 @@ describe('Kết quả thanh toán', () => {
     expect(await screen.findByRole('heading', { level: 2, name: 'Thanh toán chưa thành công' })).toBeInTheDocument();
     expect(screen.getByText('Chưa thanh toán')).toBeInTheDocument();
     expect(screen.getByText(UNPAID.message)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Xem gói và hóa đơn' })).toHaveAttribute('href', '/truong/thong-tin?tab=hoa-don');
+    expect(screen.getByRole('link', { name: 'Xem gói và hóa đơn' })).toHaveAttribute('href', '/truong/goi?tab=hoa-don');
 
     await user.click(screen.getByRole('button', { name: 'Thanh toán lại' }));
     await waitFor(() => expect(open).toHaveBeenCalledWith('https://sandbox.vnpayment.vn/pay?retry=1'));
@@ -157,9 +157,9 @@ describe('Kết quả thanh toán', () => {
     renderApp('/truong/ket-qua-thanh-toan?error=invalid');
 
     expect(
-      await screen.findByText('Không thể xem kết quả thanh toán. Liên kết trả về từ VNPay không hợp lệ. Bạn xem trạng thái hóa đơn ở Trường và gói.'),
+      await screen.findByText('Không thể xem kết quả thanh toán. Liên kết trả về từ VNPay không hợp lệ. Bạn xem trạng thái hóa đơn ở Gói đã mua.'),
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Xem gói và hóa đơn' })).toHaveAttribute('href', '/truong/thong-tin?tab=hoa-don');
+    expect(screen.getByRole('link', { name: 'Xem gói và hóa đơn' })).toHaveAttribute('href', '/truong/goi?tab=hoa-don');
     expect(calls.some((c) => c.path.startsWith('/org/payments'))).toBe(false);
   });
 

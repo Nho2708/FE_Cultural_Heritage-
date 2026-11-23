@@ -91,7 +91,8 @@ export const SCREENS = [
 
   // Quản trị trường — /truong
   { key: 'schoolOverview', name: 'Tổng quan trường', area: 'school', actors: ORG_ADMIN, path: '/truong' },
-  { key: 'schoolInfo', name: 'Trường và gói', area: 'school', actors: ORG_ADMIN, path: '/truong/thong-tin' },
+  { key: 'schoolInfo', name: 'Thông tin trường', area: 'school', actors: ORG_ADMIN, path: '/truong/thong-tin' },
+  { key: 'schoolSubscription', name: 'Gói đã mua', area: 'school', actors: ORG_ADMIN, path: '/truong/goi' },
   { key: 'schoolTeachers', name: 'Giáo viên của trường', area: 'school', actors: ORG_ADMIN, path: '/truong/giao-vien' },
   // Quản trị trường mở để tạo giáo viên; quản trị hệ thống mở từ Chi tiết trường để tạo quản trị trường.
   { key: 'accountForm', name: 'Biểu mẫu tài khoản', area: 'school', actors: ['ORG_ADMIN', 'ADMIN'], path: null },
@@ -194,10 +195,10 @@ export const PATHS = {
   lesson: (id: number) => `/giao-vien/bai-hoc/${id}`,
   /** Sinh và duyệt câu hỏi bằng AI từ một bài học. */
   lessonAiQuestions: (id: number) => `/giao-vien/bai-hoc/${id}/sinh-cau-hoi`,
-  /** Trường và gói: tab Gói và hạn mức. */
-  schoolPlan: '/truong/thong-tin?tab=goi-va-han-muc',
-  /** Trường và gói: tab Hóa đơn và giao dịch. */
-  schoolInvoices: '/truong/thong-tin?tab=hoa-don',
+  /** Gói đã mua: tab Gói và hạn mức. */
+  schoolPlan: '/truong/goi',
+  /** Gói đã mua: tab Hóa đơn và giao dịch. */
+  schoolInvoices: '/truong/goi?tab=hoa-don',
   /** Chọn gói và thanh toán, chọn sẵn một gói (gia hạn gói hiện tại). */
   planPurchaseFor: (planId: number) => `/truong/chon-goi?goi=${planId}`,
   /** Soạn và phát hành một bài kiểm tra của giáo viên. */

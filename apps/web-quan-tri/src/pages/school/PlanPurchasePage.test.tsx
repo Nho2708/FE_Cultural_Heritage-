@@ -38,7 +38,7 @@ describe('Chọn gói và thanh toán', () => {
     expect(screen.getByText(/Môi trường thử VNPay/)).toBeInTheDocument();
     // Chưa chọn gói thì chưa có khối xác nhận.
     expect(screen.queryByRole('heading', { name: 'Xác nhận thanh toán' })).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: '← Trường và gói' })).toHaveAttribute('href', '/truong/thong-tin?tab=goi-va-han-muc');
+    expect(screen.getByRole('link', { name: '← Gói đã mua' })).toHaveAttribute('href', '/truong/goi');
   });
 
   it('chọn gói nâng cấp: khối xác nhận có loại, gói, số tiền, thời hạn và lưu ý không hoàn tiền', async () => {
@@ -165,7 +165,7 @@ describe('Chọn gói và thanh toán', () => {
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Thanh toán qua VNPay' })).not.toBeInTheDocument());
   });
 
-  it('"Hủy" quay về tab Gói và hạn mức', async () => {
+  it('"Hủy" quay về màn hình Gói đã mua', async () => {
     signInAs('ORG_ADMIN');
     billingApi({ offers: [BASIC, ADVANCED] });
     const user = userEvent.setup();
@@ -173,8 +173,7 @@ describe('Chọn gói và thanh toán', () => {
 
     await user.click(await screen.findByRole('radio', { name: 'Nâng cao' }));
     await user.click(await screen.findByRole('button', { name: 'Hủy' }));
-    await waitFor(() => expect(router.state.location.pathname).toBe('/truong/thong-tin'));
-    expect(router.state.location.search).toBe('?tab=goi-va-han-muc');
+    await waitFor(() => expect(router.state.location.pathname).toBe('/truong/goi'));
   });
 
   it('chưa có gói nào đang bán thì báo trạng thái rỗng', async () => {

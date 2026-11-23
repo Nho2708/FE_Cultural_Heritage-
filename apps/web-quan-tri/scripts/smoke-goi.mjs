@@ -418,7 +418,7 @@ try {
   const phone = await newPage({ viewport: { width: 390, height: 844 } });
   await signIn(phone, orgAdminLogin, PASSWORD);
   for (const [label, url, wait] of [
-    ['Trường và gói, tab Gói và hạn mức', `${BASE}/truong/thong-tin?tab=goi-va-han-muc`, () => phone.getByRole('heading', { level: 2, name: 'Cơ bản' })],
+    ['Gói đã mua, tab Gói và hạn mức', `${BASE}/truong/goi`, () => phone.getByRole('heading', { level: 2, name: 'Cơ bản' })],
     ['Chọn gói và thanh toán', `${BASE}/truong/chon-goi`, () => phone.getByRole('radio', { name: 'Cơ bản', exact: true })],
   ]) {
     await phone.goto(url);
