@@ -31,7 +31,8 @@ export function classBody(values: ClassValues, confirmLevelChange = false): Clas
   };
 }
 
-export const GRADES = Array.from({ length: 12 }, (_, i) => i + 1);
+// Chỉ kích hoạt Khối 6 đến 12 (Cấp 2 và Cấp 3), ẩn Khối 1 đến 5 (Cấp 1) theo định hướng tập trung của nhóm
+export const GRADES = [6, 7, 8, 9, 10, 11, 12];
 
 export const GRADE_OPTIONS = [
   { value: '', label: 'Chọn khối' },
