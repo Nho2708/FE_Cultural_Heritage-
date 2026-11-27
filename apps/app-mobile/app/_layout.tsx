@@ -5,13 +5,14 @@ import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { VoiceNotice } from '../src/components/VoiceNotice';
 import { HistoryProvider } from '../src/guest/HistoryProvider';
 import { BrandSplash, SPLASH_BACKGROUND } from '../src/motion/BrandSplash';
 import { AppProvider, useApp } from '../src/state/AppProvider';
 import { ThemeProvider, useTheme } from '../src/theme/ThemeProvider';
 
 // Gốc của app: bộ nhớ đệm truy vấn, vùng an toàn, trạng thái toàn app (nạp từ máy), bộ giao diện theo cấp học. Trong lúc nạp hiện màn hình chờ
-// (biểu tượng mái đình che sách mở trên nền kem, nối liền với màn hình chờ gốc); nạp xong thì màn hình chờ mờ dần 300 ms phía trên app.
+// (biểu tượng mái đình che sách mở trên nền xanh than, nối liền với màn hình chờ gốc); nạp xong thì màn hình chờ mờ dần 300 ms phía trên app.
 
 /** Báo cho gốc biết app đã nạp xong (nằm trong AppProvider nên chỉ được dựng sau khi trạng thái đã nạp). */
 function ReadySignal({ onReady }: { onReady: () => void }) {
@@ -53,9 +54,12 @@ function Navigation() {
         <Stack.Screen name="ban-do-di-san" options={{ title: t('map.title') }} />
         <Stack.Screen name="video-gioi-thieu" options={{ title: t('intro.videoTitle') }} />
         <Stack.Screen name="bai-hoc/[ma]/index" options={{ title: mode === 'student' ? t('hs.lesson.title') : '' }} />
+        <Stack.Screen name="thong-bao" options={{ title: t('hs.notifications.title') }} />
         <Stack.Screen name="kiem-tra/[quizId]" options={{ headerShown: false, gestureEnabled: false }} />
         <Stack.Screen name="ket-qua/[luot]" options={{ headerShown: false }} />
+        <Stack.Screen name="album" options={{ headerShown: false }} />
       </Stack>
+      <VoiceNotice />
     </>
   );
 }

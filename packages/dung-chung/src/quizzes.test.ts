@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { isWellFormedAccessCode, spacedLessonCode } from './lessons';
 import type { QuizDetail } from './api/quizzes';
 import {
+  describeQuizTime,
   draftFromQuiz,
   emptyQuizDraft,
   formatDateTimeInput,
@@ -11,6 +13,7 @@ import {
   parseDateTimeInput,
   parsePoint,
   quizDraftToBody,
+  quizNeedsOpenWindow,
   sameQuizDraft,
   submissionRatio,
   sumPoints,
@@ -81,6 +84,7 @@ function quizOf(overrides: Partial<QuizDetail> = {}): QuizDetail {
     lessonId: 5,
     lessonTitle: 'Kinh thành Thăng Long',
     lessonStatus: 'PUBLISHED',
+    accessCode: null,
     lessonAccessCode: 'BH7F3K2Q',
     classId: 1,
     className: '7A1',
@@ -193,5 +197,32 @@ describe('giai đoạn của bài', () => {
     expect(submissionRatio(18, 32)).toBeCloseTo(0.5625);
     expect(submissionRatio(0, 0)).toBe(0);
     expect(submissionRatio(5, 3)).toBe(1);
+  });
+});
+
+describe('giờ và mã của bài kiểm tra', () => {
+  const now = new Date('2026-10-26T17:31:00Z'); // 00:31 ngày 27/10 giờ Việt Nam
+
+  it('đọc lại buổi trong ngày và còn bao lâu', () => {
+    expect(describeQuizTime('12:30 27/10/2026', now)).toBe('12:30 trưa 27/10/2026, còn 11 giờ 59 phút nữa');
+    expect(describeQuizTime('00:45 27/10/2026', now)).toBe('00:45 đêm 27/10/2026, còn 14 phút nữa');
+    expect(describeQuizTime('07:00 30/10/2026', now)).toBe('07:00 sáng 30/10/2026, còn 3 ngày nữa');
+    expect(describeQuizTime('00:10 27/10/2026', now)).toBe('00:10 đêm 27/10/2026, đã qua');
+    expect(describeQuizTime('sai dạng', now)).toBeNull();
+  });
+
+  it('chỉ cấp 1 được phát hành khi chưa đặt giờ', () => {
+    const blank = emptyQuizDraft('Bài chơi');
+    expect(validateQuizDraft(blank, 1, { forPublish: true }).openAt).toBeUndefined();
+    expect(validateQuizDraft({ ...blank, timeLimitMinutes: '30' }, 2, { forPublish: true }).openAt).toBeDefined();
+    expect(quizNeedsOpenWindow(1)).toBe(false);
+    expect(quizNeedsOpenWindow(3)).toBe(true);
+  });
+
+  it('ô nhập mã nhận cả mã bài học và mã bài kiểm tra', () => {
+    expect(isWellFormedAccessCode('bh 7f3-k2q')).toBe(true);
+    expect(isWellFormedAccessCode('KT4M9P2R')).toBe(true);
+    expect(isWellFormedAccessCode('KT4M9P20')).toBe(false);
+    expect(spacedLessonCode('KT4M9P2R')).toBe('KT 4M9 P2R');
   });
 });

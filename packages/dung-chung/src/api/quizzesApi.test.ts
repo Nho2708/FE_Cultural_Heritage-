@@ -26,14 +26,15 @@ describe('lớp gọi API bài kiểm tra', () => {
     expect(calls[1]!.body).toEqual({ name: 'Đổi tên', timeLimitMinutes: null });
   });
 
-  it('hộp chọn câu: lọc theo di sản của bài, dạng, độ khó, từ khóa', async () => {
+  it('hộp chọn câu: lọc theo di sản, dạng, độ khó, từ khóa', async () => {
     const calls = mockApi(() => envelope(200, { data: { ...emptyPage, level: 2, allowedTypes: [] } }));
-    await api().candidates(9, { questionType: 'FILL_BLANK', difficultyLevel: '', heritageId: 11, lessonHeritagesOnly: false, keyword: 'văn miếu', page: 1, pageSize: 10 });
+    await api().candidates(9, { questionType: 'FILL_BLANK', difficultyLevel: '', heritageId: 11, keyword: 'văn miếu', page: 1, pageSize: 10 });
     const path = decodeURIComponent(calls[0]!.path);
-    for (const part of ['/teacher/quizzes/9/question-candidates?', 'questionType=FILL_BLANK', 'heritageId=11', 'lessonHeritagesOnly=false', 'keyword=văn+miếu']) {
+    for (const part of ['/teacher/quizzes/9/question-candidates?', 'questionType=FILL_BLANK', 'heritageId=11', 'keyword=văn+miếu']) {
       expect(path).toContain(part);
     }
     expect(path).not.toContain('difficultyLevel');
+    expect(path).not.toContain('lessonHeritagesOnly');
   });
 
   it('thêm, đặt lại và bỏ câu dùng đúng ba endpoint', async () => {

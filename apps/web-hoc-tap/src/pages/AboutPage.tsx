@@ -9,7 +9,7 @@ import { revealItem } from '../intro/reveal';
 // Trang Giới thiệu (công khai, 5 ngôn ngữ, không cần đăng nhập): lời giới thiệu ngắn cho khách tham quan, ba tính năng
 // chính (bản đồ và "Gần bạn", nghe thuyết minh, mô hình 3D và dòng thời gian) hiện lên một lần khi cuộn tới, dòng nguồn
 // thông tin, lối tải app Android (khi đã có tệp cài đặt) và lối sang trang Dành cho nhà trường. Video chỉ hiện khi đã cấu
-// hình địa chỉ video. Nói thật: tóm tắt và nghe mở bằng một quảng cáo ngắn trong 24 giờ; bản Hàn, Trung, Nhật là bản dịch máy.
+// hình địa chỉ video. Nói thật: tóm tắt và nghe thuyết minh miễn phí cho mọi người; bản Hàn, Trung, Nhật là bản dịch máy.
 
 interface Feature {
   key: string;
@@ -59,6 +59,18 @@ export function AboutPage() {
         }
       />
 
+      {/* Trailer có bản tiếng Việt và tiếng Anh: giao diện tiếng Việt phát bản tiếng Việt, ngôn ngữ khác phát bản tiếng Anh, phụ đề tiếng Anh bật sẵn. */}
+      <IntroVideo
+        name="trailer"
+        edition={language === 'vi' ? 'vi' : 'en'}
+        captions={['vi', 'en']}
+        defaultCaption={language === 'vi' ? null : 'en'}
+        title={a.trailerTitle}
+        label={a.trailerLabel}
+        noSupport={a.videoNoSupport}
+        headingId="gioi-thieu-trailer"
+      />
+
       <section aria-labelledby="gioi-thieu-tinh-nang" className="bg-background py-12 dsvmd:py-16">
         <div className="dsv-content flex flex-col gap-8">
           <SectionTitle id="gioi-thieu-tinh-nang" title={a.featuresTitle} />
@@ -87,7 +99,7 @@ export function AboutPage() {
       </section>
 
       <IntroVideo
-        name="du-khach-60s"
+        name="demo-tinh-nang"
         edition={language}
         captions={[language]}
         defaultCaption={language === 'vi' ? null : language}

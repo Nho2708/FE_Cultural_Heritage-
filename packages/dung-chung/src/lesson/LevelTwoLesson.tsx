@@ -3,7 +3,9 @@ import { ButtonLink, Icon, TabPanel, Tabs, TextLink } from '../ui';
 import { useState } from 'react';
 import { milestonesOf, sectionsOf } from './lessonData';
 import { useLessonLinks } from './lessonLinks';
-import { HeritageLinks, LessonFigure, Paragraphs, QuizList } from './LessonParts';
+import { HeritageLinks, LessonFigure, QuizList } from './LessonParts';
+import { ReadAloud } from './ReadAloud';
+import { usePrefetchMainContent } from './readAloudPrefetch';
 
 // Bài học — bố cục cấp 2 (khối 6-9): đầu bài có ảnh lớn, ba bước chuyển qua lại tự do bằng tab (Đọc bài · Dòng thời gian của bài ·
 // Bài kiểm tra), cột bên phải liệt kê bài kiểm tra kèm trạng thái với riêng em. Bài đọc có hình kèm chú thích, ý chính đóng khung,
@@ -14,6 +16,7 @@ const PREFIX = 'bai-hoc-cap-2';
 
 export function LevelTwoLesson({ lesson }: { lesson: StudentLesson }) {
   const links = useLessonLinks();
+  usePrefetchMainContent(lesson.summary);
   const [tab, setTab] = useState<TabId>('READ');
   const milestones = milestonesOf(lesson);
   const body = sectionsOf(lesson, 'READING', 'IMAGE');
@@ -78,16 +81,14 @@ export function LevelTwoLesson({ lesson }: { lesson: StudentLesson }) {
               {tab === 'READ' && (
                 <div className="mt-6 flex flex-col gap-5">
                   <h2 className="type-h2 text-on-surface">Đọc bài</h2>
-                  <div className="flex flex-col gap-4 type-body-m text-on-surface">
-                    <Paragraphs text={lesson.summary} />
-                  </div>
+                  <ReadAloud text={lesson.summary} label="Nghe bài đọc" className="flex flex-col gap-4 type-body-m text-on-surface" />
                   {body.map((section, index) =>
                     section.type === 'IMAGE' ? (
                       <LessonFigure key={index} url={section.imageUrl} caption={section.body} image={section.image} />
                     ) : (
-                      <div key={index} className="flex flex-col gap-4 type-body-m text-on-surface">
+                      <div key={index} className="flex flex-col gap-3 type-body-m text-on-surface">
                         {section.title && <h3 className="type-h3">{section.title}</h3>}
-                        <Paragraphs text={section.body} />
+                        <ReadAloud text={section.body} label="Nghe phần này" className="flex flex-col gap-4" />
                       </div>
                     ),
                   )}

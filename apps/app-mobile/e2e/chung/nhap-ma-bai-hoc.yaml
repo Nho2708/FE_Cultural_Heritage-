@@ -5,7 +5,7 @@ appId: host.exp.exponent
 - tapOn: "Nhập mã thầy cô cho"
 - inputText: ${LESSON_CODE}
 - hideKeyboard
-- tapOn: "Mở bài học"
+- tapOn: "Mở"
 - extendedWaitUntil:
     visible: "Bài học"
     timeout: 30000

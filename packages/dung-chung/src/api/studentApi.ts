@@ -1,7 +1,9 @@
-import { createAttemptsApi } from './attempts';
+import { createAttemptsApi, type StudentAlbumCard } from './attempts';
 import { createStudentRecommendationsApi } from './recommendations';
 import type { ApiClient, ApiResult } from './client';
 import type { StudentLesson } from './lessons';
+import type { StudentNotificationPage } from './notifications';
+import type { QuestionPreviewOption } from './questions';
 import type { AccessToken, LoginResult, OrganizationRef, SchoolLevel, StudentClassDetail, StudentProfile } from './types';
 
 // Endpoint của học sinh, dùng chung cho web học tập và app mobile (cùng API, cùng kết quả). Máy chủ trả hồ sơ học sinh
@@ -10,11 +12,50 @@ import type { AccessToken, LoginResult, OrganizationRef, SchoolLevel, StudentCla
 
 export const STUDENT_ENDPOINTS = {
   login: '/student/auth/login',
+  forgotPassword: '/student/auth/forgot-password',
   profile: '/student/me',
   password: '/student/me/password',
   class: '/student/class',
   lesson: (code: string) => `/student/lessons/${encodeURIComponent(code)}`,
+  lessonComplete: (code: string) => `/student/lessons/${encodeURIComponent(code)}/complete`,
+  lessonRecall: (code: string) => `/student/lessons/${encodeURIComponent(code)}/recall`,
+  notifications: '/student/notifications',
+  notificationRead: (id: number) => `/student/notifications/${id}/read`,
+  notificationsReadAll: '/student/notifications/read-all',
 } as const;
+
+/** Cấp 1: em tới bước Nhận thẻ của bài. Gọi lại nhiều lần vẫn chỉ ghi một lần (`firstTime` chỉ bật ở lần đầu). */
+export interface LessonCompletion {
+  lessonId: number;
+  firstTime: boolean;
+  /** Thẻ di sản của bài, đã vào album của em. */
+  cards: StudentAlbumCard[];
+  albumCollected: number;
+  albumTotal: number;
+  /** Một câu em mang về nhà hỏi bố mẹ. */
+  takeHome: string | null;
+}
+
+/**
+ * Cấp 1: một câu ôn ở bước Nhớ lại, lấy từ các bài chơi em đã nộp của bài trước. Có sẵn đáp án đúng (bài đó đã nộp) để giao diện báo ngay;
+ * không tính sao, không lưu gì.
+ */
+export interface RecallQuestion {
+  questionId: number;
+  questionType: 'TRUE_FALSE' | 'IMAGE_CHOICE';
+  content: string;
+  imageUrl: string | null;
+  options: QuestionPreviewOption[];
+  correctIndex: number;
+  explanation: string | null;
+  heritageName: string | null;
+  lessonTitle: string | null;
+}
+
+export interface StudentRecall {
+  /** Tối đa 3 câu; rỗng khi em chưa nộp bài chơi nào của bài khác (giao diện bỏ bước Nhớ lại). */
+  questions: RecallQuestion[];
+}
 
 export interface StudentLoginBody {
   /** Mã học sinh đã chuẩn hóa (bỏ khoảng trắng và dấu gạch, viết hoa). */
@@ -101,6 +142,17 @@ export function createStudentApi(client: ApiClient) {
         await client.request<StudentSessionWire>(STUDENT_ENDPOINTS.login, { method: 'POST', body, auth: false }),
       ),
 
+    /**
+     * Học sinh xin đặt lại mật khẩu: gửi mã học sinh, máy chủ báo giáo viên chủ nhiệm nếu mã có thật. Mã đúng định dạng luôn nhận 200 với
+     * một thông điệp chung; quá giới hạn thì 429 kèm số phút chờ. Phần `data` chỉ chứa giá trị trung tính, giao diện không được hiển thị.
+     */
+    forgotPassword: (studentCode: string) =>
+      client.request<unknown>(STUDENT_ENDPOINTS.forgotPassword, {
+        method: 'POST',
+        body: { studentCode },
+        auth: false,
+      }),
+
     /** Hồ sơ của em: họ tên, mã học sinh, lớp, khối, cấp học, trường. Gọi được cả khi đang bị buộc đổi mật khẩu. */
     profile: async (): Promise<ApiResult<StudentProfile>> => {
       const result = await client.request<StudentProfileWire>(STUDENT_ENDPOINTS.profile);
@@ -115,10 +167,24 @@ export function createStudentApi(client: ApiClient) {
     classroom: () => client.request<StudentClassDetail>(STUDENT_ENDPOINTS.class),
 
     /**
-     * Mở bài học bằng mã bài học (đã chuẩn hóa). Mã sai, bài chưa xuất bản hoặc không thuộc lớp của em đều trả cùng một câu 404
-     * và tính vào giới hạn nhập sai (429 khi vượt).
+     * Mở bài học bằng mã bài học hoặc mã bài kiểm tra (đã chuẩn hóa). Mã bài kiểm tra trả bài học chứa bài đó kèm `focusQuizId`. Mã sai, bài chưa xuất bản
+     * hoặc không thuộc lớp của em đều trả cùng một câu 404 và tính vào giới hạn nhập sai (429 khi vượt).
      */
     lessonByCode: (code: string) => client.request<StudentLesson>(STUDENT_ENDPOINTS.lesson(code)),
+
+    /** Cấp 1: ghi em đã học xong bài (bước Nhận thẻ); thẻ di sản của bài vào album. Mã sai như `lessonByCode`. */
+    completeLesson: (code: string) => client.request<LessonCompletion>(STUDENT_ENDPOINTS.lessonComplete(code), { method: 'POST' }),
+
+    /** Cấp 1: tối đa 3 câu ôn của bài trước cho bước Nhớ lại. Mã sai như `lessonByCode`. */
+    lessonRecall: (code: string) => client.request<StudentRecall>(STUDENT_ENDPOINTS.lessonRecall(code)),
+
+    /** Thông báo của em, mới nhất trước, kèm số chưa đọc. */
+    notifications: (page = 1, pageSize = 30) =>
+      client.request<StudentNotificationPage>(`${STUDENT_ENDPOINTS.notifications}?page=${page}&pageSize=${pageSize}`),
+
+    markNotificationRead: (id: number) => client.request<unknown>(STUDENT_ENDPOINTS.notificationRead(id), { method: 'POST' }),
+
+    markAllNotificationsRead: () => client.request<unknown>(STUDENT_ENDPOINTS.notificationsReadAll, { method: 'POST' }),
 
     /** Làm bài kiểm tra, kết quả, lịch sử, tiến độ và trang học của em. */
     ...createAttemptsApi(client),

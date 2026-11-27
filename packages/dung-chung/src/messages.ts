@@ -24,15 +24,20 @@ export const MESSAGES = {
   samePassword: 'Mật khẩu mới phải khác mật khẩu cũ.',
   /** Hai lần nhập mật khẩu mới không giống nhau. */
   passwordMismatch: 'Hai lần nhập mật khẩu chưa giống nhau.',
-  /** Email hoặc tên đăng nhập đã có tài khoản khác dùng. */
+  /**
+   * Email hoặc tên đăng nhập đã có tài khoản khác dùng. Chỉ dành cho tài khoản: tên lớp trùng trong năm học dùng câu riêng của máy chủ
+   * (hiện dưới ô Tên lớp), giao diện không tự ghép câu này cho lớp.
+   */
   taken: (field: string, value: string) => `${field} "${value}" đã được sử dụng cho một tài khoản khác.`,
   /** Sai thông tin đăng nhập web quản trị, không cho biết sai ô nào. */
   invalidCredentials: 'Email, tên đăng nhập hoặc mật khẩu không đúng.',
   /** Tài khoản người lớn không đăng nhập được: tạm khóa, bị khóa, ngừng sử dụng, trường đã ngừng. */
   cannotSignIn: (reason: string) => `Tài khoản không đăng nhập được. ${reason}`.trim(),
-  /** Luôn cùng một câu dù email có thuộc tài khoản nào hay không. */
+  /** Thông báo khi tài khoản tồn tại và đã gửi liên kết đặt lại mật khẩu. */
   forgotPasswordAccepted:
-    'Nếu email này thuộc một tài khoản, liên kết đặt lại mật khẩu sẽ được gửi tới hộp thư. Liên kết có hiệu lực 30 phút.',
+    'Liên kết đặt lại mật khẩu đã được gửi tới hộp thư của bạn. Vui lòng kiểm tra hộp thư (kể cả mục thư rác/spam) trong 1-2 phút tới. Liên kết có hiệu lực 30 phút.',
+  /** Không tìm thấy tài khoản theo email hoặc số điện thoại. */
+  accountNotFound: 'Không tìm thấy tài khoản. Hãy kiểm tra số di động hoặc email của bạn rồi thử lại.',
   /** Liên kết đặt mật khẩu hết hạn, đã dùng hoặc đã bị thay bằng liên kết mới. */
   passwordLinkInvalid: 'Liên kết đã hết hạn hoặc không còn dùng được. Vui lòng yêu cầu gửi liên kết mới.',
   /** Đã tạo tài khoản quản trị trường hoặc giáo viên và gửi liên kết đặt mật khẩu lần đầu. */
@@ -66,11 +71,20 @@ export const MESSAGES = {
   studentInvalidCredentials: 'Mã học sinh hoặc mật khẩu chưa đúng. Em hãy kiểm tra lại phiếu đăng nhập.',
   /** Học sinh không đăng nhập được: tạm khóa, bị vô hiệu, lớp đã xóa hoặc trường đã ngừng. */
   studentCannotSignIn: (reason: string) => `Tài khoản của em tạm thời chưa đăng nhập được. ${reason}`.trim(),
-  /** Dòng nhắc cố định trên màn hình đăng nhập của học sinh. */
+  /** Nhãn nút mở màn hình quên mật khẩu trên màn hình đăng nhập của học sinh (cũng là dòng cuối của phiếu đăng nhập). */
   studentForgotPassword: 'Quên mật khẩu?',
+  /**
+   * Sau khi em gửi mã học sinh ở màn hình quên mật khẩu: luôn hiện đúng câu này, dù mã có tài khoản hay không, để người ngoài
+   * không dò được mã nào có thật. Không hiện tên em hay tên thầy cô từ phản hồi của máy chủ.
+   */
+  studentForgotPasswordSent: 'Nếu mã học sinh đúng, thầy cô chủ nhiệm của em sẽ nhận được thông báo để đặt lại mật khẩu.',
+  /** Mô tả phụ cho form quên mật khẩu học sinh. */
+  studentForgotPasswordSubtitle: 'Hãy nhập mã học sinh của em để báo thầy cô đặt lại mật khẩu.',
   /** Màn hình đổi mật khẩu bắt buộc: lần đầu đăng nhập hoặc sau khi giáo viên đặt lại. */
   studentMustChangePassword:
     'Em hãy đặt mật khẩu mới của riêng em để bắt đầu học. Mật khẩu cần 8-64 ký tự, có chữ hoa, chữ thường và chữ số.',
+  /** Cùng màn hình đó với học sinh cấp 1: quy tắc đơn giản, chỉ cần dài 6-64 ký tự. */
+  studentMustChangeSimplePassword: 'Em hãy đặt mật khẩu mới của riêng em để bắt đầu học. Mật khẩu cần 6-64 ký tự, ví dụ 6 chữ số dễ nhớ.',
   /** Mở đường dẫn bài học khi chưa đăng nhập. */
   studentSignInToOpenLesson: 'Em hãy đăng nhập để mở bài học. Đăng nhập xong, bài học sẽ tự mở.',
   /** Trang học, tiến độ khi em chưa có lượt làm bài nào. */

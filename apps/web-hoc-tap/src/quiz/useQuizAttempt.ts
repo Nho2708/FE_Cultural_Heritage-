@@ -1,13 +1,32 @@
 import { clockOffsetMs, hasAnswer, secondsLeft, submissionToSave, unansweredPositions } from '@dsvhvn/dung-chung';
-import { ApiError, type AttemptQuestion, type QuestionSubmission, type StudentAttempt, type StudentAttemptResult } from '@dsvhvn/dung-chung/api';
+import {
+  ApiError,
+  type AnswerCheck,
+  type AttemptQuestion,
+  type QuestionSubmission,
+  type StudentAttempt,
+  type StudentAttemptResult,
+} from '@dsvhvn/dung-chung/api';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { studentApi } from '../lib/api/client';
 
 // Phiên làm bài của một lượt: giữ câu trả lời của em, lưu từng câu lên máy chủ ngay khi em chọn (ghi đè cả câu), thử lại khi mất
 // kết nối, đếm ngược theo giờ máy chủ và tự nộp khi hết giờ, nộp bài. Câu trả lời trên màn hình luôn là bản mới nhất em vừa thao tác;
 // bản lưu trên máy chủ chỉ đuổi theo.
+// Bài chơi cấp 1 (`practiceMode`) không lưu ngầm: em trả lời xong một câu thì `check` gửi lên để kiểm ngay (lần kiểm đầu là lần được
+// chấm); câu trả lời trên màn hình chỉ giữ ở đây.
 
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'offline';
+
+/** Kết quả một lần kiểm câu của bài chơi cấp 1. */
+export type CheckOutcome =
+  | { kind: 'checked'; check: AnswerCheck }
+  /** Mất mạng hoặc máy chủ lỗi: em bấm Thử lại để gửi lại đúng câu trả lời đó. */
+  | { kind: 'offline' }
+  /** Máy chủ không nhận câu trả lời này (ví dụ chưa nối đủ cặp): câu báo của máy chủ. */
+  | { kind: 'rejected'; message: string }
+  /** Lượt đã chốt (đã nộp hoặc quá hạn): đang chuyển sang kết quả. */
+  | { kind: 'closed' };
 
 const TEXT_DELAY_MS = 500;
 const RETRY_MS = 3000;
@@ -27,6 +46,10 @@ export interface QuizAttemptSession {
   submitError: string | null;
   /** Đã hết giờ và đang tự nộp. */
   timedOut: boolean;
+  /** Bài chơi cấp 1: kiểm một câu ngay khi em trả lời xong. */
+  check: (question: AttemptQuestion, answer: QuestionSubmission) => Promise<CheckOutcome>;
+  /** Đang chờ máy chủ kiểm câu. */
+  checking: boolean;
 }
 
 export function useQuizAttempt(
@@ -140,14 +163,41 @@ export function useQuizAttempt(
     [drain],
   );
 
+  const practice = attempt.practiceMode;
   const setAnswer = useCallback(
     (question: AttemptQuestion, answer: QuestionSubmission) => {
       setAnswers((current) => ({ ...current, [question.questionId]: answer }));
+      // Bài chơi cấp 1 không lưu ngầm: câu trả lời chỉ lên máy chủ khi em kiểm.
+      if (practice) return;
       // Điền chữ bằng bàn phím: chờ em gõ xong mới lưu; các thao tác chạm lưu ngay.
       const typing = question.questionType === 'FILL_BLANK' && question.wordBank.length === 0;
       enqueue(question, answer, typing ? TEXT_DELAY_MS : 0);
     },
-    [enqueue],
+    [enqueue, practice],
+  );
+
+  const [checking, setChecking] = useState(false);
+  const check = useCallback(
+    async (question: AttemptQuestion, answer: QuestionSubmission): Promise<CheckOutcome> => {
+      if (finished.current) return { kind: 'closed' };
+      setChecking(true);
+      try {
+        const { data } = await studentApi.checkAnswer(attempt.id, question.questionId, submissionToSave(question, answer));
+        return { kind: 'checked', check: data };
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 409) {
+          void closedByServer();
+          return { kind: 'closed' };
+        }
+        if (error instanceof ApiError && error.status >= 400 && error.status < 500 && error.status !== 401 && error.status !== 0) {
+          return { kind: 'rejected', message: error.message };
+        }
+        return { kind: 'offline' };
+      } finally {
+        setChecking(false);
+      }
+    },
+    [attempt.id, closedByServer],
   );
 
   /** Gửi hết câu đang chờ (kể cả câu đang đợi em gõ xong). */
@@ -233,5 +283,5 @@ export function useQuizAttempt(
   const unanswered = useMemo(() => unansweredPositions(attempt.questions, answers), [attempt.questions, answers]);
   const answeredCount = attempt.questions.filter((q) => hasAnswer(q, answers[q.questionId])).length;
 
-  return { answers, setAnswer, saveStatus, savedAt, remaining, unanswered, answeredCount, submit, submitting, submitError, timedOut };
+  return { answers, setAnswer, saveStatus, savedAt, remaining, unanswered, answeredCount, submit, submitting, submitError, timedOut, check, checking };
 }

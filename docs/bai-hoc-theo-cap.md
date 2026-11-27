@@ -57,7 +57,7 @@ Thanh báo màu vàng khi trường không có gói hiệu lực (đọc từ `G
 
 | Route | Màn hình | Nội dung |
 |---|---|---|
-| `/nhap-ma` | Nhập mã bài học | Gõ tay, tự viết hoa, bỏ khoảng trắng và dấu gạch (`bh 7f3-k2q` vẫn đúng). Mã sai dạng báo ngay, **không gọi máy chủ** (không tính vào giới hạn nhập sai). Mã sai, bài chưa xuất bản hoặc không thuộc lớp của em cùng một câu 404; nhập sai quá nhiều lần hiện câu chặn của máy chủ (429) và khóa nút. Dưới ô nhập là các mã em đã mở gần đây **trên máy này** (tối đa 5, mỗi học sinh một khóa riêng) |
+| `/nhap-ma` | Nhập mã bài học | Nhận cả mã bài học (`BH`, mở bài học) và mã bài kiểm tra (`KT`, vào thẳng bài đó). Gõ tay, tự viết hoa, bỏ khoảng trắng và dấu gạch (`bh 7f3-k2q` vẫn đúng). Mã sai dạng báo ngay, **không gọi máy chủ** (không tính vào giới hạn nhập sai). Mã sai, bài chưa xuất bản hoặc không thuộc lớp của em cùng một câu 404; nhập sai quá nhiều lần hiện câu chặn của máy chủ (429) và khóa nút. Dưới ô nhập là các mã em đã mở gần đây **trên máy này** (tối đa 5, mỗi học sinh một khóa riêng) |
 | `/bai-hoc/:maBaiHoc` | Bài học | Bố cục theo **cấp của lớp em** (học sinh không chọn): ba bản dưới đây |
 
 ### Ba bố cục
@@ -68,10 +68,40 @@ Thanh báo màu vàng khi trường không có gói hiệu lực (đọc từ `G
 | 2 (khối 6-9) | Bài đọc và dòng thời gian (`cap-2`) | Đầu bài ảnh lớn; ba tab chuyển tự do: **Đọc bài** (tóm tắt, đoạn văn, hình kèm chú thích và ghi công, Ý chính đánh số, Di sản trong bài), **Dòng thời gian của bài** (các mốc theo năm), **Bài kiểm tra**; cột phải liệt kê bài kiểm tra kèm trạng thái với riêng em |
 | 3 (khối 10-12) | Trang tài liệu (`cap-3`) | Mục lục cố định bên trái theo các phần của bài, một cột rộng, đề mục và đường kẻ, mốc thời gian dạng bảng, **tư liệu gốc có khung và nguồn**, câu hỏi gợi suy nghĩ ("không chấm điểm và không lưu câu trả lời"), liên kết di sản, bài kiểm tra dạng dòng. Không linh vật, không thẻ hình lớn |
 
+**Nghe bài đọc (cấp 2 và 3, web và app):** nút "Nghe bài đọc" cho nội dung chính và nút "Nghe phần này" cho từng phần Bài đọc, theo kiểu nút viền cỡ vừa của bố cục (không dùng nút to của cấp 1). Đọc từng câu, tô sáng câu đang đọc, bấm "Dừng nghe" để dừng; chỉ một đoạn đọc một lúc, rời trang, rời màn hay chuyển tab của cấp 2 thì dừng. Dùng giọng của máy chủ như cấp 1 (cùng bộ nhớ đệm, lùi về giọng thiết bị khi máy có giọng tiếng Việt, không thì báo "Máy này chưa đọc được tiếng Việt"). Vào bài chỉ xin máy chủ tạo trước khoảng 10 câu đầu của nội dung chính (xem trước của giáo viên không xin). Các câu để đọc là kết quả của `splitSentences` trên cả nội dung, đúng cách máy chủ tách khi tạo trước tiếng lúc xuất bản; mã dùng chung ở `packages/dung-chung/src/speech/readAlong.ts` (câu, đoạn hiển thị, quyền đọc một đoạn một lúc), giao diện web ở `lesson/ReadAloud.tsx`, app ở `hocsinh/ReadAloud.tsx`.
+
 Trạng thái bài kiểm tra với riêng em: Chưa mở · Đang mở · Em đang làm · Em đã làm · Đã đóng. "Làm bài" và "Làm tiếp" dẫn tới `/bai-hoc/:mã/kiem-tra/:id`; **màn hình làm bài kiểm tra chưa dựng**
 (thuộc luồng bài kiểm tra) nên đang hiện "Đang xây dựng". Bước **Nhận sao** của cấp 1 chưa tính sao: sao gắn với kết quả làm bài, dựng cùng luồng bài kiểm tra.
 
 Đăng nhập: khách mở đường dẫn bài học thì sang Học sinh đăng nhập, đăng nhập xong mở lại đúng bài (đã có từ luồng học sinh).
+
+### Yêu cầu thêm cho AI và viết lại một phần (cải tiến 10/11/2026)
+
+- Ô "Yêu cầu thêm cho AI (không bắt buộc)" cạnh nút soạn (tối đa 500 ký tự, có đếm và gợi ý mẫu): gửi `instructions` cho API soạn bài; để trống thì không gửi.
+- "Viết lại bằng AI" trên từng phần trừ đoạn trích tư liệu gốc (`SectionRewrite.tsx`): dùng chữ đang sửa chưa lưu, ba yêu cầu chọn nhanh (Ngắn hơn, Dễ hiểu hơn,
+  Sinh động hơn) điền vào ô yêu cầu, bản cũ cạnh bản mới, "Dùng bản này" chỉ thay chữ trong biểu mẫu, "Giữ bản cũ". Mỗi lần tính một lượt AI; lỗi 422 và 503 hiện câu của máy chủ.
+
+### Thư viện bài mẫu
+
+- Soạn bài học có khối "Thư viện bài mẫu" (`SampleLibraryBlock.tsx`): trạng thái, đề xuất (bài Đã xuất bản và đủ điều kiện, đã lưu hết thay đổi), rút khỏi thư viện;
+  lưu bài đang ở thư viện thì nhắc bài sẽ chờ duyệt lại. Bài học của tôi có nhãn trạng thái thư viện.
+- Giáo viên: trang "Thư viện bài mẫu" `/giao-vien/thu-vien-bai-mau` (lọc theo cấp, khối, di sản, từ khóa, sắp xếp; xem trước chỉ đọc; "Dùng cho lớp…" chép kèm bài kiểm tra được,
+  rồi mở bài Nháp mới kèm câu lưu ý).
+- Quản trị hệ thống: trang "Thư viện bài mẫu" `/quan-tri/thu-vien-bai-mau` (ba tab Chờ duyệt, Trong thư viện, Đã từ chối; xem trước; Duyệt; Từ chối hoặc Gỡ khỏi thư viện bắt buộc lý do).
+- Mã: `lib/api/libraryEndpoints.ts`, `components/lesson/` (`LibraryPreviewDialog`, `UseSampleDialog`, `SampleReviewDialogs`, `sampleNotice.ts`), `pages/teacher/LessonLibraryPage`,
+  `pages/admin/LessonLibraryReviewPage`. Kiểm thử: `LessonLibraryPage.test.tsx`, `LessonLibraryReviewPage.test.tsx`, `LessonEditorRewriteAndLibrary.test.tsx`.
+
+### Chủ đề chương trình (bản gọn)
+
+- Hộp Tạo bài học, bước Chọn di sản: ô "Chủ đề chương trình (lớp N)" theo khối của lớp, nhóm theo chủ đề lớn (`TopicPicker.tsx`, `GET /teacher/curriculum-topics?grade=`).
+  Chọn chủ đề thì danh sách di sản là di sản đã xuất bản của chủ đề (`GET /teacher/curriculum-topics/{id}/heritages`, lọc theo tên ngay trên trang); chủ đề "Địa phương em"
+  (`localProvince`) nhắc chọn tỉnh, thành phố của trường và giữ danh sách thường; khối không có chủ đề (hoặc chưa tải được) thì ẩn ô. Đổi lớp ở bước một thì bỏ chủ đề đã chọn.
+- Soạn bài học: nhãn "Chủ đề chương trình" dưới ô Lớp (`TopicLabels.tsx`, từ `curriculumTopics` của chi tiết bài; ẩn khi rỗng). Thư viện bài mẫu của giáo viên: nhãn trên thẻ và
+  bộ lọc chủ đề (chỉ hiện khi đã chọn khối có chủ đề; `?chu-de=`, gửi `topicId`; đổi khối thì bỏ chủ đề).
+- Quản trị hệ thống: trang "Chủ đề chương trình" `/quan-tri/chu-de-chuong-trinh` và trang con quản lý di sản của chủ đề; trang Biên tập di sản hiện nhãn chủ đề chỉ đọc kèm lối sang trang này.
+- Mã: `lib/api/curriculumEndpoints.ts`, `packages/dung-chung/src/api/curriculum.ts` (kiểu dữ liệu), `SelectField` có nhóm (`group` của mục), `components/curriculum/` (`topicForm`,
+  `CurriculumTopicFormDialog`), `pages/admin/CurriculumTopicsPage`, `CurriculumTopicHeritagesPage`. Kiểm thử: `CreateLessonTopics.test.tsx`, `LessonEditorTopics.test.tsx`,
+  `LessonLibraryTopics.test.tsx`, `CurriculumTopicsPage.test.tsx`, `CurriculumTopicHeritagesPage.test.tsx`, `HeritageEditorTopics.test.tsx`, `topicForm.test.ts`.
 
 ## 3. Cấu trúc mã
 

@@ -2,6 +2,7 @@ import type { Strings } from './vi';
 
 export const ko: Strings = {
   appName: 'DiViet',
+  tagline: '베트남의 유산을 만나다',
   common: {
     back: '뒤로',
     close: '닫기',
@@ -40,7 +41,7 @@ export const ko: Strings = {
   intro: {
     title: '앱 소개',
     replay: '다시 보기',
-    replayText: '짧은 소개 카드 네 장을 다시 봅니다.',
+    replayText: '짧은 소개 카드 다섯 장을 다시 봅니다.',
     videoTitle: '소개 영상',
     videoText: '앱을 소개하는 짧은 영상을 봅니다. 인터넷 연결이 필요합니다.',
     watchVideo: '소개 영상 보기',
@@ -49,6 +50,7 @@ export const ko: Strings = {
     next: '다음',
     start: '시작하기',
     step: '{{total}}단계 중 {{current}}단계',
+    welcome: { text: '베트남 유산의 지도, 음성 해설, 3D 모델과 수업을 하나의 앱에 담았습니다.' },
     discover: { title: '내 주변의 유산 찾기', text: '지도를 열어 내가 있는 곳 주변의 유산을 찾고 각 유산의 요약을 읽어 보세요.' },
     narration: { title: '내 언어로 해설 듣기', text: '다섯 가지 언어 중 하나를 고르고 각 유산의 해설을 들어 보세요.' },
     model: { title: '3D 모델과 연표 보기', text: '유산의 3D 모델을 돌려 보고 역사 연표를 따라가 보세요.' },
@@ -135,6 +137,7 @@ export const ko: Strings = {
     detailed: '읽기',
     short: '들을 수 있는 짧은 버전',
     unavailable: '이 유산에는 아직 요약이 없습니다.',
+    locked: '지금은 이 유산의 요약과 오디오 해설을 열 수 없습니다. 잠시 후 다시 시도해 주세요.',
     fallbackOnly: '아직 {{language}} 버전이 없어 베트남어 버전을 표시합니다.',
   },
   speech: {
@@ -218,5 +221,8 @@ export const ko: Strings = {
     adsNotNeeded: '현재 지역에서는 Google 광고 동의 창이 필요하지 않아 다시 열 선택 항목이 없습니다.',
     adsUnavailable: '이 빌드에는 Google 광고가 없어 열 선택 항목이 없습니다.',
     adsCheckFailed: '광고 선택 항목을 확인할 수 없습니다. 네트워크를 확인하고 다시 시도해 주세요.',
+    privacy: '개인정보 처리방침',
+    privacyText: 'DiViet이 어떤 데이터를 수집하고 어디에 쓰는지, 이용자에게 어떤 권리가 있는지 안내합니다. 브라우저에서 열립니다.',
+    openPrivacy: '처리방침 보기',
   },
 };

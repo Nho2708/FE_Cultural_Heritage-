@@ -180,6 +180,7 @@ export function attemptQuestionOf(overrides: Partial<AttemptQuestion> = {}): Att
     partsTotal: 1,
     answered: true,
     answer: { selectedIndex: 1 },
+    checked: false,
     ...overrides,
   };
 }

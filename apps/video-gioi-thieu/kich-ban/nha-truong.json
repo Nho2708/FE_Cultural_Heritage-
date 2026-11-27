@@ -60,7 +60,7 @@
         "Mà không mất cả buổi tối soạn bài."
       ],
       "vai-tro": [
-        "Vietnam Heritage cho nhà trường",
+        "DiViet cho nhà trường",
         "Quản trị trường tạo tài khoản giáo viên; giáo viên tạo lớp và tài khoản cho học sinh."
       ],
       "lop-hoc": [
@@ -88,7 +88,7 @@
         "Học sinh học trên web hoặc app điện thoại, không có quảng cáo."
       ],
       "ket": [
-        "Vietnam Heritage",
+        "DiViet",
         "Bắt đầu với gói Miễn phí. Gửi liên hệ ở trang Dành cho nhà trường để được tạo tài khoản cho trường."
       ],
       "ghi-cong": "Dữ liệu di sản: Cục Di sản văn hóa (dsvh.gov.vn) · Nhạc: nhóm dự án tự soạn · Giọng đọc tổng hợp: Piper, giọng vais1000 (dữ liệu VAIS-1000, CC BY 4.0) · Trường, lớp, học sinh trong video là dữ liệu mẫu",
@@ -110,7 +110,7 @@
         "Without spending every evening preparing."
       ],
       "vai-tro": [
-        "Vietnam Heritage for schools",
+        "DiViet for schools",
         "The school admin creates teacher accounts; teachers create classes and student accounts."
       ],
       "lop-hoc": [
@@ -138,7 +138,7 @@
         "Students learn on the web or the phone app, with no ads."
       ],
       "ket": [
-        "Vietnam Heritage",
+        "DiViet",
         "Start with the free plan. Send us a message from the For Schools page to set up your school."
       ],
       "ghi-cong": "Heritage data: Department of Cultural Heritage (dsvh.gov.vn) · Music: original by the project team · Synthetic voice: Piper, vais1000 voice (VAIS-1000 data, CC BY 4.0) · Schools, classes and students shown are sample data"
@@ -147,7 +147,7 @@
   "ghiChuLoiDoc": "loiDoc là câu để tạo giọng đọc (scripts/tao-giong-doc.py); từ tiếng Anh viết theo cách đọc. Muốn thay bằng giọng người thật: thu từng câu, lưu đè public/giong/nha-truong/<id cảnh>.wav rồi chạy lại scripts/tao-giong-doc.py --chi-do.",
   "loiDoc": {
     "cau-hoi": "Làm sao dạy di sản để học sinh hiểu và nhớ lâu, mà không mất cả buổi tối soạn bài?",
-    "vai-tro": "Với Việt Nam Hé ri tịch, quản trị trường tạo tài khoản giáo viên; giáo viên tạo lớp và tài khoản cho học sinh.",
+    "vai-tro": "Với Di Việt, quản trị trường tạo tài khoản giáo viên; giáo viên tạo lớp và tài khoản cho học sinh.",
     "lop-hoc": "Thêm học sinh là có ngay tài khoản: mã học sinh và mật khẩu tạm, in phiếu phát cho cả lớp.",
     "soan-bai": "Chọn di sản từ kho dữ liệu biên soạn theo nguồn Cục Di sản văn hóa. Ây ai soạn bản nháp đúng cấp của lớp; thầy cô đọc lại, sửa và quyết định xuất bản.",
     "kiem-tra": "Tám dạng câu hỏi theo cấp. Câu do Ây ai sinh phải được duyệt mới dùng. Xuất bản xong, bài học có một mã để học sinh mở.",

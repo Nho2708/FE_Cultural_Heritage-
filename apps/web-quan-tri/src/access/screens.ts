@@ -1,5 +1,5 @@
-// Bảng màn hình và ma trận phân quyền của web quản trị (38 màn hình: xác thực và tài khoản, khu giáo viên, khu quản
-// trị trường, khu quản trị hệ thống; 10 hộp thoại không có URL). Đây là nguồn duy nhất cho route guard, thanh bên và
+// Bảng màn hình và ma trận phân quyền của web quản trị (44 màn hình: xác thực và tài khoản, khu giáo viên, khu quản
+// trị trường, khu quản trị hệ thống; 12 hộp thoại không có URL). Đây là nguồn duy nhất cho route guard, thanh bên và
 // menu tài khoản. Tên màn hình bằng lời, khóa đặt theo nghĩa. Học sinh không dùng web quản trị (web học tập riêng).
 // Ẩn menu ở giao diện chỉ để tiện dùng; backend tự kiểm vai trò ở mọi endpoint.
 
@@ -59,6 +59,8 @@ export const SCREENS = [
   { key: 'lessonEditor', name: 'Soạn bài học', area: 'teacher', actors: TEACHER, path: '/giao-vien/bai-hoc/:baiHoc' },
   { key: 'lessonCode', name: 'Mã bài học', area: 'teacher', actors: TEACHER, path: null },
   { key: 'lessonCopy', name: 'Nhân bản bài học sang lớp khác', area: 'teacher', actors: TEACHER, path: null },
+  { key: 'lessonLibrary', name: 'Thư viện bài mẫu', area: 'teacher', actors: TEACHER, path: '/giao-vien/thu-vien-bai-mau' },
+  { key: 'lessonLibraryUse', name: 'Dùng bài mẫu cho lớp', area: 'teacher', actors: TEACHER, path: null },
   {
     key: 'aiQuestions',
     name: 'Sinh và duyệt câu hỏi bằng AI',
@@ -89,7 +91,8 @@ export const SCREENS = [
 
   // Quản trị trường — /truong
   { key: 'schoolOverview', name: 'Tổng quan trường', area: 'school', actors: ORG_ADMIN, path: '/truong' },
-  { key: 'schoolInfo', name: 'Trường và gói', area: 'school', actors: ORG_ADMIN, path: '/truong/thong-tin' },
+  { key: 'schoolInfo', name: 'Thông tin trường', area: 'school', actors: ORG_ADMIN, path: '/truong/thong-tin' },
+  { key: 'schoolSubscription', name: 'Gói đã mua', area: 'school', actors: ORG_ADMIN, path: '/truong/goi' },
   { key: 'schoolTeachers', name: 'Giáo viên của trường', area: 'school', actors: ORG_ADMIN, path: '/truong/giao-vien' },
   // Quản trị trường mở để tạo giáo viên; quản trị hệ thống mở từ Chi tiết trường để tạo quản trị trường.
   { key: 'accountForm', name: 'Biểu mẫu tài khoản', area: 'school', actors: ['ORG_ADMIN', 'ADMIN'], path: null },
@@ -123,15 +126,31 @@ export const SCREENS = [
     aliases: ['/quan-tri/di-san/moi'],
   },
   { key: 'timelineForm', name: 'Biểu mẫu giai đoạn và sự kiện', area: 'admin', actors: ADMIN, path: null },
-  { key: 'translationReview', name: 'Duyệt bản dịch và tóm tắt', area: 'admin', actors: ADMIN, path: '/quan-tri/ban-dich' },
-  { key: 'questionModeration', name: 'Kiểm duyệt ngân hàng câu hỏi', area: 'admin', actors: ADMIN, path: '/quan-tri/cau-hoi' },
-  { key: 'plans', name: 'Gói dịch vụ', area: 'admin', actors: ADMIN, path: '/quan-tri/goi' },
+  { key: 'curriculumTopics', name: 'Chủ đề chương trình', area: 'admin', actors: ADMIN, path: '/quan-tri/chu-de-chuong-trinh' },
   {
-    key: 'adStats',
-    name: 'Thống kê khách và lượt mở khóa bằng quảng cáo',
+    key: 'curriculumTopicHeritages',
+    name: 'Di sản của chủ đề chương trình',
     area: 'admin',
     actors: ADMIN,
-    path: '/quan-tri/khach-va-quang-cao',
+    path: '/quan-tri/chu-de-chuong-trinh/:chuDe/di-san',
+  },
+  { key: 'curriculumTopicForm', name: 'Biểu mẫu chủ đề chương trình', area: 'admin', actors: ADMIN, path: null },
+  { key: 'translationReview', name: 'Duyệt bản dịch và tóm tắt', area: 'admin', actors: ADMIN, path: '/quan-tri/ban-dich' },
+  { key: 'questionModeration', name: 'Kiểm duyệt ngân hàng câu hỏi', area: 'admin', actors: ADMIN, path: '/quan-tri/cau-hoi' },
+  {
+    key: 'lessonLibraryReview',
+    name: 'Duyệt thư viện bài mẫu',
+    area: 'admin',
+    actors: ADMIN,
+    path: '/quan-tri/thu-vien-bai-mau',
+  },
+  { key: 'plans', name: 'Gói dịch vụ', area: 'admin', actors: ADMIN, path: '/quan-tri/goi' },
+  {
+    key: 'visitorStats',
+    name: 'Thống kê khách tham quan',
+    area: 'admin',
+    actors: ADMIN,
+    path: '/quan-tri/khach-tham-quan',
   },
   { key: 'auditLog', name: 'Nhật ký thao tác', area: 'admin', actors: ADMIN, path: '/quan-tri/nhat-ky' },
 ] as const satisfies readonly Screen[];
@@ -176,10 +195,10 @@ export const PATHS = {
   lesson: (id: number) => `/giao-vien/bai-hoc/${id}`,
   /** Sinh và duyệt câu hỏi bằng AI từ một bài học. */
   lessonAiQuestions: (id: number) => `/giao-vien/bai-hoc/${id}/sinh-cau-hoi`,
-  /** Trường và gói: tab Gói và hạn mức. */
-  schoolPlan: '/truong/thong-tin?tab=goi-va-han-muc',
-  /** Trường và gói: tab Hóa đơn và giao dịch. */
-  schoolInvoices: '/truong/thong-tin?tab=hoa-don',
+  /** Gói đã mua: tab Gói và hạn mức. */
+  schoolPlan: '/truong/goi',
+  /** Gói đã mua: tab Hóa đơn và giao dịch. */
+  schoolInvoices: '/truong/goi?tab=hoa-don',
   /** Chọn gói và thanh toán, chọn sẵn một gói (gia hạn gói hiện tại). */
   planPurchaseFor: (planId: number) => `/truong/chon-goi?goi=${planId}`,
   /** Soạn và phát hành một bài kiểm tra của giáo viên. */
@@ -190,6 +209,8 @@ export const PATHS = {
   newHeritage: '/quan-tri/di-san/moi',
   /** Biên tập di sản: sửa một di sản (tab nằm trong tham số `?tab=`). */
   heritage: (id: number) => `/quan-tri/di-san/${id}`,
+  /** Quản lý di sản của một chủ đề chương trình (tìm thêm, bỏ, lưu). */
+  curriculumTopicHeritages: (id: number) => `/quan-tri/chu-de-chuong-trinh/${id}/di-san`,
   /** Tab Bản dịch và tóm tắt của một di sản. */
   heritageTranslations: (id: number) => `/quan-tri/di-san/${id}?tab=ban-dich`,
 } as const;

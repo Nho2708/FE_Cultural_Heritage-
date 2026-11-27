@@ -5,7 +5,7 @@ import { envelope, mockApi, studentOf, studentServer } from '../test/fixtures';
 import { homeOf, recommendationsOf, resultOf } from '../test/quizFixtures';
 import { renderApp, signInAs } from '../test/renderApp';
 
-// "Gợi ý cho em": năm phần ở Trang học và ở Kết quả bài làm, ba cách trình bày theo cấp, không lộ mã bài học mới, cấp 1 không số hay phần trăm.
+// "Gợi ý cho em": năm phần ở Trang học và ở Kết quả bài làm, cấp 2 và 3 có hai cách trình bày, không lộ mã bài học mới; cấp 1 có bố cục riêng nên không hiện khối này.
 
 const heritage = (id: number, name: string, reason: string, slug = `di-san-${id}`): RecommendedHeritage => ({
   heritageId: id,
@@ -122,17 +122,12 @@ describe('Gợi ý cho em — Trang học cấp 2', () => {
 });
 
 describe('Gợi ý cho em — Trang học cấp 1', () => {
-  it('thẻ hình với nhãn ngắn, không có số hay phần trăm, bài mới chỉ có câu nhờ thầy cô', async () => {
+  it('trang học cấp 1 có bố cục riêng nên không hiện khối "Gợi ý cho em"', async () => {
     open(1, full(1));
-    const list = await screen.findByRole('list', { name: 'Gợi ý cho em' });
+    expect(await screen.findByRole('heading', { level: 1, name: 'Chào An!' })).toBeInTheDocument();
     expect(document.querySelector('[data-bo-cuc]')).toHaveAttribute('data-bo-cuc', 'cap-1');
-    expect(within(list).getAllByText('Chơi tiếp')).toHaveLength(2);
-    expect(within(list).getByText('Ôn lại bài')).toBeInTheDocument();
-    expect(within(list).getByText('Di sản giống bài em học')).toBeInTheDocument();
-    expect(within(list).getByText('Bài mới')).toBeInTheDocument();
-    expect(within(list).getByText('Nhờ thầy cô đưa mã bài học')).toBeInTheDocument();
-    expect(list).not.toHaveTextContent(/%|\d+\s*\/\s*\d+/);
-    expect(within(list).getByRole('link', { name: 'Văn Miếu – Quốc Tử Giám' })).toHaveAttribute('href', '/di-san/van-mieu');
+    expect(screen.queryByRole('region', { name: 'Gợi ý cho em' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Gợi ý cho em' })).not.toBeInTheDocument();
   });
 });
 
@@ -157,10 +152,11 @@ describe('Gợi ý cho em — Kết quả bài làm', () => {
     expect(calls.some((c) => c.path === RECOMMENDATION_ENDPOINTS.student)).toBe(false);
   });
 
-  it('cấp 1: kết quả vẫn không có điểm hay phần trăm khi có gợi ý', async () => {
+  it('cấp 1: trang kết quả không hiện khối "Gợi ý cho em", không có điểm hay phần trăm', async () => {
     open(1, full(1), '/ket-qua/31');
-    const list = await screen.findByRole('list', { name: 'Gợi ý cho em' });
-    expect(list).not.toHaveTextContent('%');
+    await screen.findByRole('heading', { level: 1 });
+    expect(screen.queryByRole('region', { name: 'Gợi ý cho em' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('list', { name: 'Gợi ý cho em' })).not.toBeInTheDocument();
     expect(screen.queryByText('%')).not.toBeInTheDocument();
   });
 });

@@ -25,10 +25,29 @@ export function useStudentHistory(page = 1) {
   return useQuery({ queryKey: ['student', user, 'history', page], enabled: user !== null, queryFn: async () => (await studentApi.history(page, 10)).data });
 }
 
-export function useStudentRecommendations() {
+export function useStudentRecommendations(enabled = true) {
   const { studentApi } = useServices();
   const user = useStudentKey();
-  return useQuery({ queryKey: ['student', user, 'recommendations'], enabled: user !== null, queryFn: async () => (await studentApi.recommendations()).data });
+  return useQuery({ queryKey: ['student', user, 'recommendations'], enabled: enabled && user !== null, queryFn: async () => (await studentApi.recommendations()).data });
+}
+
+/** Cấp 1: album di sản của em (thẻ đã có trước, rồi thẻ chưa có theo thứ tự bài học). */
+export function useStudentAlbum() {
+  const { studentApi } = useServices();
+  const user = useStudentKey();
+  return useQuery({ queryKey: ['student', user, 'album'], enabled: user !== null, staleTime: 0, queryFn: async () => (await studentApi.album()).data });
+}
+
+/** Thông báo của em: dùng chung cho nút chuông và màn hình Thông báo, tự làm mới mỗi phút để thấy bài thầy cô vừa giao. */
+export function useStudentNotifications() {
+  const { studentApi } = useServices();
+  const user = useStudentKey();
+  return useQuery({
+    queryKey: ['student', user, 'notifications'],
+    enabled: user !== null,
+    refetchInterval: 60_000,
+    queryFn: async () => (await studentApi.notifications()).data,
+  });
 }
 
 /** Mở bài học bằng mã. Mã sai tính vào giới hạn nhập sai của máy chủ nên không tự thử lại. */

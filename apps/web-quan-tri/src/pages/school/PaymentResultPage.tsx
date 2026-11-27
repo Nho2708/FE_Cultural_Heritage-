@@ -183,7 +183,7 @@ export default function PaymentResultPage() {
           <InlineMessage tone="danger">
             {MESSAGES.blocked(
               'xem kết quả thanh toán',
-              'Liên kết trả về từ VNPay không hợp lệ. Bạn xem trạng thái hóa đơn ở Trường và gói.',
+              'Liên kết trả về từ VNPay không hợp lệ. Bạn xem trạng thái hóa đơn ở Gói đã mua.',
             )}
           </InlineMessage>
           <div>

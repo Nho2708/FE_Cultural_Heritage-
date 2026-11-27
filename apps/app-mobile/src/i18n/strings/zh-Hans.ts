@@ -2,6 +2,7 @@ import type { Strings } from './vi';
 
 export const zhHans: Strings = {
   appName: 'DiViet',
+  tagline: '探索越南遗产',
   common: {
     back: '返回',
     close: '关闭',
@@ -40,7 +41,7 @@ export const zhHans: Strings = {
   intro: {
     title: '应用介绍',
     replay: '再看一遍',
-    replayText: '再次查看四张简短的介绍卡片。',
+    replayText: '再次查看五张简短的介绍卡片。',
     videoTitle: '介绍视频',
     videoText: '观看应用的简短介绍视频，需要联网。',
     watchVideo: '观看介绍视频',
@@ -49,6 +50,7 @@ export const zhHans: Strings = {
     next: '下一步',
     start: '开始使用',
     step: '第 {{current}} 步，共 {{total}} 步',
+    welcome: { text: '越南遗产的地图、语音讲解、3D 模型和课程，尽在一个应用中。' },
     discover: { title: '发现身边的遗产', text: '打开地图，查找您身边的遗产，并阅读每处遗产的简介。' },
     narration: { title: '用您的语言收听讲解', text: '从五种语言中任选一种，收听每处遗产的讲解。' },
     model: { title: '查看 3D 模型和时间线', text: '旋转遗产的 3D 模型，沿着历史时间线浏览。' },
@@ -135,6 +137,7 @@ export const zhHans: Strings = {
     detailed: '阅读',
     short: '适合收听的简短版',
     unavailable: '该遗产暂无摘要。',
+    locked: '暂时无法打开该遗产的摘要和语音讲解，请几分钟后再试。',
     fallbackOnly: '暂无{{language}}版本，正在显示越南语版本。',
   },
   speech: {
@@ -218,5 +221,8 @@ export const zhHans: Strings = {
     adsNotNeeded: '你所在的地区无需 Google 广告同意窗口，因此没有可重新打开的选项。',
     adsUnavailable: '此版本没有 Google 广告，因此没有可打开的选项。',
     adsCheckFailed: '无法检查广告选项。请检查网络后重试。',
+    privacy: '隐私政策',
+    privacyText: '了解 DiViet 收集哪些数据、用于什么目的，以及您享有哪些权利。将在浏览器中打开。',
+    openPrivacy: '查看政策',
   },
 };

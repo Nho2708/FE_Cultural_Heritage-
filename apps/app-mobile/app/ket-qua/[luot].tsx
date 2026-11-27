@@ -1,4 +1,4 @@
-import { clampStars, formatDuration, formatNumber, formatPercent, formatScore } from '@dsvhvn/dung-chung';
+import { formatDuration, formatNumber, formatPercent, formatScore } from '@dsvhvn/dung-chung';
 import type { StudentAnalysis, StudentAttemptResult, StudentBadge, StudentQuestionReview, StudentTopic } from '@dsvhvn/dung-chung/api';
 import { useQuery } from '@tanstack/react-query';
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
@@ -6,13 +6,14 @@ import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Badge, Button, Card, ErrorState, Loading, Screen, Section, Txt, styles as ui } from '../../src/components/ui';
+import { LevelOneResult } from '../../src/hocsinh/levelOne/LevelOneResult';
 import { answerLines, type ReviewWords } from '../../src/hocsinh/reviewText';
-import { starsText } from '../../src/hocsinh/format';
 import { Recommendations } from '../../src/hocsinh/Recommendations';
 import { useAuth, useServices } from '../../src/state/AppProvider';
 import { useTheme } from '../../src/theme/ThemeProvider';
 
-// Kết quả một lượt đã nộp, trình bày khác nhau theo cấp: cấp 1 sao và lời khen (không điểm, không đúng sai); cấp 2 điểm, số câu đúng sai và xem lại từng câu;
+// Kết quả một lượt đã nộp, trình bày khác nhau theo cấp: cấp 1 sao, lời khen, thẻ di sản và câu mang về nhà (levelOne/LevelOneResult, không điểm, không đúng sai);
+// cấp 2 điểm, số câu đúng sai và xem lại từng câu;
 // cấp 3 thêm phân tích theo di sản và theo dạng câu. Nội dung do máy chủ tính theo cấp hiện tại của lớp.
 
 function BadgeList({ badges, level }: { badges: StudentBadge[]; level: 1 | 2 | 3 }) {
@@ -132,10 +133,10 @@ export default function ResultScreen() {
     queryFn: async () => (await studentApi.result(attemptId)).data,
   });
 
-  // Gợi ý theo lượt vừa làm: nên làm tiếp, nên ôn, di sản liên quan.
+  // Gợi ý theo lượt vừa làm: nên làm tiếp, nên ôn, di sản liên quan (cấp 1 không có, trang kết quả cấp 1 ngắn).
   const recommendations = useQuery({
     queryKey: ['student', session?.user.id ?? null, 'result-recommendations', attemptId],
-    enabled: Number.isInteger(attemptId) && session !== null,
+    enabled: Number.isInteger(attemptId) && session !== null && query.data !== undefined && query.data.level !== 1,
     queryFn: async () => (await studentApi.attemptRecommendations(attemptId)).data,
   });
 
@@ -144,7 +145,7 @@ export default function ResultScreen() {
   if (query.isError || !query.data) return <ErrorState message={t('hs.common.error')} retryLabel={t('hs.common.retry')} onRetry={() => void query.refetch()} />;
   const result = query.data;
   const level = result.level;
-  const stars = clampStars(result.stars);
+  if (level === 1) return <LevelOneResult result={result} />;
 
   return (
     <Screen style={{ paddingTop: insets.top + 16 }}>
@@ -155,40 +156,25 @@ export default function ResultScreen() {
         {result.quizName}
       </Txt>
 
-      {level === 1 ? (
-        <View style={[ui.center, { backgroundColor: theme.color.primaryContainer, borderRadius: theme.radius.card }]}>
-          <Text style={{ fontSize: 56 }}>{stars >= 2 ? '🎉' : '💪'}</Text>
-          <Text accessibilityLabel={`${stars}/3`} style={{ fontSize: 48, color: theme.color.primary }}>
-            {starsText(stars)}
-          </Text>
-          <Txt variant="heading" color={theme.color.onPrimaryContainer} style={ui.centerText}>
-            {result.praise}
+      <Card>
+        <View style={{ padding: 16, gap: 6 }}>
+          <Txt variant="heading" color={theme.color.primary}>
+            {formatScore(result.score, result.totalPoint)}
+            {result.percent !== null ? `  (${formatPercent(result.percent)})` : ''}
           </Txt>
-          <Txt color={theme.color.onPrimaryContainer} style={ui.centerText}>
-            {stars === 3 ? t('hs.result.praiseThree') : t('hs.result.praiseTry')}
-          </Txt>
-        </View>
-      ) : (
-        <Card>
-          <View style={{ padding: 16, gap: 6 }}>
-            <Txt variant="heading" color={theme.color.primary}>
-              {formatScore(result.score, result.totalPoint)}
-              {result.percent !== null ? `  (${formatPercent(result.percent)})` : ''}
-            </Txt>
-            <View style={ui.wrap}>
-              {result.correctCount !== null ? <Badge label={t('hs.result.countCorrect', { count: result.correctCount })} tone="success" /> : null}
-              {result.wrongCount !== null ? <Badge label={t('hs.result.countWrong', { count: result.wrongCount })} tone="warning" /> : null}
-              {result.blankCount ? <Badge label={t('hs.result.countBlank', { count: result.blankCount })} /> : null}
-            </View>
-            <Txt variant="caption">
-              {result.statusLabel}
-              {result.durationSeconds !== null ? ` · ${t('hs.result.duration', { time: formatDuration(result.durationSeconds) })}` : ''}
-            </Txt>
-            {result.praise ? <Txt>{result.praise}</Txt> : null}
-            {level === 3 && result.totalQuestions > 0 ? <Txt variant="caption">{t('hs.result.totalQuestions', { count: formatNumber(result.totalQuestions) })}</Txt> : null}
+          <View style={ui.wrap}>
+            {result.correctCount !== null ? <Badge label={t('hs.result.countCorrect', { count: result.correctCount })} tone="success" /> : null}
+            {result.wrongCount !== null ? <Badge label={t('hs.result.countWrong', { count: result.wrongCount })} tone="warning" /> : null}
+            {result.blankCount ? <Badge label={t('hs.result.countBlank', { count: result.blankCount })} /> : null}
           </View>
-        </Card>
-      )}
+          <Txt variant="caption">
+            {result.statusLabel}
+            {result.durationSeconds !== null ? ` · ${t('hs.result.duration', { time: formatDuration(result.durationSeconds) })}` : ''}
+          </Txt>
+          {result.praise ? <Txt>{result.praise}</Txt> : null}
+          {level === 3 && result.totalQuestions > 0 ? <Txt variant="caption">{t('hs.result.totalQuestions', { count: formatNumber(result.totalQuestions) })}</Txt> : null}
+        </View>
+      </Card>
 
       <BadgeList badges={result.badges} level={level} />
       {level === 3 && result.analysis ? <Analysis analysis={result.analysis} /> : null}

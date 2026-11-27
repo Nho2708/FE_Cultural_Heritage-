@@ -1,4 +1,5 @@
 import type { StudentProfile } from '@dsvhvn/dung-chung/api';
+import { SpeechNotice } from '@dsvhvn/dung-chung/lesson';
 import { ToastProvider } from '@dsvhvn/dung-chung/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
@@ -22,6 +23,7 @@ export function renderApp(path: string, state?: unknown) {
         <AuthProvider>
           <LanguageProvider>
             <RouterProvider router={router} />
+            <SpeechNotice />
           </LanguageProvider>
         </AuthProvider>
       </ToastProvider>

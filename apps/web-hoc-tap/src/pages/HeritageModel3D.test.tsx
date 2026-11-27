@@ -121,10 +121,9 @@ describe('Nút Xem 3D ở chi tiết di sản', () => {
     expect(within(dialog).getByRole('link', { name: /Xem giấy phép/ })).toHaveAttribute('href', 'https://creativecommons.org/licenses/by/4.0/');
     expect(within(dialog).getByRole('link', { name: /Xem nguồn/ })).toHaveAttribute('href', 'https://sketchfab.com/3d-models/ngo-mon');
 
-    // Miễn phí, không cần đăng nhập, không qua quảng cáo: kể cả khi học sinh đã đăng nhập, lời gọi không mang token.
+    // Miễn phí, không cần đăng nhập: kể cả khi học sinh đã đăng nhập, lời gọi không mang token.
     const call = calls.find((c) => c.path.startsWith(MODEL_PATH));
     expect(call?.authorization).toBeUndefined();
-    expect(screen.queryByText(/quảng cáo/i)).not.toBeInTheDocument();
   });
 
   it('mô hình không đặt tên thì dùng tên di sản làm tiêu đề', async () => {

@@ -69,6 +69,8 @@ tính "Gợi ý cho bạn" và "Gần bạn" (chỉ khi khách cho phép vị tr
 
 Tóm tắt và nghe thuyết minh đi qua cổng quảng cáo có thưởng của máy chủ (`Ads:GateEnabled`). Khi máy chủ trả 403 `AD_UNLOCK_REQUIRED`, app hiện lời mời ([`src/components/AdGatePanel.tsx`](src/components/AdGatePanel.tsx));
 khách xem hết quảng cáo thì app hỏi `GET /public/ads/unlock?slug=` mỗi 2 giây (tối đa 20 giây) và chỉ mở khi **máy chủ** báo đã mở (Google gọi xác minh phía máy chủ về backend). Logic ở [`src/ads/gate.ts`](src/ads/gate.ts), phần gọi SDK ở [`src/ads/rewarded.ts`](src/ads/rewarded.ts).
+Hỏi đồng ý (UMP) và khởi tạo SDK làm một lần khi mở app ở chế độ Khách; quảng cáo được **tải sẵn** ngay khi lời mời hiện ([`src/ads/rewardedLoader.ts`](src/ads/rewardedLoader.ts)), vì quảng cáo video có khi tải
+gần hết hạn 60 giây của SDK (lỗi `Ad failed to load : 0`). Tải hỏng vì lỗi khác "không có quảng cáo" thì tự thử lại một lần; Google không có quảng cáo thì app báo "Quảng cáo chưa sẵn sàng".
 
 - **Expo Go không có AdMob.** Ở đó app gửi thêm `X-Ads-Unavailable: true`; backend ở môi trường phát triển (`Ads:AllowNoAdsDeclaration` = true) mở thẳng tóm tắt và nghe, app hiện ghi chú "chạy trong Expo Go nên chưa có quảng cáo".
   Nếu backend không bật cờ này (môi trường thật) mà cổng bật, app hiện "cần bản dựng phát triển để xem quảng cáo" và không mở được.
@@ -76,13 +78,21 @@ khách xem hết quảng cáo thì app hỏi `GET /public/ads/unlock?slug=` mỗ
   `eas build --profile development --platform android` (hoặc `ios`, cần tài khoản Apple Developer), cài bản dựng lên máy rồi `npx expo start --port 8083 --dev-client`. Đơn vị quảng cáo **không** nằm trong app: lấy từ
   `GET /public/ads/config`; ở môi trường phát triển backend trả **đơn vị thử của Google** (`.../5224354917` Android, `.../1712485313` iOS). Không dùng mã quảng cáo thật khi phát triển và không tự bấm quảng cáo thật (vi phạm chính sách của Google).
   Bản dựng dùng tài khoản AdMob của nhóm đặt mã ứng dụng lúc dựng bằng biến môi trường `ADMOB_ANDROID_APP_ID`, `ADMOB_IOS_APP_ID` ([`app.config.ts`](app.config.ts)); không đặt thì giữ mã thử.
-  Muốn thử trọn luồng mở khóa với đơn vị thật thì khai điện thoại là **thiết bị thử** trong AdMob (Settings → Test devices) để Google chỉ trả quảng cáo thử, hoặc đặt
-  `EXPO_PUBLIC_ADMOB_TEST_DEVICE_IDS` lúc dựng bằng mã băm mà SDK in ra log ("Use RequestConfiguration.Builder().setTestDeviceIds(...)").
+  Muốn thử với đơn vị thật mà không xem quảng cáo thật thì đặt `EXPO_PUBLIC_ADMOB_TEST_DEVICE_IDS` lúc dựng (`dung-apk.ps1 -TestDeviceIds`) bằng mã băm mà SDK in ra log
+  ("Use RequestConfiguration.Builder().setTestDeviceIds(...)"). Khai thiết bị thử trong AdMob (Settings → Test devices) dựa vào mã quảng cáo của máy, mà app chặn quyền đọc mã này,
+  nên cách đó không có tác dụng. Quảng cáo thử gọi xác minh với `user_id` giả (`fakeForAdDebugLog`) nên máy chủ không mở khóa: chỉ kiểm được phần tải và chiếu.
 - **Dựng APK tại máy** (không cần tài khoản Expo): đặt các biến trên cùng `EXPO_PUBLIC_API_BASE_URL` (địa chỉ HTTPS công khai của backend, vd đường hầm ngrok), chạy
   `npx expo prebuild --platform android --no-install` rồi trong `android/` chạy `gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a`; tệp ra ở `android/app/build/outputs/apk/release/`.
   Trên Windows phải bật đường dẫn dài (`LongPathsEnabled` = 1), vì đường dẫn biên dịch của reanimated dài tới 260 ký tự và ninja sẽ báo "build.ninja still dirty". `prebuild` sửa script
-  `android`, `ios` trong `package.json`: trả lại bằng `git checkout -- package.json`.
-- Để lượt xem mở khóa được, backend phải bật `Ads__GateEnabled=true` và địa chỉ `https://<máy chủ công khai>/api/v1/ads/admob/ssv` phải khai ở AdMob (dùng đường hầm khi chạy trên máy cá nhân); khách có hộp đồng ý UMP của Google ở EU và UK, nội dung giới hạn mức G.
+  `android`, `ios` trong `package.json`: trả lại bằng `git checkout -- package.json`. Script [`scripts/dung-apk.ps1`](../../scripts/dung-apk.ps1) ở thư mục gốc làm đủ các bước.
+- **Dựng cho Google Play**: mã gói `vn.id.diviet` (theo tên miền `diviet.id.vn`; không đổi được sau lần tải lên đầu). Tạo khóa tải lên một lần bằng
+  `scripts/tao-khoa-tai-len.ps1` (lưu ở `%APPDATA%\DSVHVN\google-play`, ngoài repo; cất thêm một bản ở nơi an toàn), rồi `scripts/dung-apk.ps1 -ChoGooglePlay`
+  ra tệp AAB đủ bốn kiến trúc ký bằng khóa đó ([`app.config.ts`](app.config.ts) thêm cấu hình ký đọc biến môi trường). Mỗi lần tải lên phải tăng `expo.android.versionCode` trong `app.json`.
+- **Chính sách Gia đình của Google Play**: học sinh (có cả học sinh tiểu học) dùng app nên đối tượng khai trên Play gồm trẻ em. Mọi yêu cầu quảng cáo đều xử lý như cho trẻ em
+  (không cá nhân hóa, mức G, cờ dưới tuổi đồng ý nên Google không hiện hộp đồng ý UMP) và `app.json` chặn quyền `com.google.android.gms.permission.AD_ID`, nên app không gửi mã quảng cáo của máy.
+  `blockedPermissions` cũng bỏ các quyền thư viện tự thêm mà app không dùng: Privacy Sandbox của quảng cáo (`ACCESS_ADSERVICES_*`), hiện trên ứng dụng khác
+  (`SYSTEM_ALERT_WINDOW`, mẫu của Expo), bộ nhớ ngoài, vân tay (`expo-secure-store` không dùng xác thực sinh trắc học). Thêm thư viện mới thì xem lại quyền trong tệp kê khai đã gộp.
+- Để lượt xem mở khóa được, backend phải bật `Ads__GateEnabled=true` và địa chỉ `https://<máy chủ công khai>/api/v1/ads/admob/ssv` phải khai ở AdMob (dùng đường hầm khi chạy trên máy cá nhân).
 
 Bản APK dùng API `http://` (không `https://`) cần cho phép cleartext (plugin `expo-build-properties`, `android.usesCleartextTraffic`); Expo Go không cần.
 
@@ -168,7 +178,7 @@ Các luồng nằm ở [`e2e/`](e2e/) (YAML, mở app qua `exp://10.0.2.2:8083`)
 | `hoc-sinh-dang-nhap-sai` | bỏ trống và nhập sai mật khẩu |
 | `hoc-sinh-kham-pha` | học sinh khối 8: tab Khám phá (không có lịch sử, gợi ý, Gần bạn), bản đồ và dòng thời gian mở riêng, tìm kiếm, chi tiết không có khối gợi ý |
 | `hoc-sinh-ma-gan-day` | học sinh khối 3: bài cấp 1 có thanh tiến độ theo bước, công tắc Tự đọc to tắt bật; mã vừa mở hiện ở "Mã em đã mở gần đây", chạm để mở lại |
-| `hoc-sinh-khoi-3` | cấp 1: đăng nhập mật khẩu tạm, đổi mật khẩu bắt buộc, nhập mã bài học, học từng bước, bài chơi bốn dạng câu, kết quả bằng sao |
+| `hoc-sinh-khoi-3` | cấp 1: đăng nhập bằng mật khẩu trên phiếu (không bị buộc đổi; tài khoản cũ còn bị buộc thì đổi), nhập mã bài học, học từng bước, bài chơi luyện tập bốn dạng câu (kiểm từng câu, bảng phản hồi), kết quả bằng sao và thẻ di sản, album |
 | `hoc-sinh-khoi-11` | cấp 3: bài dạng tài liệu, bài kiểm tra có giờ ba dạng câu, điểm và phân tích |
 | `khach-gan-ban-tu-choi` | (không chạy mặc định) khách từ chối quyền vị trí: app báo và vẫn cho thử lại; cần Expo Go chưa có quyền vị trí (máy ảo mới hoặc đã `pm revoke`, cấp lại sau) |
 

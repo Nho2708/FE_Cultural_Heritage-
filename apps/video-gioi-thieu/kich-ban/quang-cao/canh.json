@@ -1,0 +1,21 @@
+{
+  "ghiChu": "Thứ tự cảnh và độ dài (tính bằng phách) của video quảng cáo. src/quang-cao/nhip.ts và scripts/tao-nhac-quang-cao.py cùng đọc tệp này để điểm cắt hình và nhịp nhạc luôn khớp. Mỗi cảnh tối đa 5 phách (2,5 giây); thẻ kết 9 phách (4,5 giây) là một cảnh đứng yên để mã QR và địa chỉ ở trên màn hình đủ lâu.",
+  "khungMoiGiay": 30,
+  "nhipMoiPhut": 120,
+  "doc30": [
+    ["dung-truoc-di-tich", 4],
+    ["chi-tiet-bi-an", 4],
+    ["mo-app", 4],
+    ["ban-do-zoom", 5],
+    ["ban-do-trong-may", 4],
+    ["trang-chi-tiet", 4],
+    ["song-am", 5],
+    ["doi-ngon-ngu", 4],
+    ["mo-hinh-xoay", 4],
+    ["mo-hinh-hue", 4],
+    ["mo-hinh-trong-may", 4],
+    ["hieu-roi", 5],
+    ["the-ket", 9]
+  ],
+  "moGo": ["dung-truoc-di-tich", "ban-do-zoom", "mo-hinh-xoay", "the-ket"]
+}

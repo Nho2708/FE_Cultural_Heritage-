@@ -93,7 +93,7 @@ export function ForSchoolsPage() {
           headingId="nha-truong-tieu-de"
           kicker="DÀNH CHO NHÀ TRƯỜNG"
           title="Dạy di sản Việt Nam, soạn nhanh, học theo cấp"
-          text="Giáo viên soạn bài học và bài kiểm tra về di sản từ kho dữ liệu dựa trên nguồn của Cục Di sản văn hóa. Học sinh có tài khoản riêng, học theo cấp 1, 2, 3 và không thấy quảng cáo."
+          text="Giáo viên soạn bài học và bài kiểm tra về di sản từ kho dữ liệu dựa trên nguồn của Cục Di sản văn hóa. Học sinh có tài khoản riêng, học theo cấp 1, 2, 3 và tập trung vào bài học."
           actions={
             <>
               <HeroAnchor href={ADMIN_WEB_URL}>
@@ -163,7 +163,7 @@ export function ForSchoolsPage() {
         </section>
 
         <IntroVideo
-          name="nha-truong-90s"
+          name="gioi-thieu-nha-truong"
           edition="vi"
           captions={['vi', 'en']}
           defaultCaption={language === 'vi' ? null : 'en'}
@@ -171,6 +171,17 @@ export function ForSchoolsPage() {
           label="Video giới thiệu DiViet cho nhà trường"
           noSupport="Trình duyệt này không phát được video."
           headingId="nha-truong-video"
+        />
+
+        <IntroVideo
+          name="mot-di-san-ba-cach-hoc"
+          edition="vi"
+          captions={['vi', 'en']}
+          defaultCaption={language === 'vi' ? null : 'en'}
+          title="Một di sản, ba cách học"
+          label="Video một di sản, ba cách học theo cấp 1, 2, 3"
+          noSupport="Trình duyệt này không phát được video."
+          headingId="ba-cach-hoc-video"
         />
 
         <section aria-labelledby="bat-dau" className="bg-background py-12 dsvmd:py-16">

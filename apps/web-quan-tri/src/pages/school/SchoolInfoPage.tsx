@@ -1,14 +1,12 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState, type FormEvent } from 'react';
-import { useSearchParams } from 'react-router';
+import { Navigate, useSearchParams } from 'react-router';
 import { AreaPage, PageHeader } from '../../components/layout/PageHeader';
 import {
   Button,
   ErrorState,
   InlineMessage,
   LoadingState,
-  TabPanel,
-  Tabs,
   TextField,
   useToast,
 } from '@dsvhvn/dung-chung/ui';
@@ -27,12 +25,9 @@ import {
   validateOptionalText,
 } from '@dsvhvn/dung-chung';
 import { SubscriptionSummary } from '../../components/account/SubscriptionSummary';
-import { InvoicesTab } from '../../components/billing/InvoicesTab';
-import { PlanTab } from '../../components/billing/PlanTab';
 
-// Trường và gói (ba tab, nằm trên URL bằng ?tab=) — quản trị trường. Tab "Thông tin trường": tên trường chỉ đọc (chỉ quản trị
-// hệ thống sửa), địa chỉ, số điện thoại, email liên hệ sửa được. Tab "Gói và hạn mức": gói đang dùng, hạn mức, mua, gia hạn,
-// nâng cấp, hủy gói qua VNPay. Tab "Hóa đơn và giao dịch": biên nhận nội bộ và các lần thanh toán.
+// Thông tin trường — quản trị trường. Tên trường chỉ đọc (chỉ quản trị hệ thống sửa),
+// địa chỉ, số điện thoại, email liên hệ sửa được. Gói và hóa đơn quản lý ở trang "Gói đã mua".
 
 type Field = 'address' | 'phone' | 'email';
 
@@ -129,17 +124,7 @@ function ContactForm({ org }: { org: MyOrganization }) {
   );
 }
 
-const TABS = [
-  { id: 'thong-tin', label: 'Thông tin trường' },
-  { id: 'goi-va-han-muc', label: 'Gói và hạn mức' },
-  { id: 'hoa-don', label: 'Hóa đơn và giao dịch' },
-] as const;
-
-type TabId = (typeof TABS)[number]['id'];
-
-const readTab = (value: string | null): TabId => TABS.find((t) => t.id === value)?.id ?? 'thong-tin';
-
-function InfoTab() {
+function InfoContent() {
   const org = useQuery({ queryKey: queryKeys.org, queryFn: () => orgApi.get().then((r) => r.data) });
   if (org.isPending) return <LoadingState rows={4} />;
   if (org.isError) return <ErrorState error={org.error} onRetry={() => void org.refetch()} />;
@@ -152,31 +137,21 @@ function InfoTab() {
 }
 
 export default function SchoolInfoPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const tab = readTab(searchParams.get('tab'));
+  const [searchParams] = useSearchParams();
+  const tab = searchParams.get('tab');
 
-  const setTab = (next: TabId) =>
-    setSearchParams(
-      (current) => {
-        const params = new URLSearchParams(current);
-        if (next === 'thong-tin') params.delete('tab');
-        else params.set('tab', next);
-        return params;
-      },
-      { replace: true },
-    );
+  // Chuyển hướng nếu mở từ liên kết cũ có tab gói hoặc hóa đơn
+  if (tab === 'goi-va-han-muc') return <Navigate to="/truong/goi" replace />;
+  if (tab === 'hoa-don') return <Navigate to="/truong/goi?tab=hoa-don" replace />;
 
   return (
     <AreaPage>
       <PageHeader
-        title="Trường và gói"
-        description="Thông tin của trường, gói dịch vụ đang dùng, hạn mức và hóa đơn thanh toán."
+        title="Thông tin trường"
+        description="Thông tin liên hệ của trường."
       />
       <div>
-        <Tabs idPrefix="truong" label="Trường và gói" items={TABS} value={tab} onChange={setTab} />
-        <TabPanel idPrefix="truong" id={tab}>
-          {tab === 'thong-tin' ? <InfoTab /> : tab === 'goi-va-han-muc' ? <PlanTab /> : <InvoicesTab />}
-        </TabPanel>
+        <InfoContent />
       </div>
     </AreaPage>
   );

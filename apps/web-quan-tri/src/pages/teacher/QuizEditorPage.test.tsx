@@ -273,7 +273,9 @@ describe('Soạn bài kiểm tra: danh sách câu', () => {
     await user.click(await screen.findByRole('button', { name: 'Thêm câu từ ngân hàng' }));
     const dialog = await screen.findByRole('dialog', { name: 'Chọn câu từ ngân hàng' });
     expect(await within(dialog).findByText(/Chỉ hiện câu có dạng dùng được ở lớp cấp 2 \(Một đáp án đúng, Đúng\/Sai, Sắp xếp, Điền từ\)/)).toBeInTheDocument();
-    expect(calls.find((c) => c.path.includes('question-candidates'))?.path).toContain('lessonHeritagesOnly=true');
+    expect(within(dialog).getByText(/Câu đã duyệt về các di sản đã gắn với bài học/)).toBeInTheDocument();
+    expect(within(dialog).queryByRole('button', { name: /Di sản của bài/ })).not.toBeInTheDocument();
+    expect(calls.find((c) => c.path.includes('question-candidates'))?.path).not.toContain('lessonHeritagesOnly');
     const existing = within(dialog).getByRole('checkbox', { name: /Chọn câu: Câu hỏi số 101/ });
     expect(existing).toBeChecked();
     expect(existing).toBeDisabled();
@@ -291,7 +293,7 @@ describe('Soạn bài kiểm tra: danh sách câu', () => {
     expect(await screen.findByText('Danh sách câu hỏi (5 câu)')).toBeInTheDocument();
   });
 
-  it('hộp chọn câu: bỏ lọc di sản của bài, lọc độ khó, dạng câu và từ khóa gửi đúng tham số; câu không khớp thì báo rỗng', async () => {
+  it('hộp chọn câu: lọc độ khó, dạng câu và từ khóa gửi đúng tham số; câu không khớp thì báo rỗng', async () => {
     signInAs('TEACHER');
     const calls = api(draft(), (call) =>
       call.path.startsWith('/teacher/quizzes/9/question-candidates') ? envelope(200, { data: candidatePageOf([]) }) : undefined,
@@ -303,14 +305,13 @@ describe('Soạn bài kiểm tra: danh sách câu', () => {
     const dialog = await screen.findByRole('dialog', { name: 'Chọn câu từ ngân hàng' });
     expect(await within(dialog).findByText(/Không tìm thấy kết quả phù hợp/)).toBeInTheDocument();
 
-    await user.click(within(dialog).getByRole('button', { name: /Di sản của bài/ }));
     await user.selectOptions(within(dialog).getByLabelText('Độ khó'), 'HARD');
     await user.selectOptions(within(dialog).getByLabelText('Dạng câu'), 'FILL_BLANK');
     await user.type(within(dialog).getByLabelText('Từ khóa'), 'văn miếu{enter}');
 
     await waitFor(() => {
       const last = decodeURIComponent(calls.filter((c) => c.path.includes('question-candidates')).at(-1)?.path ?? '');
-      expect(last).toContain('lessonHeritagesOnly=false');
+      expect(last).not.toContain('lessonHeritagesOnly');
       expect(last).toContain('difficultyLevel=HARD');
       expect(last).toContain('questionType=FILL_BLANK');
       expect(last).toContain('keyword=văn+miếu');
@@ -339,11 +340,11 @@ describe('Soạn bài kiểm tra: danh sách câu', () => {
 });
 
 describe('Phát hành và đóng', () => {
-  it('phát hành: hỏi xác nhận có lời nhắc khóa danh sách, phát hành xong nhắc đưa mã bài học cho lớp', async () => {
+  it('phát hành: hỏi xác nhận có lời nhắc khóa danh sách, phát hành xong đưa mã bài kiểm tra cho lớp', async () => {
     signInAs('TEACHER');
     const calls = api(draft(), (call, current, set) => {
       if (call.method === 'POST' && call.path === '/teacher/quizzes/9/publish') {
-        const next = publishedQuizOf({ questions: current().questions });
+        const next = publishedQuizOf({ questions: current().questions, accessCode: 'KT4M9P2R' });
         set(next);
         return envelope(200, { data: { quiz: next, message: 'Đã phát hành bài kiểm tra "Kiểm tra 15 phút: Kinh thành Huế". Học sinh lớp 7A1 làm bài qua mã bài học BH7F3K2Q.' } });
       }
@@ -359,10 +360,56 @@ describe('Phát hành và đóng', () => {
     await user.click(within(confirm).getByRole('button', { name: 'Phát hành' }));
 
     expect(await screen.findByText(/Đã phát hành bài kiểm tra "Kiểm tra 15 phút: Kinh thành Huế"/)).toBeInTheDocument();
-    const code = await screen.findByRole('dialog', { name: 'Mã bài học' });
-    expect(within(code).getByTestId('ma-bai-hoc')).toHaveTextContent('BH7F3K2Q');
+    const code = await screen.findByRole('dialog', { name: 'Mã bài kiểm tra' });
+    expect(within(code).getByTestId('ma-bai-hoc')).toHaveTextContent('KT4M9P2R');
+    expect(within(code).getByRole('button', { name: 'Gửi thông báo cho lớp' })).toBeInTheDocument();
     await waitFor(() => expect(screen.queryByRole('button', { name: 'Phát hành' })).not.toBeInTheDocument());
     expect(screen.getByRole('button', { name: 'Đóng bài kiểm tra' })).toBeInTheDocument();
+  });
+
+  it('gửi thông báo cho lớp từ mã bài kiểm tra, kèm lời nhắn', async () => {
+    signInAs('TEACHER');
+    const calls = api(publishedQuizOf({ questions: THREE, accessCode: 'KT4M9P2R' }), (call) =>
+      call.path === '/teacher/quizzes/9/notify-class' ? envelope(200, { data: { sentTo: 30, message: 'Đã gửi thông báo cho 30 học sinh.' } }) : undefined,
+    );
+    const user = userEvent.setup();
+    renderApp('/giao-vien/kiem-tra/9');
+
+    await user.click(await screen.findByRole('button', { name: 'Mã bài kiểm tra' }));
+    await user.click(within(await screen.findByRole('dialog', { name: 'Mã bài kiểm tra' })).getByRole('button', { name: 'Gửi thông báo cho lớp' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Gửi thông báo cho lớp' });
+    await user.type(within(dialog).getByLabelText('Lời nhắn (không bắt buộc)'), 'Làm trước thứ Sáu');
+    await user.click(within(dialog).getByRole('button', { name: 'Gửi thông báo' }));
+
+    expect(await screen.findByText('Đã gửi thông báo cho 30 học sinh.')).toBeInTheDocument();
+    const sent = calls.find((c) => c.path === '/teacher/quizzes/9/notify-class');
+    expect(sent?.body).toEqual({ message: 'Làm trước thứ Sáu' });
+  });
+
+  it('lớp cấp 1: không có ô giờ mở và đóng, phát hành được khi chưa đặt giờ', async () => {
+    signInAs('TEACHER');
+    api(draft({ level: 1, timeLimitMinutes: null, openAt: null, closeAt: null, readiness: { isReady: true, missing: [], warnings: [] } }));
+    renderApp('/giao-vien/kiem-tra/9');
+
+    expect(await screen.findByText(/Lớp cấp 1 không đặt giờ mở và đóng/)).toBeInTheDocument();
+    expect(screen.queryByLabelText('Mở lúc *')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Đóng lúc *')).not.toBeInTheDocument();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Phát hành' }));
+    expect(await screen.findByRole('dialog', { name: 'Phát hành bài kiểm tra?' })).toBeInTheDocument();
+  });
+
+  it('ô giờ đọc lại buổi trong ngày để không nhầm 12:30 trưa với 00:30', async () => {
+    signInAs('TEACHER');
+    api(draft());
+    const user = userEvent.setup();
+    renderApp('/giao-vien/kiem-tra/9');
+
+    const field = await screen.findByLabelText('Mở lúc *');
+    await user.clear(field);
+    await user.type(field, '12:30 27/10/2030');
+
+    expect(await screen.findByText(/Đang đặt: 12:30 trưa 27\/10\/2030/)).toBeInTheDocument();
   });
 
   it('có chỉnh sửa chưa lưu: Phát hành lưu trước rồi mới hỏi xác nhận', async () => {

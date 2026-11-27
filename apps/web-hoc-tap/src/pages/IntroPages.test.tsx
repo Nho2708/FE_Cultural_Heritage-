@@ -31,11 +31,11 @@ afterEach(() => {
 });
 
 describe('trang Giới thiệu', () => {
-  it('khách mở được không cần đăng nhập; ba tính năng, ghi chú quảng cáo 24 giờ và bản dịch máy, nguồn thông tin, liên kết sang trang đã có', async () => {
+  it('khách mở được không cần đăng nhập; ba tính năng, ghi chú miễn phí cho mọi người và bản dịch máy, nguồn thông tin, liên kết sang trang đã có', async () => {
     const calls = mockApi();
     renderApp('/gioi-thieu');
 
-    expect(await screen.findByRole('heading', { level: 1, name: 'Di sản Việt Nam, kể bằng ngôn ngữ của bạn' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Di sản Việt Nam, nghe bằng ngôn ngữ của bạn' })).toBeInTheDocument();
     expect(document.title).toBe('Giới thiệu · DiViet');
     expect(screen.getByRole('link', { name: 'Bắt đầu khám phá' })).toHaveAttribute('href', '/di-san');
 
@@ -44,7 +44,7 @@ describe('trang Giới thiệu', () => {
     expect(within(features).getByRole('heading', { level: 3, name: 'Tìm di sản gần bạn trên bản đồ' })).toBeInTheDocument();
     expect(within(features).getByRole('link', { name: 'Mở bản đồ di sản' })).toHaveAttribute('href', '/ban-do');
     expect(within(features).getByRole('link', { name: 'Xem dòng thời gian' })).toHaveAttribute('href', '/dong-thoi-gian');
-    expect(within(features).getByRole('note')).toHaveTextContent(/một quảng cáo ngắn, dùng được trong 24 giờ.*Bản tiếng Hàn, Trung và Nhật là bản dịch máy/);
+    expect(within(features).getByRole('note')).toHaveTextContent(/đều miễn phí cho tất cả mọi người, không cần đăng nhập.*Bản tiếng Hàn, Trung và Nhật là bản dịch máy/);
 
     expect(screen.getByText(/Thông tin dựa trên dữ liệu của Cục Di sản văn hóa \(dsvh\.gov\.vn\)/)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Xem trang dành cho nhà trường' })).toHaveAttribute('href', '/nha-truong');
@@ -64,7 +64,7 @@ describe('trang Giới thiệu', () => {
     expect(await screen.findByRole('heading', { level: 1, name: "Viet Nam's heritage, told in your language" })).toBeInTheDocument();
     expect(document.title).toBe('About · DiViet');
     expect(screen.getByRole('link', { name: 'Start exploring' })).toHaveAttribute('href', '/di-san');
-    expect(screen.getByText(/unlock with one short ad and stay open for 24 hours/)).toBeInTheDocument();
+    expect(screen.getByText(/are free for everyone, with no sign-in needed/)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'See the page for schools' })).toHaveAttribute('href', '/nha-truong');
   });
 
@@ -138,7 +138,7 @@ describe('trang Dành cho nhà trường', () => {
 });
 
 describe('chân trang', () => {
-  it('có cột Về DiViet với Giới thiệu và Dành cho nhà trường, theo ngôn ngữ đang chọn', async () => {
+  it('có cột Về DiViet với Giới thiệu, Dành cho nhà trường và Chính sách quyền riêng tư, theo ngôn ngữ đang chọn', async () => {
     chooseLanguage('en');
     mockApi();
     renderApp('/gioi-thieu');
@@ -146,5 +146,6 @@ describe('chân trang', () => {
     const column = await screen.findByRole('navigation', { name: 'About DiViet' });
     expect(within(column).getByRole('link', { name: 'About' })).toHaveAttribute('href', '/gioi-thieu');
     expect(within(column).getByRole('link', { name: 'For schools' })).toHaveAttribute('href', '/nha-truong');
+    expect(within(column).getByRole('link', { name: 'Privacy policy' })).toHaveAttribute('href', '/chinh-sach-quyen-rieng-tu');
   });
 });

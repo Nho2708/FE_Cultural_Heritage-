@@ -118,6 +118,7 @@ function Filters({ range, onRange, quizId, quizOptions, onQuiz, scopeLabel }: Fi
 }
 
 function Panel({ data, classId, filters }: { data: ClassRecommendations; classId: number; filters: ReactNode }) {
+  const reviewHint = data.quizId === null ? 'Di sản lớp sai từ 40% và có ít nhất 10 câu trả lời, tối đa 5.' : 'Di sản lớp sai từ 40% trong bài kiểm tra này, tối đa 5.';
   const [creating, setCreating] = useState<HeritageCard[] | null>(null);
   const review = data.heritagesToReview;
   const related = data.relatedHeritages;
@@ -140,7 +141,7 @@ function Panel({ data, classId, filters }: { data: ClassRecommendations; classId
         <InlineMessage tone="warning">Dịch vụ AI chưa phản hồi nên di sản liên quan được chọn theo cùng tỉnh hoặc cùng loại di sản.</InlineMessage>
       )}
       <div className="grid gap-6 lg:grid-cols-2">
-        <SuggestionCard title="Di sản nên ôn" icon="alert-triangle" hint="Di sản lớp sai từ 40% và có ít nhất 10 câu trả lời, tối đa 5.">
+        <SuggestionCard title="Di sản nên ôn" icon="alert-triangle" hint={reviewHint}>
           {review.length === 0 ? (
             <li className="type-body-s text-on-surface-variant">Chưa có di sản nào cần ôn.</li>
           ) : (

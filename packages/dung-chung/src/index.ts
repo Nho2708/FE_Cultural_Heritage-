@@ -11,6 +11,7 @@ export * from './forms';
 export * from './guest';
 export * from './heritage';
 export * from './lessons';
+export * from './levelOne';
 export * from './messages';
 export * from './model3d';
 export * from './questions';

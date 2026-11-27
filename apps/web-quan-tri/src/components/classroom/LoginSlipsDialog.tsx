@@ -6,7 +6,7 @@ import { LoginSlipCard } from './LoginSlipCard';
 import { SLIPS_PER_PAGE, chunk, pdfName } from './slips';
 
 // Phiếu đăng nhập của học sinh (hộp thoại có chế độ in) — hiện ngay sau khi tạo tài khoản hoặc đặt lại mật khẩu. Mỗi em một
-// phiếu; "In phiếu" in khổ A4, 8 phiếu mỗi trang có đường cắt. Mật khẩu tạm chỉ hiện một lần (chỉ lưu bản băm): dữ liệu
+// phiếu; "In phiếu" in khổ A4, 8 phiếu mỗi trang có đường cắt. Mật khẩu (tạm hoặc mật khẩu cấp 1) chỉ hiện một lần (chỉ lưu bản băm): dữ liệu
 // chỉ nằm trong bộ nhớ của hộp thoại này, đóng hộp thoại là mất, và đóng thì hỏi "Thầy cô đã in hoặc lưu phiếu chưa?".
 // Bản in là một khối riêng gắn vào cuối <body> (ẩn trên màn hình); khi in, CSS ẩn toàn bộ phần còn lại của trang.
 
@@ -80,7 +80,7 @@ export function LoginSlipsDialog({ sheet, schoolName, summary, onClose }: LoginS
         }}
         onClose={() => setAsking(false)}
       >
-        Sau khi đóng, mật khẩu tạm của các em không hiện lại được nữa. Nếu mất phiếu, thầy cô dùng "Đặt lại mật khẩu".
+        Sau khi đóng, {sheet.passwordIsTemporary ? 'mật khẩu tạm' : 'mật khẩu'} của các em không hiện lại được nữa. Nếu mất phiếu, thầy cô dùng "Đặt lại mật khẩu".
       </ConfirmDialog>
 
       {createPortal(

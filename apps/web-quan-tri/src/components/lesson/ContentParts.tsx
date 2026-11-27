@@ -1,6 +1,6 @@
 import { LESSON_LENGTHS, LESSON_LENGTH_LABEL, LESSON_LIMITS, cn } from '@dsvhvn/dung-chung';
 import type { AiQuota, LessonFrame, LessonLength } from '@dsvhvn/dung-chung/api';
-import { Button, Icon, TextField } from '@dsvhvn/dung-chung/ui';
+import { Button, Icon, TextAreaField, TextField } from '@dsvhvn/dung-chung/ui';
 import { AiQuotaMeter } from './LessonBits';
 import { moveItem } from './lessonForm';
 
@@ -22,9 +22,15 @@ interface AiPanelProps {
   composing: boolean;
   disabled: boolean;
   onCompose: () => void;
+  /** Yêu cầu thêm cho AI (không bắt buộc, tối đa 500 ký tự). */
+  instructions: string;
+  onInstructions: (value: string) => void;
 }
 
-export function AiPanel({ frame, quota, length, onLength, hasContent, composing, disabled, onCompose }: AiPanelProps) {
+/** Gợi ý mẫu cho ô yêu cầu thêm. */
+export const INSTRUCTIONS_EXAMPLE = 'Nhấn mạnh kiến trúc; liên hệ với địa phương; dùng ví dụ gần gũi';
+
+export function AiPanel({ frame, quota, length, onLength, hasContent, composing, disabled, onCompose, instructions, onInstructions }: AiPanelProps) {
   const noPlan = !quota.hasEffectivePlan;
   const exhausted = quota.hasEffectivePlan && (quota.remaining ?? 0) <= 0;
   const blocked = disabled || noPlan || exhausted;
@@ -69,6 +75,31 @@ export function AiPanel({ frame, quota, length, onLength, hasContent, composing,
         <p className="type-body-s text-on-surface-variant">
           {LESSON_LENGTHS.map((value) => `${LESSON_LENGTH_LABEL[value]} khoảng ${frame[TARGET_WORDS[value]]}`).join(' · ')} từ
         </p>
+        <div>
+          <TextAreaField
+            label="Yêu cầu thêm cho AI (không bắt buộc)"
+            name="instructions"
+            rows={2}
+            maxLength={LESSON_LIMITS.aiInstructionsMaxLength}
+            value={instructions}
+            readOnly={disabled || composing}
+            placeholder={`Ví dụ: ${INSTRUCTIONS_EXAMPLE}`}
+            hint="AI làm theo về trọng tâm, cách kể và ví dụ, miễn không trái khung của cấp và không thêm dữ kiện ngoài tư liệu của di sản."
+            onChange={(e) => onInstructions(e.target.value)}
+          />
+          <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
+            {instructions.trim() === '' && !disabled && !composing ? (
+              <Button variant="ghost" size="sm" className="text-link" onClick={() => onInstructions(INSTRUCTIONS_EXAMPLE)}>
+                Dùng gợi ý mẫu
+              </Button>
+            ) : (
+              <span />
+            )}
+            <span className="type-body-s text-on-surface-variant" aria-live="polite">
+              {instructions.length}/{LESSON_LIMITS.aiInstructionsMaxLength}
+            </span>
+          </div>
+        </div>
         <div className="flex flex-wrap items-center gap-3">
           <Button variant={hasContent ? 'secondary' : 'primary'} loading={composing} disabled={blocked} onClick={onCompose}>
             <Icon name="sparkles" size={16} />

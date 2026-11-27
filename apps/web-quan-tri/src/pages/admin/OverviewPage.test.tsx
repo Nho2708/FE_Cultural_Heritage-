@@ -7,7 +7,7 @@ import { renderApp, signInAs } from '../../test/renderApp';
 import type { SystemOverview } from '@dsvhvn/dung-chung/api';
 
 // Tổng quan và doanh thu của quản trị hệ thống: tab Tổng quan (số liệu, gói, cần chú ý, biểu đồ theo thời gian) và tab Doanh thu (doanh thu từ giao
-// dịch VNPay thành công, biểu đồ theo kỳ, danh sách giao dịch có bộ lọc, liên kết sang bảng điều khiển quảng cáo của Google).
+// dịch VNPay thành công, biểu đồ theo kỳ, danh sách giao dịch có bộ lọc).
 
 function api(overview: SystemOverview = systemOverviewOf()) {
   return mockApi(
@@ -58,6 +58,55 @@ describe('Tổng quan và doanh thu', () => {
     expect(within(rows[1]!).getByText('1 trường')).toBeInTheDocument();
   });
 
+  it('cần chú ý: câu chờ duyệt và giao dịch thất bại có liên kết xử lý', async () => {
+    signInAs('ADMIN');
+    api(systemOverviewOf({ recentFailedPayments: 2 }));
+    renderApp('/quan-tri');
+    expect(await screen.findByText('Có 20 câu hỏi đang chờ giáo viên duyệt.')).toBeInTheDocument();
+    expect(screen.getByText('2 giao dịch thanh toán thất bại trong 7 ngày gần nhất.')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Xem giao dịch thất bại' })).toHaveAttribute('href', '/quan-tri?tab=doanh-thu&trang-thai=that-bai');
+  });
+
+  it('cần chú ý: thanh toán đến muộn hiện số, danh sách ngắn kèm liên kết tới trang chi tiết trường', async () => {
+    signInAs('ADMIN');
+    api(
+      systemOverviewOf({
+        latePaymentsToReview: 7,
+        latePayments: [
+          { paymentId: 1, invoiceId: 11, invoiceNumber: 'HD-2026-0042', organizationId: 7, organizationName: 'Trường THCS Lê Lợi', planName: 'Cơ bản', amount: 1990000, paidAt: '2026-10-07T07:05:00Z' },
+          { paymentId: 2, invoiceId: 12, invoiceNumber: 'HD-2026-0043', organizationId: 9, organizationName: 'Trường Tiểu học Hòa Bình', planName: null, amount: 3990000, paidAt: '2026-10-08T03:30:00Z' },
+        ],
+      }),
+    );
+    renderApp('/quan-tri');
+
+    expect(await screen.findByText('Có 7 khoản thanh toán đến muộn cần xử lý.')).toBeInTheDocument();
+    const list = screen.getByRole('list', { name: 'Khoản thanh toán đến muộn' });
+    const rows = within(list).getAllByRole('listitem');
+    expect(rows).toHaveLength(2);
+    expect(rows[0]).toHaveTextContent('Hóa đơn HD-2026-0042 · Trường THCS Lê Lợi · gói Cơ bản · 1.990.000 ₫ · 14:05 07/10/2026');
+    expect(rows[1]).toHaveTextContent('Hóa đơn HD-2026-0043 · Trường Tiểu học Hòa Bình · 3.990.000 ₫ · 10:30 08/10/2026');
+    expect(within(rows[0]!).getByRole('link', { name: 'Trường THCS Lê Lợi' })).toHaveAttribute('href', '/quan-tri/truong/7');
+    expect(screen.getByText('Còn 5 khoản khác.')).toBeInTheDocument();
+  });
+
+  it('cần chú ý: máy chủ cũ không có trường thanh toán đến muộn hoặc bằng 0 thì không hiện dòng này, không lỗi', async () => {
+    signInAs('ADMIN');
+    const old = systemOverviewOf();
+    delete old.latePaymentsToReview;
+    delete old.latePayments;
+    api(old);
+    const first = renderApp('/quan-tri');
+    expect(await screen.findByText('4 câu hỏi đang bị ẩn khỏi ngân hàng.')).toBeInTheDocument();
+    expect(screen.queryByText(/thanh toán đến muộn/)).not.toBeInTheDocument();
+    first.unmount();
+
+    api(systemOverviewOf({ latePaymentsToReview: 0, latePayments: [] }));
+    renderApp('/quan-tri');
+    expect(await screen.findByText('4 câu hỏi đang bị ẩn khỏi ngân hàng.')).toBeInTheDocument();
+    expect(screen.queryByText(/thanh toán đến muộn/)).not.toBeInTheDocument();
+  });
+
   it('cần chú ý: trường không có gói, gói sắp hết hạn và câu bị ẩn; rỗng thì báo chưa có', async () => {
     signInAs('ADMIN');
     api();
@@ -65,7 +114,7 @@ describe('Tổng quan và doanh thu', () => {
     expect(await screen.findByText('1 trường không có gói đang hiệu lực.')).toBeInTheDocument();
     expect(screen.getByText('1 trường có gói sắp hết hạn trong 14 ngày tới.')).toBeInTheDocument();
     expect(screen.getByText('4 câu hỏi đang bị ẩn khỏi ngân hàng.')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Mở kiểm duyệt câu hỏi' })).toHaveAttribute('href', '/quan-tri/cau-hoi');
+    expect(screen.getAllByRole('link', { name: 'Mở kiểm duyệt câu hỏi' })[0]).toHaveAttribute('href', '/quan-tri/cau-hoi');
     first.unmount();
 
     api(
@@ -103,7 +152,7 @@ describe('Tổng quan và doanh thu', () => {
     expect(await screen.findByRole('figure', { name: 'Học sinh mới theo ngày' })).toBeInTheDocument();
   });
 
-  it('tab Doanh thu: doanh thu tháng này, hôm nay, từ trước tới nay, biểu đồ theo kỳ bằng tiền, doanh thu quảng cáo xem ở Google', async () => {
+  it('tab Doanh thu: doanh thu tháng này, hôm nay, từ trước tới nay, biểu đồ theo kỳ bằng tiền', async () => {
     signInAs('ADMIN');
     api();
     const user = userEvent.setup();
@@ -120,8 +169,7 @@ describe('Tổng quan và doanh thu', () => {
     const chart = await screen.findByRole('figure', { name: 'Doanh thu theo ngày' });
     expect(within(chart).getByRole('cell', { name: '1.990.000 ₫' })).toBeInTheDocument();
     expect(screen.getByText(/Tổng cả khoảng:/)).toHaveTextContent('1.990.000 ₫');
-    expect(screen.getByRole('link', { name: /Mở bảng điều khiển AdMob/ })).toHaveAttribute('target', '_blank');
-    expect(screen.getByRole('link', { name: /Mở bảng điều khiển Ad Manager/ })).toHaveAttribute('rel', 'noreferrer');
+    expect(screen.queryByText(/quảng cáo|AdMob|Ad Manager/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'Số liệu toàn hệ thống' })).not.toBeInTheDocument();
   });
 

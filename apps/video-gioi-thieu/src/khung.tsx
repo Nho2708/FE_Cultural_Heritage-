@@ -12,7 +12,7 @@ export function chonAnh(...ungVien: string[]): string | null {
 
 const kep = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
 
-/** Nền xanh than với quầng vàng nhạt và vòng tròn mảnh như vành huy hiệu. */
+/** Nền xanh than với quầng vàng nhạt và vòng tròn mảnh màu vàng. */
 export function Nen({ children }: { children?: ReactNode }) {
   const { width, height } = useVideoConfig();
   const r = Math.max(width, height) * 0.62;

@@ -130,7 +130,7 @@
         "Thông tin dựa trên dữ liệu của Cục Di sản văn hóa, tóm lược và ghi nguồn."
       ],
       "ket": [
-        "Vietnam Heritage",
+        "DiViet",
         "Mở trên trình duyệt hoặc cài app Android. Miễn phí."
       ],
       "ghi-cong": "Dữ liệu: Cục Di sản văn hóa (dsvh.gov.vn) · Nhạc: nhóm dự án tự soạn",
@@ -171,12 +171,12 @@
         "Based on data from Vietnam's Department of Cultural Heritage, summarised with sources."
       ],
       "ket": [
-        "Vietnam Heritage",
+        "DiViet",
         "Open it in your browser or get the Android app. Free."
       ],
       "ghi-cong": "Data: Department of Cultural Heritage (dsvh.gov.vn) · Music: original by the project team",
       "ghi-chu-dich": "",
-      "ghi-chu-man-hinh": "Screens from the demo version; some heritage content is shown in Vietnamese."
+      "ghi-chu-man-hinh": ""
     },
     "ko": {
       "mo-dau": [
@@ -212,12 +212,12 @@
         "베트남 문화유산국의 자료를 바탕으로 요약하고 출처를 밝힙니다."
       ],
       "ket": [
-        "Vietnam Heritage",
+        "DiViet",
         "브라우저에서 열거나 Android 앱을 설치하세요. 무료입니다."
       ],
       "ghi-cong": "자료: 베트남 문화유산국 (dsvh.gov.vn) · 음악: 프로젝트 팀 창작",
       "ghi-chu-dich": "앱의 한국어 내용은 기계 번역입니다.",
-      "ghi-chu-man-hinh": "화면은 데모 버전이며 일부 유산 내용은 베트남어로 표시됩니다."
+      "ghi-chu-man-hinh": ""
     },
     "zh-Hans": {
       "mo-dau": [
@@ -253,12 +253,12 @@
         "信息基于越南文化遗产局的资料，经摘要整理并注明出处。"
       ],
       "ket": [
-        "Vietnam Heritage",
+        "DiViet",
         "在浏览器中打开，或安装 Android 应用。免费。"
       ],
       "ghi-cong": "资料：越南文化遗产局 (dsvh.gov.vn) · 音乐：项目团队原创",
       "ghi-chu-dich": "应用中的中文内容为机器翻译。",
-      "ghi-chu-man-hinh": "画面来自演示版，部分遗产内容以越南语显示。"
+      "ghi-chu-man-hinh": ""
     },
     "ja": {
       "mo-dau": [
@@ -294,12 +294,12 @@
         "ベトナム文化遺産局のデータをもとに要約し、出典を示しています。"
       ],
       "ket": [
-        "Vietnam Heritage",
+        "DiViet",
         "ブラウザで開くか、Android アプリをインストール。無料です。"
       ],
       "ghi-cong": "データ：ベトナム文化遺産局 (dsvh.gov.vn) · 音楽：プロジェクトチームのオリジナル",
       "ghi-chu-dich": "アプリ内の日本語は機械翻訳です。",
-      "ghi-chu-man-hinh": "画面はデモ版で、一部の遺産情報はベトナム語で表示されています。"
+      "ghi-chu-man-hinh": ""
     }
   },
   "chao": [

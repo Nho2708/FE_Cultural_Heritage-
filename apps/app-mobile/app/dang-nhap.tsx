@@ -11,7 +11,8 @@ import { Button, Notice, Screen, Txt } from '../src/components/ui';
 import { useApp, useAuth } from '../src/state/AppProvider';
 
 // Học sinh đăng nhập bằng mã học sinh + mật khẩu (cùng API với web học tập). Sai mã hoặc mật khẩu luôn cùng một câu, không cho biết sai ô nào; tạm khóa, bị vô hiệu,
-// lớp đã xóa báo theo câu của máy chủ. Không có "quên mật khẩu qua email": em nhờ thầy cô đặt lại. Token lưu bằng SecureStore (Keychain / Keystore), không lưu mật khẩu.
+// lớp đã xóa báo theo câu của máy chủ. Không có "quên mật khẩu qua email": nút "Quên mật khẩu?" mở ô nhập mã học sinh để báo thầy cô chủ nhiệm đặt lại; gửi xong luôn hiện cùng một câu
+// (dù mã có tài khoản hay không), chỉ báo lỗi khi gõ sai định dạng, gửi quá nhiều lần hoặc mất mạng. Token lưu bằng SecureStore (Keychain / Keystore), không lưu mật khẩu.
 
 type FieldName = 'studentCode' | 'password';
 
@@ -32,6 +33,9 @@ export default function StudentLogin() {
   const [errors, setErrors] = useState<Partial<Record<FieldName, string>>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [forgot, setForgot] = useState(false);
+  const [forgotError, setForgotError] = useState<string | null>(null);
+  const [forgotSent, setForgotSent] = useState(false);
 
   if (mode !== 'student') return <Redirect href="/" />;
   if (session) return <Redirect href="/" />;
@@ -61,6 +65,64 @@ export default function StudentLogin() {
       setSubmitting(false);
     }
   };
+
+  const submitForgot = async () => {
+    setForgotSent(false);
+    const codeError = validateStudentCodeInput(studentCode);
+    setForgotError(codeError);
+    if (codeError) return;
+
+    setSubmitting(true);
+    try {
+      await services.studentApi.forgotPassword(normalizeCode(studentCode));
+      setForgotSent(true);
+    } catch (error) {
+      const failure = splitApiError<FieldName>(error, ['studentCode']);
+      setForgotError(
+        error instanceof ApiError && error.status === 0 ? t('hs.common.error') : (failure.fields.studentCode ?? failure.form ?? MESSAGES.systemError),
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const closeForgot = () => {
+    setForgot(false);
+    setForgotError(null);
+    setForgotSent(false);
+  };
+
+  if (forgot) {
+    return (
+      <Screen style={{ paddingTop: insets.top + 24 }}>
+        <View style={{ gap: 6 }}>
+          <Txt variant="heading" accessibilityRole="header">
+            {t('hs.login.forgotTitle')}
+          </Txt>
+          <Txt muted>{MESSAGES.studentForgotPasswordSubtitle}</Txt>
+        </View>
+        {forgotSent ? <Notice tone="info" text={MESSAGES.studentForgotPasswordSent} /> : null}
+        <Field
+          label={t('hs.login.codeLabel')}
+          value={studentCode}
+          onChangeText={(value) => {
+            setStudentCode(normalizeCode(value));
+            setForgotError(null);
+          }}
+          placeholder={t('hs.login.codePlaceholder')}
+          keyboardType="visible-password"
+          autoCapitalize="characters"
+          textContentType="username"
+          autoComplete="username"
+          returnKeyType="go"
+          onSubmitEditing={() => void submitForgot()}
+          error={forgotError ?? undefined}
+        />
+        <Button label={forgotSent ? t('hs.login.forgotSubmitAgain') : t('hs.login.forgotSubmit')} loading={submitting} onPress={() => void submitForgot()} full />
+        <Button label={t('hs.login.forgotBack')} variant="ghost" onPress={closeForgot} />
+      </Screen>
+    );
+  }
 
   const message = formError ?? notice;
 
@@ -102,7 +164,15 @@ export default function StudentLogin() {
         onSubmitEditing={() => void submit()}
         error={errors.password}
       />
-      <Txt muted>{MESSAGES.studentForgotPassword}</Txt>
+      <Button
+        label={MESSAGES.studentForgotPassword}
+        variant="ghost"
+        onPress={() => {
+          setForgot(true);
+          setForgotError(null);
+          setForgotSent(false);
+        }}
+      />
       <Button label={t('hs.login.submit')} loading={submitting} onPress={() => void submit()} full />
       <Txt variant="caption" muted>
         {t('hs.login.teacherNote')}

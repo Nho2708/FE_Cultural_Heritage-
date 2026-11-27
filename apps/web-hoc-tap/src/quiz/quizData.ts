@@ -9,12 +9,14 @@ export const progressQueryKey = ['student', 'progress'] as const;
 export const historyQueryKey = ['student', 'history'] as const;
 export const introQueryKey = (quizId: number) => ['student', 'quiz-intro', quizId] as const;
 export const resultQueryKey = (attemptId: number) => ['student', 'result', attemptId] as const;
+export const albumQueryKey = ['student', 'album'] as const;
 
 export const homeQueryFn = () => studentApi.home().then((r) => r.data);
 export const progressQueryFn = () => studentApi.progress().then((r) => r.data);
 export const historyQueryFn = (page: number, pageSize: number) => () => studentApi.history(page, pageSize).then((r) => r.data);
 export const introQueryFn = (quizId: number) => () => studentApi.quizIntro(quizId).then((r) => r.data);
 export const resultQueryFn = (attemptId: number) => () => studentApi.result(attemptId).then((r) => r.data);
+export const albumQueryFn = () => studentApi.album().then((r) => r.data);
 
 export const resultPath = (attemptId: number) => pathOf('result').replace(':luotLam', String(attemptId));
 
@@ -22,11 +24,12 @@ export const resultPath = (attemptId: number) => pathOf('result').replace(':luot
 export const takeQuizPath = (code: string, quizId: number) =>
   pathOf('takeQuiz').replace(':maBaiHoc', encodeURIComponent(code)).replace(':baiKiemTra', String(quizId));
 
-/** Sau khi nộp bài: trang học, tiến độ, lịch sử và giới thiệu bài kiểm tra đều đã cũ. */
+/** Sau khi nộp bài: trang học, tiến độ, lịch sử, album và giới thiệu bài kiểm tra đều đã cũ. */
 export function refreshAfterSubmit(queryClient: QueryClient) {
   void queryClient.invalidateQueries({ queryKey: homeQueryKey });
   void queryClient.invalidateQueries({ queryKey: progressQueryKey });
   void queryClient.invalidateQueries({ queryKey: historyQueryKey });
+  void queryClient.invalidateQueries({ queryKey: albumQueryKey });
   void queryClient.invalidateQueries({ queryKey: ['student', 'lesson'] });
   void queryClient.invalidateQueries({ queryKey: ['student', 'recommendations'] });
   queryClient.removeQueries({ queryKey: ['student', 'quiz-intro'] });

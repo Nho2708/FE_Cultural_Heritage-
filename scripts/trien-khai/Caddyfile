@@ -8,9 +8,18 @@
 }
 
 (mot-trang) {
+	# Chống bị nhúng vào khung của trang khác (X-Frame-Options cho trình duyệt cũ, frame-ancestors cho trình duyệt mới). Chấp nhận được vì
+	# app điện thoại mở các trang /nhung/... bằng WebView ở mức trang, không đặt trong iframe; web không dùng iframe nào của chính nó
+	# (quảng cáo Google tự tạo khung con bên trong trang, không bị ảnh hưởng).
+	# Cố ý chỉ khai ba chỉ thị này, chưa có script-src, connect-src, img-src, frame-src...: trang nạp quảng cáo (Google Publisher Tag, AdSense,
+	# Funding Choices) theo đường dẫn của Google thay đổi và gọi tiếp nhiều tên miền khác, kèm video Cloudinary, mô hình 3D, ảnh Wikimedia,
+	# ô bản đồ OpenStreetMap/ArcGIS, chỉ đường OSRM và cổng VNPay; một chính sách nguồn thiếu một tên miền sẽ làm hỏng chức năng đó trong
+	# im lặng. Muốn siết thêm thì trước hết chạy Content-Security-Policy-Report-Only rồi mới chuyển sang áp dụng.
 	header {
 		X-Content-Type-Options nosniff
+		X-Frame-Options SAMEORIGIN
 		Referrer-Policy strict-origin-when-cross-origin
+		Content-Security-Policy "frame-ancestors 'self'; base-uri 'self'; object-src 'none'"
 	}
 	# Tệp trong assets/ có băm trong tên nên cache một năm; tệp thiếu trả 404 thật, không trả index.html.
 	handle /assets/* {

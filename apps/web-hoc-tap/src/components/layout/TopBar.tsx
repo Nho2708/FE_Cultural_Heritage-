@@ -7,6 +7,7 @@ import { useI18n } from '../../i18n/context';
 import { LanguageDialog } from '../../i18n/LanguageDialog';
 import { languageOption } from '../../i18n/languages';
 import { useAuth } from '../../lib/auth/context';
+import { NotificationBell } from '../../notifications/NotificationBell';
 import { AccountMenu } from './AccountMenu';
 import { primaryNav, type NavItem } from './navigation';
 
@@ -174,9 +175,12 @@ export function TopBar() {
 
         {!user && <ThemeToggle className="ml-1" />}
         {user ? (
-          <span className="ml-1 dsvmd:ml-4">
-            <AccountMenu />
-          </span>
+          <>
+            <NotificationBell />
+            <span className="ml-1 dsvmd:ml-2">
+              <AccountMenu />
+            </span>
+          </>
         ) : (
           <PillLink to={pathOf('login')} className="mr-2 ml-1 shrink-0 dsvmd:ml-4">
             {t.nav.studentSignIn}

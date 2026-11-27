@@ -43,7 +43,10 @@ const ROLE_SLUG = slugMap<ActorRole>({
   SYSTEM: 'he-thong',
 });
 
-const ACTION_SLUG = slugMap<AuditAction>({
+/** Hành động có trong bộ lọc: không gồm hành động của tính năng mở khóa bằng phần thưởng đã ngưng dùng (dòng nhật ký cũ vẫn hiện nhãn của nó). */
+type FilterAction = Exclude<AuditAction, 'AD_REWARD_REJECTED'>;
+
+const ACTION_SLUG = slugMap<FilterAction>({
   LOGIN: 'dang-nhap',
   LOGIN_LOCKED_OUT: 'tam-khoa-dang-nhap',
   ORG_CREATED: 'tao-truong',
@@ -70,7 +73,6 @@ const ACTION_SLUG = slugMap<AuditAction>({
   SUBSCRIPTION_CHANGED: 'doi-goi',
   BILLING_STATUS_CHANGED: 'doi-trang-thai-thanh-toan',
   IPN_REJECTED: 'tu-choi-ipn',
-  AD_REWARD_REJECTED: 'tu-choi-thuong-quang-cao',
 });
 
 const TARGET_SLUG: Record<string, string> = {
@@ -88,7 +90,6 @@ const TARGET_SLUG: Record<string, string> = {
   plans: 'goi-dich-vu',
   invoices: 'hoa-don',
   payments: 'giao-dich',
-  ad_unlocks: 'mo-khoa-quang-cao',
 };
 const TARGET_BY_SLUG = new Map(Object.entries(TARGET_SLUG).map(([target, slug]) => [slug, target]));
 
@@ -98,10 +99,12 @@ const ROLE_OPTIONS = [
 ];
 const ACTION_OPTIONS = [
   { value: '', label: 'Tất cả hành động' },
-  ...(Object.keys(AUDIT_ACTION_LABEL) as AuditAction[]).map((a) => ({
-    value: ACTION_SLUG.toSlug(a),
-    label: AUDIT_ACTION_LABEL[a],
-  })),
+  ...(Object.keys(AUDIT_ACTION_LABEL) as AuditAction[])
+    .filter((a): a is FilterAction => a !== 'AD_REWARD_REJECTED')
+    .map((a) => ({
+      value: ACTION_SLUG.toSlug(a),
+      label: AUDIT_ACTION_LABEL[a],
+    })),
 ];
 const TARGET_OPTIONS = [
   { value: '', label: 'Tất cả đối tượng' },

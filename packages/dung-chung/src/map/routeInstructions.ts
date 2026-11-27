@@ -57,9 +57,24 @@ interface Phrases {
   exitRoundabout: string;
 }
 
-const EN_ORDINAL = new Intl.PluralRules('en-US', { type: 'ordinal' });
-const EN_SUFFIX: Record<string, string> = { one: 'st', two: 'nd', few: 'rd', other: 'th' };
-const ordinalEn = (n: number) => `${n}${EN_SUFFIX[EN_ORDINAL.select(n)] ?? 'th'}`;
+/**
+ * Số thứ tự tiếng Anh: 1st, 2nd, 3rd, 4th, 11th, 12th, 13th, 21st, 101st, 111th. Viết tay thay cho `Intl.PluralRules`: Hermes trong Expo Go không có
+ * PluralRules, và dòng gọi nó ở cấp module làm app đỏ màn hình ngay khi nạp.
+ */
+export function ordinalEn(n: number): string {
+  const lastTwo = n % 100;
+  if (lastTwo >= 11 && lastTwo <= 13) return `${n}th`;
+  switch (n % 10) {
+    case 1:
+      return `${n}st`;
+    case 2:
+      return `${n}nd`;
+    case 3:
+      return `${n}rd`;
+    default:
+      return `${n}th`;
+  }
+}
 
 const PHRASES: Record<LanguageCode, Phrases> = {
   vi: {

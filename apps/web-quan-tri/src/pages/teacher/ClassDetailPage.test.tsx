@@ -2,7 +2,7 @@ import { ERROR_CODES, type ClassStudent } from '@dsvhvn/dung-chung/api';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
-import { classOf, classStudentOf, envelope, mockApi, sheetOf, studentPage, userOf, type FetchCall } from '../../test/fixtures';
+import { classOf, classStudentOf, envelope, mockApi, primarySheetOf, sheetOf, studentPage, userOf, type FetchCall } from '../../test/fixtures';
 import { renderApp, signInAs } from '../../test/renderApp';
 import { progressOf } from '../../test/statisticsFixtures';
 
@@ -106,6 +106,9 @@ describe('Chi tiết lớp — tab Học sinh', () => {
     expect(within(slip).getByText('HS6Y3RJB')).toBeInTheDocument();
     expect(within(slip).getByText('Zc5gH7rk')).toBeInTheDocument();
     expect(within(slips).getByText(/Mật khẩu tạm chỉ hiện một lần/)).toBeInTheDocument();
+    expect(within(slip).getByText('Mật khẩu tạm')).toBeInTheDocument();
+    expect(within(slip).getByText('Em sẽ phải đổi mật khẩu ở lần đăng nhập đầu tiên.')).toBeInTheDocument();
+    expect(within(dialog).queryByText(/mật khẩu 6 chữ số/)).not.toBeInTheDocument();
     expect(within(slips).getByRole('button', { name: 'In phiếu' })).toBeInTheDocument();
 
     await user.click(within(slips).getByRole('button', { name: 'Đóng' }));
@@ -311,6 +314,75 @@ describe('Chi tiết lớp — tab Học sinh', () => {
     await user.click(screen.getByRole('button', { name: 'Lưu họ tên' }));
     expect(await screen.findByText('Lưu học sinh thành công.')).toBeInTheDocument();
     expect(calls.find((c) => c.method === 'PUT')?.body).toEqual({ fullName: 'Nguyễn Minh Anh B' });
+  });
+
+  it('lớp cấp 1: hộp thêm học sinh nói mật khẩu 6 chữ số, phiếu ghi "Mật khẩu" và dòng nhắc dùng luôn mật khẩu này', async () => {
+    signInAs('TEACHER');
+    api(
+      three(),
+      (call) =>
+        call.path === `${BASE}/students` && call.method === 'POST'
+          ? envelope(201, {
+              data: {
+                students: [classStudentOf(9, { fullName: 'Đỗ Minh Khang', studentCode: 'HS6Y3RJB' })],
+                sheet: primarySheetOf([{ id: 9, name: 'Đỗ Minh Khang', code: 'HS6Y3RJB', password: '482915' }], '3A1'),
+              },
+              message: 'Thêm học sinh thành công.',
+            })
+          : undefined,
+      { name: '3A1', grade: 3, schoolLevel: 1, schoolLevelName: 'Cấp 1' },
+    );
+    const user = userEvent.setup();
+    renderApp('/giao-vien/lop/1');
+
+    await user.click(await screen.findByRole('button', { name: 'Thêm học sinh' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Thêm học sinh vào lớp 3A1' });
+    expect(within(dialog).getByText(/mã học sinh và mật khẩu 6 chữ số cho từng em/)).toBeInTheDocument();
+    expect(within(dialog).queryByText(/mật khẩu tạm/)).not.toBeInTheDocument();
+    await user.type(within(dialog).getByLabelText('Họ và tên'), 'Đỗ Minh Khang');
+    await user.click(within(dialog).getByRole('button', { name: 'Tạo tài khoản' }));
+
+    const slips = await screen.findByRole('dialog', { name: 'Phiếu đăng nhập — Lớp 3A1' });
+    const slip = within(slips).getByRole('article', { name: 'Phiếu đăng nhập của Đỗ Minh Khang' });
+    expect(within(slip).getByText('482915')).toBeInTheDocument();
+    expect(within(slip).getByText('Mật khẩu')).toBeInTheDocument();
+    expect(within(slip).queryByText('Mật khẩu tạm')).not.toBeInTheDocument();
+    expect(within(slip).getByText('Em dùng mật khẩu này mỗi lần đăng nhập. Quên mật khẩu thì em nhờ thầy cô đặt lại.')).toBeInTheDocument();
+    expect(within(slips).queryByText(/Mật khẩu tạm/)).not.toBeInTheDocument();
+
+    await user.click(within(slips).getByRole('button', { name: 'Đóng' }));
+    const ask = await screen.findByRole('dialog', { name: 'Thầy cô đã in hoặc lưu phiếu chưa?' });
+    expect(within(ask).getByText(/Sau khi đóng, mật khẩu của các em không hiện lại được nữa/)).toBeInTheDocument();
+  });
+
+  it('lớp cấp 1: bảng không có cột đã đổi mật khẩu; hộp đặt lại mật khẩu không nhắc phải đổi mật khẩu', async () => {
+    signInAs('TEACHER');
+    api(three(), undefined, { name: '3A1', grade: 3, schoolLevel: 1, schoolLevelName: 'Cấp 1' });
+    const user = userEvent.setup();
+    renderApp('/giao-vien/lop/1');
+
+    const table = await screen.findByRole('table', { name: 'Học sinh của lớp' });
+    expect(within(table).queryByText('Đã đổi mật khẩu lần đầu')).not.toBeInTheDocument();
+    expect(within(table).queryByText('Chưa đổi')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('checkbox', { name: 'Chọn Nguyễn Minh Anh' }));
+    await user.click(screen.getByRole('button', { name: 'Đặt lại mật khẩu' }));
+    const confirm = await screen.findByRole('dialog', { name: 'Đặt lại mật khẩu' });
+    expect(within(confirm).getByText('Mật khẩu hiện tại của các em không dùng được nữa; các em đăng nhập bằng mật khẩu mới trên phiếu.')).toBeInTheDocument();
+    expect(within(confirm).queryByText(/phải đổi mật khẩu/)).not.toBeInTheDocument();
+  });
+
+  it('lớp cấp 1 chưa có học sinh: gợi ý nói mật khẩu 6 chữ số; lớp cấp 2 vẫn nói mật khẩu tạm', async () => {
+    signInAs('TEACHER');
+    api([], undefined, { name: '3A1', grade: 3, schoolLevel: 1, schoolLevelName: 'Cấp 1', activeStudentCount: 0 });
+    renderApp('/giao-vien/lop/1');
+    expect(await screen.findByText(/mã học sinh và mật khẩu 6 chữ số cho từng em/)).toBeInTheDocument();
+  });
+
+  it('lớp cấp 2 chưa có học sinh: gợi ý vẫn nói mật khẩu tạm', async () => {
+    signInAs('TEACHER');
+    api([], undefined, { activeStudentCount: 0 });
+    renderApp('/giao-vien/lop/1');
+    expect(await screen.findByText(/mã học sinh và mật khẩu tạm cho từng em/)).toBeInTheDocument();
   });
 
   it('lớp đủ sĩ số: khóa Thêm học sinh và Nhập danh sách, báo lý do', async () => {

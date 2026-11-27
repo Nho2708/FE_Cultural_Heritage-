@@ -8,18 +8,19 @@ import { renderApp, signInAs } from '../test/renderApp';
 // Trang học của em: ba bản bố cục riêng theo cấp của lớp, dữ liệu lớp lấy từ máy chủ.
 
 describe('Trang học của em — ba bản bố cục theo cấp', () => {
-  it('cấp 1: một cột, lời chào có nút loa, nút lớn "Nhập mã bài học", thẻ Lớp của em, không bảng', async () => {
+  it('cấp 1: lời chào bằng tên gọi có nút loa, lối phụ "Nhập mã", thẻ Lớp của em, không bảng', async () => {
     const student = studentOf(4, { fullName: 'Trần Minh Khôi' });
     signInAs(student);
     mockApi(studentServer(student));
     renderApp('/hoc');
 
-    expect(await screen.findByRole('heading', { level: 1, name: /^Chào Trần Minh Khôi/ })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Chào Khôi!' })).toBeInTheDocument();
     expect(document.querySelector('[data-bo-cuc]')).toHaveAttribute('data-bo-cuc', 'cap-1');
+    expect(screen.getByRole('button', { name: 'Nghe lời chào' })).toBeInTheDocument();
     const classBlock = screen.getByRole('region', { name: 'Lớp của em' });
     expect(within(classBlock).getByText('4A1')).toBeInTheDocument();
     expect(within(classBlock).getByText('Trần Văn Bình')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Nhập mã bài học' })).toHaveAttribute('href', '/nhap-ma');
+    expect(within(screen.getByRole('region', { name: 'Thầy cô đưa mã bài?' })).getByRole('link', { name: 'Nhập mã' })).toHaveAttribute('href', '/nhap-ma');
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 

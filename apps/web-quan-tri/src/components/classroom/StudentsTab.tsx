@@ -30,7 +30,7 @@ import { PAGE_SIZE, slugMap, useListParams } from '../../lib/listParams';
 import { AddStudentsDialog, type AddMode, type StudentsAdded } from './AddStudentsDialog';
 
 // Tab Học sinh của Chi tiết lớp: bảng mã học sinh, họ tên, trạng thái (Hoạt động / Đã vô hiệu), lần đăng nhập gần nhất, đã
-// đổi mật khẩu lần đầu chưa. "Thêm học sinh" và "Nhập danh sách" mở hộp thoại Thêm học sinh; sửa họ tên tại chỗ; vô hiệu /
+// đổi mật khẩu lần đầu chưa (lớp cấp 1 không có cột này vì em không phải đổi). "Thêm học sinh" và "Nhập danh sách" mở hộp thoại Thêm học sinh; sửa họ tên tại chỗ; vô hiệu /
 // mở lại và xóa mềm qua hộp xác nhận chung; chọn một hoặc nhiều em đang hoạt động rồi "Đặt lại mật khẩu" (hộp xác nhận chung,
 // sau đó hiện Phiếu đăng nhập mới). Mã học sinh và lớp không sửa được; học sinh không chuyển sang lớp khác.
 
@@ -75,6 +75,9 @@ const ACTION_TEXT: Record<ActionKind, { title: string; verb: string; confirm: st
     note: 'Mật khẩu hiện tại của các em không dùng được nữa; các em đăng nhập bằng mật khẩu tạm mới trên phiếu và phải đổi mật khẩu.',
   },
 };
+
+/** Lớp cấp 1 dùng luôn mật khẩu 6 chữ số trên phiếu, không phải đổi nên câu nhắc khác lớp cấp 2, 3. */
+const RESET_NOTE_LEVEL_1 = 'Mật khẩu hiện tại của các em không dùng được nữa; các em đăng nhập bằng mật khẩu mới trên phiếu.';
 
 function RenameCell({ student, onSave, onCancel }: { student: ClassStudent; onSave: (name: string) => Promise<void>; onCancel: () => void }) {
   const formRef = useRef<HTMLFormElement>(null);
@@ -131,6 +134,7 @@ interface StudentsTabProps {
 }
 
 export function StudentsTab({ classRoom, onSlips }: StudentsTabProps) {
+  const isPrimary = classRoom.schoolLevel === 1;
   const toast = useToast();
   const queryClient = useQueryClient();
   const { params, update, page } = useListParams();
@@ -236,6 +240,7 @@ export function StudentsTab({ classRoom, onSlips }: StudentsTabProps) {
   };
 
   const text = action ? ACTION_TEXT[action.kind] : null;
+  const note = action?.kind === 'reset' && isPrimary ? RESET_NOTE_LEVEL_1 : text?.note;
 
   return (
     <div className="flex flex-col gap-4">
@@ -304,7 +309,7 @@ export function StudentsTab({ classRoom, onSlips }: StudentsTabProps) {
           />
         ) : (
           <EmptyState icon="users" title="Lớp chưa có học sinh nào.">
-            Thêm từng em hoặc nhập danh sách; hệ thống tạo mã học sinh và mật khẩu tạm cho từng em để thầy cô in phiếu đăng nhập.
+            Thêm từng em hoặc nhập danh sách; hệ thống tạo mã học sinh và {isPrimary ? 'mật khẩu 6 chữ số' : 'mật khẩu tạm'} cho từng em để thầy cô in phiếu đăng nhập.
           </EmptyState>
         )
       ) : (
@@ -326,7 +331,7 @@ export function StudentsTab({ classRoom, onSlips }: StudentsTabProps) {
                 <Th>Họ tên</Th>
                 <Th>Trạng thái</Th>
                 <Th>Đăng nhập gần nhất</Th>
-                <Th>Đã đổi mật khẩu lần đầu</Th>
+                {!isPrimary && <Th>Đã đổi mật khẩu lần đầu</Th>}
                 <Th className="text-right">Hành động</Th>
               </tr>
             </thead>
@@ -361,9 +366,11 @@ export function StudentsTab({ classRoom, onSlips }: StudentsTabProps) {
                       <span className="text-on-surface-muted">Chưa đăng nhập lần nào</span>
                     )}
                   </Td>
-                  <Td>
-                    {student.passwordChanged ? <Badge tone="success">Đã đổi</Badge> : student.isActive ? <Badge tone="warning">Chưa đổi</Badge> : <Blank />}
-                  </Td>
+                  {!isPrimary && (
+                    <Td>
+                      {student.passwordChanged ? <Badge tone="success">Đã đổi</Badge> : student.isActive ? <Badge tone="warning">Chưa đổi</Badge> : <Blank />}
+                    </Td>
+                  )}
                   <Td>
                     <div className="flex justify-end gap-1">
                       <Button variant="ghost" size="icon" aria-label={`Sửa họ tên ${student.fullName}`} onClick={() => setEditingId(student.id)}>
@@ -419,7 +426,7 @@ export function StudentsTab({ classRoom, onSlips }: StudentsTabProps) {
                 ? `Bạn có chắc muốn đặt lại mật khẩu cho ${action.students.length} học sinh?`
                 : MESSAGES.confirm(text.verb, action.students[0]?.fullName ?? '')}
             </p>
-            {text.note && <p className="mt-2 type-body-s">{text.note}</p>}
+            {note && <p className="mt-2 type-body-s">{note}</p>}
           </>
         )}
       </ConfirmDialog>

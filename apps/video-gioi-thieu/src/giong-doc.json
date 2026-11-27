@@ -1,38 +1,38 @@
 {
   "cau-hoi": {
     "batDau": 3.4,
-    "dai": 5.24
+    "dai": 4.95
   },
   "vai-tro": {
     "batDau": 10.4,
-    "dai": 5.98
+    "dai": 5.47
   },
   "lop-hoc": {
     "batDau": 18.4,
-    "dai": 5.11
+    "dai": 5.06
   },
   "soan-bai": {
     "batDau": 28.4,
-    "dai": 8.74
+    "dai": 8.75
   },
   "kiem-tra": {
     "batDau": 42.4,
-    "dai": 6.68
+    "dai": 6.84
   },
   "ba-cap": {
     "batDau": 52.4,
-    "dai": 7.65
+    "dai": 7.64
   },
   "ket-qua": {
     "batDau": 66.4,
-    "dai": 4.97
+    "dai": 5.03
   },
   "hai-noi": {
     "batDau": 76.4,
-    "dai": 3.89
+    "dai": 3.97
   },
   "ket": {
     "batDau": 83.4,
-    "dai": 5.22
+    "dai": 5.13
   }
 }

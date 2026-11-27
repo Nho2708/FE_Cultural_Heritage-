@@ -19,15 +19,15 @@ describe('Nhập mã bài học', () => {
     const user = userEvent.setup();
     renderApp('/nhap-ma');
 
-    await user.type(await screen.findByLabelText('Mã bài học'), 'BH7F3K20');
-    await user.click(screen.getByRole('button', { name: 'Mở bài học' }));
+    await user.type(await screen.findByLabelText('Mã bài học hoặc mã bài kiểm tra'), 'BH7F3K20');
+    await user.click(screen.getByRole('button', { name: 'Mở' }));
 
-    expect(await screen.findByText(/Mã bài học gồm 8 ký tự, bắt đầu bằng BH/)).toBeInTheDocument();
+    expect(await screen.findByText(/Mã gồm 8 ký tự, bắt đầu bằng BH \(bài học\)/)).toBeInTheDocument();
     expect(calls.some((c) => c.path.startsWith('/student/lessons/'))).toBe(false);
 
-    await user.clear(screen.getByLabelText('Mã bài học'));
-    await user.click(screen.getByRole('button', { name: 'Mở bài học' }));
-    expect(await screen.findByText('Vui lòng nhập mã bài học.')).toBeInTheDocument();
+    await user.clear(screen.getByLabelText('Mã bài học hoặc mã bài kiểm tra'));
+    await user.click(screen.getByRole('button', { name: 'Mở' }));
+    expect(await screen.findByText('Vui lòng nhập mã.')).toBeInTheDocument();
   });
 
   it('mã gõ thường có khoảng trắng và gạch vẫn đúng; mở được thì sang trang bài học theo cấp của lớp em', async () => {
@@ -39,14 +39,29 @@ describe('Nhập mã bài học', () => {
     const user = userEvent.setup();
     const { router } = renderApp('/nhap-ma');
 
-    await user.type(await screen.findByLabelText('Mã bài học'), 'bh 7f3-k2q');
-    expect(screen.getByLabelText('Mã bài học')).toHaveValue('BH 7F3-K2Q');
-    await user.click(screen.getByRole('button', { name: 'Mở bài học' }));
+    await user.type(await screen.findByLabelText('Mã bài học hoặc mã bài kiểm tra'), 'bh 7f3-k2q');
+    expect(screen.getByLabelText('Mã bài học hoặc mã bài kiểm tra')).toHaveValue('BH 7F3-K2Q');
+    await user.click(screen.getByRole('button', { name: 'Mở' }));
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/bai-hoc/BH7F3K2Q'));
     expect(await screen.findByRole('heading', { level: 1, name: 'Ngọ Môn và Kinh thành Huế' })).toBeInTheDocument();
     expect(document.querySelector('[data-bo-cuc]')).toHaveAttribute('data-bo-cuc', 'cap-2');
     expect(calls.filter((c) => c.path === '/student/lessons/BH7F3K2Q').length).toBeGreaterThan(0);
+  });
+
+  it('mã bài kiểm tra: vào thẳng bài kiểm tra, không qua trang bài học', async () => {
+    const student = studentOf(7);
+    signInAs(student);
+    mockApi(studentServer(student), (call) =>
+      call.path === '/student/lessons/KT4M9P2R' ? envelope(200, { data: { ...studentLessonOf(2), accessCode: 'BH7F3K2Q', focusQuizId: 31 } }) : undefined,
+    );
+    const user = userEvent.setup();
+    const { router } = renderApp('/nhap-ma');
+
+    await user.type(await screen.findByLabelText('Mã bài học hoặc mã bài kiểm tra'), 'kt4m9p2r');
+    await user.click(screen.getByRole('button', { name: 'Mở' }));
+
+    await waitFor(() => expect(router.state.location.pathname).toBe('/bai-hoc/BH7F3K2Q/kiem-tra/31'));
   });
 
   it('mã chưa đúng, bài chưa xuất bản hoặc của lớp khác: cùng một câu 404', async () => {
@@ -58,10 +73,10 @@ describe('Nhập mã bài học', () => {
     const user = userEvent.setup();
     renderApp('/nhap-ma');
 
-    await user.type(await screen.findByLabelText('Mã bài học'), 'BH7F3K2Q');
-    await user.click(screen.getByRole('button', { name: 'Mở bài học' }));
+    await user.type(await screen.findByLabelText('Mã bài học hoặc mã bài kiểm tra'), 'BH7F3K2Q');
+    await user.click(screen.getByRole('button', { name: 'Mở' }));
     expect(await screen.findByText(WRONG)).toBeInTheDocument();
-    expect(screen.getByLabelText('Mã bài học')).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByLabelText('Mã bài học hoặc mã bài kiểm tra')).toHaveAttribute('aria-invalid', 'true');
   });
 
   it('nhập sai quá nhiều lần: hiện câu chặn của máy chủ và khóa nút mở bài', async () => {
@@ -74,10 +89,10 @@ describe('Nhập mã bài học', () => {
     const user = userEvent.setup();
     renderApp('/nhap-ma');
 
-    await user.type(await screen.findByLabelText('Mã bài học'), 'BH7F3K2Z');
-    await user.click(screen.getByRole('button', { name: 'Mở bài học' }));
+    await user.type(await screen.findByLabelText('Mã bài học hoặc mã bài kiểm tra'), 'BH7F3K2Z');
+    await user.click(screen.getByRole('button', { name: 'Mở' }));
     expect(await screen.findByText(blocked)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Mở bài học' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Mở' })).toBeDisabled();
   });
 
   it('các mã em đã mở gần đây trên máy này dẫn tới bài học; em khác dùng chung máy không thấy', async () => {

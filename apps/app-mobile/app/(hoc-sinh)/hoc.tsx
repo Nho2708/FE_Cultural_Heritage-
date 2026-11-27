@@ -5,19 +5,22 @@ import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native
 import { Badge, Button, Card, EmptyState, ErrorState, Loading, Section, Txt, styles as ui } from '../../src/components/ui';
 import { remainingText, starsText } from '../../src/hocsinh/format';
 import { Recommendations } from '../../src/hocsinh/Recommendations';
+import { LevelOneHome } from '../../src/hocsinh/levelOne/LevelOneHome';
 import { useStudentHome, useStudentRecommendations } from '../../src/hocsinh/queries';
+import { useAuth } from '../../src/state/AppProvider';
 import { useTheme } from '../../src/theme/ThemeProvider';
 
-// Trang học của em. Bố cục khác nhau theo cấp: cấp 1 nút to, ít chữ, linh vật và sao; cấp 2 cân bằng chữ và hình, có gợi ý; cấp 3 gọn như danh sách tài liệu.
-// Nội dung lấy từ cùng API với web học tập: lượt đang làm dở, bài kiểm tra đang mở, bài học của em, huy hiệu gần đây.
+// Trang học của em. Bố cục khác nhau theo cấp: cấp 1 là con đường các bài thầy cô giao (bài tự hiện, không phải gõ mã) kết thúc ở album di sản;
+// cấp 2 cân bằng chữ và hình, có gợi ý; cấp 3 gọn như danh sách tài liệu.
+// Nội dung lấy từ cùng API với web học tập: lượt đang làm dở, bài kiểm tra đang mở, bài học của em, huy hiệu gần đây, các bài của lớp (cấp 1).
 
 function Mascot({ level }: { level: 1 | 2 | 3 }) {
   const theme = useTheme();
-  if (level === 3) return null;
+  if (level !== 2) return null;
   return (
     <View style={[local.mascot, { backgroundColor: theme.color.accent, borderRadius: theme.radius.card }]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      <Text allowFontScaling={false} style={{ fontSize: level === 1 ? 52 : 34 }}>
-        {level === 1 ? '🐲' : '🧭'}
+      <Text allowFontScaling={false} style={{ fontSize: 34 }}>
+        🧭
       </Text>
     </View>
   );
@@ -72,8 +75,10 @@ export default function StudentHomeScreen() {
   const theme = useTheme();
   const router = useRouter();
   const home = useStudentHome();
-  const level = theme.level ?? 2;
-  const recommendations = useStudentRecommendations();
+  const schoolName = useAuth().session?.user.organization?.name ?? null;
+  const level = home.data?.level ?? theme.level ?? 2;
+  // Cấp 1 không có khối gợi ý (một lối vào bài là con đường), nên không tải.
+  const recommendations = useStudentRecommendations(level !== 1);
 
   if (home.isLoading) return <Loading label={t('hs.common.loading')} />;
   if (home.isError || !home.data) return <ErrorState message={t('hs.common.error')} retryLabel={t('hs.common.retry')} onRetry={() => void home.refetch()} />;
@@ -83,6 +88,22 @@ export default function StudentHomeScreen() {
     if (code) router.push({ pathname: '/bai-hoc/[ma]', params: { ma: code } });
     else router.push('/(hoc-sinh)/nhap-ma');
   };
+
+  if (level === 1) {
+    return (
+      <LevelOneHome
+        home={data}
+        schoolName={schoolName}
+        refreshing={home.isRefetching}
+        onRefresh={() => void home.refetch()}
+        onOpenLesson={(code) => openLesson(code)}
+        // Lượt đang dở: vào thẳng bài chơi, không qua trang giới thiệu.
+        onPlayOn={(quizId) => router.push({ pathname: '/kiem-tra/[quizId]', params: { quizId: String(quizId), tiep: '1' } })}
+        onAlbum={() => router.push('/album')}
+        onEnterCode={() => router.push('/(hoc-sinh)/nhap-ma')}
+      />
+    );
+  }
   const codeOf = (lessonId: number) => data.myLessons.find((lesson) => lesson.lessonId === lessonId)?.accessCode ?? null;
   const openQuiz = (quizId: number) => router.push({ pathname: '/kiem-tra/[quizId]', params: { quizId: String(quizId) } });
   const gap = theme.spacing.block;
@@ -99,25 +120,19 @@ export default function StudentHomeScreen() {
           <Txt variant="heading" accessibilityRole="header">
             {t('hs.home.hello', { name: data.fullName ?? 'em' })}
           </Txt>
-          {level === 1 ? (
-            <Txt>{t('hs.home.mascotGreeting')}</Txt>
-          ) : (
-            <Txt muted>{t('hs.home.classLine', { className: data.className ?? '', level: data.levelName })}</Txt>
-          )}
+          <Txt muted>{t('hs.home.classLine', { className: data.className ?? '', level: data.levelName })}</Txt>
           {data.totalStars !== null ? (
-            <Txt variant={level === 1 ? 'title' : 'label'} color={theme.color.primary}>
+            <Txt variant="label" color={theme.color.primary}>
               ★ {t('hs.home.stars', { count: data.totalStars })}
             </Txt>
           ) : null}
         </View>
       </View>
 
-      <Button label={t('hs.home.enterCode')} onPress={() => router.push('/(hoc-sinh)/nhap-ma')} full style={level === 1 ? { minHeight: 64 } : undefined} />
-      {level !== 1 ? (
-        <Txt variant="caption" muted style={{ marginTop: -gap / 2 }}>
-          {t('hs.home.enterCodeHint')}
-        </Txt>
-      ) : null}
+      <Button label={t('hs.home.enterCode')} onPress={() => router.push('/(hoc-sinh)/nhap-ma')} full />
+      <Txt variant="caption" muted style={{ marginTop: -gap / 2 }}>
+        {t('hs.home.enterCodeHint')}
+      </Txt>
 
       {data.inProgress.length > 0 ? (
         <Section title={t('hs.home.inProgress')}>

@@ -116,7 +116,12 @@ describe('route guard theo ma trận phân quyền', () => {
     signInAs('ORG_ADMIN');
     const first = renderApp('/truong/thong-tin');
     const nav = await screen.findByRole('navigation', { name: 'Quản trị trường' });
-    expect([...nav.querySelectorAll('a')].map((a) => a.textContent)).toEqual(['Tổng quan', 'Trường và gói', 'Giáo viên']);
+    expect([...nav.querySelectorAll('a')].map((a) => a.textContent)).toEqual([
+      'Tổng quan',
+      'Trường',
+      'Gói đã mua',
+      'Giáo viên',
+    ]);
     expect(screen.getByRole('link', { name: /Mở trang khám phá di sản/ })).toHaveAttribute('target', '_blank');
     first.unmount();
 

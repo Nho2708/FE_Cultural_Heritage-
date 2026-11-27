@@ -1,17 +1,22 @@
 import { cn, focusFirstInvalid, splitApiError } from '@dsvhvn/dung-chung';
 import { HERITAGE_TYPE_LABEL } from '@dsvhvn/dung-chung';
-import type { ClassRoom, HeritageCard, HeritageType, LessonDetail } from '@dsvhvn/dung-chung/api';
+import type { ClassRoom, CurriculumTopic, HeritageCard, HeritageType, LessonDetail } from '@dsvhvn/dung-chung/api';
 import { Button, EmptyState, ErrorState, Icon, InlineMessage, LoadingState, Modal, Pagination, SelectField, TextField } from '@dsvhvn/dung-chung/ui';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useRef, useState, type FormEvent } from 'react';
 import { classesApi } from '../../lib/api/classroomEndpoints';
+import { teacherCurriculumApi } from '../../lib/api/curriculumEndpoints';
 import { lessonsApi, publishedHeritagesApi } from '../../lib/api/lessonEndpoints';
 import { queryKeys } from '../../lib/api/queryKeys';
 import { LevelBadge } from '../classroom/ClassFields';
 import { fileUrl } from '../../lib/fileUrl';
+import { TopicPicker } from './TopicPicker';
+import { useGradeTopics } from './topics';
 
 // Tạo bài học (hộp thoại hai bước): chọn lớp, rồi chọn 1-10 di sản đã xuất bản và đặt tiêu đề. Bài học dành riêng cho một
 // lớp; cấp của bài là cấp của lớp nên không có ô chọn cấp. Mở từ Chi tiết lớp thì lớp được chọn sẵn và khóa (bỏ bước 1).
+// Bước chọn di sản có ô "Chủ đề chương trình" theo khối của lớp: chọn chủ đề thì danh sách di sản là di sản của chủ đề; chủ đề "Địa phương em"
+// nhắc chọn tỉnh và giữ danh sách thường; khối không có chủ đề thì ẩn ô.
 // Tạo xong chuyển sang màn hình Soạn bài học. Trường hết gói thì máy chủ từ chối (422) và câu đó hiện ngay trong hộp thoại.
 
 const MAX_HERITAGES = 10;
@@ -97,6 +102,85 @@ function ClassStep({ classes, value, onChange }: { classes: ClassRoom[]; value: 
   );
 }
 
+function HeritageOption({ card, checked, onToggle }: { card: HeritageCard; checked: boolean; onToggle: (card: HeritageCard) => void }) {
+  return (
+    <li>
+      <label
+        htmlFor={`di-san-${card.id}`}
+        className={cn(
+          'flex h-full cursor-pointer flex-col overflow-hidden rounded-md border',
+          checked ? 'border-2 border-primary' : 'border-border hover:bg-surface-container-low',
+        )}
+      >
+        {card.thumbnailUrl ? (
+          <img src={fileUrl(card.thumbnailUrl) ?? ''} alt="" loading="lazy" className="h-28 w-full object-cover" />
+        ) : (
+          <span className="flex h-28 w-full items-center justify-center bg-image-placeholder text-on-surface-variant">
+            <Icon name="book-open" size={28} />
+          </span>
+        )}
+        <span className="flex flex-1 flex-col gap-1 p-3">
+          <span className="flex items-start gap-2">
+            <input id={`di-san-${card.id}`} type="checkbox" checked={checked} onChange={() => onToggle(card)} className="mt-1" aria-label={card.name} />
+            <span className="type-label text-on-surface">{card.name}</span>
+          </span>
+          <span className="type-body-s text-on-surface-variant">
+            {[card.provinceName, card.heritageType ? HERITAGE_TYPE_LABEL[card.heritageType] : null].filter(Boolean).join(' · ')}
+          </span>
+        </span>
+      </label>
+    </li>
+  );
+}
+
+/** Di sản đã xuất bản của một chủ đề: tải một lần, lọc theo tên ngay trên trang. */
+function TopicHeritageList({
+  topic,
+  selected,
+  onToggle,
+}: {
+  topic: CurriculumTopic;
+  selected: Map<number, HeritageCard>;
+  onToggle: (card: HeritageCard) => void;
+}) {
+  const [keyword, setKeyword] = useState('');
+  const list = useQuery({
+    queryKey: queryKeys.teacherTopicHeritages(topic.id),
+    queryFn: () => teacherCurriculumApi.heritages(topic.id).then((r) => r.data),
+    staleTime: 5 * 60_000,
+  });
+  const normalized = keyword.trim().toLocaleLowerCase('vi-VN');
+  const all = list.data?.items ?? [];
+  const items = normalized ? all.filter((c) => c.name.toLocaleLowerCase('vi-VN').includes(normalized)) : all;
+
+  return (
+    <div>
+      <h3 className="type-h4 text-on-surface">Di sản của chủ đề "{topic.title}"</h3>
+      <div className="mt-3 dsvmd:max-w-sm">
+        <TextField label="Tìm trong các di sản của chủ đề" type="search" value={keyword} onChange={(e) => setKeyword(e.target.value)} />
+      </div>
+      <div className="mt-4">
+        {list.isPending ? (
+          <LoadingState rows={2} />
+        ) : list.isError ? (
+          <ErrorState error={list.error} onRetry={() => void list.refetch()} />
+        ) : items.length === 0 ? (
+          <EmptyState icon="search" title={all.length === 0 ? 'Chủ đề này chưa có di sản đã xuất bản.' : 'Không tìm thấy di sản phù hợp trong chủ đề.'} />
+        ) : (
+          <>
+            <p className="mb-3 type-body-s text-on-surface-variant">{items.length} di sản đã xuất bản của chủ đề · chọn được nhiều di sản</p>
+            <ul className="grid gap-3 dsvsm:grid-cols-2 dsvmd:grid-cols-3">
+              {items.map((card) => (
+                <HeritageOption key={card.id} card={card} checked={selected.has(card.id)} onToggle={onToggle} />
+              ))}
+            </ul>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function HeritageGrid({
   selected,
   onToggle,
@@ -176,37 +260,9 @@ function HeritageGrid({
               Hiển thị {items.length} trên {list.data.totalItems} di sản đã xuất bản · chọn được nhiều di sản
             </p>
             <ul className="grid gap-3 dsvsm:grid-cols-2 dsvmd:grid-cols-3">
-              {items.map((card) => {
-                const checked = selected.has(card.id);
-                return (
-                  <li key={card.id}>
-                    <label
-                      htmlFor={`di-san-${card.id}`}
-                      className={cn(
-                        'flex h-full cursor-pointer flex-col overflow-hidden rounded-md border',
-                        checked ? 'border-2 border-primary' : 'border-border hover:bg-surface-container-low',
-                      )}
-                    >
-                      {card.thumbnailUrl ? (
-                        <img src={fileUrl(card.thumbnailUrl) ?? ''} alt="" loading="lazy" className="h-28 w-full object-cover" />
-                      ) : (
-                        <span className="flex h-28 w-full items-center justify-center bg-image-placeholder text-on-surface-variant">
-                          <Icon name="book-open" size={28} />
-                        </span>
-                      )}
-                      <span className="flex flex-1 flex-col gap-1 p-3">
-                        <span className="flex items-start gap-2">
-                          <input id={`di-san-${card.id}`} type="checkbox" checked={checked} onChange={() => onToggle(card)} className="mt-1" aria-label={card.name} />
-                          <span className="type-label text-on-surface">{card.name}</span>
-                        </span>
-                        <span className="type-body-s text-on-surface-variant">
-                          {[card.provinceName, card.heritageType ? HERITAGE_TYPE_LABEL[card.heritageType] : null].filter(Boolean).join(' · ')}
-                        </span>
-                      </span>
-                    </label>
-                  </li>
-                );
-              })}
+              {items.map((card) => (
+                <HeritageOption key={card.id} card={card} checked={selected.has(card.id)} onToggle={onToggle} />
+              ))}
             </ul>
             <Pagination
               label="di sản"
@@ -230,6 +286,7 @@ export function CreateLessonDialog({ fixedClass, initialHeritages, initialTitle,
   const [selected, setSelected] = useState<Map<number, HeritageCard>>(
     () => new Map((initialHeritages ?? []).slice(0, MAX_HERITAGES).map((card) => [card.id, card])),
   );
+  const [topicId, setTopicId] = useState<number | null>(null);
   const [title, setTitle] = useState(initialTitle ?? '');
   const [titleTouched, setTitleTouched] = useState(initialTitle !== undefined);
   const [errors, setErrors] = useState<{ title?: string; heritageIds?: string; classId?: string }>({});
@@ -243,6 +300,10 @@ export function CreateLessonDialog({ fixedClass, initialHeritages, initialTitle,
   });
 
   const chosenClass = fixedClass ?? classes.data?.items.find((c) => c.id === classId) ?? null;
+  // Chủ đề theo khối của lớp; lỗi hoặc khối không có chủ đề thì danh sách rỗng và ô chọn ẩn.
+  const gradeTopics = useGradeTopics(step === 'heritage' && chosenClass ? chosenClass.grade : null);
+  const topics = gradeTopics.data ?? [];
+  const topic = topics.find((t) => t.id === topicId) ?? null;
 
   const toggle = (card: HeritageCard) =>
     setSelected((current) => {
@@ -304,7 +365,14 @@ export function CreateLessonDialog({ fixedClass, initialHeritages, initialTitle,
                 Hãy tạo lớp ở màn hình Lớp học trước, rồi quay lại tạo bài học.
               </EmptyState>
             ) : (
-              <ClassStep classes={classes.data.items} value={classId} onChange={setClassId} />
+              <ClassStep
+                classes={classes.data.items}
+                value={classId}
+                onChange={(id) => {
+                  setClassId(id);
+                  setTopicId(null);
+                }}
+              />
             )}
             <div className="flex justify-end gap-3">
               <Button variant="secondary" onClick={onClose}>
@@ -344,7 +412,14 @@ export function CreateLessonDialog({ fixedClass, initialHeritages, initialTitle,
               error={errors.title}
               hint="Tối đa 255 ký tự."
             />
-            <HeritageGrid selected={selected} onToggle={toggle} />
+            {chosenClass && topics.length > 0 && (
+              <TopicPicker grade={chosenClass.grade} topics={topics} value={topicId} onChange={(t) => setTopicId(t?.id ?? null)} />
+            )}
+            {topic && !topic.localProvince ? (
+              <TopicHeritageList key={topic.id} topic={topic} selected={selected} onToggle={toggle} />
+            ) : (
+              <HeritageGrid selected={selected} onToggle={toggle} />
+            )}
             {errors.heritageIds && (
               <p role="alert" className="type-body-s text-danger">
                 {errors.heritageIds}

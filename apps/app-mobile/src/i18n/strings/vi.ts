@@ -3,6 +3,8 @@
 
 export interface Strings {
   appName: string;
+  /** Khẩu hiệu dưới tên DiViet (màn hình chọn ngôn ngữ, thẻ chào mừng). */
+  tagline: string;
   common: {
     back: string;
     close: string;
@@ -50,6 +52,7 @@ export interface Strings {
     next: string;
     start: string;
     step: string;
+    welcome: { text: string };
     discover: { title: string; text: string };
     narration: { title: string; text: string };
     model: { title: string; text: string };
@@ -129,6 +132,7 @@ export interface Strings {
     detailed: string;
     short: string;
     unavailable: string;
+    locked: string;
     fallbackOnly: string;
   };
   speech: {
@@ -197,11 +201,15 @@ export interface Strings {
     adsNotNeeded: string;
     adsUnavailable: string;
     adsCheckFailed: string;
+    privacy: string;
+    privacyText: string;
+    openPrivacy: string;
   };
 }
 
 export const vi: Strings = {
   appName: 'DiViet',
+  tagline: 'Khám phá di sản Việt Nam',
   common: {
     back: 'Quay lại',
     close: 'Đóng',
@@ -240,7 +248,7 @@ export const vi: Strings = {
   intro: {
     title: 'Giới thiệu ứng dụng',
     replay: 'Xem lại',
-    replayText: 'Xem lại bốn thẻ giới thiệu ngắn về ứng dụng.',
+    replayText: 'Xem lại năm thẻ giới thiệu ngắn về ứng dụng.',
     videoTitle: 'Video giới thiệu',
     videoText: 'Xem video giới thiệu ngắn về ứng dụng, cần kết nối mạng.',
     watchVideo: 'Xem video giới thiệu',
@@ -249,8 +257,9 @@ export const vi: Strings = {
     next: 'Tiếp',
     start: 'Bắt đầu',
     step: 'Bước {{current}} trên {{total}}',
+    welcome: { text: 'Bản đồ, thuyết minh, mô hình 3D và bài học về di sản Việt Nam, gói gọn trong một ứng dụng.' },
     discover: { title: 'Khám phá di sản gần bạn', text: 'Mở bản đồ, tìm di sản quanh nơi bạn đứng và đọc tóm tắt từng nơi.' },
-    narration: { title: 'Nghe thuyết minh bằng tiếng của bạn', text: 'Chọn một trong năm ngôn ngữ, rồi nghe thuyết minh về từng di sản.' },
+    narration: { title: 'Lắng nghe thuyết minh theo ngôn ngữ của bạn', text: 'Chọn một trong năm ngôn ngữ, rồi nghe thuyết minh về từng di sản.' },
     model: { title: 'Xem 3D và dòng thời gian', text: 'Xoay mô hình 3D của di sản và đi theo dòng thời gian lịch sử.' },
     learn: { title: 'Học sinh học theo cấp bằng mã bài học', text: 'Học sinh đăng nhập, nhập mã bài học thầy cô cho và học đúng với cấp của mình.' },
   },
@@ -341,6 +350,7 @@ export const vi: Strings = {
     detailed: 'Đọc',
     short: 'Bản ngắn để nghe',
     unavailable: 'Di sản này chưa có tóm tắt.',
+    locked: 'Tóm tắt và nghe thuyết minh của di sản này tạm thời chưa mở được. Bạn thử lại sau ít phút.',
     fallbackOnly: 'Chưa có bản {{language}}, đang hiện bản tiếng Việt.',
   },
   speech: {
@@ -424,5 +434,8 @@ export const vi: Strings = {
     adsNotNeeded: 'Khu vực của bạn không cần hộp đồng ý quảng cáo của Google, nên không có lựa chọn nào để mở lại.',
     adsUnavailable: 'Bản này chưa có quảng cáo của Google nên chưa có lựa chọn nào để mở.',
     adsCheckFailed: 'Không kiểm tra được lựa chọn quảng cáo. Bạn kiểm tra mạng rồi thử lại.',
+    privacy: 'Chính sách quyền riêng tư',
+    privacyText: 'DiViet thu thập dữ liệu nào, dùng để làm gì và bạn có những quyền gì. Mở bằng trình duyệt.',
+    openPrivacy: 'Xem chính sách',
   },
 };

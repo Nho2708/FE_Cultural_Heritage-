@@ -6,6 +6,10 @@ import { defineConfig } from 'vite';
 // (App:FrontendBaseUrl) đều trỏ về http://localhost:5173. Web học tập chạy ở cổng 5174.
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  resolve: {
+    dedupe: ['react', 'react-dom'],
+  },
+  optimizeDeps: { include: ['react', 'react-dom', 'react-router'] },
   server: { port: 5173, strictPort: true },
   preview: { port: 5173, strictPort: true },
 });

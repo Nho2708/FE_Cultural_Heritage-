@@ -17,6 +17,8 @@ function thamSo(ten, macDinh) {
 }
 const QUAN_TRI = thamSo('quan-tri', 'http://localhost:8081').replace(/\/$/, '');
 const HOC_TAP = thamSo('hoc-tap', 'http://localhost:8082').replace(/\/$/, '');
+// Địa chỉ tải app in trên phiếu mẫu, giống phiếu thật của máy chủ (App:MobileAppDownloadUrl).
+const TAI_APP = 'https://github.com/Nho2708/FE_Cultural_Heritage-/releases/latest/download/diviet.apk';
 const CHI = thamSo('chi', '').split(',').filter(Boolean); // lọc theo tiền tố tên ảnh khi chạy lại một phần
 const TK = JSON.parse(fs.readFileSync(path.join(thuMucScript, 'tai-khoan.local.json'), 'utf8'));
 
@@ -249,10 +251,10 @@ await buoc('04', async () => {
         data: {
           className: '3A',
           loginUrl: `${HOC_TAP}/dang-nhap`,
-          appDownloadUrl: null,
+          appDownloadUrl: TAI_APP,
           instructions: [
             `Mở trang học tập: ${HOC_TAP}/dang-nhap`,
-            'Hoặc cài ứng dụng Vietnam Heritage trên điện thoại, mở ứng dụng và chọn chế độ "Học sinh" (không chọn "Khách tham quan").',
+            `Hoặc cài ứng dụng DiViet trên điện thoại (tải tại ${TAI_APP}), mở ứng dụng và chọn chế độ "Học sinh" (không chọn "Khách tham quan").`,
             'Đăng nhập bằng mã học sinh và mật khẩu tạm ghi trên phiếu.',
           ],
           firstLoginReminder: 'Em sẽ phải đổi mật khẩu ở lần đăng nhập đầu tiên.',

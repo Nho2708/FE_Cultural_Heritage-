@@ -56,6 +56,7 @@ export function schoolOverviewOf(overrides: Partial<SchoolOverview> = {}): Schoo
 export function systemOverviewOf(overrides: Partial<SystemOverview> = {}): SystemOverview {
   return {
     generatedAt: '2026-10-07T00:30:00Z',
+    recentFailedPayments: 0,
     schools: { total: 13, withEffectivePlan: 12, withoutEffectivePlan: 1 },
     teachers: { total: 84, active: 80 },
     activeStudents: 3260,
@@ -75,7 +76,7 @@ export function systemOverviewOf(overrides: Partial<SystemOverview> = {}): Syste
     ],
     revenue: {
       available: true,
-      message: 'Doanh thu tính từ giao dịch VNPay thành công theo ngày thanh toán. Doanh thu quảng cáo xem ở bảng điều khiển Google AdMob và Google Ad Manager.',
+      message: 'Doanh thu tính từ giao dịch VNPay thành công theo ngày thanh toán.',
       total: 12940000,
       thisMonth: 3980000,
       today: 1990000,

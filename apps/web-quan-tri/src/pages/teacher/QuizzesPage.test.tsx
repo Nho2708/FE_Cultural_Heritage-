@@ -65,7 +65,7 @@ describe('Bài kiểm tra của tôi', () => {
     expect(within(draft).getByText('10 câu · không giới hạn')).toBeInTheDocument();
     expect(within(draft).getByText('Chưa đặt giờ mở')).toBeInTheDocument();
     expect(await screen.findByText('3 bài kiểm tra ở 2 lớp · 1 đang phát hành · 1 nháp · 1 đã đóng')).toBeInTheDocument();
-    expect(screen.getByText('Học sinh vào bài kiểm tra bằng mã bài học; bài kiểm tra không có mã riêng.')).toBeInTheDocument();
+    expect(screen.getByText('Bài kiểm tra có mã riêng, sinh khi phát hành lần đầu; học sinh gõ mã đó ở ô nhập mã để vào thẳng bài.')).toBeInTheDocument();
   });
 
   it('thao tác trên dòng theo trạng thái: nháp có Soạn và Xóa, đang phát hành có Đóng và Kết quả, đã đóng chỉ Nhân bản và Kết quả', async () => {

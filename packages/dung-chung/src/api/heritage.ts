@@ -1,6 +1,7 @@
 // Kiểu dữ liệu kho di sản (chỉ quản trị hệ thống dùng ở web quản trị; web học tập dùng lại khi có trang khám phá).
 // Enum là chuỗi viết HOA đúng giá trị trong CSDL; giao diện hiện nhãn tiếng Việt (heritage.ts ở gốc gói).
 
+import type { CurriculumTopicRef } from './curriculum';
 import type { TranslationState } from './translations';
 
 /** `heritages.heritage_type`. */
@@ -152,6 +153,8 @@ export interface HeritageDetail {
   timelines: HeritageTimeline[];
   media: HeritageMedia[];
   references: HeritageReference[];
+  /** Chủ đề chương trình mà di sản đang thuộc (chỉ đọc); vắng khi máy chủ cũ. */
+  curriculumTopics?: CurriculumTopicRef[];
 }
 
 /** Mã xem trước bản nháp do quản trị hệ thống xin: mở trang xem trước trên web học tập trước khi hết hạn. */

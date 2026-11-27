@@ -23,16 +23,32 @@ describe('Quên mật khẩu (trạng thái 1)', () => {
     expect(calls).toHaveLength(0);
   });
 
-  it('luôn hiện cùng một câu của máy chủ, nút đổi thành "Gửi lại liên kết"', async () => {
-    const calls = mockApi(() => envelope(200, { message: MESSAGES.forgotPasswordAccepted }));
+  it('tài khoản không tồn tại: báo lỗi đỏ dưới ô nhập email', async () => {
+    mockApi(() =>
+      envelope(404, {
+        errorCode: ERROR_CODES.notFound,
+        message: MESSAGES.accountNotFound,
+        errors: { email: MESSAGES.accountNotFound },
+      }),
+    );
     const user = userEvent.setup();
     renderApp('/quen-mat-khau');
     await user.type(await screen.findByLabelText('Email'), 'khong.co@truong.vn');
     await user.click(screen.getByRole('button', { name: 'Gửi liên kết' }));
 
+    expect(await screen.findByText(MESSAGES.accountNotFound)).toBeInTheDocument();
+  });
+
+  it('có tài khoản: hiện thông báo đợi link trong hộp thư, nút đổi thành "Gửi lại liên kết"', async () => {
+    const calls = mockApi(() => envelope(200, { message: MESSAGES.forgotPasswordAccepted }));
+    const user = userEvent.setup();
+    renderApp('/quen-mat-khau');
+    await user.type(await screen.findByLabelText('Email'), 'giaovien@truong.vn');
+    await user.click(screen.getByRole('button', { name: 'Gửi liên kết' }));
+
     expect(await screen.findByRole('status')).toHaveTextContent(MESSAGES.forgotPasswordAccepted);
     expect(screen.getByRole('button', { name: 'Gửi lại liên kết' })).toBeInTheDocument();
-    expect(calls[0]).toMatchObject({ method: 'POST', path: '/auth/forgot-password', body: { email: 'khong.co@truong.vn' } });
+    expect(calls[0]).toMatchObject({ method: 'POST', path: '/auth/forgot-password', body: { email: 'giaovien@truong.vn' } });
   });
 });
 

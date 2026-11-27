@@ -8,7 +8,7 @@ import { queryKeys } from '../../lib/api/queryKeys';
 import { quizzesApi } from '../../lib/api/quizEndpoints';
 
 // Tạo bài kiểm tra (hộp thoại): chọn một bài học của giáo viên (bài Nháp hoặc Đã xuất bản; bài Lưu trữ không hiện), đặt tên. Lớp làm bài
-// là lớp của bài học nên không có ô chọn lớp, và bài kiểm tra không có mã riêng. Bài học còn Nháp vẫn chọn được: soạn xong chờ xuất bản
+// là lớp của bài học nên không có ô chọn lớp; mã bài kiểm tra sinh lúc phát hành. Bài học còn Nháp vẫn chọn được: soạn xong chờ xuất bản
 // bài học rồi mới phát hành. Tạo xong chuyển sang màn hình Soạn và phát hành bài kiểm tra. Mở từ trang Soạn bài học thì bài học được
 // chọn sẵn và khóa.
 
@@ -78,7 +78,7 @@ export function CreateQuizDialog({ fixedLessonId, onCreated, onClose }: CreateQu
     <Modal
       open
       title="Tạo bài kiểm tra"
-      description="Lớp làm bài là lớp của bài học. Bài kiểm tra không có mã riêng: học sinh vào bằng mã bài học."
+      description="Lớp làm bài là lớp của bài học. Khi phát hành, bài kiểm tra có mã riêng để học sinh vào thẳng bài."
       size="panel"
       busy={saving}
       onClose={onClose}

@@ -5,7 +5,8 @@ Phần giao diện của luồng bán **gói dịch vụ cho trường**. Backen
 | Ai | Màn hình | Đường dẫn |
 |---|---|---|
 | Quản trị hệ thống | **Gói dịch vụ** | `/quan-tri/goi` |
-| Quản trị trường | **Trường và gói** (ba tab: Thông tin trường, Gói và hạn mức, Hóa đơn và giao dịch) | `/truong/thong-tin` (`?tab=goi-va-han-muc`, `?tab=hoa-don`) |
+| Quản trị trường | **Thông tin trường** | `/truong/thong-tin` |
+| Quản trị trường | **Gói đã mua** (hai tab: Gói và hạn mức, Hóa đơn và giao dịch) | `/truong/goi` (`?tab=hoa-don`) |
 | Quản trị trường | **Chọn gói và thanh toán** | `/truong/chon-goi` (`?goi=` chọn sẵn một gói) |
 | Quản trị trường | **Kết quả thanh toán** | `/truong/ket-qua-thanh-toan` (`?payment=` mã giao dịch, hoặc `?error=invalid`) |
 
@@ -19,9 +20,11 @@ Gói chỉ có hiệu lực khi **VNPay báo thanh toán thành công về backe
 - **Tắt bán** trên bảng phải qua hộp xác nhận chung (trường đang dùng giữ gói tới hết hạn, trường khác không mua mới hay gia hạn được); **bật bán lại** không cần xác nhận. Trong khung sửa, công tắc "Đang bán" áp cùng lần lưu (lưu thông tin trước, đổi trạng thái bán sau).
 - Đổi giá chỉ áp cho hóa đơn tạo sau đó (có ghi chú trong khung).
 
-## 2. Trường và gói (quản trị trường)
+## 2. Thông tin trường và Gói đã mua (quản trị trường)
 
-Tab nằm trên URL (`?tab=`), mặc định Thông tin trường.
+Trang **Thông tin trường** (`/truong/thong-tin`): tên trường chỉ đọc (chỉ quản trị hệ thống sửa được), địa chỉ, số điện thoại và email liên hệ sửa được; thẻ tóm tắt gói hiện tại ở bên phải.
+
+Trang **Gói đã mua** (`/truong/goi`): gồm hai tab: `?tab=` (mặc định Gói và hạn mức, `hoa-don` cho Hóa đơn và giao dịch). Đường dẫn cũ `/truong/thong-tin?tab=goi-va-han-muc` và `?tab=hoa-don` tự chuyển hướng sang `/truong/goi`.
 
 **Gói và hạn mức**
 - Có gói hiệu lực: tên gói, nhãn trạng thái, giá và hạn mức, ngày bắt đầu, ngày hết hạn, số ngày còn lại, thanh giáo viên `x / tối đa` và thanh lượt AI trong kỳ (kèm khoảng ngày của kỳ), ba dòng giải thích gia hạn, nâng cấp, hủy gói.
@@ -39,7 +42,7 @@ Tab nằm trên URL (`?tab=`), mặc định Thông tin trường.
 ## 3. Chọn gói và thanh toán
 
 1. Thẻ các gói đang bán (không gồm gói Miễn phí): tên, giá, thời hạn, số giáo viên, lượt AI, "Không giới hạn số học sinh". Đánh dấu **Gói hiện tại**. Gói backend báo không mua được hiện **lý do của backend** và không chọn được. Mỗi thẻ là một ô chọn thật (bàn phím và trình đọc màn hình dùng được).
-2. Chọn gói thì gọi báo giá và hiện khối **Xác nhận thanh toán**: loại thao tác (**hệ thống tự phân loại**: Mua gói, Gia hạn, Nâng cấp), gói, số tiền, ngày hiệu lực dự kiến (gia hạn: khoảng ngày bắt đầu sau khi gói hiện tại hết; còn lại "Ngay khi thanh toán thành công"), lưu ý (nâng cấp không hoàn phần chưa dùng và gói hiện tại kết thúc khi gói mới có hiệu lực) và **cảnh báo vượt hạn mức giáo viên** của backend nếu có (không chặn thanh toán).
+2. Chọn gói thì gọi báo giá và hiện khối **Xác nhận thanh toán**: loại thao tác (**hệ thống tự phân loại**: Mua gói, Gia hạn, Nâng cấp), gói, số tiền, thời hạn dự kiến (ngày bắt đầu – ngày hết hạn • số ngày; gia hạn bắt đầu sau khi gói hiện tại hết), lưu ý (nâng cấp từ gói Miễn phí: gói Miễn phí kết thúc, không cộng dồn lượt AI cũ; từ gói trả phí: không hoàn tiền hoặc khấu trừ thời gian chưa dùng và gói hiện tại kết thúc khi gói mới có hiệu lực) và **cảnh báo vượt hạn mức giáo viên** của backend nếu có (không chặn thanh toán).
 3. **Thanh toán qua VNPay** mở hộp xác nhận với câu của backend ("Trường sẽ thanh toán … đồng cho gói … qua VNPay. … Tiếp tục?"). **Tiếp tục** tạo yêu cầu mua, hóa đơn và giao dịch rồi chuyển trình duyệt sang địa chỉ VNPay mà backend trả. Địa chỉ chỉ được mở khi là `http` hoặc `https` hợp lệ (`src/lib/gateway.ts`). Lỗi (đã có yêu cầu chưa trả 422, cổng chưa cấu hình 503…) hiện bằng câu của backend, hộp xác nhận đóng.
 4. Ghi chú **môi trường thử VNPay** ở đầu màn hình, bật mặc định, tắt bằng `VITE_VNPAY_SANDBOX_NOTE=false` khi dùng cổng thật.
 
@@ -63,7 +66,7 @@ Khi có kết quả cuối, dữ liệu trường (`/org`, tab gói, hóa đơn)
 | `packages/dung-chung/src/api/billing.ts` | Kiểu dữ liệu trùng DTO của backend |
 | `packages/dung-chung/src/billing.ts` | Nhãn tiếng Việt, định dạng và đọc tiền, kiểm tra biểu mẫu gói |
 | `apps/web-quan-tri/src/pages/admin/PlansPage.tsx` | Gói dịch vụ |
-| `apps/web-quan-tri/src/pages/school/{SchoolInfoPage,PlanPurchasePage,PaymentResultPage}.tsx` | Trường và gói, Chọn gói và thanh toán, Kết quả thanh toán |
+| `apps/web-quan-tri/src/pages/school/{SchoolInfoPage,SchoolBillingPage,PlanPurchasePage,PaymentResultPage}.tsx` | Thông tin trường, Gói đã mua, Chọn gói và thanh toán, Kết quả thanh toán |
 | `apps/web-quan-tri/src/components/billing/` | Tab Gói và hạn mức, tab Hóa đơn và giao dịch, công tắc bán, thanh hạn mức, hook thanh toán một hóa đơn |
 | `apps/web-quan-tri/src/lib/gateway.ts` | Chuyển trình duyệt sang cổng thanh toán (thay được khi kiểm thử) |
 | `apps/web-quan-tri/scripts/smoke-goi.mjs` | Kiểm thử trình duyệt thật (`npm run smoke:goi -w @dsvhvn/web-quan-tri`) |

@@ -1,17 +1,30 @@
 import { spacedLessonCode } from '@dsvhvn/dung-chung';
+import type { NotifyClassResult } from '@dsvhvn/dung-chung/api';
 import { Button, Icon, InlineMessage, Modal, useToast } from '@dsvhvn/dung-chung/ui';
 import { useEffect, useRef, useState } from 'react';
 import { CodeDisplay } from './LessonBits';
 import { lessonLink } from './lessonLink';
+import { NotifyClassDialog } from './NotifyClassDialog';
 
-// Mã bài học (hộp thoại) và chế độ Chiếu lên bảng. Một mã mở cả bài học lẫn các bài kiểm tra của bài; chỉ học sinh của lớp đã đăng
-// nhập mới mở được. Mã không đổi khi sửa, lưu trữ rồi xuất bản lại. Sao chép mã hoặc đường dẫn để dán vào nhóm lớp; chiếu lên bảng
-// để cả lớp gõ tay (không quét mã QR).
+// Mã bài học hoặc mã bài kiểm tra (hộp thoại) và chế độ Chiếu lên bảng. Mã bài học mở bài học, từ đó em vào được các bài kiểm tra; mã bài kiểm tra vào thẳng
+// bài đó. Chỉ học sinh của lớp đã đăng nhập mới mở được. Mã không đổi khi sửa, lưu trữ rồi xuất bản lại. Sao chép mã hoặc đường dẫn để dán vào nhóm lớp;
+// chiếu lên bảng để cả lớp gõ tay (không quét mã QR); gửi thông báo để em ở nhà mở bài ngay.
 
 export interface CodeTarget {
   title: string | null;
   className: string | null;
   accessCode: string;
+  /** Mặc định là mã bài học. */
+  kind?: 'lesson' | 'quiz';
+  /** Gửi thông báo cho cả lớp; bỏ trống thì không hiện nút. */
+  notify?: (message: string | null) => Promise<{ data: NotifyClassResult }>;
+}
+
+function codeNote(target: CodeTarget): string {
+  const who = `Chỉ học sinh lớp ${target.className ?? ''} đã đăng nhập mới mở được.`;
+  return target.kind === 'quiz'
+    ? `${who} Em gõ mã này ở mục Nhập mã để vào thẳng bài kiểm tra.`
+    : `${who} Mã này mở bài học, từ đó em vào được các bài kiểm tra của bài.`;
 }
 
 async function copyText(text: string): Promise<boolean> {
@@ -37,7 +50,7 @@ export function ProjectorView({ target, onClose }: { target: CodeTarget; onClose
   return (
     <dialog
       ref={ref}
-      aria-label={`Mã bài học ${target.accessCode}`}
+      aria-label={`${target.kind === 'quiz' ? 'Mã bài kiểm tra' : 'Mã bài học'} ${target.accessCode}`}
       onCancel={(event) => {
         event.preventDefault();
         onClose();
@@ -63,9 +76,7 @@ export function ProjectorView({ target, onClose }: { target: CodeTarget; onClose
           <CodeDisplay code={spacedLessonCode(target.accessCode)} className="whitespace-pre-wrap" />
         </p>
         <p className="type-body-l">{lessonLink(target.accessCode).replace(/^https?:\/\//, '')}</p>
-        <p className="max-w-[60ch] type-body-m opacity-75">
-          Chỉ học sinh lớp {target.className ?? ''} đã đăng nhập mới mở được. Một mã dùng cho cả bài học và các bài kiểm tra của bài.
-        </p>
+        <p className="max-w-[60ch] type-body-m opacity-75">{codeNote(target)}</p>
       </div>
     </dialog>
   );
@@ -74,7 +85,10 @@ export function ProjectorView({ target, onClose }: { target: CodeTarget; onClose
 export function LessonCodeDialog({ target, onClose }: { target: CodeTarget; onClose: () => void }) {
   const toast = useToast();
   const [projecting, setProjecting] = useState(false);
+  const [notifying, setNotifying] = useState(false);
   const link = lessonLink(target.accessCode);
+  const isQuiz = target.kind === 'quiz';
+  const codeName = isQuiz ? 'mã bài kiểm tra' : 'mã bài học';
 
   const copy = async (text: string, success: string) => {
     if (await copyText(text)) toast.success(success);
@@ -84,8 +98,8 @@ export function LessonCodeDialog({ target, onClose }: { target: CodeTarget; onCl
   return (
     <>
       <Modal
-        open={!projecting}
-        title="Mã bài học"
+        open={!projecting && !notifying}
+        title={isQuiz ? 'Mã bài kiểm tra' : 'Mã bài học'}
         description={`${target.title ?? ''}${target.className ? ` · Lớp ${target.className}` : ''}`}
         size="panel"
         onClose={onClose}
@@ -95,24 +109,24 @@ export function LessonCodeDialog({ target, onClose }: { target: CodeTarget; onCl
             <p className="type-display-l text-on-surface" data-testid="ma-bai-hoc">
               <CodeDisplay code={target.accessCode} />
             </p>
-            <p className="mt-3 type-body-s text-on-surface-variant">Mã không đổi khi thầy cô sửa bài học.</p>
+            <p className="mt-3 type-body-s text-on-surface-variant">{isQuiz ? 'Mã không đổi khi thầy cô sửa tên, mô tả hoặc giờ đóng.' : 'Mã không đổi khi thầy cô sửa bài học.'}</p>
           </div>
           <div>
             <p className="type-label text-on-surface">Đường dẫn</p>
             <input
               readOnly
-              aria-label="Đường dẫn bài học"
+              aria-label={isQuiz ? 'Đường dẫn bài kiểm tra' : 'Đường dẫn bài học'}
               value={link.replace(/^https?:\/\//, '')}
               className="mt-1 h-11 w-full rounded-sm border border-border-strong bg-surface-container-low px-3 type-body-m text-on-surface"
               onFocus={(e) => e.currentTarget.select()}
             />
           </div>
           <div className="flex flex-wrap gap-3">
-            <Button onClick={() => void copy(target.accessCode, 'Đã sao chép mã bài học. Thầy cô dán mã vào nhóm lớp hoặc đọc cho học sinh gõ.')}>
+            <Button onClick={() => void copy(target.accessCode, `Đã sao chép ${codeName}. Thầy cô dán mã vào nhóm lớp hoặc đọc cho học sinh gõ.`)}>
               <Icon name="copy" size={16} />
               Sao chép mã
             </Button>
-            <Button variant="secondary" onClick={() => void copy(link, 'Đã sao chép đường dẫn bài học.')}>
+            <Button variant="secondary" onClick={() => void copy(link, `Đã sao chép đường dẫn ${isQuiz ? 'bài kiểm tra' : 'bài học'}.`)}>
               <Icon name="copy" size={16} />
               Sao chép đường dẫn
             </Button>
@@ -120,13 +134,20 @@ export function LessonCodeDialog({ target, onClose }: { target: CodeTarget; onCl
               <Icon name="external-link" size={16} />
               Chiếu lên bảng
             </Button>
+            {target.notify && (
+              <Button variant="secondary" onClick={() => setNotifying(true)}>
+                <Icon name="bell" size={16} />
+                Gửi thông báo cho lớp
+              </Button>
+            )}
           </div>
-          <InlineMessage tone="info">
-            Chỉ học sinh lớp {target.className ?? ''} đã đăng nhập mới mở được. Một mã dùng cho cả bài học và các bài kiểm tra của bài.
-          </InlineMessage>
+          <InlineMessage tone="info">{codeNote(target)}</InlineMessage>
         </div>
       </Modal>
       {projecting && <ProjectorView target={target} onClose={() => setProjecting(false)} />}
+      {target.notify && (
+        <NotifyClassDialog open={notifying} subject={target.title ?? ''} className={target.className} send={target.notify} onClose={() => setNotifying(false)} />
+      )}
     </>
   );
 }

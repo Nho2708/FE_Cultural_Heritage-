@@ -88,7 +88,7 @@ describe('Tổng quan trường', () => {
     renderApp('/truong');
     expect((await screen.findAllByText('Gói Cơ bản còn 9 ngày. Hãy gia hạn để không gián đoạn.')).length).toBeGreaterThan(0);
     expect(screen.getByText('9 ngày')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Xem gói và hóa đơn' })).toHaveAttribute('href', '/truong/thong-tin');
+    expect(screen.getByRole('link', { name: 'Xem gói và hóa đơn' })).toHaveAttribute('href', '/truong/goi');
   });
 
   it('trường không có gói hiệu lực: trang vẫn xem được, hạn mức báo chưa có', async () => {

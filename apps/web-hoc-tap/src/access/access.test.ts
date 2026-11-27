@@ -7,21 +7,21 @@ const student = { mustChangePassword: false };
 const mustChange = { mustChangePassword: true };
 
 describe('bảng màn hình của web học tập', () => {
-  it('19 màn hình: 9 khám phá công khai, 10 khu học; 1 hộp thoại; route chữ thường không dấu', () => {
-    expect(SCREENS).toHaveLength(19);
-    expect(ALL.filter((s) => s.area === 'explore')).toHaveLength(9);
-    expect(ALL.filter((s) => s.area === 'learning')).toHaveLength(10);
+  it('22 màn hình: 10 khám phá công khai, 12 khu học; 1 hộp thoại; route chữ thường không dấu', () => {
+    expect(SCREENS).toHaveLength(22);
+    expect(ALL.filter((s) => s.area === 'explore')).toHaveLength(10);
+    expect(ALL.filter((s) => s.area === 'learning')).toHaveLength(12);
     expect(ALL.filter((s) => s.path === null).map((s) => s.name)).toEqual(['Bắt đầu bài kiểm tra']);
     const paths = ALL.flatMap((s) => [s.path, ...(s.aliases ?? [])]).filter((p) => p !== null);
     expect(paths.every((p) => /^\/[a-z0-9/:-]*$/i.test(p) && !/[A-Z]/.test(p.replace(/:[A-Za-z]+/g, '')))).toBe(true);
   });
 
   it('khám phá mở cho mọi người; khu học chỉ cho học sinh; Học sinh đăng nhập chỉ cho khách', () => {
-    for (const key of ['home', 'search', 'map', 'heritage', 'heritagePreview', 'timeline', 'about', 'forSchools'] as const) {
+    for (const key of ['home', 'search', 'map', 'heritage', 'heritagePreview', 'timeline', 'about', 'forSchools', 'privacy'] as const) {
       expect(resolveAccess(screen(key), null)).toBe('allow');
       expect(resolveAccess(screen(key), student)).toBe('allow');
     }
-    for (const key of ['changePassword', 'learnHome', 'enterCode', 'lesson', 'takeQuiz', 'result', 'progress', 'profile'] as const) {
+    for (const key of ['changePassword', 'learnHome', 'album', 'enterCode', 'lesson', 'takeQuiz', 'result', 'progress', 'profile'] as const) {
       expect(resolveAccess(screen(key), null)).toBe('login');
       expect(resolveAccess(screen(key), student)).toBe('allow');
     }

@@ -83,7 +83,7 @@ export function TrendBars<Metric extends string>({
   metricLabel,
   format = formatCount,
 }: {
-  /** Mỗi kỳ có `period` (ngày `yyyy-MM-dd` hoặc tháng `yyyy-MM`) và số liệu `metric`; dùng cho cả biểu đồ tổng quan và thống kê quảng cáo. */
+  /** Mỗi kỳ có `period` (ngày `yyyy-MM-dd` hoặc tháng `yyyy-MM`) và số liệu `metric`; dùng cho cả biểu đồ tổng quan và thống kê khách tham quan. */
   points: ReadonlyArray<{ period: string } & Record<Metric, number>>;
   granularity: TrendGranularity;
   metric: Metric;

@@ -14,6 +14,7 @@ import { GuestHistoryPage } from '../pages/GuestHistoryPage';
 import { HeritageDetailPage } from '../pages/HeritageDetailPage';
 import { HeritagePreviewPage } from '../pages/HeritagePreviewPage';
 import { EnterCodePage } from '../pages/EnterCodePage';
+import { NotificationsPage } from '../pages/NotificationsPage';
 import { HomePage } from '../pages/HomePage';
 import { LearnHomePage } from '../pages/LearnHomePage';
 import { LessonPage } from '../pages/LessonPage';
@@ -26,12 +27,12 @@ import { ResultPage } from '../pages/ResultPage';
 import { SearchPage } from '../pages/SearchPage';
 import { TakeQuizPage } from '../pages/TakeQuizPage';
 import { TimelinePage } from '../pages/TimelinePage';
-import { LazyAboutPage, LazyForSchoolsPage } from './lazyPages';
+import { LazyAboutPage, LazyAlbumPage, LazyForSchoolsPage, LazyPrivacyPage } from './lazyPages';
 import type { RouteHandle } from './routeHandle';
 
 // Khung route của web học tập: khám phá công khai (`/`, `/di-san`, `/ban-do`, `/dong-thoi-gian`, `/gioi-thieu`,
-// `/nha-truong`) và khu học của học
-// sinh (`/dang-nhap`, `/doi-mat-khau`, `/hoc`, `/nhap-ma`, `/bai-hoc/...`, `/ket-qua/...`, `/tien-do`, `/ho-so`). Mỗi route lấy
+// `/nha-truong`, `/chinh-sach-quyen-rieng-tu`) và khu học của học
+// sinh (`/dang-nhap`, `/doi-mat-khau`, `/hoc`, `/hoc/album`, `/nhap-ma`, `/bai-hoc/...`, `/ket-qua/...`, `/tien-do`, `/ho-so`). Mỗi route lấy
 // đường dẫn và quyền từ SCREENS; màn hình chưa dựng hiện PendingScreen với đúng guard.
 
 /** Màn hình đã dựng trong bản khung. */
@@ -45,10 +46,13 @@ const BUILT: Partial<Record<ScreenKey, ReactNode>> = {
   timeline: <TimelinePage />,
   about: <LazyAboutPage />,
   forSchools: <LazyForSchoolsPage />,
+  privacy: <LazyPrivacyPage />,
   login: <LoginPage />,
   changePassword: <ChangePasswordPage />,
   learnHome: <LearnHomePage />,
+  album: <LazyAlbumPage />,
   enterCode: <EnterCodePage />,
+  notifications: <NotificationsPage />,
   lesson: <LessonPage />,
   takeQuiz: <TakeQuizPage />,
   result: <ResultPage />,

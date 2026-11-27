@@ -216,7 +216,7 @@ try {
   check('Tên đăng nhập trùng → báo trùng dưới ô trong hộp thoại', (await dialog.locator('p.text-danger').textContent())?.includes(`"${teacher.username}" đã được sử dụng`));
   await dialog.getByRole('button', { name: 'Hủy' }).click();
 
-  await page.getByRole('link', { name: 'Trường và gói' }).first().click();
+  await page.getByRole('link', { name: 'Trường', exact: true }).first().click();
   await page.waitForURL(`${BASE}/truong/thong-tin`);
   check('Trường và gói: tên trường chỉ đọc', await page.getByLabel('Tên trường').evaluate((el) => el.readOnly));
   await page.getByLabel('Số điện thoại').fill('028 3822 1234');

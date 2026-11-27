@@ -11,6 +11,8 @@ export type * from './heritage';
 export type * from './billing';
 export type * from './classroom';
 export type * from './lessons';
+export type * from './curriculum';
+export type * from './notifications';
 export type * from './models';
 export type * from './questions';
 export type * from './translations';

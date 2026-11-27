@@ -1,8 +1,9 @@
 import { cn } from '../cn';
 import { Icon } from '../ui';
 import { speakVietnamese } from './speechVoice';
+import { useSpeechState } from './useSpeech';
 
-// Nút loa đọc to bằng FPT.AI Cloud TTS hoặc giọng có sẵn của trình duyệt.
+// Nút loa đọc to bằng giọng của máy chủ, hoặc giọng tiếng Việt có sẵn của trình duyệt. Đang chờ máy chủ tạo tiếng thì nút xoay và báo "đang chuẩn bị".
 
 function canSpeak(): boolean {
   return (
@@ -28,9 +29,11 @@ export function SpeakButton({
   className?: string;
   size?: 'sm' | 'md' | 'lg';
 }) {
+  const { preparing } = useSpeechState(text);
   if (!canSpeak()) return null;
   const speak = () => {
-    speakVietnamese(text);
+    if (preparing) return;
+    void speakVietnamese(text);
   };
   const s = SIZE_MAP[size] ?? SIZE_MAP.md;
   return (
@@ -38,13 +41,17 @@ export function SpeakButton({
       type="button"
       onClick={speak}
       aria-label={label}
+      aria-busy={preparing || undefined}
       className={cn(
         'flex shrink-0 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container shadow-xs transition-transform hover:scale-105 active:scale-95',
         s.button,
         className,
       )}
     >
-      <Icon name="volume" size={s.icon} />
+      <Icon name={preparing ? 'refresh' : 'volume'} size={s.icon} className={preparing ? 'motion-safe:animate-spin' : undefined} />
+      <span className="sr-only" aria-live="polite">
+        {preparing ? 'Đang chuẩn bị giọng đọc' : ''}
+      </span>
     </button>
   );
 }

@@ -261,7 +261,7 @@ try {
   await kid.goto(`${LEARNING_WEB}/nhap-ma`);
   await kid.getByLabel('Mã bài học').fill(`${code3.slice(0, 2).toLowerCase()} ${code3.slice(2, 5).toLowerCase()}-${code3.slice(5).toLowerCase()}`);
   await shot(kid, 'cap-1-hs-0-nhap-ma');
-  await kid.getByRole('button', { name: 'Mở bài học' }).click();
+  await kid.getByRole('button', { name: 'Mở', exact: true }).click();
   await kid.waitForURL(`${LEARNING_WEB}/bai-hoc/${code3}`);
   await kid.locator('[data-bo-cuc]').first().waitFor();
   check('Học sinh khối 3: bố cục cấp 1 (kể chuyện từng bước)', (await kid.locator('[data-bo-cuc]').first().getAttribute('data-bo-cuc')) === 'cap-1');
@@ -291,7 +291,7 @@ try {
   // Mã của lớp khác: cùng một câu, không lộ việc mã có ở lớp khác.
   await kid.goto(`${LEARNING_WEB}/nhap-ma`);
   await kid.getByLabel('Mã bài học').fill(code8);
-  await kid.getByRole('button', { name: 'Mở bài học' }).click();
+  await kid.getByRole('button', { name: 'Mở', exact: true }).click();
   await kid.getByText('Mã bài học chưa đúng hoặc không dành cho lớp của em').waitFor();
   check('Học sinh khối 3 nhập mã của lớp khối 8: bị từ chối cùng một câu', pathOf(kid) === '/nhap-ma');
   await shot(kid, 'cap-1-hs-4-ma-lop-khac');
@@ -303,7 +303,7 @@ try {
   const teen = await studentLogin(student8);
   await teen.goto(`${LEARNING_WEB}/nhap-ma`);
   await teen.getByLabel('Mã bài học').fill(code8);
-  await teen.getByRole('button', { name: 'Mở bài học' }).click();
+  await teen.getByRole('button', { name: 'Mở', exact: true }).click();
   await teen.waitForURL(`${LEARNING_WEB}/bai-hoc/${code8}`);
   await teen.locator('[data-bo-cuc]').first().waitFor();
   check('Học sinh khối 8: bố cục cấp 2 (bài đọc, dòng thời gian)', (await teen.locator('[data-bo-cuc]').first().getAttribute('data-bo-cuc')) === 'cap-2');

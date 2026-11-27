@@ -1,4 +1,4 @@
-// Hộp đồng ý quảng cáo của Google (UMP) hiện lần đầu ngay trước quảng cáo đầu tiên, và chỉ với khách ở vùng bắt buộc (châu Âu, Anh...). Khách phải đổi ý lại được, nên Cài đặt có nút mở lại
+// Hộp đồng ý quảng cáo của Google (UMP) được hỏi một lần mỗi khi mở app ở chế độ Khách, và chỉ hiện với khách ở vùng bắt buộc (châu Âu, Anh...). Khách phải đổi ý lại được, nên Cài đặt có nút mở lại
 // "tùy chọn quyền riêng tư" của Google. Nút chỉ hiện khi Google báo vùng của khách yêu cầu có lựa chọn này; chỗ khác thì giải thích vì sao không có.
 
 /**

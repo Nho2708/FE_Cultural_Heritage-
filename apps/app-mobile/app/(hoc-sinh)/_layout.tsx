@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type { ColorValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GuardRedirect } from '../../src/components/GuardRedirect';
+import { NotificationBell } from '../../src/hocsinh/NotificationBell';
 import { entryHref } from '../../src/navigation/entry';
 import { STUDENT_TABS } from '../../src/navigation/tabs';
 import { useApp, useAuth } from '../../src/state/AppProvider';
@@ -19,6 +20,8 @@ function icon(name: IconName, focusedName: IconName) {
     return <Ionicons name={focused ? focusedName : name} size={size} color={color} />;
   };
 }
+
+const renderBell = () => <NotificationBell />;
 
 export default function StudentLayout() {
   const { chosenLanguage, mode, introSeen } = useApp();
@@ -38,6 +41,7 @@ export default function StudentLayout() {
         tabBarStyle: { backgroundColor: theme.color.surface, borderTopColor: theme.color.border, height: Math.max(68, theme.touchTarget + 22) + insets.bottom, paddingBottom: insets.bottom + 8, paddingTop: 8 },
         tabBarLabelStyle: { fontSize: theme.level === 1 ? 14 : 12, lineHeight: theme.level === 1 ? 17 : 15, fontWeight: "700" },
         sceneStyle: { backgroundColor: theme.color.background },
+        headerRight: renderBell,
       }}
     >
       {STUDENT_TABS.map((tab) => (

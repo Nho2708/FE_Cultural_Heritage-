@@ -231,13 +231,13 @@ try {
   check('Điểm trung bình theo lớp: có tên lớp và điểm 5', (await classList.innerText()).includes(className) && /\b5\b/.test(await classList.innerText()));
   const body = await orgPage.locator('body').innerText();
   check('Chỉ có số tổng: không có tên giáo viên hay học sinh trên trang', !body.includes(teacherName) && !studentNames.some((n) => body.includes(n)));
-  check('Thanh bên khu quản trị trường có mục Tổng quan, Trường và gói, Giáo viên', (await orgPage.getByRole('navigation', { name: 'Quản trị trường' }).getByRole('link').allInnerTexts()).join('|') === 'Tổng quan|Trường và gói|Giáo viên');
+  check('Thanh bên khu quản trị trường có mục Tổng quan, Trường, Gói đã mua, Giáo viên', (await orgPage.getByRole('navigation', { name: 'Quản trị trường' }).getByRole('link').allInnerTexts()).join('|') === 'Tổng quan|Trường|Gói đã mua|Giáo viên');
   check('Gói hiện tại: thẻ gói có nút Xem gói và hóa đơn', await visible(orgPage.getByRole('link', { name: 'Xem gói và hóa đơn' })));
   await shot(orgPage, '1-tong-quan-truong');
 
   await orgPage.getByRole('link', { name: 'Xem gói và hóa đơn' }).click();
-  await orgPage.waitForURL(/\/truong\/thong-tin/);
-  check('Xem gói và hóa đơn mở màn hình Trường và gói', pathOf(orgPage) === '/truong/thong-tin');
+  await orgPage.waitForURL(/\/truong\/goi/);
+  check('Xem gói và hóa đơn mở màn hình Gói đã mua', pathOf(orgPage) === '/truong/goi');
 
   // Màn hình hẹp.
   await orgPage.setViewportSize({ width: 390, height: 800 });
@@ -297,7 +297,7 @@ try {
   const paymentTable = adminPage.getByRole('table', { name: 'Giao dịch thanh toán' });
   await paymentTable.or(adminPage.getByText('Chưa có giao dịch thanh toán nào.')).waitFor();
   check('Tab Doanh thu: biểu đồ doanh thu theo kỳ và danh sách giao dịch (hoặc báo chưa có)', true, (await paymentTable.count()) ? `${await paymentTable.locator('tbody tr').count()} giao dịch` : 'chưa có giao dịch');
-  check('Tab Doanh thu: liên kết sang bảng điều khiển AdMob và Ad Manager (tab mới)', (await adminPage.locator('a[target="_blank"][href*="admob"], a[target="_blank"][href*="admanager"]').count()) === 2);
+  check('Tab Doanh thu: không có liên kết mở ra tab mới', (await adminPage.locator('a[target="_blank"]').count()) === 0);
   check('Tab Doanh thu giữ trên URL (?tab=doanh-thu)', adminPage.url().includes('tab=doanh-thu'));
   await shot(adminPage, '5-doanh-thu');
 

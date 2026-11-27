@@ -1,9 +1,11 @@
 import { BrandLogo } from '@dsvhvn/dung-chung/ui';
 import type { ReactNode } from 'react';
+import { LEARNING_WEB_URL } from '../../config/env';
 import type { AuthPhoto } from './authPhotos';
 
 // Khung chung của Đăng nhập, Quên / đặt mật khẩu theo khung Figma: nửa trái là ảnh tư liệu phủ kín với lớp phủ
-// chuyển màu và chú thích chữ trắng, nửa phải là biểu mẫu. Dưới 841px chỉ còn biểu mẫu.
+// chuyển màu và chú thích chữ trắng, nửa phải là biểu mẫu. Dưới 841px chỉ còn biểu mẫu. Dưới biểu mẫu có lối tới trang Chính sách
+// quyền riêng tư (nằm ở web học tập, chung cho mọi phần của DiViet).
 
 const BLANK_PIXEL = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 
@@ -47,6 +49,11 @@ export function AuthLayout({ photo, title, subtitle, children }: AuthLayoutProps
           <h1 className="type-h2 text-on-surface dsvmd:type-display-l">{title}</h1>
           {subtitle && <p className="mt-2 type-body-m text-on-surface-variant">{subtitle}</p>}
           <div className="mt-8">{children}</div>
+          <p className="mt-8 type-body-s text-on-surface-variant">
+            <a href={`${LEARNING_WEB_URL}/chinh-sach-quyen-rieng-tu`} className="text-link underline underline-offset-4">
+              Chính sách quyền riêng tư
+            </a>
+          </p>
         </div>
       </div>
     </div>

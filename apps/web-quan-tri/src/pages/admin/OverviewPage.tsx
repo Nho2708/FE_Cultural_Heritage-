@@ -33,7 +33,7 @@ import {
 } from '@dsvhvn/dung-chung/ui';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { pathOf } from '../../access/screens';
+import { PATHS, pathOf } from '../../access/screens';
 import { PaymentStatusBadge } from '../../components/billing/billingUi';
 import { AreaPage, PageHeader } from '../../components/layout/PageHeader';
 import { MetricTile, TrendBars, UsageBar } from '../../components/overview/OverviewBits';
@@ -45,18 +45,46 @@ import { PAGE_SIZE, slugMap, useListParams } from '../../lib/listParams';
 
 // Tổng quan và doanh thu — quản trị hệ thống. Tab Tổng quan: số trường, giáo viên, học sinh, lượt AI toàn hệ thống, nội dung, số trường đang
 // dùng từng gói, việc cần chú ý và biểu đồ theo thời gian (ngày Việt Nam). Tab Doanh thu: doanh thu từ giao dịch VNPay thành công theo ngày thanh
-// toán (tháng này, hôm nay, từ trước tới nay, biểu đồ theo kỳ) và danh sách giao dịch lọc theo trạng thái, trường, khoảng ngày; doanh thu quảng cáo
-// xem ở bảng điều khiển của Google, hệ thống không nhận số liệu đó.
+// toán (tháng này, hôm nay, từ trước tới nay, biểu đồ theo kỳ) và danh sách giao dịch lọc theo trạng thái, trường, khoảng ngày.
 
 type TabId = 'tong-quan' | 'doanh-thu';
 
-const ADMOB_URL = 'https://admob.google.com';
 const PAYMENT_SLUG = slugMap<PaymentStatus>({ PENDING: 'dang-cho', SUCCEEDED: 'thanh-cong', FAILED: 'that-bai', REFUNDED: 'da-hoan-tien' });
 const PAYMENT_RANGES = [{ id: 'tat-ca', label: 'Mọi thời điểm' }, ...TREND_RANGES] as const;
-const AD_MANAGER_URL = 'https://admanager.google.com';
+
+/** Số khoản thanh toán đến muộn hiện ngay trong mục Cần chú ý; phần còn lại chỉ nêu số. */
+const LATE_PAYMENTS_SHOWN = 5;
+
+function LatePayments({ data }: { data: SystemOverview }) {
+  const total = data.latePaymentsToReview ?? 0;
+  const rows = (data.latePayments ?? []).slice(0, LATE_PAYMENTS_SHOWN);
+  return (
+    <li className="border-b border-border pb-4 last:border-b-0 last:pb-0">
+      <p className="type-body-m text-on-surface">Có {formatCount(total)} khoản thanh toán đến muộn cần xử lý.</p>
+      <p className="mt-1 type-body-s text-on-surface-variant">
+        Tiền đã ghi nhận nhưng trường đã có gói mới hơn nên gói cũ không kích hoạt lại. Hãy liên hệ trường hoặc hoàn tiền ngoài hệ thống.
+      </p>
+      {rows.length > 0 && (
+        <ul aria-label="Khoản thanh toán đến muộn" className="mt-2 flex flex-col gap-2">
+          {rows.map((row) => (
+            <li key={row.paymentId} className="type-body-s text-on-surface">
+              <span className="font-medium">Hóa đơn {row.invoiceNumber}</span>
+              {' · '}
+              <TextLink to={PATHS.school(row.organizationId)}>{row.organizationName}</TextLink>
+              {row.planName ? ` · gói ${row.planName}` : ''}
+              {` · ${formatMoney(row.amount)} · ${formatDateTime(row.paidAt)}`}
+            </li>
+          ))}
+        </ul>
+      )}
+      {total > rows.length && <p className="mt-2 type-body-s text-on-surface-variant">Còn {formatCount(total - rows.length)} khoản khác.</p>}
+    </li>
+  );
+}
 
 function Attention({ data }: { data: SystemOverview }) {
   const expiring = data.plans.reduce((sum, p) => sum + p.expiringSoonSchools, 0);
+  const latePayments = data.latePaymentsToReview ?? 0;
   const items: Array<{ key: string; text: string; to: string; action: string }> = [];
   if (data.schools.withoutEffectivePlan > 0)
     items.push({
@@ -72,6 +100,20 @@ function Attention({ data }: { data: SystemOverview }) {
       to: pathOf('schools'),
       action: 'Xem danh sách trường',
     });
+  if (data.content.questions.pending > 0)
+    items.push({
+      key: 'pending-questions',
+      text: `Có ${formatCount(data.content.questions.pending)} câu hỏi đang chờ giáo viên duyệt.`,
+      to: pathOf('questionModeration'),
+      action: 'Mở kiểm duyệt câu hỏi',
+    });
+  if (data.recentFailedPayments > 0)
+    items.push({
+      key: 'failed-payments',
+      text: `${formatCount(data.recentFailedPayments)} giao dịch thanh toán thất bại trong 7 ngày gần nhất.`,
+      to: `${pathOf('adminOverview')}?tab=doanh-thu&trang-thai=${PAYMENT_SLUG.toSlug('FAILED')}`,
+      action: 'Xem giao dịch thất bại',
+    });
   if (data.content.questions.hidden > 0)
     items.push({
       key: 'hidden',
@@ -81,10 +123,11 @@ function Attention({ data }: { data: SystemOverview }) {
     });
   return (
     <Block title="Cần chú ý" hint="Tính từ số liệu hiện có, không phải cảnh báo thời gian thực.">
-      {items.length === 0 ? (
+      {items.length === 0 && latePayments === 0 ? (
         <p className="type-body-m text-on-surface-variant">Chưa có việc nào cần chú ý.</p>
       ) : (
         <ul className="flex flex-col gap-4">
+          {latePayments > 0 && <LatePayments data={data} />}
           {items.map((item) => (
             <li key={item.key} className="border-b border-border pb-4 last:border-b-0 last:pb-0">
               <p className="type-body-m text-on-surface">{item.text}</p>
@@ -380,18 +423,6 @@ function RevenueTab({ data }: { data: SystemOverview }) {
       </section>
       <RevenueTrend />
       <PaymentList />
-      <Block title="Doanh thu quảng cáo" hint="Hệ thống không nhận số liệu doanh thu quảng cáo từ Google nên không tính ở đây.">
-        <div className="flex flex-wrap gap-3">
-          <a href={ADMOB_URL} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center gap-2 rounded-sm border border-border-strong px-4 type-control text-on-surface hover:bg-surface-container-low">
-            <Icon name="external-link" size={16} />
-            Mở bảng điều khiển AdMob
-          </a>
-          <a href={AD_MANAGER_URL} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center gap-2 rounded-sm border border-border-strong px-4 type-control text-on-surface hover:bg-surface-container-low">
-            <Icon name="external-link" size={16} />
-            Mở bảng điều khiển Ad Manager
-          </a>
-        </div>
-      </Block>
     </div>
   );
 }

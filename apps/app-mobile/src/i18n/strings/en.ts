@@ -2,6 +2,7 @@ import type { Strings } from './vi';
 
 export const en: Strings = {
   appName: 'DiViet',
+  tagline: 'Discover Vietnamese heritage',
   common: {
     back: 'Back',
     close: 'Close',
@@ -40,7 +41,7 @@ export const en: Strings = {
   intro: {
     title: 'App introduction',
     replay: 'View again',
-    replayText: 'Watch the four short introduction cards again.',
+    replayText: 'Watch the five short introduction cards again.',
     videoTitle: 'Intro video',
     videoText: 'Watch a short video about the app. It needs an internet connection.',
     watchVideo: 'Watch intro video',
@@ -49,6 +50,7 @@ export const en: Strings = {
     next: 'Next',
     start: 'Get started',
     step: 'Step {{current}} of {{total}}',
+    welcome: { text: 'Maps, audio guides, 3D models and lessons about Vietnamese heritage, all in one app.' },
     discover: { title: 'Discover heritage near you', text: 'Open the map, find sites around where you stand and read a short summary of each.' },
     narration: { title: 'Listen in your own language', text: 'Pick one of five languages, then listen to a narration of each heritage site.' },
     model: { title: 'See 3D models and the timeline', text: 'Turn a 3D model of a site and follow the historical timeline.' },
@@ -141,6 +143,7 @@ export const en: Strings = {
     detailed: 'Read',
     short: 'Short version to listen to',
     unavailable: 'This heritage site has no summary yet.',
+    locked: 'The summary and audio guide for this site are not available right now. Please try again in a few minutes.',
     fallbackOnly: 'No {{language}} version yet, showing the Vietnamese version.',
   },
   speech: {
@@ -224,5 +227,8 @@ export const en: Strings = {
     adsNotNeeded: 'Google ad consent is not required where you are, so there are no choices to reopen.',
     adsUnavailable: 'This build has no Google ads yet, so there are no choices to open.',
     adsCheckFailed: 'Could not check ad choices. Check your connection and try again.',
+    privacy: 'Privacy policy',
+    privacyText: 'What data DiViet collects, what it is used for and what rights you have. Opens in your browser.',
+    openPrivacy: 'View policy',
   },
 };

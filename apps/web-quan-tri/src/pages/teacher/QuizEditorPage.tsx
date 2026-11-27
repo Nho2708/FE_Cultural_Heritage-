@@ -3,10 +3,12 @@ import {
   DIFFICULTY_LABEL,
   MESSAGES,
   QUIZ_LIMITS,
+  describeQuizTime,
   draftFromQuiz,
   focusFirstInvalid,
   formatDateTime,
   quizDraftToBody,
+  quizNeedsOpenWindow,
   sameQuizDraft,
   splitApiError,
   timeLimitHint,
@@ -45,8 +47,8 @@ import { NotFoundPage } from '../errors/ErrorPages';
 
 // Soạn và phát hành bài kiểm tra — giáo viên. Thông tin chung (tên, bài học và lớp chỉ đọc, mô tả, độ khó, thời gian làm theo cấp của
 // lớp, giờ mở, giờ đóng, xáo câu, cho xem đáp án sau khi nộp) và danh sách câu (điểm, thứ tự, bỏ câu, tổng điểm tự tính; thêm câu ở hộp
-// Chọn câu từ ngân hàng). Không chọn lớp, không sinh mã: lớp là lớp của bài học và học sinh vào bằng mã bài học.
-//   - Nháp: sửa mọi thứ. "Phát hành" lưu thiết lập, hỏi xác nhận (khóa danh sách câu) rồi nhắc đưa mã bài học cho lớp; thiếu điều kiện
+// Chọn câu từ ngân hàng). Không chọn lớp: lớp là lớp của bài học. Lớp cấp 1 không đặt giờ mở và đóng: bài chơi mở ngay khi phát hành.
+//   - Nháp: sửa mọi thứ. "Phát hành" lưu thiết lập, hỏi xác nhận (khóa danh sách câu) rồi đưa mã bài kiểm tra để giao cho lớp; thiếu điều kiện
 //     thì liệt kê đủ ngay dưới thanh thao tác.
 //   - Đang phát hành: danh sách câu, điểm, thứ tự, bài học, thời gian làm, giờ mở, xáo câu, cờ hiện đáp án bị khóa; vẫn sửa tên, mô tả,
 //     giờ đóng. Có Nhân bản, Kết quả, Đóng bài kiểm tra. Đã đóng: chỉ đọc, còn Nhân bản và Kết quả.
@@ -82,6 +84,24 @@ export default function QuizEditorPage() {
       </AreaPage>
     );
   return <QuizEditor key={detail.data.id} quiz={detail.data} />;
+}
+
+/** Mã bài kiểm tra kèm nút gửi thông báo khi bài còn đang phát hành. */
+function quizCodeTarget(quiz: QuizDetail): CodeTarget {
+  const canNotify = quiz.status === 'PUBLISHED' && quiz.openState !== 'ENDED';
+  return {
+    title: quiz.name,
+    className: quiz.className,
+    accessCode: quiz.accessCode ?? '',
+    kind: 'quiz',
+    notify: canNotify ? (message) => quizzesApi.notifyClass(quiz.id, message) : undefined,
+  };
+}
+
+/** Lời nhắc dưới ô giờ, kèm cách đọc giờ đang nhập để không nhầm 12:30 với 00:30. */
+function timeHint(text: string, base: string): string {
+  const described = describeQuizTime(text);
+  return described ? `${base} Đang đặt: ${described}.` : base;
 }
 
 function QuizEditor({ quiz }: { quiz: QuizDetail }) {
@@ -213,7 +233,7 @@ function QuizEditor({ quiz }: { quiz: QuizDetail }) {
       const next = draftFromQuiz(data.quiz);
       setDraft(next);
       setBaseline(next);
-      if (data.quiz.lessonAccessCode) setCode({ title: data.quiz.lessonTitle, className: data.quiz.className, accessCode: data.quiz.lessonAccessCode });
+      if (data.quiz.accessCode) setCode(quizCodeTarget(data.quiz));
     } catch (err) {
       setConfirmingPublish(false);
       setFormError(errorMessage(err));
@@ -257,6 +277,8 @@ function QuizEditor({ quiz }: { quiz: QuizDetail }) {
   const lessonDraft = quiz.lessonStatus !== 'PUBLISHED';
   const showMissing = draftStatus && quiz.readiness.missing.length > 0 && (attempt === 'publish' || quiz.questionCount > 0 || quiz.openAt !== null);
   const timeDisabled = !canSettings || level === 1;
+  // Bài cấp 1 không đặt giờ; bài cũ đã có giờ thì vẫn hiện để thầy cô thấy.
+  const showTimes = quizNeedsOpenWindow(level) || quiz.openAt !== null || quiz.closeAt !== null;
   const editedBy = quiz.updatedAt ? `sửa lần cuối ${formatDateTime(quiz.updatedAt)}` : null;
 
   return (
@@ -304,6 +326,12 @@ function QuizEditor({ quiz }: { quiz: QuizDetail }) {
             <SubmissionProgress submitted={quiz.submittedCount} students={quiz.studentCount} /> em đã nộp
           </span>
           <span className="flex-1" />
+          {quiz.accessCode && (
+            <Button variant="secondary" onClick={() => setCode(quizCodeTarget(quiz))}>
+              <Icon name="key" size={16} />
+              Mã bài kiểm tra
+            </Button>
+          )}
           <Button variant="secondary" onClick={() => void duplicate()} loading={busy === 'duplicate'} disabled={!quiz.access.canDuplicate || busy !== null}>
             <Icon name="copy" size={16} />
             Nhân bản
@@ -410,29 +438,38 @@ function QuizEditor({ quiz }: { quiz: QuizDetail }) {
             error={errors.timeLimitMinutes}
             hint={timeLimitHint(level)}
           />
-          <TextField
-            label="Mở lúc *"
-            name="openAt"
-            value={draft.openAt}
-            placeholder="07:00 06/10/2026"
-            autoComplete="off"
-            disabled={!canSettings}
-            onChange={(e) => edit({ openAt: e.target.value })}
-            error={errors.openAt}
-            hint="Giờ Việt Nam, dạng giờ:phút ngày/tháng/năm."
-          />
-          <TextField
-            label="Đóng lúc *"
-            name="closeAt"
-            value={draft.closeAt}
-            placeholder="17:00 07/10/2026"
-            autoComplete="off"
-            disabled={!canClose}
-            onChange={(e) => edit({ closeAt: e.target.value })}
-            error={errors.closeAt}
-            hint="Phải sau giờ mở."
-          />
+          {showTimes && (
+            <>
+              <TextField
+                label="Mở lúc *"
+                name="openAt"
+                value={draft.openAt}
+                placeholder="07:00 06/10/2026"
+                autoComplete="off"
+                disabled={!canSettings}
+                onChange={(e) => edit({ openAt: e.target.value })}
+                error={errors.openAt}
+                hint={timeHint(draft.openAt, 'Giờ Việt Nam, đồng hồ 24 giờ: 00:30 là nửa đêm, 12:30 là giữa trưa.')}
+              />
+              <TextField
+                label="Đóng lúc *"
+                name="closeAt"
+                value={draft.closeAt}
+                placeholder="17:00 07/10/2026"
+                autoComplete="off"
+                disabled={!canClose}
+                onChange={(e) => edit({ closeAt: e.target.value })}
+                error={errors.closeAt}
+                hint={timeHint(draft.closeAt, 'Phải sau giờ mở. Quá giờ đóng, hệ thống tự đóng bài.')}
+              />
+            </>
+          )}
         </div>
+        {!showTimes && (
+          <InlineMessage tone="info" className="mt-4">
+            Lớp cấp 1 không đặt giờ mở và đóng để em không bị áp lực: bài chơi mở ngay khi phát hành, thầy cô bấm "Đóng bài kiểm tra" khi không dùng nữa.
+          </InlineMessage>
+        )}
         <div className="mt-4 grid gap-4 dsvmd:grid-cols-2">
           <SwitchRow
             label="Xáo câu"
@@ -484,6 +521,7 @@ function QuizEditor({ quiz }: { quiz: QuizDetail }) {
         onClose={() => setConfirmingPublish(false)}
       >
         {quiz.publishNotice ?? 'Sau khi phát hành, danh sách câu hỏi và điểm sẽ bị khóa.'}
+        {draft.openAt.trim() !== '' && ` Bài mở lúc ${describeQuizTime(draft.openAt) ?? draft.openAt}.`}
       </ConfirmDialog>
       <ConfirmDialog
         open={confirmingClose}

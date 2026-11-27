@@ -9,7 +9,7 @@ import { DifficultyBadge } from '../question/QuestionBits';
 import { QuestionPreviewDialog } from './QuestionPreviewDialog';
 
 // Chọn câu từ ngân hàng (hộp thoại): câu đã duyệt, chưa ẩn, dùng chung mọi trường, và chỉ hiện câu có dạng dùng được ở cấp của lớp làm bài
-// (câu khác dạng bị ẩn, không chọn được). Mặc định lọc theo các di sản của bài học; lọc thêm độ khó, dạng câu, từ khóa. Chọn nhiều câu,
+// (câu khác dạng bị ẩn, không chọn được). Chỉ hiện câu về các di sản đã gắn với bài học (bài kiểm tra không nhận câu về di sản khác); lọc thêm độ khó, dạng câu, từ khóa. Chọn nhiều câu,
 // kể cả qua nhiều trang; câu đã có trong bài hiện mờ. Con mắt mở câu ở chế độ xem trước như học sinh, chồng lên hộp thoại này và không
 // làm mất các câu đang chọn. Mỗi câu thêm vào được 1 điểm, sửa ở danh sách câu.
 
@@ -22,7 +22,6 @@ interface QuestionPickerDialogProps {
 }
 
 export function QuestionPickerDialog({ quiz, onAdd, onClose }: QuestionPickerDialogProps) {
-  const [lessonOnly, setLessonOnly] = useState(true);
   const [difficulty, setDifficulty] = useState<QuestionDifficulty | ''>('');
   const [type, setType] = useState<QuestionType | ''>('');
   const [keyword, setKeyword] = useState('');
@@ -32,7 +31,7 @@ export function QuestionPickerDialog({ quiz, onAdd, onClose }: QuestionPickerDia
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const filter = { questionType: type, difficultyLevel: difficulty, lessonHeritagesOnly: lessonOnly, keyword, page, pageSize: PAGE_SIZE };
+  const filter = { questionType: type, difficultyLevel: difficulty, keyword, page, pageSize: PAGE_SIZE };
   const list = useQuery({
     queryKey: queryKeys.quizCandidates(quiz.id, filter),
     queryFn: () => quizzesApi.candidates(quiz.id, filter).then((r) => r.data),
@@ -72,11 +71,7 @@ export function QuestionPickerDialog({ quiz, onAdd, onClose }: QuestionPickerDia
       <Modal
         open
         title="Chọn câu từ ngân hàng"
-        description={
-          lessonOnly
-            ? `Câu đã duyệt, dùng chung cho mọi trường. Mặc định lọc theo các di sản của bài học ${quiz.lessonTitle ?? ''}.`
-            : 'Câu đã duyệt, dùng chung cho mọi trường. Đang xem câu của mọi di sản.'
-        }
+        description={`Câu đã duyệt về các di sản đã gắn với bài học ${quiz.lessonTitle ?? ''}. Bài kiểm tra chỉ nhận câu về các di sản này.`}
         size="wide"
         busy={adding}
         onClose={onClose}
@@ -88,20 +83,6 @@ export function QuestionPickerDialog({ quiz, onAdd, onClose }: QuestionPickerDia
           {error && <InlineMessage tone="danger">{error}</InlineMessage>}
 
           <div className="flex flex-col gap-3 dsvmd:flex-row dsvmd:items-end">
-            <div className="flex items-center gap-2 dsvmd:pb-1">
-              <button
-                type="button"
-                aria-pressed={lessonOnly}
-                onClick={() => reset(() => setLessonOnly(!lessonOnly))}
-                className={cn(
-                  'inline-flex h-9 items-center gap-2 rounded-full border px-4 type-label whitespace-nowrap',
-                  lessonOnly ? 'border-primary bg-primary-container text-on-primary-container' : 'border-border bg-surface text-on-surface hover:bg-surface-container-low',
-                )}
-              >
-                Di sản của bài
-                {lessonOnly && <Icon name="x" size={14} />}
-              </button>
-            </div>
             <SelectField
               label="Độ khó"
               value={difficulty}
@@ -124,7 +105,7 @@ export function QuestionPickerDialog({ quiz, onAdd, onClose }: QuestionPickerDia
           ) : list.isError ? (
             <ErrorState error={list.error} onRetry={() => void list.refetch()} />
           ) : rows.length === 0 ? (
-            <EmptyState icon="search" title="Không tìm thấy kết quả phù hợp. Hãy bớt tiêu chí lọc hoặc thử từ khóa khác." />
+            <EmptyState icon="search" title="Không tìm thấy kết quả phù hợp. Hãy bớt tiêu chí lọc hoặc thử từ khóa khác. Chỉ có câu hỏi về các di sản đã gắn với bài học; muốn thêm câu về di sản khác, hãy tạo câu mới cho di sản của bài." />
           ) : (
             <div>
               <p className="mb-2 type-body-s text-on-surface-variant" aria-live="polite">

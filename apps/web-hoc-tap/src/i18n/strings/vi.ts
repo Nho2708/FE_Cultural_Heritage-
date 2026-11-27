@@ -61,6 +61,7 @@ export const vi = {
     aboutColumn: 'Về DiViet',
     intro: 'Giới thiệu',
     forSchools: 'Dành cho nhà trường',
+    privacy: 'Chính sách quyền riêng tư',
     copyright: '© 2026 DiViet',
   },
 
@@ -257,36 +258,6 @@ export const vi = {
     sourceNote: 'Tóm tắt từ nội dung đã lưu của di sản, không tạo mới khi xem.',
   },
 
-  ads: {
-    gateTitle: 'Xem quảng cáo để mở tóm tắt và nghe thuyết minh',
-    gateBody: (name: string, hours: number) =>
-      `Xem một quảng cáo ngắn để mở tóm tắt và nghe thuyết minh của "${name}" trong ${hours} giờ trên thiết bị này.`,
-    freeNote: 'Xem ảnh, bản đồ, dòng thời gian và mô hình 3D vẫn miễn phí.',
-    later: 'Để sau',
-    unlockedUntil: (time: string) => `Đã mở khóa đến ${time}`,
-    watch: 'Xem quảng cáo',
-    watchAgain: 'Xem lại quảng cáo',
-    resend: 'Gửi lại',
-    providedByGoogle: 'Quảng cáo do Google cung cấp, hiện không cá nhân hóa. Bạn cần xem hết quảng cáo để được mở.',
-    starting: 'Đang chuẩn bị…',
-    loading: 'Đang tải quảng cáo…',
-    watching: 'Đang phát quảng cáo.',
-    verifying: 'Đang xác nhận phần thưởng, vui lòng đợi trong giây lát.',
-    problem: {
-      closed: 'Bạn chưa xem hết quảng cáo nên chưa mở được tóm tắt. Hãy xem lại và xem đến hết.',
-      noFill: 'Hiện chưa có quảng cáo để hiện. Bạn hãy thử lại sau ít phút.',
-      unsupported: 'Trình duyệt hoặc thiết bị này chưa hiện được quảng cáo có thưởng. Bạn hãy thử trên điện thoại hoặc dùng app DiViet.',
-      blocked: 'Không tải được quảng cáo. Nếu bạn đang dùng trình chặn quảng cáo, hãy tắt nó cho trang này rồi thử lại.',
-      timeout: 'Quảng cáo tải quá lâu. Bạn hãy thử lại sau ít phút.',
-      rejected: 'Chưa mở được tóm tắt. Bạn hãy xem hết quảng cáo hoặc thử lại sau ít phút.',
-      network: 'Không kết nối được tới máy chủ. Bạn hãy kiểm tra mạng rồi thử lại.',
-      resend: 'Chưa báo được cho máy chủ là bạn đã xem xong quảng cáo. Bạn hãy kiểm tra mạng rồi gửi lại, không cần xem lại quảng cáo.',
-      unavailable: 'Hiện chưa có quảng cáo để hiện. Bạn hãy thử lại sau ít phút.',
-      rateLimited: (minutes: number | null) =>
-        minutes === null ? 'Bạn đã xem quá nhiều quảng cáo trong thời gian ngắn. Hãy thử lại sau ít phút.' : `Bạn đã xem quá nhiều quảng cáo trong thời gian ngắn. Hãy thử lại sau ${minutes} phút.`,
-    },
-  },
-
   model: {
     kicker: 'MÔ HÌNH 3D',
     viewerAria: (name: string) => `Mô hình 3D của ${name}`,
@@ -411,7 +382,7 @@ export const vi = {
   about: {
     title: 'Giới thiệu',
     kicker: 'GIỚI THIỆU',
-    heroTitle: 'Di sản Việt Nam, kể bằng ngôn ngữ của bạn',
+    heroTitle: 'Di sản Việt Nam, nghe bằng ngôn ngữ của bạn',
     heroText: 'DiViet là trang web và app miễn phí để khám phá di sản văn hóa và thiên nhiên Việt Nam. Đọc được bằng tiếng Việt, Anh, Hàn, Trung hoặc Nhật, không cần tài khoản.',
     start: 'Bắt đầu khám phá',
     openMap: 'Mở bản đồ di sản',
@@ -421,7 +392,7 @@ export const vi = {
     nearbyLink: 'Mở bản đồ di sản',
     listenTitle: 'Nghe thuyết minh bằng ngôn ngữ của bạn',
     listenText: 'Mỗi di sản có một bản tóm tắt ngắn để đọc, hoặc nghe bằng giọng đọc của thiết bị.',
-    listenNote: 'Tóm tắt và thuyết minh của một di sản mở bằng một quảng cáo ngắn, dùng được trong 24 giờ; mọi phần khác đều miễn phí. Bản tiếng Hàn, Trung và Nhật là bản dịch máy.',
+    listenNote: 'Tóm tắt và thuyết minh của mọi di sản đều miễn phí cho tất cả mọi người, không cần đăng nhập. Bản tiếng Hàn, Trung và Nhật là bản dịch máy.',
     listenLink: 'Tìm một di sản',
     modelTitle: 'Mô hình 3D và dòng thời gian',
     modelText: 'Xoay mô hình 3D để ngắm di sản từ mọi phía, rồi đi dọc dòng thời gian qua từng giai đoạn và sự kiện của di sản.',
@@ -434,6 +405,8 @@ export const vi = {
     schoolsTitle: 'Dành cho nhà trường',
     schoolsText: 'Giáo viên soạn bài học và bài kiểm tra về di sản cho lớp mình; học sinh học theo cấp 1, 2, 3 bằng mã bài học.',
     schoolsLink: 'Xem trang dành cho nhà trường',
+    trailerTitle: 'Trailer DiViet',
+    trailerLabel: 'Trailer giới thiệu DiViet',
     videoTitle: 'Video giới thiệu',
     videoLabel: 'Video giới thiệu DiViet',
     videoNoSupport: 'Trình duyệt này không phát được video.',

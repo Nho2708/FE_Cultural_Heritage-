@@ -11,14 +11,19 @@ const AdminArea = lazy(() => import('../areas/admin/AdminArea'));
 
 /** Màn hình trong khu làm việc (tải lười; AreaLayout bọc Suspense quanh nội dung). */
 export const SchoolInfoPage = lazy(() => import('../pages/school/SchoolInfoPage'));
+export const SchoolBillingPage = lazy(() => import('../pages/school/SchoolBillingPage'));
 export const TeachersPage = lazy(() => import('../pages/school/TeachersPage'));
 export const SchoolsPage = lazy(() => import('../pages/admin/SchoolsPage'));
 export const SchoolDetailPage = lazy(() => import('../pages/admin/SchoolDetailPage'));
 export const HeritagesPage = lazy(() => import('../pages/admin/HeritagesPage'));
 export const HeritageEditorPage = lazy(() => import('../pages/admin/HeritageEditorPage'));
+export const CurriculumTopicsPage = lazy(() => import('../pages/admin/CurriculumTopicsPage'));
+export const CurriculumTopicHeritagesPage = lazy(() => import('../pages/admin/CurriculumTopicHeritagesPage'));
 export const ClassesPage = lazy(() => import('../pages/teacher/ClassesPage'));
 export const ClassDetailPage = lazy(() => import('../pages/teacher/ClassDetailPage'));
 export const LessonsPage = lazy(() => import('../pages/teacher/LessonsPage'));
+export const LessonLibraryPage = lazy(() => import('../pages/teacher/LessonLibraryPage'));
+export const LessonLibraryReviewPage = lazy(() => import('../pages/admin/LessonLibraryReviewPage'));
 export const QuestionBankPage = lazy(() => import('../pages/teacher/QuestionBankPage'));
 export const QuizzesPage = lazy(() => import('../pages/teacher/QuizzesPage'));
 export const QuizResultsPage = lazy(() => import('../pages/teacher/QuizResultsPage'));
@@ -32,7 +37,7 @@ export const PaymentResultPage = lazy(() => import('../pages/school/PaymentResul
 export const SchoolOverviewPage = lazy(() => import('../pages/school/SchoolOverviewPage'));
 export const OverviewPage = lazy(() => import('../pages/admin/OverviewPage'));
 export const QuestionModerationPage = lazy(() => import('../pages/admin/QuestionModerationPage'));
-export const AdStatsPage = lazy(() => import('../pages/admin/AdStatsPage'));
+export const VisitorStatsPage = lazy(() => import('../pages/admin/VisitorStatsPage'));
 export const AuditLogPage = lazy(() => import('../pages/admin/AuditLogPage'));
 export const TranslationReviewPage = lazy(() => import('../pages/admin/TranslationReviewPage'));
 

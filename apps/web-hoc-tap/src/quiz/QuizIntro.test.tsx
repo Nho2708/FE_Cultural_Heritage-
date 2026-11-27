@@ -25,11 +25,13 @@ function show(level: 1 | 2 | 3) {
 }
 
 describe('nút bắt đầu theo cấp', () => {
-  it('cấp 1: nút "Bắt đầu chơi" và lời nhắc cùng chữ, không có nút "Bắt đầu"', async () => {
+  it('cấp 1: nút "Bắt đầu chơi", số câu bằng chữ to, lời nhắc cách chơi của máy chủ, không chữ nhỏ về giờ đóng', async () => {
     show(1);
 
     expect(await screen.findByRole('button', { name: 'Bắt đầu chơi' })).toBeInTheDocument();
-    expect(screen.getByText(/Bấm “Bắt đầu chơi” để làm bài\./)).toBeInTheDocument();
+    expect(screen.getByText('Bài chơi có 10 câu')).toBeInTheDocument();
+    expect(screen.getByText('Em trả lời từng câu. Chưa đúng thì em được thử lại. Mỗi bài em chơi một lần.')).toBeInTheDocument();
+    expect(screen.queryByText(/Đóng lúc/)).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Bắt đầu' })).not.toBeInTheDocument();
   });
 

@@ -11,15 +11,27 @@ import {
   toggleOrderItem,
 } from '@dsvhvn/dung-chung';
 import type { AttemptQuestion, QuestionSubmission } from '@dsvhvn/dung-chung/api';
+import { LevelOneChoices } from '@dsvhvn/dung-chung/lesson';
 import { Icon } from '@dsvhvn/dung-chung/ui';
 import { useId, useState } from 'react';
 import { dragProps, dropProps, parseDrag } from './dnd';
 
 // Ô trả lời của tám dạng câu. Một bộ component, ba cách trình bày theo cấp học của lớp em (cấp 1 nút to và hình lớn, cấp 2 cân bằng,
 // cấp 3 gọn). Mọi vị trí trong câu trả lời tính theo thứ tự đang hiện trên màn hình (máy chủ đã xáo cố định theo lượt). Mỗi thao
-// tác trả về cả câu trả lời mới; việc lưu do hook làm bài đảm nhiệm.
+// tác trả về cả câu trả lời mới; việc lưu do hook làm bài đảm nhiệm. Cấp 1 là bài chơi luyện tập: dạng chọn là nút và thẻ hình to (chạm là
+// kiểm), ghép cặp chỉ chạm (không kéo thả), phương án vừa chọn chưa đúng làm mờ và khóa, đáp án đúng sáng viền kèm dấu tích.
 
 export type QuizLevel = 1 | 2 | 3;
+
+/** Dấu của bài chơi luyện tập cấp 1 trên câu đang làm. */
+export interface PracticeMarks {
+  /** Phương án em đã chọn chưa đúng (dạng chọn): làm mờ và khóa. */
+  tried?: ReadonlySet<number>;
+  /** Đáp án đúng đang được chỉ ra (em vừa làm đúng, hoặc đã tới lượt chỉ đáp án). */
+  reveal?: QuestionSubmission | null;
+  /** Sắp xếp: các mục chưa đứng đúng chỗ ở lần kiểm vừa rồi. */
+  misplaced?: ReadonlySet<number>;
+}
 
 export interface QuestionInputProps {
   question: AttemptQuestion;
@@ -27,6 +39,8 @@ export interface QuestionInputProps {
   onChange: (next: QuestionSubmission) => void;
   level: QuizLevel;
   disabled?: boolean;
+  /** Chỉ cấp 1: dấu thử lại và đáp án đúng của bài chơi luyện tập. */
+  marks?: PracticeMarks;
 }
 
 const OPTION_SIZE: Record<QuizLevel, string> = {
@@ -66,6 +80,23 @@ function Letter({ index, selected, level }: { index: number; selected: boolean; 
 // ---- Chọn một phương án: Một đáp án đúng, Đúng/Sai, Đọc tư liệu ----
 
 const FOCUS = 'has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-(--dsv-color-focus-ring)';
+
+/** Cấp 1: nút chạm to, chạm là chọn (bài chơi kiểm ngay); không dùng nút radio để phím mũi tên không chọn thay em. */
+function LevelOneChoiceInput({ question, answer, onChange, disabled, marks }: QuestionInputProps) {
+  const kind = question.questionType === 'TRUE_FALSE' ? 'TRUE_FALSE' : question.questionType === 'IMAGE_CHOICE' ? 'IMAGE_CHOICE' : 'TEXT';
+  return (
+    <LevelOneChoices
+      kind={kind}
+      options={question.options}
+      picked={answer?.selectedIndex ?? null}
+      tried={marks?.tried}
+      correct={marks?.reveal?.selectedIndex ?? null}
+      disabled={disabled || Boolean(marks?.reveal)}
+      onPick={(index) => onChange({ selectedIndex: index })}
+      label={kind === 'IMAGE_CHOICE' ? 'Các hình' : 'Các phương án'}
+    />
+  );
+}
 
 function OptionsInput({ question, answer, onChange, level, disabled }: QuestionInputProps) {
   const selected = answer?.selectedIndex ?? null;
@@ -135,9 +166,14 @@ function ImageChoiceInput({ question, answer, onChange, level, disabled }: Quest
 
 type Pick = { side: 'left' | 'right'; index: number } | null;
 
-function MatchingInput({ question, answer, onChange, level, disabled }: QuestionInputProps) {
+function MatchingInput({ question, answer, onChange, level, disabled: locked, marks }: QuestionInputProps) {
   const count = question.leftItems.length;
-  const matches = answer?.matches ?? null;
+  const reveal = marks?.reveal?.matches ?? null;
+  const disabled = locked || reveal !== null;
+  // Cấp 1 chỉ chạm (trẻ nhỏ kéo thả khó); khi chỉ đáp án thì hiện đủ các cặp đúng.
+  const drag = level !== 1;
+  const one = level === 1;
+  const matches = reveal ?? answer?.matches ?? null;
   const [pick, setPick] = useState<Pick>(null);
   const usedRight = new Set((matches ?? []).filter((m): m is number => m !== null && m !== undefined));
 
@@ -156,25 +192,34 @@ function MatchingInput({ question, answer, onChange, level, disabled }: Question
 
   return (
     <div className="flex flex-col gap-5">
-      <p className="type-body-s text-on-surface-variant">
-        {level === 1
-          ? 'Chạm một hình rồi chạm tên đúng, hoặc kéo tên thả vào hình.'
-          : 'Chọn một hình rồi chọn tên tương ứng (hoặc kéo tên thả vào hình). Chọn lại để đổi.'}
-      </p>
-      <ul aria-label="Các hình cần nối" className={cn('grid gap-4', level === 1 ? 'sm:grid-cols-3' : 'sm:grid-cols-2')}>
+      {!one && (
+        <p className="type-body-s text-on-surface-variant">Chọn một hình rồi chọn tên tương ứng (hoặc kéo tên thả vào hình). Chọn lại để đổi.</p>
+      )}
+      <ul aria-label="Các hình cần nối" className={cn('grid', one ? 'grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4' : 'gap-4 sm:grid-cols-2')}>
         {question.leftItems.map((item, left) => {
           const right = matches?.[left] ?? null;
           const picked = pick?.side === 'left' && pick.index === left;
+          // Cấp 1 có ba hình: hình thứ ba nằm giữa hàng dưới trên điện thoại.
+          const centered = one && count === 3 && left === 2;
           return (
-            <li key={left}>
+            <li key={left} className={centered ? 'col-span-2 w-[calc(50%-6px)] justify-self-center sm:col-span-1 sm:w-auto sm:justify-self-stretch' : undefined}>
               <div
                 {...dropProps((payload) => {
                   const dragged = parseDrag(payload, 'ten');
                   if (dragged !== null) commit(left, dragged);
-                }, !disabled)}
+                }, drag && !disabled)}
                 className={cn(
-                  'overflow-hidden rounded-(--dsv-option-radius) border-2',
-                  picked ? 'border-primary bg-primary-container' : right !== null ? 'border-success bg-surface' : 'border-border bg-surface',
+                  'overflow-hidden rounded-(--dsv-option-radius)',
+                  one ? 'border-[3px]' : 'border-2',
+                  reveal !== null
+                    ? 'border-success bg-success-container ring-4 ring-success/25'
+                    : picked
+                      ? 'border-primary bg-primary-container'
+                      : right !== null
+                        ? one
+                          ? 'border-primary/50 bg-surface'
+                          : 'border-success bg-surface'
+                        : 'border-border bg-surface',
                 )}
               >
                 <button
@@ -183,7 +228,7 @@ function MatchingInput({ question, answer, onChange, level, disabled }: Question
                   aria-pressed={picked}
                   aria-label={`Hình ${left + 1}${item.content ? `: ${item.content}` : ''}${right !== null ? `, đã nối với ${question.rightItems[right] ?? ''}` : ', chưa nối'}`}
                   onClick={() => onLeft(left)}
-                  className="block w-full text-left"
+                  className="block min-h-0 w-full text-left"
                 >
                   {item.imageUrl ? (
                     <img src={item.imageUrl} alt="" className="aspect-[4/3] w-full object-cover" />
@@ -192,25 +237,32 @@ function MatchingInput({ question, answer, onChange, level, disabled }: Question
                       <Icon name="image" size={36} />
                     </span>
                   )}
-                  {item.content && <span className="block px-3 pt-2 type-label text-on-surface-variant">{item.content}</span>}
+                  {item.content && <span className={cn('block px-3 pt-2 text-on-surface-variant', one ? 'text-[16px]' : 'type-label')}>{item.content}</span>}
                 </button>
-                <div className="flex min-h-12 items-center gap-2 px-3 py-2">
+                <div className={cn('flex items-center gap-2 px-3 py-2', one ? 'min-h-14' : 'min-h-12')}>
                   {right !== null ? (
                     <>
-                      <Icon name="check" size={18} className="text-success" />
-                      <span className={cn('min-w-0 flex-1', level === 1 ? 'type-h4' : 'type-label')}>{question.rightItems[right]}</span>
-                      <button
-                        type="button"
-                        disabled={disabled}
-                        aria-label={`Gỡ tên đã nối ở hình ${left + 1}`}
-                        onClick={() => onChange({ matches: clearMatch(matches, count, left) })}
-                        className="flex size-9 min-h-0 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container"
-                      >
-                        <Icon name="x" size={16} />
-                      </button>
+                      <Icon name="check" size={one ? 22 : 18} className={one && reveal === null ? 'shrink-0 text-primary' : 'shrink-0 text-success'} />
+                      <span className={cn('min-w-0 flex-1', one ? 'text-[18px] leading-tight font-bold' : 'type-label')}>{question.rightItems[right]}</span>
+                      {reveal === null && (
+                        <button
+                          type="button"
+                          disabled={disabled}
+                          aria-label={`Gỡ tên đã nối ở hình ${left + 1}`}
+                          onClick={() => onChange({ matches: clearMatch(matches, count, left) })}
+                          className={cn(
+                            'flex min-h-0 shrink-0 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container',
+                            one ? 'size-11' : 'size-9',
+                          )}
+                        >
+                          <Icon name="x" size={one ? 20 : 16} />
+                        </button>
+                      )}
                     </>
                   ) : (
-                    <span className="type-body-s text-on-surface-variant">Chưa nối tên</span>
+                    <span className={one ? 'text-[16px] text-on-surface-variant' : 'type-body-s text-on-surface-variant'}>
+                      {one && picked ? 'Chạm một tên ở dưới' : 'Chưa nối tên'}
+                    </span>
                   )}
                 </div>
               </div>
@@ -218,83 +270,103 @@ function MatchingInput({ question, answer, onChange, level, disabled }: Question
           );
         })}
       </ul>
-      <ul aria-label="Các tên để nối" className="flex flex-wrap gap-3">
-        {question.rightItems.map((name, right) => {
-          const used = usedRight.has(right);
-          const picked = pick?.side === 'right' && pick.index === right;
-          return (
-            <li key={right}>
-              <button
-                type="button"
-                disabled={disabled || used}
-                aria-pressed={picked}
-                onClick={() => onRight(right)}
-                {...dragProps(`ten:${right}`, !disabled && !used)}
-                className={cn(
-                  'rounded-full border-2 px-5 transition-colors disabled:opacity-40',
-                  level === 1 ? 'min-h-14 type-h4' : 'min-h-11 type-label',
-                  picked ? 'border-primary bg-primary text-on-primary' : 'border-border-strong bg-surface text-on-surface hover:bg-surface-container-low',
-                )}
-              >
-                {name}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+      {reveal === null && (
+        <ul aria-label="Các tên để nối" className="flex flex-wrap gap-3">
+          {question.rightItems.map((name, right) => {
+            const used = usedRight.has(right);
+            const picked = pick?.side === 'right' && pick.index === right;
+            return (
+              <li key={right}>
+                <button
+                  type="button"
+                  disabled={disabled || used}
+                  aria-pressed={picked}
+                  onClick={() => onRight(right)}
+                  {...dragProps(`ten:${right}`, drag && !disabled && !used)}
+                  className={cn(
+                    'rounded-full border-2 px-5 transition-colors disabled:opacity-40',
+                    one ? 'min-h-16 text-[20px] font-bold' : 'min-h-11 type-label',
+                    picked ? 'border-primary bg-primary text-on-primary' : 'border-border-strong bg-surface text-on-surface hover:bg-surface-container-low',
+                  )}
+                >
+                  {name}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }
 
 // ---- Sắp xếp ----
 
-function OrderingInput({ question, answer, onChange, level, disabled }: QuestionInputProps) {
-  const order = answer?.order ?? [];
+function OrderingInput({ question, answer, onChange, level, disabled: locked, marks }: QuestionInputProps) {
+  const reveal = marks?.reveal?.order ?? null;
+  const disabled = locked || reveal !== null;
+  const one = level === 1;
+  // Khi chỉ đáp án: các mục hiện theo thứ tự đúng.
+  const order = reveal ?? answer?.order ?? [];
   const total = question.items.length;
   const rank = new Map(order.map((item, position) => [item, position]));
   const complete = order.length === total && total > 0;
+  const shown = reveal ?? question.items.map((_, item) => item);
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="type-body-s text-on-surface-variant">
-        Chạm lần lượt các mục theo đúng thứ tự (mục chạm trước đứng trước). Chạm một mục đã chọn để bỏ chọn.
-      </p>
+      {!one && (
+        <p className="type-body-s text-on-surface-variant">
+          Chạm lần lượt các mục theo đúng thứ tự (mục chạm trước đứng trước). Chạm một mục đã chọn để bỏ chọn.
+        </p>
+      )}
       <ul
         aria-label="Các mục cần sắp xếp"
         className="flex flex-col gap-3"
         {...dropProps((payload) => {
           const dragged = parseDrag(payload, 'muc');
           if (dragged !== null && !order.includes(dragged)) onChange({ order: toggleOrderItem(order, dragged) });
-        }, !disabled)}
+        }, !one && !disabled)}
       >
-        {question.items.map((text, item) => {
+        {shown.map((item) => {
+          const text = question.items[item] ?? '';
           const position = rank.get(item);
           const placed = position !== undefined;
+          const misplaced = one && reveal === null && placed && (marks?.misplaced?.has(item) ?? false);
           return (
             <li key={item} className="flex items-center gap-2">
               <button
                 type="button"
                 disabled={disabled}
                 aria-pressed={placed}
-                aria-label={placed ? `${text}, thứ ${position + 1}` : `${text}, chưa xếp`}
+                aria-label={placed ? `${text}, thứ ${position + 1}${misplaced ? ', chưa đúng chỗ' : ''}` : `${text}, chưa xếp`}
                 onClick={() => onChange({ order: toggleOrderItem(order, item) })}
-                {...dragProps(`muc:${item}`, !disabled && !placed)}
-                className={choiceClass(level, placed)}
+                {...dragProps(`muc:${item}`, !one && !disabled && !placed)}
+                className={cn(
+                  choiceClass(level, placed),
+                  one && 'min-h-[72px] border-[3px] text-[22px] leading-snug font-bold',
+                  reveal !== null && 'border-success bg-success-container text-on-success-container',
+                  misplaced && 'border-dashed border-on-surface-variant bg-surface-container-low text-on-surface',
+                )}
               >
-                <Icon name="grip" size={18} className="shrink-0 text-on-surface-variant" />
+                {!one && <Icon name="grip" size={18} className="shrink-0 text-on-surface-variant" />}
                 <span
                   aria-hidden="true"
                   className={cn(
                     'flex shrink-0 items-center justify-center rounded-full border-2 type-label',
-                    level === 1 ? 'size-11' : 'size-8',
-                    placed ? 'border-primary bg-primary text-on-primary' : 'border-dashed border-border-strong text-transparent',
+                    one ? 'size-11 text-[18px]' : 'size-8',
+                    reveal !== null
+                      ? 'border-success bg-success text-on-success'
+                      : placed
+                        ? 'border-primary bg-primary text-on-primary'
+                        : 'border-dashed border-border-strong text-transparent',
                   )}
                 >
                   {placed ? position + 1 : '·'}
                 </span>
                 <span className="min-w-0 flex-1">{text}</span>
               </button>
-              {placed && level !== 1 && (
+              {placed && !one && (
                 <span className="flex shrink-0 flex-col">
                   <button
                     type="button"
@@ -320,21 +392,23 @@ function OrderingInput({ question, answer, onChange, level, disabled }: Question
           );
         })}
       </ul>
-      <div className="flex items-center gap-3">
-        <p className="type-body-s text-on-surface-variant" aria-live="polite">
-          {complete ? 'Em đã xếp đủ các mục.' : `Em đã xếp ${order.length} / ${total} mục.`}
-        </p>
-        {order.length > 0 && (
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={() => onChange({ order: [] })}
-            className="rounded-sm px-3 type-label text-link underline underline-offset-4"
-          >
-            Xếp lại từ đầu
-          </button>
-        )}
-      </div>
+      {reveal === null && (
+        <div className="flex flex-wrap items-center gap-3">
+          <p className={one ? 'text-[18px] text-on-surface-variant' : 'type-body-s text-on-surface-variant'} aria-live="polite">
+            {complete ? 'Em đã xếp đủ các mục.' : one ? `Em đã xếp ${order.length} trên ${total} mục.` : `Em đã xếp ${order.length} / ${total} mục.`}
+          </p>
+          {order.length > 0 && (
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={() => onChange({ order: [] })}
+              className={cn('rounded-sm px-3 text-link underline underline-offset-4', one ? 'min-h-12 text-[18px] font-bold' : 'type-label')}
+            >
+              Xếp lại từ đầu
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -471,7 +545,11 @@ function MultiTrueFalseInput({ question, answer, onChange, level, disabled }: Qu
 
 /** Ô trả lời theo dạng của câu. */
 export function QuestionInput(props: QuestionInputProps) {
-  switch (props.question.questionType) {
+  const type = props.question.questionType;
+  if (props.level === 1 && (type === 'TRUE_FALSE' || type === 'IMAGE_CHOICE' || type === 'SINGLE_CHOICE' || type === 'SOURCE_READING')) {
+    return <LevelOneChoiceInput {...props} />;
+  }
+  switch (type) {
     case 'IMAGE_CHOICE':
       return <ImageChoiceInput {...props} />;
     case 'MATCHING':

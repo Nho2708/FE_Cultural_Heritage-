@@ -188,7 +188,7 @@ async function loginAs(page, code) {
 async function enterCode(page, code) {
   await go(page, '/nhap-ma');
   await page.getByLabel('Mã bài học').fill(code);
-  await page.getByRole('button', { name: 'Mở bài học' }).click();
+  await page.getByRole('button', { name: 'Mở', exact: true }).click();
   await page.waitForURL(`**/bai-hoc/${code}`);
 }
 

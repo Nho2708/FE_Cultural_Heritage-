@@ -468,7 +468,7 @@ try {
   check('Ghi công hiện ngay trong trình xem, kèm liên kết giấy phép và nguồn', (await viewerDialog.getByText('Nhóm sản phẩm · CC BY 4.0 · https://sketchfab.com/3d-models/ngo-mon').count()) === 1 && (await viewerDialog.getByRole('link', { name: /Xem giấy phép/ }).getAttribute('href')) === 'https://creativecommons.org/licenses/by/4.0/' && (await viewerDialog.getByRole('link', { name: /Xem nguồn/ }).getAttribute('href')) === 'https://sketchfab.com/3d-models/ngo-mon');
   const guestCall = modelCalls.find((c) => c.url.includes(`/public/heritages/${A.slug}/model`));
   check('Xem 3D miễn phí, không đăng nhập: lời gọi mô hình không mang token', guestCall && guestCall.auth === null);
-  check('Không có quảng cáo hay cổng đăng nhập trước khi xem 3D', (await viewerDialog.getByText(/quảng cáo|đăng nhập/i).count()) === 0);
+  check('Không có cổng đăng nhập trước khi xem 3D', (await viewerDialog.getByText(/đăng nhập/i).count()) === 0);
   await shot(guest, '11-khach-xem-3d');
   const gBox = await guest.locator('model-viewer').boundingBox();
   const gBefore = await orbitOf(guest);

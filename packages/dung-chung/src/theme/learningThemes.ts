@@ -129,7 +129,10 @@ const DEFAULT_THEME: LearningTheme = {
   celebration: false,
 };
 
-/** Cấp 1 (khối 1-5): màu tươi tương phản cao, chữ lớn dòng thưa, bo góc nhiều, vùng bấm 48px, linh vật, có chúc mừng. */
+/**
+ * Cấp 1 (khối 1-5, một bộ cho cả lớp 1 đến lớp 5): màu tươi tương phản cao, chữ lớn dòng thưa (câu hỏi 28px), bo góc nhiều, vùng bấm 64px
+ * vì trẻ 6-7 tuổi chạm trượt nhiều với nút nhỏ, linh vật, có chúc mừng.
+ */
 const LEVEL_1_THEME: LearningTheme = {
   key: 'cap-1',
   level: 1,
@@ -159,17 +162,17 @@ const LEVEL_1_THEME: LearningTheme = {
     focusRing: '#1B1B1F',
   },
   text: {
-    bodySize: 19,
-    bodyLineHeight: 30,
-    questionSize: 24,
-    questionLineHeight: 34,
-    controlSize: 18,
-    controlLineHeight: 26,
-    headingSize: 30,
-    headingLineHeight: 38,
+    bodySize: 20,
+    bodyLineHeight: 32,
+    questionSize: 28,
+    questionLineHeight: 40,
+    controlSize: 20,
+    controlLineHeight: 28,
+    headingSize: 32,
+    headingLineHeight: 40,
   },
   radius: { control: 16, card: 24, option: 20 },
-  touchTarget: 48,
+  touchTarget: 64,
   spacing: { block: 32, inline: 20 },
   illustrationSet: 'linh-vat',
   celebration: true,

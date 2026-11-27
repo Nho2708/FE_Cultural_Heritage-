@@ -3,6 +3,8 @@ import { FPS, NGON_NGU, type NgonNgu } from './brand';
 import { DuKhach } from './DuKhach';
 import { DoanLogo } from './DoanLogo';
 import { NhaTruong } from './NhaTruong';
+import { QuangCao } from './quang-cao/QuangCao';
+import { TONG_DOC_30 } from './quang-cao/nhip';
 
 const MA: Record<NgonNgu, string> = { vi: 'vi', en: 'en', ko: 'ko', 'zh-Hans': 'zh', ja: 'ja' };
 
@@ -41,6 +43,9 @@ export function Root() {
         ))}
       </Folder>
       <Composition id="nha-truong-90s" component={NhaTruong} durationInFrames={FPS * 90} fps={FPS} width={1920} height={1080} />
+      <Folder name="quang-cao">
+        <Composition id="quang-cao-30s-doc-en" component={QuangCao} durationInFrames={TONG_DOC_30} fps={FPS} width={1080} height={1920} defaultProps={{ ngonNgu: 'en' }} />
+      </Folder>
     </>
   );
 }

@@ -26,30 +26,34 @@ function build(specs: readonly NavSpec[], role: StaffRole | null | undefined): N
 /** Menu tài khoản: Hồ sơ. Lối vào khu làm việc lấy từ `workArea` của vai trò. */
 const ACCOUNT: readonly NavSpec[] = [{ screen: 'profile', label: 'Hồ sơ', icon: 'user' }];
 
-/** Thanh bên /giao-vien: Lớp học · Bài học · Ngân hàng câu hỏi · Bài kiểm tra. */
+/** Thanh bên /giao-vien: Lớp học · Bài học · Thư viện bài mẫu · Ngân hàng câu hỏi · Bài kiểm tra. */
 const TEACHER: readonly NavSpec[] = [
   { screen: 'classes', label: 'Lớp học', icon: 'users' },
   { screen: 'lessons', label: 'Bài học', icon: 'book-open' },
+  { screen: 'lessonLibrary', label: 'Thư viện bài mẫu', icon: 'cards' },
   { screen: 'questionBank', label: 'Ngân hàng câu hỏi', icon: 'shield-check' },
   { screen: 'quizzes', label: 'Bài kiểm tra', icon: 'check' },
 ];
 
-/** Thanh bên /truong: Tổng quan · Trường và gói · Giáo viên. */
+/** Thanh bên /truong: Tổng quan · Trường · Gói đã mua · Giáo viên. */
 const SCHOOL: readonly NavSpec[] = [
   { screen: 'schoolOverview', label: 'Tổng quan', icon: 'bar-chart' },
-  { screen: 'schoolInfo', label: 'Trường và gói', icon: 'building' },
+  { screen: 'schoolInfo', label: 'Trường', icon: 'building' },
+  { screen: 'schoolSubscription', label: 'Gói đã mua', icon: 'star' },
   { screen: 'schoolTeachers', label: 'Giáo viên', icon: 'users' },
 ];
 
-/** Thanh bên /quan-tri: Tổng quan · Trường · Di sản · Bản dịch · Câu hỏi · Gói dịch vụ · Khách và quảng cáo · Nhật ký. */
+/** Thanh bên /quan-tri: Tổng quan · Trường · Di sản · Chủ đề chương trình · Bản dịch · Câu hỏi · Thư viện bài mẫu · Gói dịch vụ · Khách tham quan · Nhật ký. */
 const ADMIN: readonly NavSpec[] = [
   { screen: 'adminOverview', label: 'Tổng quan', icon: 'bar-chart' },
   { screen: 'schools', label: 'Trường', icon: 'building' },
   { screen: 'heritages', label: 'Di sản', icon: 'map-pin' },
+  { screen: 'curriculumTopics', label: 'Chủ đề chương trình', icon: 'list' },
   { screen: 'translationReview', label: 'Bản dịch', icon: 'languages' },
   { screen: 'questionModeration', label: 'Câu hỏi', icon: 'shield-check' },
+  { screen: 'lessonLibraryReview', label: 'Thư viện bài mẫu', icon: 'cards' },
   { screen: 'plans', label: 'Gói dịch vụ', icon: 'star' },
-  { screen: 'adStats', label: 'Khách và quảng cáo', icon: 'play' },
+  { screen: 'visitorStats', label: 'Khách tham quan', icon: 'eye' },
   { screen: 'auditLog', label: 'Nhật ký', icon: 'file-text' },
 ];
 

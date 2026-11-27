@@ -34,6 +34,20 @@ const TYPE_ICON: Record<HeritageType, IconName> = {
   DOCUMENTARY: 'file-text',
 };
 
+const REGION_IMAGE: Record<RegionValue, string> = {
+  Bắc: 'https://upload.wikimedia.org/wikipedia/commons/9/91/Doan_Mon_Gate_1.jpg',
+  Trung: 'https://upload.wikimedia.org/wikipedia/commons/e/eb/Vietnam%2C_Hue%2C_Imperial_City_of_Hue%2C_Meridian_Gate_2.jpg',
+  Nam: 'https://upload.wikimedia.org/wikipedia/commons/7/7d/20190923_Independence_Palace-10.jpg',
+};
+
+const TYPE_IMAGE: Record<HeritageType, string> = {
+  TANGIBLE: 'https://upload.wikimedia.org/wikipedia/commons/2/22/Constellation_of_Literature_pavilion_-_Temple_of_Literature%2C_Hanoi_-_DSC04557.JPG',
+  INTANGIBLE: 'https://upload.wikimedia.org/wikipedia/commons/d/d9/Quan_Ho-Ensemble.JPG',
+  NATURAL: 'https://upload.wikimedia.org/wikipedia/commons/2/2d/Halong_Bay_in_Vietnam.jpg',
+  MIXED: 'https://upload.wikimedia.org/wikipedia/commons/a/ab/Trang_An_Scenic_Landscape_Complex%2C_northern_Vietnam_%28354%29_%2838540830421%29.jpg',
+  DOCUMENTARY: 'https://upload.wikimedia.org/wikipedia/commons/6/6a/Stelae_of_Doctors_-_Temple_of_Literature%2C_Hanoi_-_DSC04561.JPG',
+};
+
 function isHeritageType(value: string): value is HeritageType {
   return value in TYPE_ICON;
 }
@@ -204,16 +218,45 @@ function FeaturedMosaic({ featured, total }: { featured: HeritageCard[]; total: 
   );
 }
 
-function CircleLink({ item, label, to, icon }: { item: CountItem; label: string; to: string; icon: IconName }) {
+function CategoryCard({
+  item,
+  label,
+  to,
+  icon,
+  imageUrl,
+}: {
+  item: CountItem;
+  label: string;
+  to: string;
+  icon: IconName;
+  imageUrl?: string | null;
+}) {
   const { language, t } = useI18n();
   return (
     <li>
-      <Link to={to} className="group flex w-[160px] flex-col items-center gap-3 rounded-md text-center dsvmd:w-[252px]">
-        <span className="flex size-[160px] items-center justify-center rounded-full bg-primary-container text-on-primary-container transition-colors group-hover:bg-secondary-container dsvmd:size-[252px]">
-          <Icon name={icon} size={56} />
-        </span>
-        <span className="type-label-kicker text-(--dsv-circle-kicker-fg)">{t.home.circleCount(formatCount(item.count, language))}</span>
-        <span className="type-h4 text-(--dsv-circle-title-fg)">{label}</span>
+      <Link
+        to={to}
+        className="group relative flex h-[150px] w-full flex-col justify-between overflow-hidden rounded-xl border border-outline-variant/30 bg-inverse-surface p-4 text-left shadow-xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+      >
+        <Thumbnail
+          url={imageUrl}
+          width={500}
+          className="transition-transform duration-300 ease-out group-hover:scale-105"
+        />
+        <div aria-hidden="true" className="absolute inset-0 entry-tile-scrim" />
+        <div className="relative flex justify-end">
+          <span className="flex size-7 items-center justify-center rounded-full bg-surface/20 text-on-image backdrop-blur-xs transition-colors group-hover:bg-primary group-hover:text-on-primary">
+            <Icon name={icon} size={15} />
+          </span>
+        </div>
+        <div className="relative flex flex-col gap-0.5 text-on-image">
+          <span className="type-label-kicker text-on-image-variant drop-shadow-xs">
+            {t.home.circleCount(formatCount(item.count, language))}
+          </span>
+          <span className="type-h4 font-semibold text-on-image drop-shadow-sm">
+            {label}
+          </span>
+        </div>
       </Link>
     </li>
   );
@@ -225,37 +268,39 @@ function RegionAndType({ home }: { home: DiscoveryHome }) {
     <section aria-labelledby="theo-vung-va-loai" className="bg-surface-container-low py-16">
       <div className="dsv-content flex flex-col gap-12">
         <SectionHeading id="theo-vung-va-loai" title={t.home.regionTypeTitle} subtitle={t.home.regionTypeText} />
-        <div className="flex flex-col gap-6 dsvlg:flex-row dsvlg:items-center dsvlg:gap-16">
-          <div className="max-w-[240px] shrink-0">
+        <div className="flex flex-col gap-6 dsvlg:flex-row dsvlg:items-start dsvlg:gap-12">
+          <div className="w-full shrink-0 dsvlg:w-[240px]">
             <h3 className="type-h2 text-on-background">{t.home.byRegion}</h3>
             <p className="mt-2 type-body-s text-on-surface-variant">{t.home.byRegionText}</p>
           </div>
-          <ul className="flex flex-wrap gap-x-10 gap-y-8">
+          <ul className="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-3">
             {home.byRegion.map((item) => (
-              <CircleLink
+              <CategoryCard
                 key={item.value}
                 item={item}
                 label={language !== 'vi' && isRegion(item.value) ? REGION_LONG_NAME[language][item.value] : item.label}
                 icon="map-pin"
+                imageUrl={isRegion(item.value) ? REGION_IMAGE[item.value] : null}
                 to={`${pathOf('search')}?${FILTER_PARAM.region}=${encodeURIComponent(item.value)}`}
               />
             ))}
           </ul>
         </div>
-        <div className="flex flex-col gap-6 dsvlg:flex-row dsvlg:items-center dsvlg:gap-16">
-          <div className="max-w-[240px] shrink-0">
+        <div className="flex flex-col gap-6 dsvlg:flex-row dsvlg:items-start dsvlg:gap-12">
+          <div className="w-full shrink-0 dsvlg:w-[240px]">
             <h3 className="type-h2 text-on-background">{t.home.byType}</h3>
             <p className="mt-2 type-body-s text-on-surface-variant">{t.home.byTypeText}</p>
           </div>
-          <ul className="flex flex-wrap gap-x-10 gap-y-8">
+          <ul className="grid flex-1 grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5">
             {home.byType
               .filter(isKnownType)
               .map((item) => (
-                <CircleLink
+                <CategoryCard
                   key={item.value}
                   item={item}
                   label={language === 'vi' ? item.label : HERITAGE_TYPE_NAME[language][item.value]}
                   icon={TYPE_ICON[item.value]}
+                  imageUrl={TYPE_IMAGE[item.value]}
                   to={`${pathOf('search')}?${FILTER_PARAM.type}=${item.value}`}
                 />
               ))}

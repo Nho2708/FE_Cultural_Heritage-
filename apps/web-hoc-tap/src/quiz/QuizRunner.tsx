@@ -1,14 +1,13 @@
-import { cn, clampStars, passageGroup } from '@dsvhvn/dung-chung';
+import { cn, passageGroup } from '@dsvhvn/dung-chung';
 import type { StudentAttempt, StudentAttemptResult } from '@dsvhvn/dung-chung/api';
-import { Button, ButtonLink, Icon } from '@dsvhvn/dung-chung/ui';
+import { Button, Icon } from '@dsvhvn/dung-chung/ui';
 import { useEffect, useState } from 'react';
-import { pathOf } from '../access/screens';
-import { Stars } from './Meters';
+import { RunnerLevelOne } from './LevelOneRunner';
 import { Clock, PassageBox, QuestionCard, QuestionGrid, SaveNote, SubmitDialog, TimeUpNotice } from './runnerParts';
 import { useQuizAttempt, type QuizAttemptSession } from './useQuizAttempt';
 
 // Màn hình làm bài toàn màn hình (không thanh điều hướng). Ba bố cục riêng theo cấp học của lớp, học sinh không chọn:
-// cấp 1 từng câu một, nút lớn, hình lớn, loa đọc to, hàng sao tiến độ, không đồng hồ; cấp 2 cân bằng, đồng hồ khi bài đặt giờ,
+// cấp 1 là bài chơi luyện tập (LevelOneRunner): từng câu một, kiểm ngay, thử lại, không sao, không đồng hồ; cấp 2 cân bằng, đồng hồ khi bài đặt giờ,
 // bảng số câu bên cạnh; cấp 3 gọn, luôn có đồng hồ, bảng số câu nằm ngang, tư liệu ghim bên trái, đánh dấu câu cần xem lại.
 
 interface RunnerProps {
@@ -25,77 +24,6 @@ export function QuizRunner({ attempt, onFinished }: RunnerProps) {
   const session = useQuizAttempt(attempt, onFinished);
   const Layout = { 1: RunnerLevelOne, 2: RunnerLevelTwo, 3: RunnerLevelThree }[attempt.level];
   return <Layout attempt={attempt} session={session} />;
-}
-
-// ---- Cấp 1 ----
-
-function RunnerLevelOne({ attempt, session }: LayoutProps) {
-  const [index, setIndex] = useState(0);
-  const [confirming, setConfirming] = useState(false);
-  const total = attempt.questions.length;
-  const question = attempt.questions[index]!;
-  const last = index === total - 1;
-  const goNext = () => {
-    if (!last) {
-      setIndex(index + 1);
-      window.scrollTo?.({ top: 0 });
-    } else if (session.unanswered.length > 0) setConfirming(true);
-    else void session.submit();
-  };
-
-  return (
-    <section data-bo-cuc="cap-1" className="min-h-dvh bg-background">
-      <title>{`${attempt.quizName ?? 'Bài kiểm tra'} · DiViet`}</title>
-      <header className="border-b-2 border-border bg-surface">
-        <div className="mx-auto flex max-w-[960px] flex-wrap items-center gap-4 px-4 py-3">
-          <ButtonLink to={pathOf('learnHome')} variant="secondary" size="lg" className="rounded-full">
-            Tạm dừng
-          </ButtonLink>
-          <h1 className="type-h3 min-w-0 flex-1 text-on-surface">{attempt.quizName}</h1>
-          <Stars total={total} count={clampStars(session.answeredCount, total)} size={28} />
-          <span className="type-label text-on-surface">
-            Câu {index + 1} / {total}
-          </span>
-        </div>
-      </header>
-      <div className="mx-auto flex max-w-[960px] flex-col gap-5 px-4 py-6">
-        <TimeUpNotice session={session} />
-        <QuestionCard
-          key={question.questionId}
-          question={question}
-          index={index}
-          total={total}
-          level={1}
-          answer={session.answers[question.questionId] ?? null}
-          onChange={(answer) => session.setAnswer(question, answer)}
-          readAloud={attempt.readAloud}
-          disabled={session.submitting}
-        />
-        <SaveNote status={session.saveStatus} savedAt={session.savedAt} />
-        <div className="flex flex-wrap gap-3">
-          {index > 0 && (
-            <Button variant="secondary" size="lg" className="rounded-full" onClick={() => setIndex(index - 1)}>
-              <Icon name="arrow-left" size={22} />
-              Câu trước
-            </Button>
-          )}
-          <Button size="lg" className="min-h-16 flex-1 rounded-full type-h3" onClick={goNext} loading={session.submitting && last}>
-            {last ? 'Xong rồi!' : 'Tiếp nhé'}
-          </Button>
-        </div>
-        <p className="text-center type-body-m text-on-surface-variant">Em chọn xong thì bấm "{last ? 'Xong rồi!' : 'Tiếp nhé'}". Bài chỉ chấm khi em làm hết.</p>
-      </div>
-      <SubmitDialog
-        open={confirming}
-        level={1}
-        unanswered={session.unanswered}
-        submitting={session.submitting}
-        error={session.submitError}
-        onBack={() => setConfirming(false)}
-        onSubmit={() => void session.submit()}
-      />
-    </section>
-  );
 }
 
 // ---- Cấp 2 ----

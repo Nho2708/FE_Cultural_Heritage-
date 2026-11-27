@@ -7,6 +7,7 @@ import {
   createDiscoveryApi,
   createGuestApi,
   createStudentApi,
+  createTtsApi,
   sessionEndNotice,
   type AdsApi,
   type ApiClient,
@@ -18,6 +19,7 @@ import {
 } from '@dsvhvn/dung-chung/api';
 import { isProfileLike, SessionStore } from '@dsvhvn/dung-chung/auth';
 import { adsAvailable } from '../ads/rewarded';
+import { configureCloudVoice, createVoiceSource } from '../speech/cloudVoice';
 import { API_BASE_URL, APP_CHANNEL, APP_VERSION } from '../config/env';
 import { KEYS, prefs, secure } from '../storage/keyValue';
 import { PersistentStorage } from '../storage/persistentStorage';
@@ -77,12 +79,16 @@ export async function createServices(getMode: () => AppMode | null): Promise<Ser
       if (getMode() === 'guest') {
         headers['X-Device-Key'] = deviceId;
         headers['X-Client-Platform'] = platform;
-        // Bản không có mô-đun quảng cáo (Expo Go) khai báo để máy chủ ở môi trường phát triển mở thẳng; môi trường thật bỏ qua tiêu đề này.
+        // Bản không có mô-đun quảng cáo (Expo Go, bản không quảng cáo đưa lên Google Play) khai báo để máy chủ mở thẳng tóm tắt và nghe;
+        // máy chủ chỉ nhận khai báo này khi cấu hình Ads:AllowNoAdsDeclaration bật.
         if (!adsAvailable()) headers['X-Ads-Unavailable'] = 'true';
       }
       return headers;
     },
   });
+
+  // Giọng đọc tiếng Việt do máy chủ tạo (cấp 1): dùng chung lớp gọi API nên tự gửi token của học sinh đang đăng nhập.
+  configureCloudVoice(createVoiceSource(createTtsApi(apiClient), API_BASE_URL));
 
   return { apiClient, discoveryApi: createDiscoveryApi(apiClient), guestApi: createGuestApi(apiClient), adsApi: createAdsApi(apiClient), studentApi: createStudentApi(apiClient), sessionStore, deviceId, platform };
 }

@@ -2,7 +2,7 @@
   "name": "@dsvhvn/video-gioi-thieu",
   "private": true,
   "version": "0.1.0",
-  "description": "Video giới thiệu Vietnam Heritage dựng bằng Remotion: đoạn logo, video cho khách du lịch (5 ngôn ngữ) và video cho nhà trường. Không triển khai; video xuất ra không đưa vào git.",
+  "description": "Video giới thiệu DiViet dựng bằng Remotion: đoạn logo, video cho khách du lịch (5 ngôn ngữ) và video cho nhà trường. Không triển khai; video xuất ra không đưa vào git.",
   "type": "module",
   "scripts": {
     "studio": "remotion studio src/index.ts",
@@ -12,14 +12,20 @@
     "dung": "node scripts/dung-video.mjs"
   },
   "dependencies": {
+    "@react-three/fiber": "9.8.1",
     "@remotion/cli": "4.0.530",
     "@remotion/google-fonts": "4.0.530",
+    "@remotion/three": "4.0.530",
+    "qrcode": "1.5.4",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "remotion": "4.0.530"
+    "remotion": "4.0.530",
+    "three": "0.186.1"
   },
   "devDependencies": {
+    "@types/qrcode": "1.5.5",
     "@types/react": "^19.3.0",
+    "@types/three": "0.186.0",
     "playwright-core": "1.63.0",
     "typescript": "6.0.3"
   }

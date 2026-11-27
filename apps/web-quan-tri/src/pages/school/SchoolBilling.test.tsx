@@ -13,24 +13,35 @@ import { renderApp, signInAs } from '../../test/renderApp';
 
 vi.setConfig({ testTimeout: 15_000 });
 
-const PLAN_TAB = '/truong/thong-tin?tab=goi-va-han-muc';
+const PLAN_TAB = '/truong/goi';
 let open: MockInstance<(url: string) => void>;
 
 beforeEach(() => {
   open = vi.spyOn(gateway, 'open').mockImplementation(() => undefined);
 });
 
-describe('Trường và gói — tab Gói và hạn mức', () => {
-  it('có ba tab và tab nằm trên URL; mặc định là Thông tin trường', async () => {
+describe('Gói đã mua — tab Gói và hạn mức', () => {
+  it('màn hình Gói đã mua có hai tab và tab nằm trên URL; mặc định là Gói và hạn mức', async () => {
     signInAs('ORG_ADMIN');
-    billingApi();
-    renderApp('/truong/thong-tin');
-    expect(await screen.findByRole('tab', { name: 'Thông tin trường', selected: true })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: 'Gói và hạn mức' })).toBeInTheDocument();
+    billingApi({ invoices: [invoiceOf(1)] });
+    renderApp('/truong/goi');
+    expect(await screen.findByRole('tab', { name: 'Gói và hạn mức', selected: true })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Hóa đơn và giao dịch' })).toBeInTheDocument();
 
-    await userEvent.setup().click(screen.getByRole('tab', { name: 'Gói và hạn mức' }));
-    expect(await screen.findByRole('heading', { level: 2, name: 'Cơ bản' })).toBeInTheDocument();
+    await userEvent.setup().click(screen.getByRole('tab', { name: 'Hóa đơn và giao dịch' }));
+    expect(await screen.findByRole('table', { name: 'Hóa đơn của trường' })).toBeInTheDocument();
+  });
+
+  it('đường dẫn cũ /truong/thong-tin?tab=goi-va-han-muc và ?tab=hoa-don tự chuyển hướng sang /truong/goi', async () => {
+    signInAs('ORG_ADMIN');
+    billingApi();
+    const first = renderApp('/truong/thong-tin?tab=goi-va-han-muc');
+    await waitFor(() => expect(first.router.state.location.pathname).toBe('/truong/goi'));
+    first.unmount();
+
+    const second = renderApp('/truong/thong-tin?tab=hoa-don');
+    await waitFor(() => expect(second.router.state.location.pathname).toBe('/truong/goi'));
+    expect(second.router.state.location.search).toBe('?tab=hoa-don');
   });
 
   it('gói đang dùng: trạng thái, ngày, còn lại, hạn mức giáo viên và lượt AI, ba nút', async () => {
@@ -238,7 +249,7 @@ describe('Thanh báo gói hết hiệu lực', () => {
   });
 });
 
-describe('Trường và gói — tab Hóa đơn và giao dịch', () => {
+describe('Gói đã mua — tab Hóa đơn và giao dịch', () => {
   const unpaid = invoiceOf(31, { description: 'Nâng cấp gói Nâng cao', amount: 3_990_000, status: 'UNPAID', canPay: true, dueAt: '2026-10-07T03:15:00Z' });
   const paid = invoiceOf(30);
   const cancelled = invoiceOf(24, { status: 'CANCELLED', description: 'Mua gói Cơ bản' });
@@ -246,7 +257,7 @@ describe('Trường và gói — tab Hóa đơn và giao dịch', () => {
   it('bảng hóa đơn: số, nội dung, tiền, trạng thái, ngày xuất, hạn; "Thanh toán" chỉ ở hóa đơn còn thanh toán được', async () => {
     signInAs('ORG_ADMIN');
     billingApi({ invoices: [unpaid, paid, cancelled] });
-    renderApp('/truong/thong-tin?tab=hoa-don');
+    renderApp('/truong/goi?tab=hoa-don');
 
     const table = await screen.findByRole('table', { name: 'Hóa đơn của trường' });
     expect(within(table).getByText('HD20261006-000031')).toBeInTheDocument();
@@ -274,7 +285,7 @@ describe('Trường và gói — tab Hóa đơn và giao dịch', () => {
       },
     });
     const user = userEvent.setup();
-    renderApp('/truong/thong-tin?tab=hoa-don');
+    renderApp('/truong/goi?tab=hoa-don');
 
     await user.click(await screen.findByRole('button', { name: /^Xem giao dịch của hóa đơn HD20261006-000030/ }));
     expect(await screen.findByText('Giao dịch của hóa đơn HD20261006-000030')).toBeInTheDocument();
@@ -297,7 +308,7 @@ describe('Trường và gói — tab Hóa đơn và giao dịch', () => {
         : undefined,
     );
     const user = userEvent.setup();
-    renderApp('/truong/thong-tin?tab=hoa-don');
+    renderApp('/truong/goi?tab=hoa-don');
 
     await user.click(await screen.findByRole('button', { name: 'Thanh toán hóa đơn HD20261006-000031' }));
     await waitFor(() => expect(open).toHaveBeenCalledWith('https://sandbox.vnpayment.vn/pay?x=1'));
@@ -312,7 +323,7 @@ describe('Trường và gói — tab Hóa đơn và giao dịch', () => {
         : undefined,
     );
     const user = userEvent.setup();
-    renderApp('/truong/thong-tin?tab=hoa-don');
+    renderApp('/truong/goi?tab=hoa-don');
 
     await user.click(await screen.findByRole('button', { name: 'Thanh toán hóa đơn HD20261006-000031' }));
     expect(await screen.findByText(MESSAGES.systemError)).toBeInTheDocument();
@@ -327,7 +338,7 @@ describe('Trường và gói — tab Hóa đơn và giao dịch', () => {
         : undefined,
     );
     const user = userEvent.setup();
-    renderApp('/truong/thong-tin?tab=hoa-don');
+    renderApp('/truong/goi?tab=hoa-don');
 
     await user.click(await screen.findByRole('button', { name: 'Thanh toán hóa đơn HD20261006-000031' }));
     expect(await screen.findByText('Không thể thanh toán hóa đơn. Hóa đơn đã quá hạn thanh toán.')).toBeInTheDocument();
@@ -337,7 +348,7 @@ describe('Trường và gói — tab Hóa đơn và giao dịch', () => {
   it('chưa có hóa đơn nào thì báo trạng thái rỗng', async () => {
     signInAs('ORG_ADMIN');
     billingApi({ invoices: [] });
-    renderApp('/truong/thong-tin?tab=hoa-don');
+    renderApp('/truong/goi?tab=hoa-don');
     expect(await screen.findByText('Trường chưa có hóa đơn nào.')).toBeInTheDocument();
   });
 });

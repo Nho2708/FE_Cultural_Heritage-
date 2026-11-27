@@ -280,7 +280,7 @@ try {
   await guest.goto(`${LEARNING_WEB}/di-san/${C.slug}`);
   await guest.getByRole('button', { name: 'Summary' }).click();
   await guest.getByText('This heritage site has no summary yet. You can still read the full content below.').waitFor();
-  check('Di sản C chưa có tóm tắt: báo một câu, không mở hộp thoại, không có cổng quảng cáo', (await guest.getByRole('dialog').count()) === 0);
+  check('Di sản C chưa có tóm tắt: báo một câu, không mở hộp thoại', (await guest.getByRole('dialog').count()) === 0);
 
   // Tóm tắt và nghe thuyết minh của di sản A.
   await guest.goto(`${LEARNING_WEB}/di-san/${A.slug}`);
